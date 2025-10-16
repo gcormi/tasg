@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - Italien</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Palette de couleurs "Tricolore Italiano" */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #009246; /* Vert */
+            --primary-600: #007a3b;
+            --primary-700: #006430;
+            --secondary-500: #ce2b37; /* Rouge */
+            --secondary-600: #b1242e;
+            --accent-500: #4a5568; 
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(0, 146, 70, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--primary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { .grid-2-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-monument icon"></i>
+                Générateur de Cours - Italien
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des séquences de cours d'Italien LV2 pour le collège (cycle 4).</p>
+    </div>
+
+    <section class="section">
+        <h2>Génération du Prompt de Séquence</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau (Classe) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="moduleSelect" class="label-text">Séquence :</label>
+                <select id="moduleSelect" class="select-field" disabled>
+                    <option value="">-- Choisir un thème puis une séquence --</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="specialFocusInput" class="label-text">Œuvre ou Thème Spécifique (Optionnel) :</label>
+            <input type="text" id="specialFocusInput" class="input-field" placeholder="Ex: La Sicile, un film de Fellini, la Renaissance à Florence...">
+        </div>
+
+        <div class="form-group">
+            <label class="label-text">Documents d'Appui (Optionnel) :</label>
+            <p style="font-size:0.9rem; color:var(--neutral-500); margin-top:-0.5rem; margin-bottom:1rem;">Si vous remplissez un de ces champs, l'IA construira toute la séquence autour de vos documents.</p>
+            <div class="grid-2-cols">
+                <textarea id="videoLinks" class="textarea-field" rows="3" placeholder="Liens Vidéo (un par ligne)"></textarea>
+                <textarea id="audioLinks" class="textarea-field" rows="3" placeholder="Liens Audio (un par ligne)"></textarea>
+                <textarea id="webLinks" class="textarea-field" rows="3" placeholder="Liens de Sites Web (un par ligne)"></textarea>
+                <textarea id="textDocuments" class="textarea-field" rows="3" placeholder="Texte(s) à utiliser (copier-coller ici)"></textarea>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+
+        <div class="form-group" style="text-align: center; margin-top: 2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Générer Prompt pour Séquence
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séquence généré :</label>
+            <textarea id="outputPrompt" rows="12" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séquence apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modulesData = {
+        "5e": {
+            1: { mainTheme: "Rencontres avec d'autres cultures", title: "Presentarsi: Ciao, come ti chiami?", skills: "Saluer et prendre congé. Se présenter (nom, âge, nationalité). (A1)", knowledge: "Vocabulaire des salutations. Pronoms sujets. Grammaire: le présent du verbe essere (être)." },
+            2: { mainTheme: "École et société", title: "A scuola", skills: "Nommer les objets de la classe. Décrire son emploi du temps simple. (A1)", knowledge: "Vocabulaire de l'école (materie, oggetti). Articles définis. Noms (genre et nombre)." },
+            3: { mainTheme: "École et société", title: "Cosa mangiamo oggi?", skills: "Nommer des aliments et des boissons. Commander au bar ou au restaurant. (A1+/A2)", knowledge: "Vocabulaire des repas et de la nourriture. Verbes volere et prendere. La structure partitive (del, della...)." },
+            4: { mainTheme: "Rencontres avec d'autres cultures", title: "La mia famiglia", skills: "Présenter sa famille. Décrire des liens de parenté. (A1)", knowledge: "Vocabulaire de la famille. Adjectifs possessifs. Grammaire: le présent du verbe avere (avoir)." },
+            5: { mainTheme: "Rencontres avec d'autres cultures", title: "Che tempo fa?", skills: "Décrire la météo. Parler des saisons. (A2)", knowledge: "Vocabulaire de la météo. Verbe fare pour la météo. Les saisons." },
+            6: { mainTheme: "L'imaginaire", title: "Il mio animale preferito", skills: "Décrire un animal. Exprimer ses préférences. (A1)", knowledge: "Vocabulaire des animaux. Adjectifs de couleur et de taille. Verbe piacere." },
+            7: { mainTheme: "Voyages et migrations", title: "In giro per la città", skills: "Nommer les lieux de la ville. Demander et indiquer une direction simple. (A2)", knowledge: "Vocabulaire de la ville (negozi, monumenti). Prépositions de lieu (a, in, da). Verbe andare." },
+            8: { mainTheme: "Voyages et migrations", title: "La bella Roma", skills: "Identifier quelques monuments célèbres de Rome. Comprendre une description de carte postale. (A2)", knowledge: "Les monuments de Rome (Colosseo, Fontana di Trevi...). C'è / Ci sono." },
+            9: { mainTheme: "Langages", title: "Chiedere e dire l'ora", skills: "Demander et dire l'heure. Comprendre des horaires simples. (A1)", knowledge: "Les nombres de 1 à 60. Les expressions 'Che ore sono?', 'Sono le...'" }
+        },
+        "4e": {
+            10: { mainTheme: "École et société", title: "La giornata di uno studente italiano", skills: "Décrire et comparer des routines quotidiennes. (A2)", knowledge: "Le 'passato prossimo' (avec avere et essere). Verbes réfléchis. Connecteurs temporels (prima, dopo...)." },
+            11: { mainTheme: "École et société", title: "La moda italiana", skills: "Décrire des vêtements et des styles. Donner son opinion sur la mode. (A2)", knowledge: "Vocabulaire des vêtements et des accessoires. Adjectifs qualificatifs et leur accord." },
+            12: { mainTheme: "Rencontres avec d'autres cultures", title: "Le feste italiane", skills: "Comprendre un texte sur une fête traditionnelle italienne. Décrire une célébration. (A2)", knowledge: "Vocabulaire des fêtes (Carnevale, Ferragosto...). L'imparfait pour décrire des scènes." },
+            13: { mainTheme: "L'imaginaire", title: "Pinocchio, una storia mondiale", skills: "Lire et comprendre un extrait simplifié de l'histoire de Pinocchio. Raconter une anecdote au passé. (A2+)", knowledge: "L'imparfait et le 'passato prossimo' dans un récit. Vocabulaire du conte." },
+            14: { mainTheme: "L'imaginaire", title: "Supereroi all'italiana", skills: "Imaginer un super-héros et décrire ses pouvoirs et sa mission. (A2)", knowledge: "Le futur simple pour parler de projets. Vocabulaire des pouvoirs et des qualités." },
+            15: { mainTheme: "Voyages et migrations", title: "Le mie vacanze", skills: "Raconter ses vacances passées. Écrire une carte postale. (A2)", knowledge: "Révision du 'passato prossimo'. Prépositions articulées (al, nello, sulla...)." },
+            16: { mainTheme: "Voyages et migrations", title: "Un viaggio nelle regioni d'Italia", skills: "Présenter une région italienne (capitale, spécialités). Comprendre une brochure touristique. (A2+)", knowledge: "Les régions italiennes. Le superlatif relatif (il più bello). Géographie de l'Italie." },
+            17: { mainTheme: "Langages", title: "Al cinema!", skills: "Parler d'un film. Donner son avis. Inviter quelqu'un. (A2)", knowledge: "Vocabulaire du cinéma. Verbe piacere au passé. Expressions pour donner son opinion." },
+            18: { mainTheme: "Langages", title: "La musica italiana", skills: "Écouter et comprendre les paroles d'une chanson simple. Parler de ses goûts musicaux. (A2)", knowledge: "Vocabulaire de la musique. Pronoms directs (lo, la, li, le)." }
+        },
+        "3e": {
+            19: { mainTheme: "École et société", title: "Il mondo del lavoro in Italia", skills: "Comprendre une petite annonce pour un job d'été. Rédiger un court CV. (A2+/B1)", knowledge: "Vocabulaire du travail. Le conditionnel présent (vorrei, potrei)." },
+            20: { mainTheme: "École et société", title: "L'Italia e l'ecologia", skills: "Comprendre un article simple sur un enjeu environnemental en Italie. Proposer des solutions. (B1)", knowledge: "Vocabulaire de l'environnement (inquinamento, riciclaggio...). L'impératif pour donner des conseils." },
+            21: { mainTheme: "Rencontres avec d'autres cultures", title: "L'emigrazione italiana nel mondo", skills: "Comprendre un témoignage d'un émigré italien. Raconter un parcours de vie. (B1)", knowledge: "L'imparfait et le 'passato prossimo' pour la biographie. Les raisons de l'émigration." },
+            22: { mainTheme: "Rencontres avec d'autres cultures", title: "Personaggi che hanno fatto l'Italia", skills: "Lire une biographie simple (Léonard de Vinci, Garibaldi...). Présenter un personnage historique. (A2+)", knowledge: "Le 'passato remoto' (reconnaissance passive). Vocabulaire historique et artistique." },
+            23: { mainTheme: "L'imaginaire", title: "Un film di Roberto Benigni", skills: "Comprendre et résumer l'intrigue d'un film. Débattre de son message. (B1)", knowledge: "Vocabulaire de l'analyse de film. Expressions pour argumenter et débattre." },
+            24: { mainTheme: "Voyages et migrations", title: "Scoprire la Sicilia", skills: "Préparer un itinéraire de voyage en Sicile. Comprendre des informations touristiques et culturelles. (A2+/B1)", knowledge: "Le futur simple. Vocabulaire du tourisme et de la culture (art, gastronomie)." },
+            25: { mainTheme: "Voyages et migrations", title: "I miei progetti per il futuro", skills: "Parler de ses projets d'avenir (études, voyages, métier). Exprimer des rêves et des espoirs. (B1)", knowledge: "Le futur simple et le conditionnel présent. Vocabulaire de l'orientation et des projets personnels." },
+            26: { mainTheme: "Langages", title: "La lingua dei gesti", skills: "Découvrir et interpréter quelques gestes typiquement italiens. Comprendre la communication non verbale. (A2)", knowledge: "La communication non-verbale. Expressions idiomatiques liées aux gestes." },
+            27: { mainTheme: "Langages", title: "Leggere un articolo di giornale", skills: "Comprendre les points essentiels d'un article de presse simple. Résumer une information. (B1)", knowledge: "Structure d'un article de journal. Le passif (forme passive). Vocabulaire de l'actualité." }
+        }
+    };
+    
+    const gradeSelect = document.getElementById('gradeSelect');
+    const moduleSelect = document.getElementById('moduleSelect');
+    const specialFocusInput = document.getElementById('specialFocusInput');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+    const videoLinksInput = document.getElementById('videoLinks');
+    const audioLinksInput = document.getElementById('audioLinks');
+    const webLinksInput = document.getElementById('webLinks');
+    const textDocumentsInput = document.getElementById('textDocuments');
+
+    function populateModules(grade) {
+        moduleSelect.innerHTML = '<option value="">-- Choisir un thème puis une séquence --</option>';
+        moduleSelect.disabled = true;
+        if (grade && modulesData[grade]) {
+            const modulesForGrade = modulesData[grade];
+            const themes = [...new Set(Object.values(modulesForGrade).map(item => item.mainTheme))];
+            
+            themes.forEach(theme => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `Thème : ${theme}`;
+                
+                Object.keys(modulesForGrade).forEach(key => {
+                    const moduleItem = modulesForGrade[key];
+                    if (moduleItem.mainTheme === theme) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = moduleItem.title;
+                        optgroup.appendChild(option);
+                    }
+                });
+                moduleSelect.appendChild(optgroup);
+            });
+            
+            moduleSelect.disabled = false;
+        }
+    }
+
+    gradeSelect.addEventListener('change', () => populateModules(gradeSelect.value));
+
+    generateButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = moduleSelect.value;
+        const specialFocus = specialFocusInput.value.trim();
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!grade || !moduleKey || !outputFormatRadio) {
+            alert("Veuillez choisir un niveau, une séquence et un format de sortie.");
+            return;
+        }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const outputFormat = outputFormatRadio.value;
+
+        const videoLinks = videoLinksInput.value.trim();
+        const audioLinks = audioLinksInput.value.trim();
+        const webLinks = webLinksInput.value.trim();
+        const textDocuments = textDocumentsInput.value.trim();
+        let sourceMaterialsPrompt = "";
+        
+        let sources = [];
+        if (videoLinks) sources.push(`- Liens Vidéo :\n${videoLinks}`);
+        if (audioLinks) sources.push(`- Liens Audio :\n${audioLinks}`);
+        if (webLinks) sources.push(`- Liens Sites Web :\n${webLinks}`);
+        if (textDocuments) sources.push(`- Contenu Texte Fourni :\n"""\n${textDocuments}\n"""`);
+
+        if (sources.length > 0) {
+            sourceMaterialsPrompt = `**DOCUMENT(S) D'APPUI FOURNI(S) PAR L'ENSEIGNANT :**\n` +
+            `ATTENTION : Tu dois **impérativement** construire toute la séquence (activités, exemples, tâche finale) autour du ou des documents suivants.\n` +
+            sources.join('\n\n') + `\n\n`;
+        }
+        
+        let promptText = `Tu agis en tant que professeur d'italien expérimenté, concepteur de séquences pédagogiques basées sur le CECRL. Ta mission est de rédiger le déroulé complet d'une séquence d'italien pour des élèves de ${grade}, prête à être utilisée.\n\n` +
+            `**Séquence à traiter :** "${moduleDetails.title}"\n` +
+            `**Thème Culturel Principal :** ${moduleDetails.mainTheme}\n` +
+            `**Format de Sortie Requis :** ${outputFormat.toUpperCase()}\n\n`;
+
+        if (specialFocus) {
+            promptText += `**Focus Spécifique de l'Enseignant :** Toute la séquence devra s'articuler autour de : **${specialFocus}**.\n\n`;
+        }
+
+        if (sourceMaterialsPrompt) {
+            promptText += sourceMaterialsPrompt;
+        }
+
+        promptText += `---
+            **STRUCTURE ET CONTENU DÉTAILLÉ DE LA SÉQUENCE À RÉDIGER**\n\n` +
+            `**1. Titre et Problématique :**\n` +
+            `Titre : ${moduleDetails.title.toUpperCase()}\n` +
+            `Problématique (Objectif de communication) : Formule une question engageante qui résume ce que l'élève saura faire à la fin. (Ex: "Come posso presentare la mia famiglia?").\n\n` +
+            (sourceMaterialsPrompt ? `**2. Analyse des Documents Fournis et Activités :**\n` : `**2. Document d'Appui Principal et Activités :**\nChoisis et décris un document authentique principal (court texte, etc.).\n`) +
+            `À partir du ou des documents d'appui, décris une série d'activités pour chaque compétence du CECRL :\n` +
+            `   a) **Compréhension :** Questions pour guider la compréhension.\n` +
+            `   b) **Expression Écrite :** Une courte tâche pour réutiliser le vocabulaire/la grammaire.\n` +
+            `   c) **Expression Orale (Continu/Interaction) :** Des questions pour un débat ou une présentation.\n\n`+
+            `**3. Points de Langue (Language Focus) :**\n` +
+            `   a) **Grammaire :** Explique de manière simple le point de grammaire : "${(moduleDetails.knowledge.split('Grammaire: ')[1] || 'Point de grammaire principal')}". Les exemples doivent être tirés des documents d'appui fournis.\n` +
+            `   b) **Vocabulaire :** Liste 10-15 mots et expressions essentiels tirés des documents d'appui.\n\n` +
+            `**4. Tâche Finale (Final Task) :**\n` +
+            `Décris un projet de production finale (oral ou écrit) où les élèves devront mobiliser tout ce qu'ils ont appris, en lien avec les documents d'appui.\n\n` +
+            `**RÈGLE FINALE :** Ton texte doit être immédiatement utilisable par un élève. Ne rédige aucune note pour le professeur.`;
+        
+        if (outputFormat === 'html') {
+            promptText += `\n\n**CONSIGNES SPÉCIFIQUES AU FORMAT HTML :**\n` +
+            `- Le code doit être un fichier HTML unique et responsive.\n` +
+            `- Si des liens YouTube/audio sont fournis, intègre-les directement dans des lecteurs (<iframe>).`;
+        } else {
+             promptText += `\n\n**CONSIGNES SPÉCIFIQUES AU FORMAT DOCX :**\n` +
+            `- Structure clairement le document avec des titres.\n` +
+            `- Mets les points de grammaire et le vocabulaire essentiel en gras.`;
+        }
+
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt généré !", "success");
+    });
+    
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, duration);
+    }
+
+    function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") {
+            if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error');
+            return;
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            if (messageElement) showFeedback(messageElement, successText, 'success');
+        }).catch(err => {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        });
+    }
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = moduleSelect.value;
+        if (!grade || !moduleKey) { alert("Sélectionnez un niveau et une séquence."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const videoLinks = videoLinksInput.value.trim();
+        const textDocuments = textDocumentsInput.value.trim();
+        let supportText = "";
+        if (videoLinks || textDocuments) {
+            supportText = " à partir des documents fournis";
+        }
+        const logbookText = `Italien ${grade} - Séquence sur "${moduleDetails.title}". Objectif : ${moduleDetails.skills}${supportText}. Notions : ${moduleDetails.knowledge}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = moduleSelect.value;
+        if (!grade || !moduleKey) { alert("Sélectionnez un niveau et une séquence."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const videoLinks = videoLinksInput.value.trim();
+        const textDocuments = textDocumentsInput.value.trim();
+        let supportText = "";
+        if (videoLinks || textDocuments) {
+            supportText = " en s'appuyant sur les documents fournis";
+        }
+        const summaryText = `Résumé (Italien - ${moduleDetails.title}) :\nÀ la fin de cette séquence${supportText}, tu dois connaître : ${moduleDetails.knowledge}.\nTu dois être capable de : ${moduleDetails.skills}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+    
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboardUtil(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+});
+</script>
+
+</body>
+</html>

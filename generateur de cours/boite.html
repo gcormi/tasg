@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail des Outils Pédagogiques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Un gris-bleu très clair */
+        }
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .tool-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border-left-width: 4px;
+            position: relative;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+        .card-edit { border-color: #3b82f6; /* Blue */ }
+        .card-run { border-color: #16a34a; /* Green */ }
+        .card-generate { border-color: #8b5cf6; /* Violet */ }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .output-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+        .badge-html { background-color: #e0f2fe; color: #0369a1; } /* Light Blue */
+        .badge-docx { background-color: #dbeafe; color: #1e40af; } /* Blue */
+        .badge-img-doc { background-color: #dcfce7; color: #15803d; } /* Green */
+        .badge-prompt { background-color: #f3e8ff; color: #581c87; } /* Purple */
+        .badge-xml { background-color: #fef9c3; color: #854d0e; } /* Yellow */
+
+    </style>
+</head>
+<body class="text-slate-700">
+    <div class="container mx-auto max-w-5xl px-4 py-12">
+        
+        <a href="index.html" class="mb-8 inline-block bg-white/80 backdrop-blur-sm text-slate-700 font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-white transition-all items-center gap-2">
+            <i class="fas fa-arrow-left mr-2"></i>Retour à l'accueil
+        </a>
+        
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-800">
+                Votre Boîte à Outils Pédagogiques
+            </h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.
+            </p>
+        </header>
+
+        <!-- Section 1: Éditer et Retoucher -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-4">
+                <i class="fas fa-edit text-blue-500"></i>
+                Usage 1 : Éditer et Retoucher Visuellement
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <a href="Atelier-web.html" class="tool-card card-edit bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-html">HTML</span>
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="card-icon flex-shrink-0 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-paint-brush text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Atelier Web</h3>
+                            <p class="text-sm text-slate-500">Éditeur Visuel Principal</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600">Chargez une page HTML et modifiez textes et images directement, comme dans un traitement de texte. Parfait pour les ajustements finaux.</p>
+                </a>
+                <a href="integrateur-visuel.html" class="tool-card card-edit bg-white p-6 rounded-lg shadow-md">
+                     <span class="output-badge badge-html">HTML</span>
+                     <div class="flex items-center gap-4 mb-4">
+                        <div class="card-icon flex-shrink-0 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-magic text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Intégrateur Visuel</h3>
+                            <p class="text-sm text-slate-500">Éditeur Visuel Alternatif</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600">Une autre version de l'éditeur visuel pour retoucher vos pages HTML sans code, avec gestion des images et export facile.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 2: Exécuter le code -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-4">
+                <i class="fas fa-cogs text-green-500"></i>
+                Usage 2 : Exécuter le Code
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <a href="html.html" class="tool-card card-run bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-html">HTML</span>
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="card-icon flex-shrink-0 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-play-circle text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Visualiseur / Sauvegardeur</h3>
+                             <p class="text-sm text-slate-500">Testeur de code HTML</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600">Collez un bloc de code fourni par une IA pour le visualiser instantanément et le télécharger en tant que fichier `.html` fonctionnel.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 3: Générer les Prompts -->
+        <section>
+            <h2 class="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-4">
+                <i class="fas fa-rocket text-purple-500"></i>
+                Usage 3 : Générer les Instructions (Prompts)
+            </h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="exercices.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-img-doc">PNG/DOCX</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Exercices Visuels</h3>
+                        <p class="text-slate-600">Crée un prompt pour générer des exercices (QCM, etc.) à exporter en image ou document.</p>
+                    </div>
+                </a>
+                <a href="exercices2.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-xml">XML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Exercices Avancés & Moodle</h3>
+                        <p class="text-slate-600">Génère des prompts pour des fichiers XML Moodle ou des contenus créatifs.</p>
+                    </div>
+                </a>
+                <a href="generateurjeux.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Parcours Multi-Jeux</h3>
+                        <p class="text-slate-600">Crée un prompt pour une page web contenant plusieurs jeux en onglets.</p>
+                    </div>
+                </a>
+                <a href="escapegame.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Jeu Pédagogique Complet</h3>
+                        <p class="text-slate-600">Génère un prompt pour un quiz interactif complet de type "escape game".</p>
+                    </div>
+                </a>
+                <a href="motscroises.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Mots Croisés</h3>
+                        <p class="text-slate-600">Outil spécialisé pour générer un prompt de jeu de mots croisés.</p>
+                    </div>
+                </a>
+                <a href="motsmeles.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Mots Mêlés</h3>
+                        <p class="text-slate-600">Outil spécialisé pour générer un prompt de jeu de mots mêlés.</p>
+                    </div>
+                </a>
+                <a href="association.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Jeu d'Association</h3>
+                        <p class="text-slate-600">Outil pour générer un prompt de jeu de tri par glisser-déposer.</p>
+                    </div>
+                </a>
+                <a href="memory.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Jeu de Memory</h3>
+                        <p class="text-slate-600">Outil pour générer un prompt de jeu de Memory (paires de cartes).</p>
+                    </div>
+                </a>
+                <a href="design.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-prompt">Prompt → HTML</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Amélioration HTML</h3>
+                        <p class="text-slate-600">Génère un prompt pour modifier un cours HTML existant (design, contenu).</p>
+                    </div>
+                </a>
+                <a href="ameliorer_docx.html" class="tool-card card-generate bg-white p-6 rounded-lg shadow-md">
+                    <span class="output-badge badge-docx">Prompt → DOCX</span>
+                    <div class="pr-20">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Amélioration Texte/DOCX</h3>
+                        <p class="text-slate-600">Génère un prompt pour réécrire et enrichir un texte brut.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
+

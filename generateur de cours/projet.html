@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Projet Pédagogique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        
+        :root {
+            /* Palette de couleurs moderne et vibrante */
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            --primary-800: #3730a3;
+            --accent-500: #8b5cf6; 
+            --accent-600: #7c3aed; 
+            --accent-700: #6d28d9;
+            --secondary-500: #10b981; 
+            --secondary-600: #059669;
+            --secondary-700: #047857;
+            --tertiary-500: #f59e0b;
+            --tertiary-600: #d97706;
+            
+            /* Couleurs neutres */
+            --neutral-50: #f8fafc; 
+            --neutral-100: #f1f5f9; 
+            --neutral-200: #e2e8f0; 
+            --neutral-300: #cbd5e1; 
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b; 
+            --neutral-600: #475569;
+            --neutral-700: #334155; 
+            --neutral-800: #1e293b;
+            --neutral-900: #0f172a;
+            --white: #ffffff;
+            
+            /* Typographie */
+            --font-primary: 'Poppins', sans-serif; 
+            --font-secondary: 'Inter', sans-serif;
+            
+            /* Ombres modernes */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            
+            /* Rayons de bordure */
+            --border-radius-sm: 0.375rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem; 
+            --border-radius-xl: 1rem;
+            --border-radius-2xl: 1.5rem;
+            --border-radius-3xl: 2rem;
+            
+            /* Transitions */
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Effets spéciaux */
+            --shadow-focus-ring: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            --danger-500: #ef4444; 
+            --success-500: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            font-family: var(--font-secondary); 
+            background-color: var(--neutral-100);
+            color: var(--neutral-700); 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+
+        .header-container, .section { 
+            background: var(--white);
+            padding: 2.5rem; 
+            border-radius: var(--border-radius-2xl); 
+            box-shadow: var(--shadow-xl); 
+            margin-bottom: 2rem;
+            border: 1px solid var(--neutral-200);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-default);
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .page-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--neutral-200); 
+            padding-bottom: 2rem; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .back-button { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            padding: 0.75rem 1.5rem; 
+            background-color: var(--neutral-200);
+            color: var(--neutral-700); 
+            text-decoration: none; 
+            border-radius: var(--border-radius-xl); 
+            font-weight: 600; 
+            transition: var(--transition-default);
+            box-shadow: var(--shadow-md);
+        }
+
+        .back-button:hover { 
+            background-color: var(--neutral-300);
+            transform: translateX(-5px) translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .page-header h1 { 
+            font-family: var(--font-primary); 
+            font-size: clamp(2rem, 5vw, 3rem); 
+            color: var(--primary-600);
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            margin: 0; 
+            text-align: center; 
+            flex-grow: 1; 
+            justify-content: center;
+            position: relative;
+        }
+
+        .page-header h1 .icon { 
+            color: var(--accent-500);
+        }
+
+        .page-header-subtitle { 
+            text-align: center; 
+            font-size: 1.2rem; 
+            color: var(--neutral-600);
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        .section h2 { 
+            font-family: var(--font-primary); 
+            font-size: 2rem; 
+            color: var(--primary-700);
+            margin-bottom: 2rem; 
+            border-bottom: 2px solid var(--neutral-200); 
+            padding-bottom: 1rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-500);
+            border-radius: 2px;
+        }
+
+        .section h3 { 
+            font-family: var(--font-primary); 
+            font-size: 1.5rem; 
+            color: var(--neutral-800); 
+            margin-bottom: 1.5rem; 
+            margin-top: 2.5rem; 
+            border-left: 5px solid var(--accent-500); 
+            padding-left: 1.5rem;
+        }
+
+        .form-group { 
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .label-text { 
+            display: block; 
+            font-weight: 600; 
+            color: var(--neutral-700); 
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .input-field, .select-field, .textarea-field { 
+            width: 100%; 
+            box-sizing: border-box; 
+            padding: 1rem 1.25rem; 
+            border: 2px solid var(--neutral-300); 
+            border-radius: var(--border-radius-lg); 
+            background-color: var(--neutral-50);
+            font-size: 1rem; 
+            color: var(--neutral-700); 
+            transition: var(--transition-default); 
+            font-family: var(--font-secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .input-field:focus, .select-field:focus, .textarea-field:focus { 
+            outline: none; 
+            border-color: var(--primary-500); 
+            box-shadow: var(--shadow-focus-ring);
+            background: var(--white);
+        }
+
+        .textarea-field {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn { 
+            padding: 1rem 2rem; 
+            border-radius: var(--border-radius-xl); 
+            font-weight: 700; 
+            cursor: pointer; 
+            border: none; 
+            transition: var(--transition-default); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.75rem;
+            font-size: 1rem;
+            font-family: var(--font-secondary);
+            box-shadow: var(--shadow-lg);
+        }
+
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: var(--white);
+        }
+
+        .btn-primary:hover:not(:disabled) { 
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary { 
+            background-color: var(--secondary-500);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover:not(:disabled) { 
+            background-color: var(--secondary-600);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .grid-2-cols { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 2rem;
+        }
+
+        .radio-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .feedback-message { 
+            transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;
+        }
+        .feedback-message.show { 
+            opacity: 1; max-height: 40px;
+        }
+        .feedback-message.success { 
+            color: var(--secondary-700);
+        }
+        .feedback-message.error { 
+            color: var(--danger-500);
+        }
+
+        .subsection-tools h2 { 
+            color: var(--secondary-600);
+        }
+
+        .discipline-button-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 2rem;
+        }
+
+        .discipline-button { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 2.5rem; 
+            border-radius: var(--border-radius-2xl); 
+            background-color: var(--white);
+            border: 2px solid var(--neutral-200); 
+            text-decoration: none; 
+            color: var(--neutral-800); 
+            text-align: center; 
+            transition: var(--transition-default);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .discipline-button:hover { 
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-300);
+        }
+
+        .discipline-button .icon { 
+            font-size: 3rem; 
+            margin-bottom: 1rem;
+            color: var(--primary-500);
+        }
+
+        .discipline-button .title { 
+            font-family: var(--font-primary); 
+            font-size: 1.3rem; 
+            font-weight: 700;
+            color: var(--neutral-800);
+        }
+        
+        @media (max-width: 768px) { 
+            body {
+                padding: 1rem;
+            }
+            .grid-2-cols { 
+                grid-template-columns: 1fr; 
+            }
+            .header-container, .section {
+                padding: 1.5rem;
+            }
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+            <h1><i class="fas fa-sitemap icon"></i> Générateur de Projet Pédagogique</h1>
+        </header>
+        <p class="page-header-subtitle">Un outil flexible et puissant pour créer des prompts de cours ou de projets transversaux sur mesure.</p>
+    </div>
+
+    <section class="section">
+        <h2><i class="fas fa-bullseye"></i> Paramètres du Projet</h2>
+        
+        <h3><i class="fas fa-bullseye"></i> Le Cœur du Projet</h3>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="mainThemeInput" class="label-text">Thème Principal du Projet (Obligatoire) :</label>
+                <input type="text" id="mainThemeInput" class="input-field" placeholder="Ex: Construire une ville sur Mars, L'eau et nous...">
+            </div>
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau de la Classe (Obligatoire) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="Cycle 4">Cycle 4 (général)</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="disciplinesInput" class="label-text">Disciplines à Intégrer (Optionnel) :</label>
+            <input type="text" id="disciplinesInput" class="input-field" placeholder="Ex: SVT, Technologie, Français, Mathématiques...">
+        </div>
+        <div class="form-group">
+            <label for="goalInput" class="label-text">Objectif Final / Production Attendue (Obligatoire) :</label>
+            <input type="text" id="goalInput" class="input-field" placeholder="Ex: Créer une maquette, réaliser un podcast, rédiger une charte...">
+        </div>
+
+        <h3><i class="fas fa-book-open"></i> Contenu et Ressources</h3>
+        <div class="form-group">
+            <label for="topicsTextarea" class="label-text">Axes d'étude / Sujets à aborder (Obligatoire) :</label>
+            <textarea id="topicsTextarea" class="textarea-field" rows="4" placeholder="Un point par ligne pour plus de clarté..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="label-text">Ressources et Documents d'Appui (Optionnel) :</label>
+            <div class="grid-2-cols">
+                <textarea id="videoLinks" class="textarea-field" rows="3" placeholder="Liens Vidéo (un par ligne)"></textarea>
+                <textarea id="webLinks" class="textarea-field" rows="3" placeholder="Liens de Sites Web (un par ligne)"></textarea>
+            </div>
+            <textarea id="textDocuments" class="textarea-field" style="margin-top:1rem;" rows="4" placeholder="Texte(s) brut(s) à utiliser (copier-coller ici)"></textarea>
+        </div>
+        
+        <h3><i class="fas fa-cogs"></i> Format et Structure</h3>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2><i class="fas fa-magic"></i> Génération du Prompt</h2>
+        <div class="form-group" style="text-align: center;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Générer le Prompt de Projet
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Projet généré :</label>
+            <textarea id="outputPrompt" rows="12" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération du projet apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2><i class="fas fa-tools"></i> Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const mainThemeInput = document.getElementById('mainThemeInput');
+    const gradeSelect = document.getElementById('gradeSelect');
+    const disciplinesInput = document.getElementById('disciplinesInput');
+    const goalInput = document.getElementById('goalInput');
+    const topicsTextarea = document.getElementById('topicsTextarea');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const videoLinksInput = document.getElementById('videoLinks');
+    const webLinksInput = document.getElementById('webLinks');
+    const textDocumentsInput = document.getElementById('textDocuments');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+
+    function showFeedback(element, message, type = 'success') {
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, 3000);
+    }
+
+    function copyToClipboard(text, messageElement) {
+        if (!text || text.trim() === "") {
+            showFeedback(messageElement, "Rien à copier.", 'error');
+            return;
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            showFeedback(messageElement, "Copié avec succès !", 'success');
+        }).catch(err => {
+            console.error('Erreur de copie:', err);
+            showFeedback(messageElement, 'Erreur de copie.', 'error');
+        });
+    }
+
+    generateButton.addEventListener('click', () => {
+        const mainTheme = mainThemeInput.value.trim();
+        const grade = gradeSelect.value;
+        const disciplines = disciplinesInput.value.trim();
+        const goal = goalInput.value.trim();
+        const topics = topicsTextarea.value.trim();
+        const outputFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+        const videoLinks = videoLinksInput.value.trim();
+        const webLinks = webLinksInput.value.trim();
+        const textDocuments = textDocumentsInput.value.trim();
+        
+        if (!mainTheme || !grade || !goal || !topics) {
+            alert("Veuillez remplir tous les champs obligatoires.");
+            return;
+        }
+
+        let sourceMaterialsPrompt = "";
+        let sources = [];
+        if (videoLinks) sources.push(`- Liens Vidéo à utiliser comme référence principale :\n${videoLinks}`);
+        if (webLinks) sources.push(`- Sites Web à utiliser comme référence principale :\n${webLinks}`);
+        if (textDocuments) sources.push(`- Texte(s) suivant(s) à utiliser comme base de contenu :\n"""\n${textDocuments}\n"""`);
+
+        if (sources.length > 0) {
+            sourceMaterialsPrompt = `**RESSOURCES FONDAMENTALES FOURNIES :**\n` +
+            `ATTENTION : Le projet doit impérativement s'articuler autour des ressources suivantes. Elles sont le point de départ de l'analyse et des exemples.\n` +
+            sources.join('\n\n') + `\n\n`;
+        }
+
+        let promptText = `**RÔLE ET MISSION :**
+Tu agis en tant qu'ingénieur pédagogique expert en approches par projet et en interdisciplinarité. Ta mission est de rédiger un **document de cadrage de projet complet**, destiné à des élèves de niveau ${grade}.
+
+**PARAMÈTRES DU PROJET :**
+- **Thème Principal :** ${mainTheme}
+${disciplines ? `- **Disciplines à intégrer :** ${disciplines}\n` : ''}` +
+`- **Objectif Final (Production attendue) :** ${goal}
+- **Axes d'étude à aborder :**\n${topics.split('\n').map(t => `- ${t.trim()}`).join('\n')}
+- **Format de Sortie Requis :** ${outputFormat.toUpperCase()}\n\n`;
+
+        if (sourceMaterialsPrompt) {
+            promptText += sourceMaterialsPrompt;
+        }
+
+        promptText += `---
+**STRUCTURE ET CONTENU DÉTAILLÉ À RÉDIGER POUR LES ÉLÈVES :**
+
+**1. TITRE DU PROJET**
+(Propose un titre engageant pour le projet : ${mainTheme})
+
+**2. INTRODUCTION ET MISE EN SITUATION**
+Rédige une introduction qui présente le projet, ses enjeux, son lien avec le monde réel et qui motive les élèves. Présente la production finale attendue.
+
+**3. PROBLÉMATIQUE CENTRALE**
+Formule une problématique claire qui guidera tout le projet.
+
+**4. AXES D'ÉTUDE ET PISTES DE RECHERCHE**
+Pour chaque axe d'étude fourni (${topics.replace(/\n/g, ', ')}), développe un court paragraphe qui explique ce qui sera étudié et quelles questions se poser.
+
+**5. CONCLUSION ET BILAN ATTENDU**
+Rédige une conclusion qui résume les grands apprentissages visés par le projet et ce que les élèves devront avoir compris à la fin.
+
+**RÈGLE FINALE :** Ton texte doit être immédiatement utilisable. Ne rédige **aucune note pour le professeur**. Ton unique sortie est le cours lui-même.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, 'Prompt généré avec succès !', 'success');
+    });
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const mainTheme = mainThemeInput.value.trim();
+        const goal = goalInput.value.trim();
+        
+        if (!mainTheme || !goal) {
+            showFeedback(copyPedagogICALOutputMessage, 'Veuillez remplir au moins le thème et l\'objectif du projet.', 'error');
+            return;
+        }
+        
+        const logbookText = `Projet "${mainTheme}" : Les élèves travaillent pour ${goal.toLowerCase()}. Ils analysent des documents, mènent des recherches et développent leur esprit critique.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogICALOutputMessage, 'Phrase pour cahier de texte générée !', 'success');
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const topics = topicsTextarea.value.trim();
+        const grade = gradeSelect.value;
+        
+        if (!topics) {
+            showFeedback(copyPedagogICALOutputMessage, 'Veuillez remplir les axes d\'étude pour générer un résumé.', 'error');
+            return;
+        }
+        
+        const topicsList = topics.split('\n').filter(t => t.trim()).map(t => `• ${t.trim()}`).join('\n');
+        const summaryText = `**Connaissances et compétences développées (niveau ${grade}) :**\n\n${topicsList}`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogICALOutputMessage, 'Résumé des connaissances généré !', 'success');
+    });
+
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - Éducation Musicale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS Inchangé - Palette Musique */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #8e44ad; --primary-600: #7b2a9a; --primary-700: #6c238a;
+            --secondary-500: #e91e63; --secondary-600: #c2185b;
+            --accent-500: #3b82f6; --accent-600: #2563eb;
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(142, 68, 173, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--secondary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { .grid-2-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-music icon"></i>
+                Générateur de Cours - Éducation Musicale
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des séances de cours d'Éducation Musicale pour le collège (cycle 4).</p>
+    </div>
+
+    <section class="section">
+        <h2>1. Sélection de la Séance (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau (Classe) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Séance :</label>
+                <select id="sequenceSelect" class="select-field" disabled>
+                    <option value="">-- Choisir un champ de compétence puis une séance --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        <div class="form-group">
+            <label for="studyReferenceInput" class="label-text">Compositeur, artiste ou style musical de référence :</label>
+            <input type="text" id="studyReferenceInput" class="input-field" placeholder="Ex: Mozart, Daft Punk, le Jazz, Stromae...">
+        </div>
+        <div class="form-group">
+            <label for="planInput" class="label-text">Déroulé de la séance (Plan) :</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Dictez la structure exacte de la séance. Ex: 1. Écoute de l'œuvre de référence, 2. Projet vocal, 3. Écoute comparative..."></textarea>
+        </div>
+        
+        <label class="label-text">Ressources et Documents d'Appui :</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos (concerts, clips...)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens vers des analyses, biographies..."></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (paroles, partitions simples...)"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+        <div class="form-group" style="text-align: center; margin-top:2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séance généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séance apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modulesData = {
+        "5e": {
+            1: { theme: "Réaliser des projets musicaux", title: "La voix dans tous ses états", hook: "Ta voix est le premier instrument de musique que tu possèdes. Explorons ensemble tous ses pouvoirs !", skills: "Produire des sons vocaux variés et contrôlés (parlés, chantés). Participer à une production vocale collective simple (unisson).", knowledge: "Les registres de la voix (grave, aigu). Notions de hauteur, d'intensité. Le principe de la respiration pour le chant." },
+            2: { theme: "Réaliser des projets musicaux", title: "Le rythme dans la peau", hook: "Le cœur qui bat, la marche... le rythme est partout ! Comment le ressentir, le frapper en rythme et le jouer tous ensemble ?", skills: "Maintenir une pulsation régulière. Jouer des rythmes simples en groupe (percussions corporelles, instruments).", knowledge: "Pulsation, tempo (rapide/lent). Figures de rythme simples (noire, croche). L'ostinato rythmique." },
+            3: { theme: "Réaliser des projets musicaux", title: "Créer un paysage sonore", hook: "Ferme les yeux et écoute... Comment recréer l'ambiance sonore de la ville ou de la forêt uniquement avec des sons ?", skills: "Explorer et sélectionner des sources sonores variées. Organiser des sons dans le temps pour créer une atmosphère.", knowledge: "Le son et le bruit. L'intensité (fort/faible). L'espace sonore (premier plan, arrière-plan)." },
+            4: { theme: "Écouter, comparer, construire une culture", title: "Orchestre, mode d'emploi", hook: "Un orchestre, c'est comme une grande équipe de super-héros sonores ! Comment reconnaître les différentes familles d'instruments ?", skills: "Identifier auditivement les principales familles d'instruments (cordes, vents, percussions). Décrire le timbre d'un instrument.", knowledge: "Les familles de l'orchestre symphonique. Le timbre." },
+            5: { theme: "Écouter, comparer, construire une culture", title: "Comment est faite une chanson ?", hook: "Pourquoi certaines parties d'une chanson nous restent-elles dans la tête ? Découvrons la recette secrète de la plupart des tubes !", skills: "Identifier la structure d'une chanson. Repérer les parties qui se répètent et celles qui changent.", knowledge: "La structure couplet / refrain. L'introduction, le pont, le final (coda)." },
+            6: { theme: "Écouter, comparer, construire une culture", title: "Le timbre et la couleur des sons", hook: "Pourquoi un violon et une flûte ne produisent-ils pas le même son en jouant la même note ? Partons à la chasse aux 'couleurs' des instruments.", skills: "Comparer des timbres d'instruments ou de voix. Décrire un timbre avec des adjectifs (brillant, sourd, chaud...).", knowledge: "Définition du timbre. Le rôle des matériaux et de la façon de jouer sur le timbre." },
+            7: { theme: "Écouter, comparer, construire une culture", title: "Le tempo et le caractère", hook: "Une même mélodie peut-elle nous faire danser ou nous endormir ? Voyons comment la vitesse change tout dans la musique.", skills: "Identifier le tempo d'une musique. Décrire le caractère d'une musique (joyeux, triste...).", knowledge: "Le tempo. Les nuances de caractère (allegro, adagio...). Le lien entre tempo et émotion." },
+            8: { theme: "Écouter, comparer, construire une culture", title: "La musique peut-elle raconter une histoire ?", hook: "Un orage, une bataille... Comment un compositeur peut-il 'peindre' une scène avec des notes de musique ?", skills: "Établir des liens entre des éléments musicaux et une narration. Décrire ce que la musique évoque.", knowledge: "La musique descriptive ou à programme. L'imitation musicale. Le leitmotiv." },
+            9: { theme: "Écouter, comparer, construire une culture", title: "Le son et l'image", hook: "Imagine ton film ou ton jeu vidéo préféré sans musique... Impossible ! Comment la musique renforce-t-elle les émotions ?", skills: "Analyser le rôle de la musique dans une séquence audiovisuelle. Repérer si la musique accompagne ou contredit l'image.", knowledge: "Musique d'écran. La synchronisation son/image. Le sound design." },
+            10: { theme: "Écouter, comparer, construire une culture", title: "La mélodie", hook: "Qu'est-ce qui fait qu'on peut fredonner un air ? C'est la mélodie ! Apprenons à suivre sa 'ligne'.", skills: "Suivre et mémoriser une ligne mélodique simple. Décrire le mouvement d'une mélodie (montante, descendante).", knowledge: "Définition de la mélodie. Le mouvement conjoint et disjoint. Le motif mélodique." },
+            11: { theme: "Écouter, comparer, construire une culture", title: "Musiques de cérémonie et de fête", hook: "Des mariages aux fêtes nationales, la musique est toujours là pour marquer les grands moments. Quel est son rôle ?", skills: "Identifier la fonction sociale d'une musique. Comparer des musiques de fête de différentes cultures.", knowledge: "La fonction sociale de la musique. Les hymnes, les marches, les danses traditionnelles." }
+        },
+        "4e": {
+            12: { theme: "Réaliser des projets musicaux", title: "Le dialogue des voix : la polyphonie", hook: "Et si on chantait plusieurs mélodies différentes en même temps ? Découvrons la magie de la polyphonie.", skills: "Tenir sa partie dans un canon ou un chant à deux voix simples. Identifier auditivement plusieurs lignes mélodiques.", knowledge: "La monodie, la polyphonie. Le canon. L'imitation en musique." },
+            13: { theme: "Réaliser des projets musicaux", title: "Créer un accompagnement rythmique", hook: "Comment créer une base rythmique solide et entraînante pour accompagner un chant ?", skills: "Créer et jouer un ostinato rythmique. Utiliser la MAO pour programmer une boucle de batterie simple.", knowledge: "L'accompagnement. La complémentarité rythmique. La notion de 'boucle' (loop)." },
+            14: { theme: "Réaliser des projets musicaux", title: "Interpréter une chanson", hook: "Chanter une chanson, c'est bien. L'interpréter, c'est mieux ! Comment s'approprier une œuvre pour la rendre unique ?", skills: "Proposer une intention d'interprétation. Utiliser les nuances et les variations de tempo.", knowledge: "L'interprétation. Les nuances (crescendo...). Le rubato." },
+            15: { theme: "Écouter, comparer, construire une culture", title: "Musiques de tradition orale", hook: "Avant l'écriture, la musique se transmettait de bouche à oreille. Partons en voyage à la découverte des musiques du monde.", skills: "Reconnaître des caractéristiques de musiques de différentes aires culturelles. Mémoriser et reproduire une mélodie simple.", knowledge: "La tradition orale. Les échelles musicales non tempérées. Instruments du monde (kora, balafon...)." },
+            16: { theme: "Écouter, comparer, construire une culture", title: "Quand la musique rencontre le texte", hook: "Comment un compositeur met-il en valeur un poème ? De l'opéra à la chanson, explorons le mariage des mots et des notes.", skills: "Analyser les rapports entre texte et musique. Identifier différents types de chant (récitatif, air).", knowledge: "L'opéra, la mélodie française, la chanson. Le figuralisme musical." },
+            17: { theme: "Écouter, comparer, construire une culture", title: "La forme Rondo", hook: "A, B, A, C, A... Le rondo, c'est le plaisir de retrouver un 'refrain' musical. Comment les compositeurs jouent-ils avec ce principe ?", skills: "Identifier auditivement une structure de rondo. Repérer le thème principal et les couplets.", knowledge: "La forme rondo (ABACA). Le refrain et le couplet en musique instrumentale." },
+            18: { theme: "Écouter, comparer, construire une culture", title: "Le Thème et Variations", hook: "Prenez un thème simple, et transformez-le ! Comment les compositeurs déguisent-ils une mélodie ?", skills: "Reconnaître un thème et identifier les procédés de variation. Décrire les transformations appliquées à une mélodie.", knowledge: "La forme thème et variations. Procédés de variation (mélodique, rythmique, harmonique, de timbre)." },
+            19: { theme: "Écouter, comparer, construire une culture", title: "Musique et société : le chant engagé", hook: "Une chanson peut-elle changer le monde ? Découvrons comment les artistes utilisent la musique pour protester et défendre des idées.", skills: "Analyser le message et le contexte d'une chanson engagée. Mettre en relation le texte et les choix musicaux.", knowledge: "La 'protest song'. Chants de révolte, chants pacifistes, chants écologiques." },
+            20: { theme: "Écouter, comparer, construire une culture", title: "La dynamique et les nuances", hook: "Du murmure à l'explosion, la musique est pleine de contrastes d'intensité. Comment les compositeurs les utilisent-ils ?", skills: "Identifier et décrire les contrastes de dynamique. Utiliser un vocabulaire précis (piano, forte...).", knowledge: "La dynamique musicale. Les nuances (pp, p, mf, f, ff). Le crescendo et le decrescendo." },
+            21: { theme: "Écouter, comparer, construire une culture", title: "Harmonie et Accords", hook: "Pourquoi certaines notes jouées ensemble sonnent-elles 'bien' ? Introduction au monde des accords.", skills: "Différencier un son isolé, un accord et une mélodie. Identifier le caractère d'un accord (consonant/dissonant).", knowledge: "L'harmonie. La consonance et la dissonance. Les accords parfaits (majeur/mineur)." },
+            22: { theme: "Écouter, comparer, construire une culture", title: "La musique baroque", hook: "Perruques poudrées et ors ! Plongeons dans la musique de Lully, Vivaldi et Bach, entre ordre et exubérance.", skills: "Reconnaître les caractéristiques du style baroque. Identifier des instruments typiques (clavecin, luth).", knowledge: "La période baroque (1600-1750). La basse continue. L'ornementation. Le concerto." }
+        },
+        "3e": {
+            23: { theme: "Réaliser des projets musicaux", title: "Chanter à trois voix", hook: "Passons à la vitesse supérieure ! Comment chanter à trois parties différentes et créer des harmonies riches ?", skills: "Tenir sa partie dans un arrangement polyphonique à trois voix. Contribuer à l'équilibre sonore du groupe.", knowledge: "L'arrangement vocal. Les registres vocaux (soprano, alto, ténor, basse). L'écoute polyphonique." },
+            24: { theme: "Réaliser des projets musicaux", title: "L'improvisation guidée", hook: "Et si on inventait la musique en direct ? Apprenons à improviser une mélodie sur une grille de blues.", skills: "Produire une courte improvisation vocale ou instrumentale sur une structure harmonique. Utiliser une gamme simple (pentatonique).", knowledge: "L'improvisation. La grille d'accords. Le 'chorus' dans le jazz." },
+            25: { theme: "Réaliser des projets musicaux", title: "Arranger une chanson", hook: "Prenons une chanson connue et transformons-la complètement ! Comment changer son style ou son instrumentation ?", skills: "Proposer un arrangement personnel d'une pièce existante. Utiliser la MAO pour réaliser une maquette.", knowledge: "L'arrangement musical. La ré-harmonisation. La reprise (cover)." },
+            26: { theme: "Réaliser des projets musicaux", title: "Mon projet de création musicale", hook: "C'est votre projet ! Comment mener une démarche de création de A à Z, de l'idée à la maquette finale, pour le DNB ?", skills: "Concevoir et réaliser un projet de création personnel. Documenter sa démarche. Argumenter ses choix.", knowledge: "La démarche de projet. La composition. La structuration d'une pièce musicale." },
+            27: { theme: "Écouter, comparer, construire une culture", title: "La Forme Sonate", hook: "Exposition, Développement, Réexposition... La forme sonate est le 'plan' de nombreuses œuvres classiques. Comment fonctionne-t-elle ?", skills: "Identifier les grandes parties d'une forme sonate. Repérer les deux thèmes principaux et leur développement.", knowledge: "La forme sonate. Le développement thématique. La période classique (Haydn, Mozart, Beethoven)." },
+            28: { theme: "Écouter, comparer, construire une culture", title: "Le Jazz, une révolution musicale", hook: "Comment le jazz a-t-il bouleversé le rythme, l'harmonie et l'improvisation au XXe siècle ?", skills: "Reconnaître les caractéristiques du jazz (swing, improvisation). Identifier des instruments emblématiques.", knowledge: "Le swing. L'improvisation. Les origines du jazz (blues, ragtime). Les grands noms (Armstrong, Davis)." },
+            29: { theme: "Écouter, comparer, construire une culture", title: "La musique de film", hook: "Comment un compositeur comme John Williams réussit-il à nous faire peur ou rêver en quelques notes ?", skills: "Analyser la fonction de la musique dans une scène. Identifier un leitmotiv associé à un personnage.", knowledge: "Le leitmotiv. Musique diégétique et extra-diégétique. Le rôle du silence." },
+            30: { theme: "Écouter, comparer, construire une culture", title: "Musique et pouvoir", hook: "Un hymne qui unit, une musique qui fait défiler l'armée... Comment la musique a-t-elle toujours été un outil pour le pouvoir ?", skills: "Analyser comment la musique peut servir un pouvoir. Critiquer l'utilisation de la musique comme propagande.", knowledge: "Les hymnes nationaux. Les musiques militaires. La musique de cour. La censure." },
+            31: { theme: "Écouter, comparer, construire une culture", title: "Musique et les autres arts", hook: "Un tableau peut-il inspirer une musique ? Explorons les dialogues fascinants entre les arts.", skills: "Mettre en relation une œuvre musicale et une œuvre d'un autre art. Créer une production qui mêle plusieurs arts.", knowledge: "Les correspondances entre les arts. Le ballet. Le poème symphonique." },
+            32: { theme: "Écouter, comparer, construire une culture", title: "Les révolutions musicales du XXe siècle", hook: "Du rock'n'roll à la musique électronique, le XXe siècle a tout changé. Quels sont les grands courants actuels ?", skills: "Situer chronologiquement les grands courants musicaux du XXe siècle. En reconnaître les caractéristiques sonores.", knowledge: "Rock'n'roll, Pop, Hip-hop, Musique électronique. L'arrivée de l'électricité et de l'enregistrement." },
+            33: { theme: "Écouter, comparer, construire une culture", title: "Construire son argumentation (Prépa DNB)", hook: "Comment parler d'une musique de manière construite et personnelle pour convaincre un jury ? Préparons-nous à l'oral !", skills: "Structurer un exposé sur une œuvre musicale. Utiliser un vocabulaire précis. Exprimer un jugement critique.", knowledge: "La méthodologie de l'analyse d'écoute. La mise en contexte de l'œuvre. L'expression du ressenti." }
+        }
+    };
+
+    // --- SCRIPT DE GESTION DE LA PAGE (CORRIGÉ ET VÉRIFIÉ) ---
+    const gradeSelect = document.getElementById('gradeSelect');
+    const sequenceSelect = document.getElementById('sequenceSelect');
+    const studyReferenceInput = document.getElementById('studyReferenceInput');
+    const planInput = document.getElementById('planInput');
+    const videoLinks = document.getElementById('videoLinks');
+    const websiteLinks = document.getElementById('websiteLinks');
+    const rawText = document.getElementById('rawText');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+
+    function populateModules(grade) {
+        sequenceSelect.innerHTML = '<option value="">-- Choisir un champ de compétence puis une séance --</option>';
+        sequenceSelect.disabled = true;
+        if (grade && modulesData[grade]) {
+            const modulesForGrade = modulesData[grade];
+            const themes = [...new Set(Object.values(modulesForGrade).map(item => item.theme))];
+            
+            themes.forEach(theme => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = theme;
+                
+                Object.keys(modulesForGrade).forEach(key => {
+                    const moduleItem = modulesForGrade[key];
+                    if (moduleItem.theme === theme) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = moduleItem.title;
+                        optgroup.appendChild(option);
+                    }
+                });
+                sequenceSelect.appendChild(optgroup);
+            });
+            
+            sequenceSelect.disabled = false;
+        }
+    }
+
+    gradeSelect.addEventListener('change', () => populateModules(gradeSelect.value));
+
+    generateButton.addEventListener('click', () => {
+        const selectedGrade = gradeSelect.value;
+        const selectedModuleKey = sequenceSelect.value;
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!selectedGrade || !selectedModuleKey || !outputFormatRadio) {
+            alert("Veuillez choisir un niveau, une séance et un format de sortie.");
+            return;
+        }
+        
+        const moduleDetails = modulesData[selectedGrade]?.[selectedModuleKey];
+        if (!moduleDetails) {
+            alert("Détails de la séance non trouvés."); return;
+        }
+
+        const studyReference = studyReferenceInput.value.trim();
+        const plan = planInput.value.trim();
+        const videos = videoLinks.value.trim();
+        const websites = websiteLinks.value.trim();
+        const text = rawText.value.trim();
+        const outputFormat = outputFormatRadio.value;
+
+        let promptText = `**RÔLE ET MISSION**
+Tu agis en tant que professeur d'Éducation Musicale, musicologue et spécialiste en didactique. Ta mission est de **concevoir une fiche de préparation de séance complète, structurée et directement utilisable** pour un cours destiné à des élèves de ${selectedGrade}.\n\n`;
+
+        const hasImperativeInstructions = studyReference || plan || videos || websites || text;
+        if (hasImperativeInstructions) {
+            promptText += `**INSTRUCTIONS IMPÉRATIVES FOURNIES PAR L'ENSEIGNANT**
+Tu dois **impérativement** baser ta conception sur les éléments suivants :\n`;
+            if (studyReference) {
+                promptText += `- **Références imposées :** La séance doit être entièrement centrée sur l'étude de : **${studyReference}**. Toutes les analyses et exemples doivent s'y rapporter.\n`;
+            }
+            if (plan) {
+                promptText += `- **Déroulé imposé :** La séance doit suivre scrupuleusement le plan suivant :\n${plan}\n`;
+            }
+            if (videos || websites || text) {
+                promptText += `- **Ressources d'appui imposées :** Le contenu de la séance doit se baser en priorité sur l'analyse et la synthèse des ressources suivantes :\n`;
+                if (videos) promptText += `  - Vidéos à analyser (concerts, clips...) : \n${videos}\n`;
+                if (websites) promptText += `  - Sites web/analyses à consulter : \n${websites}\n`;
+                if (text) promptText += `  - Textes de référence (paroles, partitions...) : \n${text}\n`;
+            }
+            promptText += "\n";
+        }
+        
+        promptText += `**CONTENU DE BASE DE LA SÉANCE**
+- **Niveau :** ${selectedGrade}
+- **Champ de Compétence Principal :** ${moduleDetails.theme}
+- **Titre de la Séance :** ${moduleDetails.title}
+- **Accroche / Idée de départ :** "${moduleDetails.hook}"
+- **Compétences à maîtriser :** ${moduleDetails.skills}
+- **Savoirs & Notions à acquérir :** ${moduleDetails.knowledge}\n\n`;
+
+        promptText += `**STRUCTURE DÉTAILLÉE ET FORMAT DE SORTIE EXIGÉ**
+Tu dois rédiger la fiche de cours en respectant **impérativement** le format de sortie demandé et la structure pédagogique en 5 points ci-dessous.
+
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n` +
+`---
+**DÉBUT DU CONTENU À RÉDIGER**
+
+**1. TITRE DE LA SÉANCE**
+(Rédige ici le titre : ${moduleDetails.title.toUpperCase()})
+
+**2. INTRODUCTION ET PROBLÉMATIQUE MUSICALE**
+Partant de l'accroche ("${moduleDetails.hook}"), rédige une introduction qui pose une **problématique musicale claire** sous forme de question (ex: "Comment la musique peut-elle suggérer une émotion sans utiliser de mots ?").
+
+**3. ÉCOUTE PRINCIPALE : ŒUVRE DE RÉFÉRENCE**
+   a. **Présentation et analyse :** Choisis une œuvre musicale principale qui illustre parfaitement la problématique. Présente-la (artiste, date, contexte). Analyse-la de manière simple mais précise en utilisant le vocabulaire clé ("${moduleDetails.knowledge}").
+   b. **Intégration des médias :**
+      - **Si le format est DOCX :** Indique clairement où insérer le lien d'écoute. Ex: **[ÉCOUTE PRINCIPALE : "Clair de Lune" de Debussy - lien YouTube à insérer]**.
+      - **Si le format est HTML :** Génère un **fichier HTML complet et auto-contenu**. Pour l'écoute, utilise un placeholder clair comme \`<div class="placeholder-audio">Lecteur audio pour "Clair de Lune" de Debussy</div>\`.
+
+**4. PROJET MUSICAL DE MISE EN PRATIQUE**
+Décris un **projet musical simple et réalisable en classe** (vocal, instrumental, rythmique ou de création) permettant aux élèves de mettre en œuvre les compétences visées ("${moduleDetails.skills}"). Les consignes doivent être claires et encourageantes.
+
+**5. ÉCOUTE COMPARATIVE ET BILAN**
+   a. **Écoute comparative :** Propose une deuxième œuvre, plus courte et contrastée, et pose une question simple pour comparer les deux écoutes.
+   b. **Trace écrite / "Ce que je dois retenir" :** Rédige un bilan clair et concis en 2 ou 3 points qui résument les notions apprises et répondent à la problématique.
+
+**RÈGLE FINALE :** Ton texte doit être immédiatement utilisable. Ne rédige **aucune note pour le professeur**. Ton unique sortie est le cours lui-même.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt détaillé généré avec succès !", "success");
+    });
+    
+    // --- Fonctions utilitaires ---
+    function showFeedback(element, message, type = 'success', duration = 3000) { if (!element) return; element.textContent = message; element.className = `feedback-message ${type}`; requestAnimationFrame(() => { element.classList.add('show'); }); setTimeout(() => { element.classList.remove('show'); setTimeout(() => { if (element.textContent === message) { element.textContent = ''; element.className = 'feedback-message'; } }, 300); }, duration); }
+    function copyToClipboardUtil(text, messageElement, successText = "Copié avec succès !") { if (!text || text.trim() === "") { if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error'); return; } navigator.clipboard.writeText(text).then(() => { if (messageElement) showFeedback(messageElement, successText, 'success'); }).catch(err => { console.error('Erreur de copie:', err); if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error'); }); }
+    
+    copyButton.addEventListener('click', () => copyToClipboardUtil(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey) { alert("Sélectionnez un niveau et une séance."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const logbookText = `Éd. Musicale ${grade} - Séance "${moduleDetails.title}". Compétences : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey) { alert("Sélectionnez un niveau et une séance."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const summaryText = `Résumé (Musique - ${moduleDetails.title}) :\nDurant cette séance, nous avons appris à reconnaître : ${moduleDetails.knowledge}.\nNous avons pratiqué pour être capable de : ${moduleDetails.skills}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+    
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboardUtil(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+
+});
+</script>
+
+</body>
+</html>
+}

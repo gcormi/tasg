@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - SNT (Seconde)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #3b82f6; --primary-600: #2563eb; --primary-700: #1d4ed8;
+            --secondary-500: #10b981; --secondary-600: #059669;
+            --accent-500: #8b5cf6; --accent-600: #7c3aed;
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .static-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-200); border-radius: var(--border-radius-md); background-color: var(--neutral-100); font-size: 0.95rem; color: var(--neutral-700); font-family: var(--font-secondary); font-weight: 600; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--secondary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .object-input-group { display: flex; gap: 0.5rem; }
+        .object-input-group .input-field { flex-grow: 1; }
+        .btn-add { padding: 0.8rem; background-color: var(--accent-500); color: white; border-radius: var(--border-radius-md); font-size: 1rem; line-height: 1; }
+        .btn-add:hover { background-color: var(--accent-600); }
+        #selectedObjectsContainer { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding: 0.5rem; min-height: 20px; }
+        .selected-item { display: inline-flex; align-items: center; background-color: var(--secondary-500); color: white; padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 500; }
+        .remove-item-btn { margin-left: 0.75rem; background: none; border: none; color: white; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0; }
+        .suggestion-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .suggestion-item { padding: 0.4rem 0.8rem; background-color: var(--primary-500); color: var(--white); border-radius: var(--border-radius-md); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition-default); user-select: none; }
+        .suggestion-item:hover { background-color: var(--primary-600); transform: translateY(-1px); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { .grid-2-cols, .grid-3-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-network-wired icon"></i>
+                Générateur de Cours - SNT
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des prompts de séquences de cours de Sciences du Numérique et Technologie pour le lycée (Seconde).</p>
+    </div>
+
+    <section class="section">
+        <h2>1. Sélection de la Séquence (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label class="label-text">Niveau :</label>
+                <div id="gradeDisplay" class="static-field">Seconde Générale et Technologique</div>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Séquence :</label>
+                <select id="sequenceSelect" class="select-field">
+                    <option value="">-- Choisir une séquence --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        <div class="form-group">
+            <label for="studyObjectInput" class="label-text">Système(s) ou Concept(s) d'étude (6 maximum)</label>
+            <div class="object-input-group">
+                <input type="text" id="studyObjectInput" class="input-field" placeholder="Entrez un concept puis cliquez sur '+'...">
+                <button id="addObjectButton" class="btn btn-add" title="Ajouter l'objet"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="selectedObjectsContainer"></div>
+            <div id="suggestionContainer" class="suggestion-container"></div>
+            <p id="objectFeedback" class="feedback-message"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="planInput" class="label-text">Plan de la séquence :</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Dictez la structure exacte du cours. Ex: I. L'architecture Client/Serveur, II. Le langage HTML, III. Le rôle du CSS..."></textarea>
+        </div>
+        
+        <label class="label-text">Ressources et Documents d'Appui :</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens de sites web (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (articles, documentations...)"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="designCheckbox" class="label-text" style="display: flex; align-items: center; transition: color 0.3s;">
+                <input type="checkbox" id="designCheckbox" style="margin-right: 0.75rem; width: 1.1rem; height: 1.1rem;">
+                Inclure des instructions de design moderne pour la sortie HTML (facultatif)
+            </label>
+        </div>
+        
+        <div class="form-group" style="text-align: center; margin-top: 2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séquence généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séquence apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modulesData = {
+        "seconde": {
+            0: { mainTheme: "Introduction et Transversal", title: "Le numérique : citoyenneté, bases et programmation", hook: "Chaque jour, tu utilises des dizaines de services numériques sans y penser. Mais sais-tu vraiment ce qu'est une 'donnée personnelle' ? Et si on te donnait les clés pour non seulement comprendre, mais aussi commencer à créer tes propres outils numériques avec quelques lignes de code ?", skills: "Faire preuve d'autonomie, d'initiative et de créativité. Utiliser des sources de qualité. Faire un usage responsable et critique du numérique. Écrire et développer des programmes simples en Python (variables, affectations, séquences, instructions conditionnelles). (CRCN Domaines 2, 3, 4)", knowledge: "Identité numérique, e-réputation. Donnée personnelle. Espace numérique de travail (ENT). Langage de programmation Python : variables, types de base, affectation, instruction conditionnelle. Pensée informatique." },
+            1: { mainTheme: "Internet", title: "Internet : les fondations du réseau mondial", hook: "Quand tu envoies un message à l'autre bout du monde, il arrive en moins d'une seconde. Comment est-ce possible ? Quel chemin emprunte-t-il ? Découvrons l'architecture invisible qui connecte la planète.", skills: "Distinguer le rôle des protocoles IP et TCP. Caractériser les principes du routage et ses limites. Distinguer la fiabilité de transmission de l'absence de garantie temporelle. Retrouver une adresse IP à partir d'une adresse symbolique (et inversement). (CRCN Domaine 4.1)", knowledge: "Protocole TCP/IP : paquets, routage des paquets. Adresses symboliques et serveurs DNS. Réseaux pair-à-pair. Indépendance d'Internet par rapport au réseau physique." },
+            2: { mainTheme: "Le Web", title: "Le Web : naviguer et construire la toile", hook: "Qu'est-ce qui se passe réellement entre le moment où tu tapes 'google.fr' et celui où la page s'affiche ? Et si tu avais le pouvoir de créer ta propre page web, que mettrais-tu dedans ?", skills: "Distinguer ce qui relève du contenu d'une page et de son style de présentation. Étudier et modifier une page HTML simple. Décomposer l'URL d'une page. Mener une analyse critique des résultats fournis par un moteur de recherche. (CRCN Domaines 1.1, 3.2, 4.1)", knowledge: "Langages HTML et CSS. URL. Requête HTTP. Modèle client/serveur. Moteurs de recherche : principes et usages. Paramètres de sécurité d'un navigateur." },
+            3: { mainTheme: "Les réseaux sociaux", title: "Les réseaux sociaux : entre liens et dérives", hook: "Une application 'gratuite' qui te permet de discuter avec tes amis... Comment gagne-t-elle des milliards ? Tes données sont-elles vraiment en sécurité ? Plongeons dans le modèle économique et les enjeux de la vie sociale en ligne.", skills: "Distinguer plusieurs réseaux sociaux selon leurs caractéristiques. Paramétrer des abonnements pour assurer la confidentialité de données personnelles. Identifier les sources de revenus des entreprises de réseautage social. Connaître les différentes formes de cyberviolence et les ressources pour lutter contre. (CRCN Domaines 2.4, 4.2, 4.3)", knowledge: "Identité numérique, e-réputation. Modèle économique des réseaux sociaux. Notion de 'petit monde' et graphe social. Cyberviolence." },
+            4: { mainTheme: "Les données structurées et leur traitement", title: "Les données structurées : organiser et interroger l'information", hook: "Spotify te recommande la chanson parfaite, Netflix le film que tu vas adorer. Comment font-ils ? Le secret réside dans l'organisation des données. Apprenons à collecter, structurer et interroger des données pour en faire jaillir des informations.", skills: "Identifier les différents descripteurs d'un objet. Utiliser un site de données ouvertes pour récupérer des données (CSV). Réaliser des opérations de recherche, filtre, tri ou calcul sur une table. Retrouver les métadonnées d'un fichier. (CRCN Domaines 1.2, 1.3, 4.2)", knowledge: "Donnée personnelle. Données structurées (table, descripteur, valeur). Traitement de données structurées. Métadonnées. Stockage dans le 'nuage' (cloud) et consommation énergétique des datacenters." },
+            5: { mainTheme: "Localisation, cartographie et mobilité", title: "Géolocalisation : le monde en données", hook: "Comment ton téléphone peut-il te situer à quelques mètres près n'importe où sur Terre ? Qui collecte ces données de déplacement et pour quoi faire ? Explorons la technologie derrière le point bleu sur ta carte.", skills: "Décrire le principe de fonctionnement de la géolocalisation. Contribuer à OpenStreetMap de façon collaborative. Décoder une trame NMEA pour trouver des coordonnées. Représenter un calcul d'itinéraire comme un problème sur un graphe. Régler les paramètres de confidentialité liés à la position. (CRCN Domaine 4.2)", knowledge: "GPS, Galileo. Cartes numériques (couches d'information). Protocole NMEA 0183. Calculs d'itinéraires. Confidentialité." },
+            6: { mainTheme: "Informatique embarquée et objets connectés", title: "Objets Connectés : le numérique dans le réel", hook: "Une montre qui mesure ton rythme cardiaque, un thermostat qui s'adapte à tes habitudes... Le numérique n'est plus seulement dans nos écrans, il est dans nos objets. Comment un objet 'sent-il' son environnement et comment 'agit-il' sur le monde ?", skills: "Identifier des algorithmes de contrôle des comportements physiques. Réaliser une IHM simple d'un objet connecté. Écrire des programmes simples d'acquisition de données d'un capteur et de commande d'un actionneur. (CRCN Domaine 3.4)", knowledge: "Systèmes informatiques embarqués. Interface homme-machine (IHM). Commande d'un actionneur, acquisition des données d'un capteur." },
+            7: { mainTheme: "La photographie numérique", title: "La photographie numérique : l'image algorithmique", hook: "Ton smartphone a un objectif minuscule, pourtant il prend des photos incroyables. Le secret n'est plus dans l'optique, mais dans le logiciel. Et si on utilisait la programmation pour transformer nous-mêmes les couleurs et les formes d'une image ?", skills: "Distinguer les photosites du capteur et les pixels de l'image. Retrouver les métadonnées d'une photographie (EXIF). Traiter par programme une image pour la transformer en agissant sur les trois composantes de ses pixels. (CRCN Domaines 1.2, 3.4)", knowledge: "Photosites, pixels, résolution, profondeur de couleur. Métadonnées EXIF. Traitement d'image. Rôle des algorithmes dans les appareils photo numériques." },
+            8: { mainTheme: "Projet de Synthèse", title: "Projet : mon premier objet numérique", hook: "Tu as exploré les réseaux, le web, les données, les objets connectés... Il est temps de combiner ces savoirs pour créer ton propre projet numérique ! Quelle application, quel service ou quel objet vas-tu inventer pour répondre à un besoin ?", skills: "Faire preuve d'autonomie, d'initiative et de créativité. Coopérer au sein d'une équipe. Présenter un problème ou sa solution, développer une argumentation. Appliquer des compétences de plusieurs thèmes SNT pour réaliser un projet concret.", knowledge: "Synthèse des connaissances acquises durant l'année. Démarche de projet : analyse du besoin, conception, réalisation, validation. Communication orale et écrite." }
+        }
+    };
+    
+    const suggestionDatabase = {
+        'général': ["Script Python", "Page web (HTML/CSS)", "Fichier CSV", "Base de données", "Application mobile"],
+        'internet': ["Adresse IP", "Serveur DNS", "Routeur", "Paquet TCP", "Réseau pair-à-pair"],
+        'web': ["Navigateur web", "Serveur web (Apache, Nginx)", "Requête HTTP GET/POST", "Cookie de navigateur", "Moteur de recherche"],
+        'réseaux sociaux': ["Profil utilisateur", "Graphe d'amis", "Fil d'actualité", "Données personnelles", "Cyberharcèlement"],
+        'données': ["Fichier CSV", "Tableur (Excel, Sheets)", "Métadonnées d'un fichier", "API de données ouvertes", "Datacenter"],
+        'localisation': ["Récepteur GPS", "Trame NMEA", "Carte OpenStreetMap", "Application de navigation (Waze, Maps)", "Historique de positions"],
+        'iot': ["Carte micro:bit", "Carte Arduino", "Capteur de température", "Actionneur (LED, moteur)", "Interface Homme-Machine (IHM)"],
+        'photo': ["Image JPEG/PNG", "Métadonnées EXIF", "Pixel (RVB)", "Filtre d'image", "Capteur photo de smartphone"]
+    };
+
+    // --- DOM Elements ---
+    const sequenceSelect = document.getElementById('sequenceSelect');
+    const studyObjectInput = document.getElementById('studyObjectInput');
+    const planInput = document.getElementById('planInput');
+    const videoLinks = document.getElementById('videoLinks');
+    const websiteLinks = document.getElementById('websiteLinks');
+    const rawText = document.getElementById('rawText');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+    const designCheckbox = document.getElementById('designCheckbox');
+    const designCheckboxLabel = document.querySelector('label[for="designCheckbox"]');
+    const addObjectButton = document.getElementById('addObjectButton');
+    const suggestionContainer = document.getElementById('suggestionContainer');
+    const selectedObjectsContainer = document.getElementById('selectedObjectsContainer');
+    const objectFeedback = document.getElementById('objectFeedback');
+    
+    let selectedObjects = [];
+    const MAX_OBJECTS = 6;
+
+    function renderSelectedObjects() {
+        selectedObjectsContainer.innerHTML = '';
+        selectedObjects.forEach((objectName, index) => {
+            const item = document.createElement('span');
+            item.className = 'selected-item';
+            item.textContent = objectName;
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+            removeBtn.title = 'Retirer cet objet';
+            removeBtn.onclick = () => {
+                selectedObjects.splice(index, 1);
+                renderSelectedObjects();
+            };
+            item.appendChild(removeBtn);
+            selectedObjectsContainer.appendChild(item);
+        });
+    }
+
+    function addObject(name) {
+        const cleanedName = name.trim();
+        if (!cleanedName) return;
+        if (selectedObjects.length >= MAX_OBJECTS) {
+            showFeedback(objectFeedback, `Limite de ${MAX_OBJECTS} objets atteinte.`, 'error');
+            return;
+        }
+        if (selectedObjects.includes(cleanedName)) {
+            showFeedback(objectFeedback, `"${cleanedName}" est déjà dans la liste.`, 'error');
+            return;
+        }
+        selectedObjects.push(cleanedName);
+        renderSelectedObjects();
+        studyObjectInput.value = '';
+        studyObjectInput.focus();
+    }
+
+    addObjectButton.addEventListener('click', () => addObject(studyObjectInput.value));
+    studyObjectInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addObject(studyObjectInput.value);
+        }
+    });
+
+    function displaySuggestions(suggestions) {
+        suggestionContainer.innerHTML = '';
+        if (suggestions.length === 0) return;
+        const label = document.createElement('span');
+        label.className = 'label-text';
+        label.textContent = 'Suggestions :';
+        label.style.marginBottom = '0';
+        label.style.fontSize = '0.9rem';
+        suggestionContainer.appendChild(label);
+        suggestions.forEach(text => {
+            const item = document.createElement('span');
+            item.className = 'suggestion-item';
+            item.textContent = text;
+            item.onclick = () => addObject(text);
+            suggestionContainer.appendChild(item);
+        });
+    }
+
+    function generateSuggestions(moduleDetails) {
+        if (!moduleDetails) {
+            displaySuggestions([]);
+            return;
+        }
+        const relevantText = `${moduleDetails.title.toLowerCase()} ${moduleDetails.knowledge.toLowerCase()}`;
+        const suggestions = new Set(suggestionDatabase['général']);
+        const keywordMap = {
+            'internet': ['internet', 'tcp', 'ip', 'dns', 'réseau', 'routage'],
+            'web': ['web', 'html', 'css', 'http', 'serveur', 'client', 'moteur'],
+            'réseaux sociaux': ['réseau social', 'profil', 'graphe', 'cyberviolence'],
+            'données': ['donnée', 'csv', 'métadonnée', 'cloud', 'traitement'],
+            'localisation': ['gps', 'carte', 'nmea', 'géolocalisation', 'itinéraire'],
+            'iot': ['objet connecté', 'iot', 'embarqué', 'capteur', 'actionneur', 'ihm'],
+            'photo': ['photo', 'image', 'pixel', 'exif', 'traitement']
+        };
+        for (const key in keywordMap) {
+            if (keywordMap[key].some(keyword => relevantText.includes(keyword))) {
+                suggestionDatabase[key].forEach(item => suggestions.add(item));
+            }
+        }
+        const finalSuggestions = Array.from(suggestions).sort(() => 0.5 - Math.random()).slice(0, 10);
+        displaySuggestions(finalSuggestions);
+    }
+    
+    function populateSequences() {
+        sequenceSelect.innerHTML = '<option value="">-- Choisir une séquence --</option>';
+        const modulesForGrade = modulesData.seconde;
+        const themes = [...new Set(Object.values(modulesForGrade).map(item => item.mainTheme))];
+        
+        themes.forEach(theme => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = theme;
+            Object.keys(modulesForGrade).forEach(key => {
+                const moduleItem = modulesForGrade[key];
+                if (moduleItem.mainTheme === theme) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = moduleItem.title;
+                    optgroup.appendChild(option);
+                }
+            });
+            sequenceSelect.appendChild(optgroup);
+        });
+    }
+
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, duration);
+    }
+
+    sequenceSelect.addEventListener('change', () => {
+        const moduleKey = sequenceSelect.value;
+        if (moduleKey && modulesData.seconde[moduleKey]) {
+            generateSuggestions(modulesData.seconde[moduleKey]);
+        } else {
+            displaySuggestions([]);
+        }
+    });
+
+    document.querySelectorAll('input[name="outputFormat"]').forEach(radio => {
+        radio.addEventListener('change', handleDesignCheckboxState);
+    });
+
+    function handleDesignCheckboxState() {
+        const selectedFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+        if (selectedFormat === 'html') {
+            designCheckbox.disabled = false;
+            designCheckboxLabel.style.color = 'var(--neutral-700)';
+            designCheckboxLabel.style.cursor = 'pointer';
+        } else {
+            designCheckbox.disabled = true;
+            designCheckbox.checked = false;
+            designCheckboxLabel.style.color = 'var(--neutral-300)';
+            designCheckboxLabel.style.cursor = 'not-allowed';
+        }
+    }
+
+    generateButton.addEventListener('click', () => {
+        const selectedModuleKey = sequenceSelect.value;
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!selectedModuleKey || !outputFormatRadio) { 
+            alert("Veuillez choisir une séquence et un format de sortie."); return;
+        }
+
+        const moduleDetails = modulesData.seconde?.[selectedModuleKey];
+        if (!moduleDetails) { alert("Détails de la séquence non trouvés."); return; }
+
+        const studyObjectsList = selectedObjects.join(', ');
+        const plan = planInput.value.trim();
+        const videos = videoLinks.value.trim();
+        const websites = websiteLinks.value.trim();
+        const text = rawText.value.trim();
+        const outputFormat = outputFormatRadio.value;
+        const includeDesign = designCheckbox.checked;
+
+        let promptText = `**RÔLE ET MISSION DE HAUT NIVEAU**
+Tu es un **concepteur pédagogique expert en ingénierierie de la formation**, agissant en tant qu'auteur principal pour un éditeur de manuels scolaires de premier plan. Tu es également **Professeur agrégé, spécialiste de la didactique des sciences du numérique** et tu maîtrises parfaitement les programmes de l'Éducation Nationale française (SNT, Seconde) ainsi que les sciences cognitives appliquées à l'apprentissage des lycéens.
+
+Ta mission est de rédiger un **document de cours complet, exhaustif et multi-facettes** pour un élève de **Seconde**. Ce document doit être une ressource de référence, alliant rigueur conceptuelle, clarté pédagogique et un engagement fort pour l'élève. Il ne s'agit pas d'un simple résumé, mais d'un chapitre de manuel scolaire de très haute qualité.\n\n`;
+
+        const hasImperativeInstructions = studyObjectsList || plan || videos || websites || text;
+        if (hasImperativeInstructions) {
+            promptText += `**INSTRUCTIONS IMPÉRATIVES DE L'ENSEIGNANT**
+La conception du cours doit obligatoirement intégrer les éléments suivants :\n`;
+            if (studyObjectsList) {
+                promptText += `- **Système(s) ou concept(s) d'étude centraux :** Le cours doit être entièrement articulé autour des exemples suivants : **${studyObjectsList}**.\n`;
+            }
+            if (plan) { promptText += `- **Plan imposé :** La structure du cours doit suivre scrupuleusement ce plan :\n${plan}\n`; }
+            if (videos || websites || text) {
+                promptText += `- **Ressources d'appui imposées :** Le contenu doit se baser sur l'analyse et la synthèse de ces ressources :\n`;
+                if (videos) promptText += `  - Vidéos : \n${videos}\n`;
+                if (websites) promptText += `  - Sites web : \n${websites}\n`;
+                if (text) promptText += `  - Textes : \n${text}\n`;
+            }
+            promptText += "\n";
+        }
+        
+        promptText += `**CAHIER DES CHARGES PÉDAGOGIQUE DU COURS**
+- **Niveau :** Seconde
+- **Thème :** ${moduleDetails.mainTheme}
+- **Titre de la Séquence :** ${moduleDetails.title}
+- **Accroche / Hook :** "${moduleDetails.hook}"
+- **Capacités Attendues (Programme & CRCN) :** ${moduleDetails.skills}
+- **Savoirs & Connaissances :** ${moduleDetails.knowledge}\n\n`;
+
+        promptText += `**STRUCTURE DÉTAILLÉE DU DOCUMENT DE COURS À PRODUIRE**
+Tu dois rédiger le cours en respectant **impérativement** le format de sortie demandé et la structure complète en 9 points ci-dessous.
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n`;
+        if (outputFormat === 'html' && includeDesign) {
+            promptText += `**INSTRUCTIONS SPÉCIFIQUES POUR LE DESIGN HTML :**
+Crée un cours en HTML/CSS moderne et attractif. Utilise une palette de couleurs cohérente, des animations CSS simples pour l'engagement, des icônes Font Awesome pour illustrer les concepts, des encadrés stylisés pour les notions clés, et une mise en page responsive. Le cours doit être un fichier HTML autonome (CSS interne).\n\n`;
+        }
+        promptText += `---
+**DÉBUT DU CONTENU DU COURS À RÉDIGER**
+
+**1. TITRE DE LA SÉQUENCE :** (Titre : ${moduleDetails.title.toUpperCase()})
+
+**2. SITUATION DÉCLENCHANTE :** Scénarise l'accroche ("${moduleDetails.hook}") en un court récit engageant, une énigme ou une mise en situation concrète et actuelle pour qu'un lycéen comprenne immédiatement l'intérêt de la leçon.
+
+**3. OBJECTIFS PÉDAGOGIQUES : "Ta mission, si tu l'acceptes..."**
+Présente les objectifs sous forme de listes à puces claires :
+   - **Capacités à maîtriser :** (basé sur : "${moduleDetails.skills}").
+   - **Savoirs et connaissances à acquérir :** (basé sur : "${moduleDetails.knowledge}").
+
+**4. INTRODUCTION ET PROBLÉMATIQUE :** Fais le lien avec la situation déclenchante, situe le sujet dans un contexte plus large (sociétal, technologique, éthique) et formule la problématique centrale à laquelle le cours va répondre. Annonce le plan.
+
+**5. DÉVELOPPEMENT DU COURS - EXPLORATION EN PROFONDEUR :**
+Ceci est le cœur du cours. Pour **CHAQUE SAVOIR ET CONNAISSANCE** listé dans "${moduleDetails.knowledge}", tu dois **impérativement** suivre la structure de développement en 8 étapes ci-dessous. Chaque étape doit être un paragraphe ou une section distincte et richement développée.
+
+   Pour la notion de **[NOM DE LA NOTION]** :
+   **a) 🎓 La Définition de Référence : "Qu'est-ce que c'est exactement ?" :** Présente le concept de manière officielle et précise. Explique son importance et les enjeux.
+   **b) 🧠 Analogie et Simplification Pédagogique :** "Traduis" immédiatement la définition en utilisant une métaphore ou une comparaison simple et parlante pour un lycéen.
+   **c) 📱 Étude de Cas Concrète :** Montre où et comment cette notion s'applique sur un ou plusieurs des objets d'étude imposés (${studyObjectsList || 'des services numériques du quotidien'}).
+   **d) 🛠️ Au Cœur du Système (Mini-Tutoriel) :** Propose un mini-tutoriel pratique qui décrit, étape par étape, comment analyser ou mettre en œuvre le concept sur l'exemple choisi.
+   **e) 🤔 Points de Vigilance et Erreurs à Éviter :** Anticipe et explique 2 ou 3 confusions ou erreurs classiques que font les élèves sur ce sujet.
+   **f) 💡 Le Saviez-Vous ? / Enjeu Actuel :** Insère ici un fait marquant, un chiffre clé ou un enjeu de société actuel (cybersécurité, environnement, éthique) lié à la notion.
+   **g) 🤝 Ponts Interdisciplinaires :** Crée des liens explicites avec d'autres matières (Maths, Physique-Chimie, SES, Histoire-Géo...).
+   **h) 🚀 Pour les Experts (Approfondissement) :** Propose une information complémentaire de plus haut niveau, une ouverture sur un métier (Data scientist, ingénieur réseau...) ou un défi de réflexion.
+
+   (Répète cette structure en 8 points pour toutes les notions de la séquence).
+
+**6. AVENIR ET PERSPECTIVES :** Rédige une section prospective qui aborde les innovations futures, les impacts sur la société et les métiers, et les défis (éthiques, environnementaux, de souveraineté) liés au sujet de la séquence.
+
+**7. CONCLUSION :** Rédige une conclusion générale qui synthétise les points clés et répond de manière claire et directe à la problématique posée en introduction.
+
+**8. SYNTHÈSE VISUELLE (FORMAT CARTE MENTALE) :** Crée une synthèse de tout le cours sous forme de liste à puces imbriquées, facile à mémoriser.
+
+**9. LEXIQUE / GLOSSAIRE DES TERMES CLÉS :** Liste alphabétique de tous les termes techniques importants avec leur définition simple et précise.
+
+**RÈGLE FINALE ABSOLUE :** Ta seule et unique sortie doit être le document de cours lui-même, en suivant scrupuleusement la structure numérotée de 1 à 9 et en respectant le format de sortie demandé. Ne rédige aucun commentaire ou méta-discours. Produis directement le contenu final.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt détaillé généré avec succès !", "success");
+    });
+    
+    function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") {
+            if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error');
+            return;
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            if (messageElement) showFeedback(messageElement, successText, 'success');
+        }).catch(err => {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        });
+    }
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const moduleKey = sequenceSelect.value;
+        if (!moduleKey || !modulesData.seconde[moduleKey]) { alert("Sélectionnez une séquence."); return; }
+        const moduleDetails = modulesData.seconde[moduleKey];
+        const logbookText = `SNT Seconde - Séquence "${moduleDetails.title}". Capacités attendues : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const moduleKey = sequenceSelect.value;
+        if (!moduleKey || !modulesData.seconde[moduleKey]) { alert("Sélectionnez une séquence."); return; }
+        const moduleDetails = modulesData.seconde[moduleKey];
+        const summaryText = `Résumé (SNT - ${moduleDetails.title}) :\nÀ la fin de cette séquence, tu dois connaître : ${moduleDetails.knowledge}.\nTu dois être capable de : ${moduleDetails.skills}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+
+    // --- Initialisation ---
+    handleDesignCheckboxState();
+    populateSequences();
+});
+</script>
+
+</body>
+</html>

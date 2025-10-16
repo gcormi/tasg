@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - SVT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS Inchangé sauf ajouts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #22c55e; --primary-600: #16a34a; --primary-700: #15803d;
+            --secondary-500: #3b82f6; --secondary-600: #2563eb;
+            --accent-500: #f97316; --accent-600: #ea580c;
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(34, 197, 94, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--secondary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        
+        .object-input-group { display: flex; gap: 0.5rem; }
+        .object-input-group .input-field { flex-grow: 1; }
+        .btn-add { padding: 0.8rem; background-color: var(--accent-500); color: white; border-radius: var(--border-radius-md); font-size: 1rem; line-height: 1; }
+        .btn-add:hover { background-color: var(--accent-600); }
+        #selectedObjectsContainer { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; padding: 0.5rem; min-height: 20px; }
+        .selected-item { display: inline-flex; align-items: center; background-color: var(--secondary-500); color: white; padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 500; }
+        .remove-item-btn { margin-left: 0.75rem; background: none; border: none; color: white; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0; }
+        .suggestion-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .suggestion-item { padding: 0.4rem 0.8rem; background-color: var(--primary-500); color: var(--white); border-radius: var(--border-radius-md); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition-default); user-select: none; }
+        .suggestion-item:hover { background-color: var(--primary-600); transform: translateY(-1px); }
+        
+        @media (max-width: 768px) { .grid-2-cols, .grid-3-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-leaf icon"></i>
+                Générateur de Cours - SVT
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des prompts de séquences de cours de SVT pour le collège.</p>
+    </div>
+
+    <section class="section">
+        <h2>1. Sélection de la Séquence (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau (Classe) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Séquence :</label>
+                <select id="sequenceSelect" class="select-field" disabled>
+                    <option value="">-- Choisir un thème puis une séquence --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        <div class="form-group">
+            <label for="studyObjectInput" class="label-text">Exemple(s) ou concept(s) d'étude (6 maximum)</label>
+            <div class="object-input-group">
+                <input type="text" id="studyObjectInput" class="input-field" placeholder="Entrez un concept puis cliquez sur '+'...">
+                <button id="addObjectButton" class="btn btn-add" title="Ajouter le concept"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="selectedObjectsContainer"></div>
+            <div id="suggestionContainer" class="suggestion-container"></div>
+            <p id="objectFeedback" class="feedback-message"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="planInput" class="label-text">Plan de la séquence :</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Dictez la structure exacte du cours. Ex: I. La transformation des aliments, II. L'absorption des nutriments..."></textarea>
+        </div>
+        
+        <label class="label-text">Ressources et Documents d'Appui :</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens de sites web (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (articles, extraits de publications...)"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="designCheckbox" class="label-text" style="display: flex; align-items: center; transition: color 0.3s;">
+                <input type="checkbox" id="designCheckbox" style="margin-right: 0.75rem; width: 1.1rem; height: 1.1rem;">
+                Inclure des instructions de design moderne pour la sortie HTML (facultatif)
+            </label>
+        </div>
+        
+        <div class="form-group" style="text-align: center; margin-top: 2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séquence généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séquence apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modulesData = {
+        "5e": {
+            // --- THÈME 1 : LA PLANÈTE TERRE, L'ENVIRONNEMENT ET L'ACTION HUMAINE ---
+            1: { 
+                mainTheme: "La planète Terre, l'environnement et l'action humaine", 
+                title: "Météorologie et climats : comprendre le temps qu'il fait", 
+                hook: "Pourquoi pleut-il aujourd'hui alors qu'il faisait si beau hier ? Quelle est la différence entre la météo de la semaine et le climat de notre région ?", 
+                skills: "Distinguer météo et climat. Identifier les principaux phénomènes météorologiques. Comprendre l'influence de l'humain sur le climat.", 
+                knowledge: "Météorologie, climatologie, température, pression atmosphérique, vents, précipitations, effet de serre, changement climatique.",
+                socleSkills: "Domaine 1 : Lire des cartes, des graphiques. Domaine 5 : Se repérer dans le temps (différentes échelles) et l'espace."
+            },
+            2: {
+                mainTheme: "La planète Terre, l'environnement et l'action humaine", 
+                title: "L'eau sur Terre : un cycle et une ressource", 
+                hook: "D'où vient l'eau de pluie qui remplit les rivières ? Et où va-t-elle ensuite ? Suivons le grand voyage de l'eau sur notre planète.", 
+                skills: "Schématiser le cycle de l'eau. Comprendre les changements d'état de l'eau. Identifier les réservoirs d'eau et les usages par l'être humain.", 
+                knowledge: "Cycle de l'eau, évaporation, condensation, précipitation, ruissellement, infiltration, états de l'eau (solide, liquide, gaz), ressource en eau.",
+                socleSkills: "Domaine 1 : Réaliser des schémas fonctionnels. Domaine 4 : Concevoir et réaliser un protocole expérimental (changements d'état)."
+            },
+            3: {
+                mainTheme: "La planète Terre, l'environnement et l'action humaine",
+                title: "Paysages, géologie locale et action humaine",
+                hook: "Pourquoi y a-t-il des montagnes ici et des plaines ailleurs ? De quoi est fait le sol sous nos pieds et comment l'Homme le transforme-t-il ?",
+                skills: "Observer et décrire un paysage. Mettre en relation la nature des roches avec le paysage. Comprendre l'impact des aménagements humains sur les paysages.",
+                knowledge: "Paysage, géologie, roches (sédimentaires, magmatiques), érosion, sédimentation, fossiles, aménagement du territoire.",
+                socleSkills: "Domaine 2 : Utiliser des outils d'observation (loupe). Domaine 5 : Comprendre les responsabilités individuelles et collectives (aménagement)."
+            },
+            // --- THÈME 2 : LE VIVANT ET SON ÉVOLUTION ---
+            4: {
+                mainTheme: "Le vivant et son évolution",
+                title: "Les besoins des êtres vivants : nutrition et relations",
+                hook: "De quoi une plante a-t-elle besoin pour grandir ? Et un animal ? Comment tous ces êtres vivants interagissent-ils pour se nourrir ?",
+                skills: "Identifier les besoins nutritifs des végétaux et des animaux. Définir les régimes alimentaires. Construire une chaîne alimentaire simple.",
+                knowledge: "Nutrition, matière minérale, matière organique, photosynthèse, producteur, consommateur, décomposeur, chaîne et réseau alimentaire.",
+                socleSkills: "Domaine 4 : Identifier des chaînes de relations. Domaine 1 : Utiliser des langages scientifiques (schémas de réseaux trophiques)."
+            },
+            5: {
+                mainTheme: "Le vivant et son évolution",
+                title: "Le peuplement des milieux au cours des saisons",
+                hook: "Pourquoi certains animaux hibernent-ils en hiver ? Où vont les oiseaux migrateurs ? Comment les êtres vivants s'adaptent-ils aux changements de leur environnement ?",
+                skills: "Relier les variations saisonnières à leurs effets sur les êtres vivants. Décrire différentes formes d'adaptation (comportementale, morphologique).",
+                knowledge: "Saisons, alternance de formes (graine, larve), migration, hibernation, adaptation au milieu.",
+                socleSkills: "Domaine 2 : Mener une démarche d'investigation. Domaine 5 : Se repérer dans le temps (cycles)."
+            },
+            // --- THÈME 3 : LE CORPS HUMAIN ET LA SANTÉ ---
+            6: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Devenir des aliments : la digestion",
+                hook: "Que deviennent la pomme ou le sandwich que tu manges ? Suivons leur incroyable transformation à l'intérieur de notre corps.",
+                skills: "Identifier les organes de l'appareil digestif. Décrire l'action mécanique et chimique sur les aliments. Expliquer le rôle des enzymes.",
+                knowledge: "Appareil digestif, tube digestif, glandes digestives, aliments, nutriments, enzymes, digestion, absorption intestinale.",
+                socleSkills: "Domaine 4 : Comprendre le fonctionnement d'un système complexe (le corps). Domaine 1 : Communiquer à l'aide de schémas."
+            },
+            7: {
+                mainTheme: "Le corps humain et la santé",
+                title: "L'approvisionnement des organes : respiration et circulation",
+                hook: "Pourquoi es-tu essoufflé après une course ? Comment le dioxygène de l'air arrive-t-il jusqu'à tes muscles pour leur donner de l'énergie ?",
+                skills: "Décrire les mouvements respiratoires. Mettre en relation les poumons, le cœur et les organes. Schématiser les échanges gazeux.",
+                knowledge: "Appareil respiratoire, inspiration, expiration, échanges gazeux, alvéoles pulmonaires, sang, cœur, vaisseaux sanguins, circulation sanguine, dioxygène, dioxyde de carbone.",
+                socleSkills: "Domaine 2 : Interpréter des résultats (mesures de rythme cardiaque/respiratoire). Domaine 4 : Appliquer des principes de base de la physiologie."
+            },
+            8: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Le fonctionnement des organes : le besoin en énergie",
+                hook: "Comment nos muscles utilisent-ils les nutriments et le dioxygène pour nous permettre de bouger, de réfléchir et de vivre ?",
+                skills: "Relier la consommation de nutriments et de dioxygène à la production d'énergie. Comprendre que tous les organes ont besoin d'énergie.",
+                knowledge: "Organe, muscle, énergie, nutriments (glucose), dioxygène, déchets (dioxyde de carbone).",
+                socleSkills: "Domaine 1 : Raisonner, argumenter. Domaine 3 : Adopter un comportement responsable (alimentation, exercice)."
+            },
+            9: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Les microbes et notre corps",
+                hook: "Sommes-nous seuls dans notre corps ? Découvrons le monde invisible des micro-organismes qui nous entourent et qui vivent en nous.",
+                skills: "Distinguer les différents types de micro-organismes. Comprendre la différence entre contamination et infection. Identifier les barrières naturelles du corps.",
+                knowledge: "Micro-organismes (bactéries, virus), microbiote, contamination, infection, barrières naturelles (peau, muqueuses).",
+                socleSkills: "Domaine 4 : Appréhender les ordres de grandeur (taille des microbes). Domaine 3 : Appliquer des règles d'hygiène."
+            }
+        },
+        "4e": {
+            // --- THÈME 1 : LA PLANÈTE TERRE, L'ENVIRONNEMENT ET L'ACTION HUMAINE ---
+            101: {
+                mainTheme: "La planète Terre, l'environnement et l'action humaine",
+                title: "L'activité interne du globe : volcans et séismes",
+                hook: "Pourquoi la Terre tremble-t-elle parfois ? D'où vient la lave qui jaillit des volcans ? Plongeons au cœur des manifestations de l'énergie de la Terre.",
+                skills: "Expliquer l'origine des séismes et des éruptions volcaniques. Identifier les risques pour les populations et les moyens de prévention.",
+                knowledge: "Séisme (foyer, épicentre), faille, ondes sismiques, volcan (effusif, explosif), magma, lave, aléa, enjeu, risque, prévention.",
+                socleSkills: "Domaine 5 : Comprendre la responsabilité face aux risques naturels. Domaine 1 : Lire et utiliser des cartes thématiques."
+            },
+            102: {
+                mainTheme: "La planète Terre, l'environnement et l'action humaine",
+                title: "La tectonique des plaques : une planète en mouvement",
+                hook: "Les continents ont-ils toujours eu la même position ? Comment expliquer que l'on trouve des volcans et des séismes toujours aux mêmes endroits du globe ?",
+                skills: "Mettre en relation la répartition des volcans/séismes avec les frontières de plaques. Expliquer les mouvements de convergence et de divergence.",
+                knowledge: "Plaques lithosphériques, tectonique des plaques, divergence (dorsale), convergence (subduction, collision), GPS, lithosphère, asthénosphère.",
+                socleSkills: "Domaine 2 : Utiliser des outils numériques (logiciels de sismologie, GPS). Domaine 5 : Se repérer dans le temps (temps géologiques) et l'espace (échelle planétaire)."
+            },
+            // --- THÈME 2 : LE VIVANT ET SON ÉVOLUTION ---
+            103: {
+                mainTheme: "Le vivant et son évolution",
+                title: "La reproduction des êtres vivants",
+                hook: "Comment une fleur se transforme-t-elle en fruit ? Comment les animaux assurent-ils leur descendance ? Découvrons les stratégies de la vie pour se perpétuer.",
+                skills: "Distinguer la reproduction sexuée et asexuée. Décrire les étapes de la reproduction sexuée (fécondation). Comprendre l'influence du milieu.",
+                knowledge: "Reproduction sexuée, reproduction asexuée (multiplication végétative), gamètes (mâle, femelle), fécondation (interne, externe), cellule-œuf.",
+                socleSkills: "Domaine 4 : Mettre en œuvre un protocole (dissection florale). Domaine 1 : Pratiquer différents langages (dessin d'observation)."
+            },
+            104: {
+                mainTheme: "Le vivant et son évolution",
+                title: "Parentés et classification des êtres vivants",
+                hook: "En quoi un Homme est-il plus proche d'un chat que d'un poisson ? Comment les scientifiques font-ils pour ranger et classer l'immense diversité du vivant ?",
+                skills: "Identifier les attributs partagés par plusieurs espèces. Construire des groupes emboîtés. Lire un arbre de parenté.",
+                knowledge: "Espèce, attributs, classification, ancêtre commun, arbre de parenté, évolution.",
+                socleSkills: "Domaine 1 : Raisonner, pratiquer une démarche scientifique (observer, classer). Domaine 2 : Utiliser des logiciels de classification."
+            },
+            // --- THÈME 3 : LE CORPS HUMAIN ET LA SANTÉ ---
+            105: {
+                mainTheme: "Le corps humain et la santé",
+                title: "La transmission de la vie chez l'Homme",
+                hook: "De la rencontre de deux cellules microscopiques à la naissance d'un être humain, comment se déroule ce processus extraordinaire ?",
+                skills: "Identifier les organes reproducteurs et leur fonction. Décrire la fécondation et le développement de l'embryon. Comprendre le cycle menstruel.",
+                knowledge: "Appareils reproducteurs, gamètes (spermatozoïde, ovule), fécondation, nidation, embryon, fœtus, cycle utérin, règles, hormones.",
+                socleSkills: "Domaine 4 : Comprendre les bases de la physiologie humaine. Domaine 3 : Respecter son corps et celui des autres."
+            },
+            106: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Maîtrise de la reproduction et sexualité",
+                hook: "Comment choisir le moment d'avoir un enfant ? Quels sont les moyens pour se protéger des infections sexuellement transmissibles ?",
+                skills: "Comprendre le principe de la contraception. Identifier les différentes IST et les moyens de s'en protéger.",
+                knowledge: "Contraception (hormonale, mécanique), IST (Infection Sexuellement Transmissible), SIDA/VIH, préservatif, puberté.",
+                socleSkills: "Domaine 3 : Adopter un comportement éthique et responsable en matière de santé. Domaine 2 : S'informer, rechercher de l'information fiable."
+            },
+            107: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Le système nerveux : perception et communication",
+                hook: "Comment ton cerveau sait-il que tu touches un objet chaud ? Comment tes yeux transforment-ils la lumière en images ? Explorons les autoroutes de l'information de notre corps.",
+                skills: "Identifier les organes des sens. Schématiser le trajet d'un message nerveux sensitif. Comprendre le rôle du cerveau.",
+                knowledge: "Organes des sens (récepteurs), nerf sensitif, cerveau (centre nerveux), message nerveux, perception.",
+                socleSkills: "Domaine 4 : Relier le monde microscopique (cellules) et macroscopique (organes). Domaine 1 : Réaliser des schémas fonctionnels."
+            },
+            108: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Le système nerveux : la commande du mouvement",
+                hook: "Comment passes-tu de la décision d'attraper un ballon au geste lui-même ? Quel est le chemin parcouru par l'ordre de bouger ?",
+                skills: "Décrire la commande volontaire d'un mouvement. Schématiser le trajet du message nerveux moteur. Expliquer un arc réflexe.",
+                knowledge: "Cerveau, moelle épinière, nerf moteur, muscle (effecteur), mouvement volontaire, mouvement réflexe, neurone.",
+                socleSkills: "Domaine 1 : Communiquer sur ses démarches, ses résultats. Domaine 2 : Interpréter des résultats d'expériences (temps de réaction)."
+            },
+            109: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Perturbations du système nerveux",
+                hook: "Pourquoi le sommeil est-il si important ? Quels sont les effets de la fatigue, du bruit ou de certaines substances sur notre cerveau ?",
+                skills: "Expliquer les besoins du système nerveux (sommeil). Identifier les effets de substances psychoactives sur le cerveau.",
+                knowledge: "Sommeil, fatigue, bruit, stress, substances psychoactives (alcool, drogues), dépendance, synapse.",
+                socleSkills: "Domaine 3 : Développer son esprit critique face à l'information et aux influences. Domaine 5 : Comprendre les enjeux de santé publique."
+            }
+        },
+        "3e": {
+            // --- THÈME 1 : LA PLANÈTE TERRE, L'ENVIRONNEMENT ET L'ACTION HUMAINE ---
+            201: {
+                mainTheme: "La planète Terre, l'environnement et l'action humaine",
+                title: "Les écosystèmes et la responsabilité humaine",
+                hook: "Comment les activités humaines (agriculture, urbanisation, pollution) transforment-elles les écosystèmes et menacent-elles la biodiversité ?",
+                skills: "Analyser l'impact d'une activité humaine sur un écosystème. Proposer des solutions pour préserver la biodiversité.",
+                knowledge: "Écosystème, biodiversité, ressources naturelles (eau, sol, énergie), pollution, développement durable.",
+                socleSkills: "Domaine 5 : Assumer des responsabilités individuelles et collectives face aux enjeux environnementaux. Domaine 3 : S'engager dans un projet collectif."
+            },
+            202: {
+                mainTheme: "La planète Terre, l'environnement et l'action humaine",
+                title: "Exploitation des ressources et grands enjeux",
+                hook: "Comment produire assez de nourriture pour 8 milliards d'humains tout en préservant l'environnement ? Quels sont les défis énergétiques de demain ?",
+                skills: "Comprendre les enjeux liés à la gestion des ressources alimentaires et énergétiques. Analyser des exemples d'agrosystèmes et de production d'énergie.",
+                knowledge: "Agrosystème, énergies fossiles, énergies renouvelables, empreinte écologique, réchauffement climatique.",
+                socleSkills: "Domaine 2 : Mener une recherche d'information, évaluer sa fiabilité. Domaine 1 : Argumenter à l'oral et à l'écrit lors d'un débat."
+            },
+            // --- THÈME 2 : LE VIVANT ET SON ÉVOLUTION ---
+            203: {
+                mainTheme: "Le vivant et son évolution",
+                title: "L'information génétique : support et transmission",
+                hook: "Pourquoi ressembles-tu à tes parents mais es-tu unique ? Quel est le 'plan de construction' caché au cœur de chacune de nos cellules ?",
+                skills: "Localiser l'information génétique dans la cellule. Décrire la structure de l'ADN. Relier chromosomes, gènes et caractères.",
+                knowledge: "Cellule, noyau, chromosomes, gène, allèles, ADN, caractère héréditaire, caryotype.",
+                socleSkills: "Domaine 4 : Passer d'une échelle à l'autre (de la cellule à l'organisme). Domaine 1 : Utiliser des modèles pour comprendre (modèle ADN)."
+            },
+            204: {
+                mainTheme: "Le vivant et son évolution",
+                title: "La transmission de l'information génétique",
+                hook: "Comment les cellules se multiplient-elles à l'identique ? Et comment se forment les cellules reproductrices, uniques ?",
+                skills: "Expliquer le mécanisme de la mitose (division cellulaire conforme). Expliquer le mécanisme de la méiose (formation des gamètes).",
+                knowledge: "Mitose, méiose, chromosomes doubles et simples, gamètes, brassage génétique.",
+                socleSkills: "Domaine 1 : Représenter des phénomènes complexes par des schémas. Domaine 2 : Organiser son travail pour comparer des processus."
+            },
+            205: {
+                mainTheme: "Le vivant et son évolution",
+                title: "Mutations, diversité et évolution",
+                hook: "Comment de nouvelles versions de gènes apparaissent-elles ? Quel est le moteur de l'évolution qui a sculpté la diversité du vivant sur des millions d'années ?",
+                skills: "Définir une mutation. Expliquer le principe de la sélection naturelle. Relier la diversité génétique à l'évolution des espèces.",
+                knowledge: "Mutation, diversité génétique, sélection naturelle, évolution, parenté des espèces.",
+                socleSkills: "Domaine 5 : Situer l'espèce humaine dans l'évolution. Domaine 1 : Raisonner, valider une hypothèse à partir d'arguments."
+            },
+            // --- THÈME 3 : LE CORPS HUMAIN ET LA SANTÉ ---
+            206: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Les défenses de l'organisme : l'immunité",
+                hook: "Comment notre corps se défend-il chaque jour contre des milliers d'agressions de microbes ? Qui sont les soldats de notre système immunitaire ?",
+                skills: "Décrire la réaction inflammatoire (immunité innée). Expliquer le rôle des lymphocytes et des anticorps (immunité adaptative).",
+                knowledge: "Système immunitaire, leucocytes (globules blancs), phagocytose, réaction inflammatoire, lymphocytes, anticorps, antigène.",
+                socleSkills: "Domaine 4 : Comprendre le fonctionnement intégré du corps humain. Domaine 2 : Utiliser le microscope pour observer des cellules."
+            },
+            207: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Aider le système immunitaire : vaccination et antibiothérapie",
+                hook: "Comment un vaccin peut-il nous protéger d'une maladie que nous n'avons jamais eue ? Pourquoi les antibiotiques ne sont-ils pas efficaces contre les virus ?",
+                skills: "Expliquer le principe de la vaccination (mémoire immunitaire). Comprendre le principe de l'antibiothérapie et ses limites (antibiorésistance).",
+                knowledge: "Vaccination, mémoire immunitaire, séropositivité, antibiotiques, antibiorésistance, virus, bactérie.",
+                socleSkills: "Domaine 3 : Prendre conscience de sa responsabilité en matière de santé individuelle et collective. Domaine 5 : Comprendre l'apport des sciences à la santé."
+            },
+            208: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Le dialogue nerveux : neurones et synapses",
+                hook: "Comment l'information circule-t-elle à très grande vitesse dans notre cerveau et notre corps ? Plongeons dans le réseau de nos neurones.",
+                skills: "Schématiser un neurone. Expliquer la transmission du message nerveux au niveau d'une synapse.",
+                knowledge: "Neurone, fibre nerveve, synapse, neurotransmetteur, message nerveux (nature électrique et chimique).",
+                socleSkills: "Domaine 1 : Lire et produire des schémas complexes. Domaine 4 : Modéliser le fonctionnement d'un système."
+            },
+            209: {
+                mainTheme: "Le corps humain et la santé",
+                title: "Le cerveau, un organe fragile et plastique",
+                hook: "Comment l'apprentissage modifie-t-il notre cerveau ? Quelles sont les conséquences des drogues sur le circuit de la récompense ?",
+                skills: "Comprendre la plasticité cérébrale. Expliquer le fonctionnement du circuit de la récompense et sa perturbation par les substances psychoactives.",
+                knowledge: "Plasticité cérébrale, aires cérébrales, circuit de la récompense, addiction, récepteurs synaptiques.",
+                socleSkills: "Domaine 3 : Développer son esprit critique face aux comportements à risque. Domaine 2 : Utiliser des logiciels de visualisation 3D du cerveau."
+            }
+        }
+    };
+    
+    const suggestionDatabase = {
+        'général': ["Cellule", "ADN", "Écosystème", "Volcan", "Cerveau", "Photosynthèse"],
+        'corps_humain': ["Cœur", "Poumon", "Muscle", "Système nerveux", "Globule rouge", "Enzyme", "Hormone"],
+        'génétique': ["Chromosome", "Gène", "Allèle", "Mutation", "Caryotype"],
+        'terre': ["Plaque tectonique", "Séisme", "Fossile", "Roche magmatique", "Érosion"],
+        'vivant': ["Bactérie", "Virus", "Biodiversité", "Chaîne alimentaire", "Espèce"]
+    };
+
+    // --- DOM Elements ---
+    const gradeSelect = document.getElementById('gradeSelect');
+    const sequenceSelect = document.getElementById('sequenceSelect');
+    const studyObjectInput = document.getElementById('studyObjectInput');
+    const planInput = document.getElementById('planInput');
+    const videoLinks = document.getElementById('videoLinks');
+    const websiteLinks = document.getElementById('websiteLinks');
+    const rawText = document.getElementById('rawText');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+    const designCheckbox = document.getElementById('designCheckbox');
+    const designCheckboxLabel = document.querySelector('label[for="designCheckbox"]');
+
+    const addObjectButton = document.getElementById('addObjectButton');
+    const suggestionContainer = document.getElementById('suggestionContainer');
+    const selectedObjectsContainer = document.getElementById('selectedObjectsContainer');
+    const objectFeedback = document.getElementById('objectFeedback');
+    
+    let selectedObjects = [];
+    const MAX_OBJECTS = 6;
+
+    function renderSelectedObjects() {
+        selectedObjectsContainer.innerHTML = '';
+        selectedObjects.forEach((objectName, index) => {
+            const item = document.createElement('span');
+            item.className = 'selected-item';
+            item.textContent = objectName;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+            removeBtn.title = 'Retirer ce concept';
+            removeBtn.onclick = () => {
+                selectedObjects.splice(index, 1);
+                renderSelectedObjects();
+            };
+            
+            item.appendChild(removeBtn);
+            selectedObjectsContainer.appendChild(item);
+        });
+    }
+
+    function addObject(name) {
+        const cleanedName = name.trim();
+        if (!cleanedName) return;
+
+        if (selectedObjects.length >= MAX_OBJECTS) {
+            showFeedback(objectFeedback, `Limite de ${MAX_OBJECTS} concepts atteinte.`, 'error');
+            return;
+        }
+
+        if (selectedObjects.includes(cleanedName)) {
+            showFeedback(objectFeedback, `"${cleanedName}" est déjà dans la liste.`, 'error');
+            return;
+        }
+
+        selectedObjects.push(cleanedName);
+        renderSelectedObjects();
+        studyObjectInput.value = '';
+        studyObjectInput.focus();
+    }
+
+    addObjectButton.addEventListener('click', () => addObject(studyObjectInput.value));
+    studyObjectInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addObject(studyObjectInput.value);
+        }
+    });
+
+    function displaySuggestions(suggestions) {
+        suggestionContainer.innerHTML = '';
+        if (suggestions.length === 0) return;
+
+        const label = document.createElement('span');
+        label.className = 'label-text';
+        label.textContent = 'Suggestions :';
+        label.style.marginBottom = '0';
+        label.style.fontSize = '0.9rem';
+        suggestionContainer.appendChild(label);
+
+        suggestions.forEach(text => {
+            const item = document.createElement('span');
+            item.className = 'suggestion-item';
+            item.textContent = text;
+            item.onclick = () => addObject(text);
+            suggestionContainer.appendChild(item);
+        });
+    }
+
+    function generateSuggestions(moduleDetails) {
+        if (!moduleDetails) {
+            displaySuggestions([]);
+            return;
+        }
+        const relevantText = `${moduleDetails.title.toLowerCase()} ${moduleDetails.knowledge.toLowerCase()}`;
+        const suggestions = new Set(suggestionDatabase['général']);
+        const keywordMap = {
+            'corps_humain': ['corps', 'santé', 'respiration', 'digestion', 'reproduction', 'nerveux', 'cerveau'], 
+            'génétique': ['génétique', 'adn', 'chromosome', 'gène', 'héréditaire'], 
+            'terre': ['planète', 'terre', 'environnement', 'volcan', 'séisme', 'tectonique', 'roche'], 
+            'vivant': ['vivant', 'évolution', 'espèce', 'cellule', 'écosystème', 'biodiversité']
+        };
+        for (const key in keywordMap) {
+            if (keywordMap[key].some(keyword => relevantText.includes(keyword))) {
+                suggestionDatabase[key].forEach(item => suggestions.add(item));
+            }
+        }
+        const finalSuggestions = Array.from(suggestions).sort(() => 0.5 - Math.random()).slice(0, 10);
+        displaySuggestions(finalSuggestions);
+    }
+    
+    function populateModules(gradeValue) {
+        sequenceSelect.innerHTML = '<option value="">-- Choisir un thème puis une séquence --</option>';
+        sequenceSelect.disabled = true;
+        displaySuggestions([]);
+        selectedObjects = [];
+        renderSelectedObjects();
+        
+        if (gradeValue && modulesData[gradeValue]) {
+            const modulesForGrade = modulesData[gradeValue];
+            const themes = [...new Set(Object.values(modulesForGrade).map(item => item.mainTheme))];
+            
+            themes.forEach(theme => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = theme;
+                Object.keys(modulesForGrade).forEach(key => {
+                    const moduleItem = modulesForGrade[key];
+                    if (moduleItem.mainTheme === theme) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = moduleItem.title;
+                        optgroup.appendChild(option);
+                    }
+                });
+                sequenceSelect.appendChild(optgroup);
+            });
+            sequenceSelect.disabled = false;
+        }
+    }
+
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, duration);
+    }
+
+    gradeSelect.addEventListener('change', (e) => {
+        populateModules(e.target.value);
+    });
+
+    sequenceSelect.addEventListener('change', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (grade && moduleKey && modulesData[grade] && modulesData[grade][moduleKey]) {
+            generateSuggestions(modulesData[grade][moduleKey]);
+        } else {
+            displaySuggestions([]);
+        }
+    });
+
+    document.querySelectorAll('input[name="outputFormat"]').forEach(radio => {
+        radio.addEventListener('change', handleDesignCheckboxState);
+    });
+
+    function handleDesignCheckboxState() {
+        const selectedFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+        if (selectedFormat === 'html') {
+            designCheckbox.disabled = false;
+            designCheckboxLabel.style.color = 'var(--neutral-700)';
+            designCheckboxLabel.style.cursor = 'pointer';
+        } else {
+            designCheckbox.disabled = true;
+            designCheckbox.checked = false;
+            designCheckboxLabel.style.color = 'var(--neutral-300)';
+            designCheckboxLabel.style.cursor = 'not-allowed';
+        }
+    }
+
+    generateButton.addEventListener('click', () => {
+        const selectedGrade = gradeSelect.value;
+        const selectedModuleKey = sequenceSelect.value;
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!selectedGrade || !selectedModuleKey || !outputFormatRadio) { 
+            alert("Veuillez choisir un niveau, une séquence et un format de sortie."); return;
+        }
+
+        const moduleDetails = modulesData[selectedGrade]?.[selectedModuleKey];
+        if (!moduleDetails) { alert("Détails de la séquence non trouvés."); return; }
+
+        const studyObjectsList = selectedObjects.join(', ');
+        const plan = planInput.value.trim();
+        const videos = videoLinks.value.trim();
+        const websites = websiteLinks.value.trim();
+        const text = rawText.value.trim();
+        const outputFormat = outputFormatRadio.value;
+        const includeDesign = designCheckbox.checked;
+
+        let promptText = `**RÔLE ET MISSION DE HAUT NIVEAU**
+Tu es un **concepteur pédagogique expert en ingénierierie de la formation**, agissant en tant qu'auteur principal pour un éditeur de manuels scolaires de premier plan. Tu es également **Professeur agrégé de SVT** et tu maîtrises parfaitement les programmes de l'Éducation Nationale française, le Socle Commun, ainsi que les recommandations didactiques d'Eduscol ("Idées-clés pour enseigner").
+
+Ta mission est de rédiger un **document de cours complet, exhaustif et multi-facettes** pour un élève de **${selectedGrade}**. Ce document doit être une ressource de référence, alliant rigueur académique, clarté pédagogique et un engagement fort pour l'élève. Il ne s'agit pas d'un simple résumé, mais d'un chapitre de manuel scolaire de très haute qualité.\n\n`;
+
+        const hasImperativeInstructions = studyObjectsList || plan || videos || websites || text;
+        if (hasImperativeInstructions) {
+            promptText += `**INSTRUCTIONS IMPÉRATIVES DE L'ENSEIGNANT**
+La conception du cours doit obligatoirement intégrer les éléments suivants :\n`;
+            if (studyObjectsList) {
+                promptText += `- **Exemple(s) d'étude centraux :** Le cours doit être entièrement articulé autour des exemples suivants : **${studyObjectsList}**.\n`;
+            }
+            if (plan) { promptText += `- **Plan imposé :** La structure du cours doit suivre scrupuleusement ce plan :\n${plan}\n`; }
+            if (videos || websites || text) {
+                promptText += `- **Ressources d'appui imposées :** Le contenu doit se baser sur l'analyse et la synthèse de ces ressources :\n`;
+                if (videos) promptText += `  - Vidéos : \n${videos}\n`;
+                if (websites) promptText += `  - Sites web : \n${websites}\n`;
+                if (text) promptText += `  - Textes : \n${text}\n`;
+            }
+            promptText += "\n";
+        }
+        
+        promptText += `**CAHIER DES CHARGES PÉDAGOGIQUE DU COURS**
+- **Niveau :** ${selectedGrade}
+- **Thème :** ${moduleDetails.mainTheme}
+- **Titre de la Séquence :** ${moduleDetails.title}
+- **Accroche / Hook (à développer en situation déclenchante) :** "${moduleDetails.hook}"
+- **Compétences Disciplinaires Visées :** ${moduleDetails.skills}
+- **Savoirs & Connaissances :** ${moduleDetails.knowledge}
+- **Compétences du Socle Commun Travaillées :** ${moduleDetails.socleSkills}\n\n`;
+
+        promptText += `**STRUCTURE DÉTAILLÉE DU DOCUMENT DE COURS À PRODUIRE**
+Tu dois rédiger le cours en respectant **impérativement** le format de sortie demandé et la structure complète en 9 points ci-dessous.
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n`;
+        if (outputFormat === 'html' && includeDesign) {
+            promptText += `**INSTRUCTIONS SPÉCIFIQUES POUR LE DESIGN HTML :**
+Crée un cours en HTML/CSS moderne et attractif. Utilise une palette de couleurs cohérente, des animations CSS simples pour l'engagement, des icônes Font Awesome pour illustrer les concepts, des encadrés stylisés pour les notions clés, et une mise en page responsive. Le cours doit être un fichier HTML autonome (CSS interne).\n\n`;
+        }
+        promptText += `---
+**DÉBUT DU CONTENU DU COURS À RÉDIGER**
+
+**1. TITRE DE LA SÉQUENCE :** (Titre : ${moduleDetails.title.toUpperCase()})
+
+**2. SITUATION DÉCLENCHANTE :** Scénarise l'accroche ("${moduleDetails.hook}") en un court récit engageant, une énigme ou une mise en situation concrète qui pose un problème à résoudre. L'objectif est de susciter la curiosité et de lancer une démarche d'investigation.
+
+**3. OBJECTIFS PÉDAGOGIQUES : "Ta mission, si tu l'acceptes..."**
+Présente les objectifs sous forme de listes à puces claires :
+   - **Compétences à maîtriser :** (basé sur : "${moduleDetails.skills}").
+   - **Savoirs et connaissances à acquérir :** (basé sur : "${moduleDetails.knowledge}").
+   - **Compétences du Socle que tu vas travailler :** (basé sur : "${moduleDetails.socleSkills}").
+
+**4. INTRODUCTION ET PROBLÉMATIQUE :** Fais le lien avec la situation déclenchante, situe le sujet dans un contexte plus large (biologique, géologique, sanitaire) et formule la problématique scientifique centrale à laquelle le cours va répondre. Annonce le plan.
+
+**5. DÉVELOPPEMENT DU COURS - EXPLORATION EN PROFONDEUR :**
+Ceci est le cœur du cours. Pour **CHAQUE SAVOIR ET CONNAISSANCE** listé dans "${moduleDetails.knowledge}", tu dois **impérativement** suivre la structure de développement en 8 étapes ci-dessous. Chaque étape doit être un paragraphe ou une section distincte et richement développée.
+
+   Pour la notion de **[NOM DE LA NOTION]** :
+   **a) 🎓 La Définition de Référence : "Qu'est-ce que c'est exactement ?" :** Présente le concept de manière officielle et précise, comme dans un dictionnaire scientifique. Explique son importance et les enjeux.
+   **b) 🧠 Analogie et Simplification Pédagogique :** "Traduis" immédiatement la définition en utilisant une métaphore ou une comparaison simple et parlante pour un collégien (ex: "L'ADN, c'est comme le livre de recettes de la cellule...").
+   **c) 🔬 Étude de Cas Concrète :** Montre où et comment cette notion s'applique sur un ou plusieurs des exemples d'étude imposés (${studyObjectsList || 'exemples du quotidien ou du corps humain'}).
+   **d) 🛠️ Au Cœur du Système :** Propose un mini-tutoriel pratique qui décrit, étape par étape, comment observer ou analyser le concept sur l'exemple choisi (ex: description d'une expérience, lecture d'un schéma, interprétation d'un graphique).
+   **e) 🤔 Points de Vigilance et Erreurs à Éviter :** Anticipe et explique 2 ou 3 confusions ou erreurs classiques que font les élèves sur ce sujet.
+   **f) 💡 Le Saviez-Vous ? / Anecdote Scientifique :** Insère ici un fait marquant, une anecdote historique (histoire des sciences) ou un chiffre surprenant lié à la notion pour susciter la curiosité.
+   **g) 🤝 Ponts Interdisciplinaires :** Crée des liens explicites avec d'autres matières (Mathématiques, Physique-Chimie, Histoire-Géo, EPS...).
+   **h) 🚀 Pour les Experts (Approfondissement) :** Propose une information complémentaire de plus haut niveau, une ouverture sur un métier (médecin, chercheur, géologue...) ou un défi de réflexion pour les élèves les plus avancés.
+
+   (Répète cette structure en 8 points pour toutes les notions de la séquence).
+
+**6. AVENIR ET PERSPECTIVES :** Rédige une section prospective qui aborde les innovations futures (biotechnologies, médecine, géosciences), les impacts sur la société et les métiers, et les défis (éthiques, environnementaux) liés au sujet de la séquence.
+
+**7. CONCLUSION :** Rédige une conclusion générale qui synthétise les points clés et répond de manière claire et directe à la problématique posée en introduction.
+
+**8. SYNTHÈSE VISUELLE (FORMAT CARTE MENTALE) :** Crée une synthèse de tout le cours sous forme de liste à puces imbriquées, facile à mémoriser.
+
+**9. LEXIQUE / GLOSSAIRE DES TERMES CLÉS :** Liste alphabétique de tous les termes techniques importants avec leur définition simple et précise.
+
+**RÈGLE FINALE ABSOLUE :** Ta seule et unique sortie doit être le document de cours lui-même, en suivant scrupuleusement la structure numérotée de 1 à 9 et en respectant le format de sortie demandé. Ne rédige aucun commentaire ou méta-discours. Produis directement le contenu final.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt détaillé généré avec succès !", "success");
+    });
+    
+    function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") { 
+            if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error'); 
+            return; 
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            if (messageElement) showFeedback(messageElement, successText, 'success');
+        }).catch(err => {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        });
+    }
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+    
+    logbookButton.addEventListener('click', () => {
+        const grade = gradeSelect.value; const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey || !modulesData[grade] || !modulesData[grade][moduleKey]) { alert("Sélectionnez un niveau et une séquence."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const logbookText = `SVT ${grade} - Séquence "${moduleDetails.title}". Compétences : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+    
+    summaryButton.addEventListener('click', () => {
+        const grade = gradeSelect.value; const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey || !modulesData[grade] || !modulesData[grade][moduleKey]) { alert("Sélectionnez un niveau et une séquence."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const summaryText = `Résumé (SVT - ${moduleDetails.title}) :\nÀ la fin de cette séquence, tu dois connaître : ${moduleDetails.knowledge}.\nTu dois être capable de : ${moduleDetails.skills}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+    
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+
+    handleDesignCheckboxState();
+    // Initial population in case a grade is pre-selected or for setup
+    populateModules(gradeSelect.value);
+});
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier d'Amélioration - Cours DOCX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Un style adapté pour cette nouvelle page */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #4f46e5; --primary-600: #4338ca; --primary-700: #3730a3;
+            --secondary-500: #10b981; --secondary-600: #059669;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(79, 70, 229, 0.4);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: #334155; line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: #334155; text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: #cbd5e1; transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: #1e293b; display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: #64748b; }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .section h3 { font-family: var(--font-primary); font-size: 1.4rem; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; border-left: 4px solid var(--primary-500); padding-left: 1rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: #334155; margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid #cbd5e1; border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: #334155; transition: all 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer; border:none; transition: var(--transition-default); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .sub-section { border-top: 1px dashed #cbd5e1; margin-top: 2rem; padding-top: 2rem; }
+        .button-group { display: flex; gap: 1rem; align-items: center; justify-content: center; margin-bottom: 1rem; }
+        .feedback-message { padding: 0.5rem 1rem; border-radius: var(--border-radius-md); font-size: 0.9rem; margin-top: 0.5rem; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .feedback-message.success { background-color: #d1fae5; color: #065f46; opacity: 1; }
+        .feedback-message.error { background-color: #fee2e2; color: #dc2626; opacity: 1; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
+        .media-item { border: 1px solid #e2e8f0; border-radius: var(--border-radius-md); padding: 1rem; margin-bottom: 1rem; background-color: #f8fafc; }
+        .media-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .media-item-title { font-weight: 600; color: #334155; }
+        .remove-btn { background-color: #ef4444; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .remove-btn:hover { background-color: #dc2626; }
+        @media (max-width: 768px) { .grid-2-cols { grid-template-columns: 1fr; } .button-group { flex-direction: column; align-items: stretch; } }
+    </style>
+</head>
+<body>
+<!-- Bouton retour fixe en haut à gauche -->
+<div style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+    <a href="index.html" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    " onmouseover="this.style.background='rgba(90, 111, 216, 0.9)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.9)'">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <h1><i class="fas fa-file-word icon"></i> Atelier d'Amélioration - DOCX</h1>
+        </header>
+        <p class="page-header-subtitle">Améliorez vos cours générés au format DOCX en les re-générant avec vos modifications.</p>
+    </div>
+
+    <section class="section">
+        <h2><i class="fas fa-paste"></i> 1. Texte du Cours à Améliorer</h2>
+        <div class="form-group">
+            <label for="inputText" class="label-text">Collez ici l'intégralité du texte de votre cours DOCX :</label>
+            <textarea id="inputText" class="textarea-field" rows="10" placeholder="Collez le texte brut de votre document ici..."></textarea>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2><i class="fas fa-tools"></i> 2. Boîte à Outils d'Amélioration</h2>
+
+        <h3><i class="fas fa-edit"></i> Modification de Contenu</h3>
+        <div class="form-group">
+            <label class="label-text">Modifier / Développer un paragraphe (Optionnel) :</label>
+            <textarea id="paraToModify" class="textarea-field" rows="3" placeholder="Collez ici le paragraphe original à modifier..."></textarea>
+            <textarea id="paraInstructions" class="textarea-field" style="margin-top:0.5rem;" rows="2" placeholder="Indiquez l'instruction (ex: Rendre plus détaillé et ajouter un exemple sur...)"></textarea>
+        </div>
+         <div class="form-group">
+            <label class="label-text">Ajouter un nouveau paragraphe (Optionnel) :</label>
+            <textarea id="paraToAdd" class="textarea-field" rows="3" placeholder="Rédigez ici le nouveau paragraphe à insérer..."></textarea>
+            <input type="text" id="paraLocation" class="input-field" style="margin-top:0.5rem;" placeholder="Indiquez où l'insérer (ex: après le paragraphe sur la Révolution)">
+        </div>
+        
+        <div class="sub-section">
+            <h3><i class="fas fa-photo-video"></i> Intégration de Médias</h3>
+            
+            <!-- Vidéos -->
+            <div class="form-group">
+                <label class="label-text">Ajouter des vidéos (Optionnel) :</label>
+                <div id="videoContainer"></div>
+                <button type="button" id="addVideoBtn" class="btn" style="background-color: #e2e8f0; color: #334155; margin-top: 0.5rem;">
+                    <i class="fas fa-plus"></i> Ajouter une vidéo
+                </button>
+            </div>
+
+            <!-- Images -->
+            <div class="form-group">
+                <label class="label-text">Ajouter des images (Optionnel) :</label>
+                <div id="imageContainer"></div>
+                <button type="button" id="addImageBtn" class="btn" style="background-color: #e2e8f0; color: #334155; margin-top: 0.5rem;">
+                    <i class="fas fa-plus"></i> Ajouter une image
+                </button>
+            </div>
+
+            <!-- Audio -->
+            <div class="form-group">
+                <label class="label-text">Ajouter des fichiers audio (Optionnel) :</label>
+                <div id="audioContainer"></div>
+                <button type="button" id="addAudioBtn" class="btn" style="background-color: #e2e8f0; color: #334155; margin-top: 0.5rem;">
+                    <i class="fas fa-plus"></i> Ajouter un audio
+                </button>
+            </div>
+        </div>
+
+        <div class="sub-section">
+            <h3><i class="fas fa-question-circle"></i> Ajout d'Évaluation</h3>
+            <p class="label-text">Ajouter des exercices à la fin du cours :</p>
+            <div class="grid-2-cols">
+                 <div class="form-group">
+                    <label for="numQCM" class="label-text">Nombre de QCM :</label>
+                    <input type="number" id="numQCM" class="input-field" min="0" max="5" value="0">
+                </div>
+                 <div class="form-group">
+                    <label for="numQuestions" class="label-text">Nombre de questions simples :</label>
+                    <input type="number" id="numQuestions" class="input-field" min="0" max="5" value="0">
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="section">
+        <h2><i class="fas fa-cogs"></i> 3. Génération du Prompt de Re-génération</h2>
+        <div class="button-group">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Générer le Prompt de Re-génération
+            </button>
+            <button id="copyButton" class="btn btn-secondary" style="display: none;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+        </div>
+        <div id="copyFeedback" class="feedback-message"></div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour réécrire votre cours apparaîtra ici..."></textarea>
+        </div>
+    </section>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const generateButton = document.getElementById('generateButton');
+    const copyButton = document.getElementById('copyButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyFeedback = document.getElementById('copyFeedback');
+
+    // Compteurs pour les médias
+    let videoCount = 0;
+    let imageCount = 0;
+    let audioCount = 0;
+
+    function showFeedback(message, type) {
+        copyFeedback.textContent = message;
+        copyFeedback.className = `feedback-message ${type}`;
+        setTimeout(() => {
+            copyFeedback.className = 'feedback-message';
+        }, 3000);
+    }
+
+    // Fonction pour créer un élément vidéo
+    function createVideoElement(id) {
+        const div = document.createElement('div');
+        div.className = 'media-item';
+        div.innerHTML = `
+            <div class="media-item-header">
+                <span class="media-item-title"><i class="fas fa-video"></i> Vidéo ${id}</span>
+                <button type="button" class="remove-btn" onclick="removeVideo(${id})">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+            <input type="text" class="input-field" placeholder="URL de la vidéo (YouTube, etc.)" style="margin-bottom: 0.5rem;" id="videoUrl${id}">
+            <input type="text" class="input-field" placeholder="Lieu (ex: après le 3ème paragraphe)" style="margin-bottom: 0.5rem;" id="videoLocation${id}">
+            <div class="checkbox-group">
+                <input type="checkbox" id="embedVideo${id}">
+                <label for="embedVideo${id}" class="label-text" style="margin-bottom: 0;">Intégrer la vidéo directement (au lieu d'un simple lien)</label>
+            </div>
+        `;
+        return div;
+    }
+
+    // Fonction pour créer un élément image
+    function createImageElement(id) {
+        const div = document.createElement('div');
+        div.className = 'media-item';
+        div.innerHTML = `
+            <div class="media-item-header">
+                <span class="media-item-title"><i class="fas fa-image"></i> Image ${id}</span>
+                <button type="button" class="remove-btn" onclick="removeImage(${id})">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+            <input type="text" class="input-field" placeholder="URL de l'image" style="margin-bottom: 0.5rem;" id="imageUrl${id}">
+            <input type="text" class="input-field" placeholder="Lieu (ex: après le titre H2)" style="margin-bottom: 0.5rem;" id="imageLocation${id}">
+            <div class="checkbox-group">
+                <input type="checkbox" id="embedImage${id}">
+                <label for="embedImage${id}" class="label-text" style="margin-bottom: 0;">Intégrer l'image directement (au lieu d'un simple lien)</label>
+            </div>
+        `;
+        return div;
+    }
+
+    // Fonction pour créer un élément audio
+    function createAudioElement(id) {
+        const div = document.createElement('div');
+        div.className = 'media-item';
+        div.innerHTML = `
+            <div class="media-item-header">
+                <span class="media-item-title"><i class="fas fa-volume-up"></i> Audio ${id}</span>
+                <button type="button" class="remove-btn" onclick="removeAudio(${id})">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+            <input type="text" class="input-field" placeholder="URL du fichier audio" style="margin-bottom: 0.5rem;" id="audioUrl${id}">
+            <input type="text" class="input-field" placeholder="Lieu (ex: après le 2ème paragraphe)" style="margin-bottom: 0.5rem;" id="audioLocation${id}">
+            <div class="checkbox-group">
+                <input type="checkbox" id="embedAudio${id}">
+                <label for="embedAudio${id}" class="label-text" style="margin-bottom: 0;">Intégrer le lecteur audio (au lieu d'un simple lien)</label>
+            </div>
+        `;
+        return div;
+    }
+
+    // Fonctions globales pour supprimer les médias
+    window.removeVideo = function(id) {
+        const element = document.querySelector(`#videoContainer .media-item:has(#videoUrl${id})`);
+        if (element) element.remove();
+    };
+
+    window.removeImage = function(id) {
+        const element = document.querySelector(`#imageContainer .media-item:has(#imageUrl${id})`);
+        if (element) element.remove();
+    };
+
+    window.removeAudio = function(id) {
+        const element = document.querySelector(`#audioContainer .media-item:has(#audioUrl${id})`);
+        if (element) element.remove();
+    };
+
+    // Gestionnaires d'événements pour ajouter des médias
+    document.getElementById('addVideoBtn').addEventListener('click', () => {
+        videoCount++;
+        const videoContainer = document.getElementById('videoContainer');
+        videoContainer.appendChild(createVideoElement(videoCount));
+    });
+
+    document.getElementById('addImageBtn').addEventListener('click', () => {
+        imageCount++;
+        const imageContainer = document.getElementById('imageContainer');
+        imageContainer.appendChild(createImageElement(imageCount));
+    });
+
+    document.getElementById('addAudioBtn').addEventListener('click', () => {
+        audioCount++;
+        const audioContainer = document.getElementById('audioContainer');
+        audioContainer.appendChild(createAudioElement(audioCount));
+    });
+
+    copyButton.addEventListener('click', () => {
+        outputPrompt.select();
+        outputPrompt.setSelectionRange(0, 99999); // Pour mobile
+        
+        try {
+            document.execCommand('copy');
+            showFeedback('Prompt copié dans le presse-papiers !', 'success');
+        } catch (err) {
+            // Fallback pour les navigateurs modernes
+            navigator.clipboard.writeText(outputPrompt.value).then(() => {
+                showFeedback('Prompt copié dans le presse-papiers !', 'success');
+            }).catch(() => {
+                showFeedback('Erreur lors de la copie. Sélectionnez et copiez manuellement.', 'error');
+            });
+        }
+    });
+
+    generateButton.addEventListener('click', () => {
+        const inputText = document.getElementById('inputText').value.trim();
+        if (!inputText) {
+            alert("Veuillez coller le texte de votre cours dans la première section.");
+            return;
+        }
+
+        let instructions = [];
+
+        // Modification de contenu
+        const paraToModify = document.getElementById('paraToModify').value.trim();
+        if (paraToModify) {
+             const paraInstructions = document.getElementById('paraInstructions').value.trim();
+             instructions.push(`- **MODIFIER UN PARAGRAPHE :**\n  - PARAGRAPHE ORIGINAL À RETROUVER : "${paraToModify}"\n  - INSTRUCTION DE MODIFICATION : "${paraInstructions || 'Améliorer la clarté et le style de ce paragraphe.'}"`);
+        }
+        const paraToAdd = document.getElementById('paraToAdd').value.trim();
+        if (paraToAdd) {
+            const paraLocation = document.getElementById('paraLocation').value.trim();
+            instructions.push(`- **AJOUTER UN PARAGRAPHE :**\n  - CONTENU À AJOUTER : "${paraToAdd}"\n  - EMPLACEMENT : "${paraLocation}"`);
+        }
+        
+        // Intégration de Médias
+        // Traiter toutes les vidéos
+        const videoContainer = document.getElementById('videoContainer');
+        const videoItems = videoContainer.querySelectorAll('.media-item');
+        videoItems.forEach((item, index) => {
+            const id = item.querySelector('input[id^="videoUrl"]').id.replace('videoUrl', '');
+            const videoUrl = document.getElementById(`videoUrl${id}`).value.trim();
+            const videoLocation = document.getElementById(`videoLocation${id}`).value.trim();
+            const embedVideo = document.getElementById(`embedVideo${id}`).checked;
+            
+            if (videoUrl) {
+                if (embedVideo) {
+                    instructions.push(`- **INTÉGRER UNE VIDÉO :** À l'emplacement "${videoLocation}", intègre une vidéo avec le code d'intégration HTML approprié pour l'URL: ${videoUrl}. Assure-toi que la vidéo soit responsive et bien formatée dans le document.`);
+                } else {
+                    instructions.push(`- **AJOUTER UN LIEN VIDÉO :** Insère la mention "[LIEN VIDÉO : ${videoUrl}]" à l'emplacement suivant : "${videoLocation}".`);
+                }
+            }
+        });
+
+        // Traiter toutes les images
+        const imageContainer = document.getElementById('imageContainer');
+        const imageItems = imageContainer.querySelectorAll('.media-item');
+        imageItems.forEach((item, index) => {
+            const id = item.querySelector('input[id^="imageUrl"]').id.replace('imageUrl', '');
+            const imageUrl = document.getElementById(`imageUrl${id}`).value.trim();
+            const imageLocation = document.getElementById(`imageLocation${id}`).value.trim();
+            const embedImage = document.getElementById(`embedImage${id}`).checked;
+            
+            if (imageUrl) {
+                if (embedImage) {
+                    instructions.push(`- **INTÉGRER UNE IMAGE :** À l'emplacement "${imageLocation}", intègre l'image depuis l'URL: ${imageUrl}. Utilise une balise HTML appropriée avec une largeur adaptée et une légende descriptive.`);
+                } else {
+                    instructions.push(`- **AJOUTER UN LIEN IMAGE :** Insère la mention "[LIEN IMAGE : ${imageUrl}]" à l'emplacement suivant : "${imageLocation}".`);
+                }
+            }
+        });
+
+        // Traiter tous les audios
+        const audioContainer = document.getElementById('audioContainer');
+        const audioItems = audioContainer.querySelectorAll('.media-item');
+        audioItems.forEach((item, index) => {
+            const id = item.querySelector('input[id^="audioUrl"]').id.replace('audioUrl', '');
+            const audioUrl = document.getElementById(`audioUrl${id}`).value.trim();
+            const audioLocation = document.getElementById(`audioLocation${id}`).value.trim();
+            const embedAudio = document.getElementById(`embedAudio${id}`).checked;
+            
+            if (audioUrl) {
+                if (embedAudio) {
+                    instructions.push(`- **INTÉGRER UN FICHIER AUDIO :** À l'emplacement "${audioLocation}", intègre un lecteur audio pour le fichier: ${audioUrl}. Utilise une balise HTML audio avec contrôles et format adapté.`);
+                } else {
+                    instructions.push(`- **AJOUTER UN LIEN AUDIO :** Insère la mention "[LIEN AUDIO : ${audioUrl}]" à l'emplacement suivant : "${audioLocation}".`);
+                }
+            }
+        });
+
+        // Ajout d'évaluation
+        const numQCM = parseInt(document.getElementById('numQCM').value, 10);
+        const numQuestions = parseInt(document.getElementById('numQuestions').value, 10);
+        if (numQCM > 0 || numQuestions > 0) {
+            let evalInstructions = `- **AJOUTER UNE SECTION D'ÉVALUATION :** À la fin du document, crée une nouvelle section "Pour s'évaluer".\n`;
+            if (numQCM > 0) {
+                evalInstructions += `  - Ajoute ${numQCM} QCM pertinents basés sur le cours, avec 4 propositions et la bonne réponse indiquée par un astérisque (*).\n`;
+            }
+            if (numQuestions > 0) {
+                evalInstructions += `  - Ajoute ${numQuestions} questions simples et ouvertes, également basées sur le cours.`;
+            }
+            instructions.push(evalInstructions);
+        }
+        
+        if (instructions.length === 0) {
+            alert("Veuillez choisir au moins une amélioration à apporter au cours.");
+            return;
+        }
+
+        let promptText = "Tu agis en tant qu'éditeur et expert en ingénierie pédagogique. Ta mission est de prendre le texte de base d'un cours fourni ci-dessous et de le **réécrire entièrement** en y appliquant une liste de modifications précises. Le résultat final doit être le texte complet et modifié, prêt à être copié dans un document DOCX.\n\n" +
+            "--- TEXTE DE BASE À MODIFIER ---\n" +
+            inputText + "\n\n" +
+            "--- MODIFICATIONS À APPLIQUER ---\n" +
+            instructions.join('\n\n') + "\n\n" +
+            "--- INSTRUCTIONS FINALES ---\n" +
+            "1. Réécris le cours COMPLET en appliquant toutes les modifications demandées\n" +
+            "2. Conserve la structure générale mais améliore la fluidité et la cohérence\n" +
+            "3. Assure-toi que les nouveaux éléments s'intègrent naturellement\n" +
+            "4. Le résultat doit être directement utilisable dans un document DOCX\n" +
+            "5. Formate correctement les titres, paragraphes et listes\n\n" +
+            "Commence ta réponse directement par le texte réécrit, sans commentaire préalable.";
+
+        outputPrompt.value = promptText;
+        copyButton.style.display = 'inline-flex';
+        showFeedback('Prompt généré avec succès !', 'success');
+    });
+
+});
+</script>
+
+</body>
+</html>

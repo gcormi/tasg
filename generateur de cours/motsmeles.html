@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Générateur de Prompt pour Mots Mêlés</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .prompt-output::-webkit-scrollbar { width: 8px; height: 8px; }
+      .prompt-output::-webkit-scrollbar-track { background: #e2e8f0; } /* slate-200 */
+      .prompt-output::-webkit-scrollbar-thumb { background-color: #94a3b8; border-radius: 4px; } /* slate-400 */
+      .prompt-output::-webkit-scrollbar-thumb:hover { background-color: #64748b; } /* slate-500 */
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+      
+      /* Styles pour les sliders en mode clair */
+      input[type='range'] {
+        -webkit-appearance: none; appearance: none;
+        width: 100%; height: 8px;
+        background: #e2e8f0; /* slate-200 */
+        border-radius: 5px; outline: none;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none;
+        width: 20px; height: 20px;
+        background: #0284c7; /* sky-600 */
+        border-radius: 50%; cursor: pointer;
+        border: 2px solid white; margin-top: -6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+      input[type='range']::-moz-range-thumb {
+        width: 20px; height: 20px;
+        background: #0284c7; /* sky-600 */
+        border-radius: 50%; cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
+  }
+}
+</script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+    <div id="root"></div>
+    <script type="module">
+        import React, { useState, useCallback } from 'react';
+        import ReactDOM from 'react-dom/client';
+
+        // --- CONSTANTES (inchangées) ---
+        const STOP_WORDS = new Set(['a', 'afin', 'ai', 'aie', 'aient', 'aies', 'ait', 'alors', 'apres', 'as', 'au', 'aucun', 'aucune', 'aujourd', 'aura', 'aurai', 'auraient', 'aurais', 'aurait', 'auras', 'aurez', 'auriez', 'aurions', 'aurons', 'auront', 'aussi', 'autre', 'autres', 'aux', 'avaient', 'avais', 'avait', 'avant', 'avec', 'avez', 'aviez', 'avions', 'avoir', 'avons', 'ayant', 'ayez', 'ayons', 'bon', 'car', 'ce', 'ceci', 'cela', 'celle', 'celles', 'celui', 'cependant', 'certain', 'certaine', 'certaines', 'certains', 'ces', 'cet', 'cette', 'ceux', 'chaque', 'ci', 'comme', 'comment', 'd', 'dans', 'de', 'deja', 'depuis', 'des', 'deux', 'devant', 'devrait', 'doit', 'donc', 'dont', 'du', 'elle', 'elles', 'en', 'encore', 'entre', 'est', 'et', 'etaient', 'etais', 'etait', 'etant', 'ete', 'etes', 'etiez', 'etions', 'etre', 'eu', 'eue', 'eues', 'eurent', 'eus', 'eusse', 'eussent', 'eusses', 'eussiez', 'eussions', 'eut', 'eux', 'faire', 'fais', 'faisaient', 'faisant', 'fait', 'faites', 'fois', 'font', 'furent', 'fus', 'fusse', 'fussent', 'fusses', 'fussiez', 'fussions', 'fut', 'haut', 'hors', 'hui', 'il', 'ils', 'j', 'je', 'l', 'la', 'le', 'les', 'leur', 'leurs', 'lui', 'm', 'ma', 'mais', 'me', 'meme', 'memes', 'mes', 'mien', 'mienne', 'miennes', 'miens', 'moi', 'moins', 'mon', 'mot', 'n', 'ne', 'ni', 'nom', 'non', 'nos', 'notre', 'notres', 'nous', 'on', 'ont', 'ou', 'par', 'parce', 'pas', 'pendant', 'personne', 'peu', 'peut', 'plus', 'plutot', 'pour', 'pourquoi', 'puis', 'qu', 'quand', 'que', 'quel', 'quelle', 'quelles', 'quels', 'qui', 's', 'sa', 'sans', 'se', 'sera', 'serai', 'seraient', 'serais', 'serait', 'seras', 'serez', 'seriez', 'serions', 'serons', 'seront', 'ses', 'si', 'sien', 'sienne', 'siennes', 'siens', 'soi', 'soient', 'sois', 'soit', 'sommes', 'son', 'sont', 'soyez', 'soyons', 'suis', 'sur', 't', 'ta', 'tandis', 'te', 'tel', 'telle', 'telles', 'tels', 'tes', 'toi', 'ton', 'tous', 'tout', 'toute', 'toutes', 'tres', 'tu', 'un', 'une', 'va', 'vais', 'vas', 'vers', 'voici', 'voila', 'vont', 'vos', 'votre', 'votres', 'vous', 'y']);
+
+        // --- SERVICES (inchangés) ---
+        function extractKeywords(courseText, totalWordCount, forcedWordsText) {
+            const normalizeWord = (word) => word.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, '');
+            const forcedWords = forcedWordsText.split(/[\s,]+/).map(w => w.trim()).filter(w => w.length > 2).map(normalizeWord).filter(Boolean);
+            const uniqueForcedWords = new Set(forcedWords);
+            if (uniqueForcedWords.size >= totalWordCount) { return Array.from(uniqueForcedWords).slice(0, totalWordCount); }
+            const wordsFromText = courseText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s']/g, ' ').split(/\s+/);
+            const wordFrequencies = {};
+            for (const word of wordsFromText) {
+                if (word.length > 3 && !STOP_WORDS.has(word)) {
+                    const normalized = normalizeWord(word);
+                    if(normalized && !uniqueForcedWords.has(normalized)) { wordFrequencies[normalized] = (wordFrequencies[normalized] || 0) + 1; }
+                }
+            }
+            const sortedWords = Object.keys(wordFrequencies).sort((a, b) => wordFrequencies[b] - wordFrequencies[a]);
+            const finalWordList = Array.from(uniqueForcedWords);
+            for (const word of sortedWords) { if (finalWordList.length >= totalWordCount) break; finalWordList.push(word); }
+            return finalWordList;
+        }
+
+        function constructWordSearchPrompt(params) {
+            const { gridWidth, gridHeight, words, timerMinutes, magicWord, courseText } = params;
+            const wordData = JSON.stringify(words, null, 2);
+            return `**Titre :** Prompt pour la création d'un jeu de mots mêlés interactif en HTML
+
+**Objectif :** Générer une page web HTML autonome complète (un seul fichier) qui contient un jeu de mots mêlés. Le jeu doit être fonctionnel sans dépendances externes (tout le CSS et JS doit être inclus dans le fichier HTML).
+
+---
+
+### Contexte : Texte du Cours
+
+Ce texte sert de référence thématique. Les mots à cacher dans la grille proviennent de ce texte.
+
+\`\`\`
+${courseText}
+\`\`\`
+
+---
+
+### Spécifications du Jeu
+
+Vous devez créer le code pour le jeu en respectant scrupuleusement les paramètres et fonctionnalités ci-dessous.
+
+#### 1. Paramètres de la Grille et des Mots
+
+* **Dimensions de la grille :** ${gridWidth} colonnes (largeur) par ${gridHeight} lignes (hauteur).
+* **Liste des mots à cacher :** La liste suivante doit être cachée dans la grille. Les mots doivent être en majuscules.
+    \`\`\`json
+    ${wordData}
+    \`\`\`
+
+#### 2. Fonctionnalités Requises
+
+1.  **Génération de la Grille :**
+    * Créez une grille HTML/CSS (avec des \`div\` ou une table) respectant les dimensions spécifiées.
+    * Placez tous les mots de la liste JSON dans la grille. Les mots peuvent être placés horizontalement, verticalement, et en diagonale (dans les deux sens pour chaque orientation : de gauche à droite, de droite à gauche, de haut en bas, de bas en haut, etc.).
+    * Remplissez les cases restantes de la grille avec des lettres majuscules aléatoires de l'alphabet français.
+
+2.  **Interface Utilisateur :**
+    * Affichez la grille de manière claire et lisible. Utilisez une police à chasse fixe (monospace) pour un alignement parfait.
+    * À côté (ou en dessous sur mobile), affichez la liste des mots à trouver.
+
+3.  **Logique de Jeu (JavaScript) :**
+    * **Sélection :** L'utilisateur doit pouvoir sélectionner des mots en cliquant sur la première lettre puis en faisant glisser la souris jusqu'à la dernière lettre du mot. Un retour visuel doit indiquer la sélection en cours.
+    * **Validation :** Une fois la sélection relâchée, le système doit vérifier si la chaîne de lettres sélectionnée correspond (dans un sens ou dans l'autre) à un mot de la liste.
+    * **Feedback Visuel :** Si un mot est trouvé correctement, il doit être visuellement marqué sur la grille (par exemple, surligné de façon permanente avec une couleur verte) ET rayé de la liste des mots à trouver.
+    * **Fin du jeu :** Le jeu est gagné lorsque tous les mots de la liste ont été trouvés.
+
+#### 3. Chronomètre et Récompense
+
+* **Chronomètre :** ${timerMinutes ? `Un chronomètre doit être visible et décompter à partir de ${timerMinutes} minute(s). Si le temps est écoulé avant que tous les mots ne soient trouvés, le jeu se termine et une modale affiche un message "Temps écoulé !".` : "Aucun chronomètre n'est requis pour ce jeu."}
+* **Mot Magique (Récompense) :**
+    * Si le jeu est gagné ${timerMinutes ? `dans le temps imparti` : ''}, une fenêtre modale (pop-up) de félicitations doit apparaître.
+    * Cette fenêtre doit révéler le mot magique suivant : **"${magicWord || 'BRAVO'}"**
+
+---
+
+Produisez maintenant le code complet et unique pour ce fichier \`index.html\`. Le code doit être propre, bien commenté et utiliser des pratiques modernes de HTML, CSS et JavaScript vanilla.
+`;
+        }
+        
+        // --- ICONS ---
+        const ClipboardIcon = ({ className = "w-5 h-5" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:2, stroke:"currentColor" }, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" }));
+        const CheckIcon = ({ className = "w-5 h-5" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:3, stroke:"currentColor" }, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M5 13l4 4L19 7" }));
+        const SparklesIcon = ({ className = "w-6 h-6" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor" }, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.562L16.5 21.75l-.398-1.188a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.188-.398a2.25 2.25 0 001.423-1.423L16.5 15.75l.398 1.188a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.188.398a2.25 2.25 0 00-1.423 1.423z" }));
+        const DocumentTextIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" }));
+        const CogIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5M12 9.75v3.75m-3.75-1.5h7.5" }));
+        const SearchIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" }));
+        const ArrowLeftIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className:className, fill:"none", viewBox:"0 0 24 24", strokeWidth:2, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M10 19l-7-7m0 0l7-7m-7 7h18" }));
+        
+        // --- COMPONENTS ---
+        const Spinner = () => React.createElement('svg', { className: "animate-spin h-5 w-5 text-white", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24" }, React.createElement('circle', { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }), React.createElement('path', { className: "opacity-75", fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" }));
+        const Card = ({ children, className = '' }) => React.createElement('div', { className: `bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200/80 ${className}` }, children);
+        const SectionTitle = ({ icon, title, subtitle }) => React.createElement('div', { className: 'flex items-start space-x-4' }, React.createElement('div', { className: 'bg-sky-100 p-3 rounded-xl border border-sky-200' }, icon), React.createElement('div', null, React.createElement('h2', { className: 'text-xl font-bold text-slate-800' }, title), React.createElement('p', { className: 'text-sm text-slate-500' }, subtitle)));
+        const Button = ({ children, isLoading = false, icon, className = '', ...props }) => React.createElement('button', { ...props, disabled: isLoading || props.disabled, className: `w-full flex items-center justify-center bg-sky-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-sky-700 disabled:bg-sky-300 disabled:cursor-not-allowed transition-all duration-300 ease-in-out text-lg shadow-md hover:shadow-sky-300 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-sky-500 ${className}` }, isLoading ? React.createElement(Spinner) : React.createElement(React.Fragment, null, icon && React.createElement('span', { className: "mr-2 -ml-1" }, icon), children));
+        const PromptOutput = ({ prompt }) => {
+            const [copySuccess, setCopySuccess] = useState(false);
+            const copyToClipboard = () => { if (!prompt) return; navigator.clipboard.writeText(prompt).then(() => { setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2500); }).catch(err => { console.error('Erreur de copie: ', err); }); };
+            return React.createElement('div', { className: "relative" }, React.createElement('pre', { className: "bg-slate-800 text-slate-200 p-4 rounded-lg overflow-x-auto max-h-[400px] text-sm prompt-output border border-slate-700" }, React.createElement('code', null, prompt)), React.createElement('button', { onClick: copyToClipboard, className: `absolute top-3 right-3 p-2 rounded-lg transition-colors text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-sky-500 ${copySuccess ? 'bg-green-500 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`, 'aria-label': copySuccess ? "Copié !" : "Copier le prompt" }, copySuccess ? React.createElement(CheckIcon) : React.createElement(ClipboardIcon)));
+        };
+        const ToggleSwitch = ({ checked, onChange, labelId }) => React.createElement('label', { htmlFor: labelId, className: "relative inline-flex items-center cursor-pointer" }, React.createElement('input', { type: "checkbox", id: labelId, checked: checked, onChange: onChange, className: "sr-only peer" }), React.createElement('div', { className: "w-11 h-6 bg-slate-200 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-offset-white peer-focus:ring-sky-500 transition-colors peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600" }));
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const DEFAULT_TEXT = "Un écosystème est un ensemble d'organismes vivants (biocénose) qui interagissent entre eux et avec leur milieu (biotope). La photosynthèse est le processus utilisé par les plantes et certaines bactéries pour convertir l'énergie lumineuse en énergie chimique. La biodiversité représente la diversité des espèces vivantes sur Terre.";
+            const [courseText, setCourseText] = useState(DEFAULT_TEXT);
+            const [forcedWords, setForcedWords] = useState('');
+            const [magicWord, setMagicWord] = useState('BRAVO');
+            const [gridWidth, setGridWidth] = useState(15);
+            const [gridHeight, setGridHeight] = useState(15);
+            const [numWords, setNumWords] = useState(10);
+            const [timerEnabled, setTimerEnabled] = useState(true);
+            const [timerMinutes, setTimerMinutes] = useState(9);
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [generatedPrompt, setGeneratedPrompt] = useState('');
+
+            const handleGeneratePrompt = useCallback(() => {
+                if (!courseText.trim() || !magicWord.trim()) { setError("Veuillez fournir un texte de base et un mot magique."); return; }
+                setIsLoading(true); setError(null); setGeneratedPrompt('');
+                setTimeout(() => {
+                    try {
+                        const finalWords = extractKeywords(courseText, numWords, forcedWords);
+                        if (finalWords.length < numWords) {
+                            setError(`Seulement ${finalWords.length} mots uniques sur les ${numWords} demandés ont été trouvés. Essayez avec un texte plus long ou moins de mots.`);
+                            setIsLoading(false); return;
+                        }
+                        const prompt = constructWordSearchPrompt({ gridWidth, gridHeight, words: finalWords, timerMinutes: timerEnabled ? timerMinutes : null, magicWord, courseText });
+                        setGeneratedPrompt(prompt);
+                    } catch (e) {
+                        console.error(e);
+                        setError("Une erreur de traitement est survenue. Veuillez réessayer.");
+                    } finally {
+                        setIsLoading(false);
+                    }
+                }, 50);
+            }, [courseText, numWords, forcedWords, magicWord, gridWidth, gridHeight, timerEnabled, timerMinutes]);
+            
+            return (
+                React.createElement('div', { className: "min-h-screen bg-slate-50 font-sans p-4 sm:p-6 lg:p-8" },
+                    React.createElement('div', { className: "max-w-6xl mx-auto space-y-8" },
+                        React.createElement('a', { href: "exercices2.html", className: "absolute top-4 left-4 flex items-center gap-2 text-slate-500 hover:text-sky-600 font-semibold transition-colors" },
+                            React.createElement(ArrowLeftIcon, { className: 'w-5 h-5'}), 'Retour'
+                        ),
+                        React.createElement('header', { className: "text-center pt-10" },
+                            React.createElement('div', {className: 'inline-block bg-sky-100 p-4 rounded-full mb-4 ring-8 ring-white/50'}, 
+                                React.createElement(SearchIcon, {className: 'w-12 h-12 text-sky-600'})
+                            ),
+                            React.createElement('h1', { className: "text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight" }, "Créez votre Jeu de Mots Mêlés"),
+                            React.createElement('p', { className: "mt-4 text-lg text-slate-600 max-w-2xl mx-auto" }, "Transformez n'importe quel texte en un jeu de mots mêlés personnalisé. Vous êtes le créateur du jeu !")
+                        ),
+                        React.createElement('main', null,
+                            React.createElement(Card, { className: "p-6 sm:p-8" },
+                                 React.createElement('fieldset', { disabled: isLoading, className: "space-y-10" },
+                                    React.createElement('div', { className: "grid grid-cols-1 lg:grid-cols-2 gap-10" },
+                                        React.createElement('div', { className: "space-y-8" },
+                                            React.createElement(SectionTitle, { icon: React.createElement(DocumentTextIcon, {className: 'text-sky-600'}), title: 'Étape 1 : Fournissez le contenu', subtitle: 'Indiquez le texte qui servira à trouver les mots à cacher.'}),
+                                            React.createElement('div', null,
+                                                React.createElement('label', { htmlFor: "course-text", className: "block text-md font-semibold mb-2 text-slate-700" }, "Votre texte de référence"),
+                                                React.createElement('textarea', { id: "course-text", className: "w-full p-3 h-48 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm", value: courseText, onChange: (e) => setCourseText(e.target.value), placeholder: "Collez votre texte ici..." })
+                                            ),
+                                            React.createElement('div', null,
+                                                React.createElement('label', { htmlFor: "forced-words", className: "block text-md font-semibold mb-2 text-slate-700" }, "Mots à inclure absolument", React.createElement('span', { className: "text-sm font-normal text-slate-500" }, " (Optionnel)")),
+                                                React.createElement('textarea', { id: "forced-words", className: "w-full p-3 h-28 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm", value: forcedWords, onChange: (e) => setForcedWords(e.target.value), placeholder: "Écrivez ici les mots que vous voulez voir dans la grille, séparés par un espace." })
+                                            )
+                                        ),
+                                        React.createElement('div', { className: "space-y-8" },
+                                            React.createElement(SectionTitle, { icon: React.createElement(CogIcon, {className: 'text-sky-600'}), title: 'Étape 2 : Paramétrez le jeu', subtitle: 'Personnalisez la grille et les options de jeu.'}),
+                                            React.createElement('div', { className: "space-y-4" },
+                                                React.createElement('div', null, React.createElement('label', { htmlFor: "grid-width", className: "flex justify-between text-md font-semibold mb-2 text-slate-700" }, React.createElement('span', null, "Largeur de la grille"), React.createElement('span', { className: "font-bold text-sky-600" }, gridWidth)), React.createElement('input', { id: "grid-width", type: "range", min: "10", max: "20", value: gridWidth, onChange: (e) => setGridWidth(Number(e.target.value)), className: "w-full" })),
+                                                React.createElement('div', null, React.createElement('label', { htmlFor: "grid-height", className: "flex justify-between text-md font-semibold mb-2 text-slate-700" }, React.createElement('span', null, "Hauteur de la grille"), React.createElement('span', { className: "font-bold text-sky-600" }, gridHeight)), React.createElement('input', { id: "grid-height", type: "range", min: "10", max: "20", value: gridHeight, onChange: (e) => setGridHeight(Number(e.target.value)), className: "w-full" })),
+                                                React.createElement('div', null, React.createElement('label', { htmlFor: "num-words", className: "flex justify-between text-md font-semibold mb-2 text-slate-700" }, React.createElement('span', null, "Nombre de mots à trouver"), React.createElement('span', { className: "font-bold text-sky-600" }, numWords)), React.createElement('input', { id: "num-words", type: "range", min: "8", max: "15", value: numWords, onChange: (e) => setNumWords(Number(e.target.value)), className: "w-full" }))
+                                            ),
+                                            React.createElement('div', { className: "border-t border-slate-200 pt-4 space-y-4" },
+                                                React.createElement('div', { className: "flex items-center justify-between" }, React.createElement('label', { htmlFor: "timer-toggle", className: "text-md font-semibold text-slate-700" }, "Activer un chronomètre ?"), React.createElement(ToggleSwitch, { labelId: "timer-toggle", checked: timerEnabled, onChange: (e) => setTimerEnabled(e.target.checked) })),
+                                                timerEnabled && React.createElement('div', { className: "animate-fade-in" }, React.createElement('label', { htmlFor: "timer-minutes", className: "block text-sm font-semibold mb-2 text-slate-600" }, "Durée (minutes)"), React.createElement('input', { id: "timer-minutes", type: "number", min: "1", max: "60", className: "w-full p-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm", value: timerMinutes, onChange: (e) => setTimerMinutes(Math.max(1, Number(e.target.value))) })),
+                                                React.createElement('div', { className: "border-t border-slate-200 pt-4"}, React.createElement('label', { htmlFor: "magic-word", className: "block text-md font-semibold mb-2 text-slate-700" }, "Mot magique (récompense)"), React.createElement('input', { id: "magic-word", type: "text", className: "w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm", value: magicWord, onChange: (e) => setMagicWord(e.target.value), placeholder: "Ex: BRAVO, CHAMPION..." }))
+                                            )
+                                        )
+                                    ),
+                                    React.createElement('div', { className: "mt-10 border-t border-slate-200 pt-8" },
+                                        React.createElement(Button, { onClick: handleGeneratePrompt, isLoading: isLoading, icon: React.createElement(SparklesIcon, { className: "w-6 h-6" }) }, isLoading ? 'Création en cours...' : 'Générer le Prompt')
+                                    ),
+                                    error && React.createElement('div', { className: "mt-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md", role: "alert" }, React.createElement('p', { className: "font-bold" }, "Attention !"), React.createElement('p', null, error))
+                                )
+                            ),
+                            generatedPrompt && !isLoading && React.createElement('div', { className: "animate-fade-in mt-10" },
+                                React.createElement(Card, { className: "p-6 sm:p-8" },
+                                    React.createElement(SectionTitle, { icon: React.createElement(SparklesIcon, {className: 'text-sky-600'}), title: 'Étape 3 : Lancez la magie !', subtitle: "Copiez ce prompt et donnez-le à une IA. Elle créera votre jeu instantanément !"}),
+                                    React.createElement('div', { className: 'mt-6' }, React.createElement(PromptOutput, { prompt: generatedPrompt }))
+                                )
+                            ),
+                             isLoading && !generatedPrompt && React.createElement(Card, { className: "p-6 sm:p-8 text-center mt-10" }, React.createElement('div', { className: "flex justify-center items-center gap-4" }, React.createElement(Spinner), React.createElement('p', { className: "text-slate-500 text-lg" }, "Analyse du texte et création du prompt...")))
+                        )
+                    )
+                )
+            );
+        };
+        
+        // --- RENDER ---
+        const rootElement = document.getElementById('root');
+        if (!rootElement) { throw new Error("L'élément root est introuvable."); }
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(React.createElement(React.StrictMode, null, React.createElement(App)));
+    </script>
+</body>
+</html>

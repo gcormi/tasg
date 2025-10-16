@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - EMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #8b5cf6; --primary-600: #7c3aed; --primary-700: #6d28d9;
+            --secondary-500: #10b981; --secondary-600: #059669;
+            --accent-500: #3b82f6; --accent-600: #2563eb;
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--secondary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-700); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { .grid-2-cols, .grid-3-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-balance-scale icon"></i>
+                Générateur de Cours - EMC
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des séances de cours d'Éducation Morale et Civique pour le collège (cycle 4).</p>
+    </div>
+    
+    <section class="section">
+        <h2>1. Sélection de la Séance (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau (Classe) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Séance :</label>
+                <select id="sequenceSelect" class="select-field" disabled>
+                    <option value="">-- Choisir un axe puis une séance --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        <div class="form-group">
+            <label for="studyCaseInput" class="label-text">Étude de cas ou Thème transversal principal :</label>
+            <input type="text" id="studyCaseInput" class="input-field" placeholder="Ex: la laïcité dans le sport, le cyberharcèlement, une campagne de l'UNICEF...">
+        </div>
+        <div class="form-group">
+            <label for="planInput" class="label-text">Déroulé de la séance (Plan) :</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Dictez la structure exacte de la séance. Ex: I. Étude de documents, II. Débat argumenté, III. Synthèse des notions clés..."></textarea>
+        </div>
+        
+        <label class="label-text">Ressources et Documents d'Appui :</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens vers des articles de presse, des sites institutionnels..."></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (extraits de loi, témoignages...)"></textarea>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="designCheckbox" class="label-text" style="display: flex; align-items: center; transition: color 0.3s;">
+                <input type="checkbox" id="designCheckbox" style="margin-right: 0.75rem; width: 1.1rem; height: 1.1rem;">
+                Inclure des instructions de design moderne pour la sortie HTML (facultatif)
+            </label>
+        </div>
+        
+        <div class="form-group" style="text-align: center; margin-top: 2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séance généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séance apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modulesData = {
+        "5e": {
+            1: { theme: "Axe 1 : Le respect d'autrui et les valeurs morales", title: "Identifier et exprimer ses émotions", hook: "Comment reconnaître ce que l'on ressent et pourquoi est-ce important de pouvoir le dire aux autres ?", skills: "Nommer ses émotions. Exprimer un sentiment moral.", knowledge: "Vocabulaire des émotions (joie, tristesse, colère, peur). Différence entre émotion et sentiment.", socleSkills: "Domaine 3 : La formation de la personne et du citoyen. Domaine 1 : S'exprimer à l'oral." },
+            2: { theme: "Axe 1 : Le respect d'autrui et les valeurs morales", title: "Le respect d'autrui et l'acceptation des différences", hook: "Pourquoi est-il parfois difficile d'accepter ceux qui ne nous ressemblent pas ?", skills: "Expliquer en quoi le respect des autres est essentiel. Donner des exemples de différences.", knowledge: "Définition du respect et de la tolérance. Les différentes formes de différences (culturelles, physiques, d'opinions).", socleSkills: "Domaine 3 : Respecter les autres et leurs différences. Domaine 2 : Coopérer et réaliser des projets." },
+            3: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Les règles de la vie collective", hook: "À quoi servent les règles à l'école, dans le sport ou à la maison ? Imaginons une vie sans aucune règle...", skills: "Expliquer le rôle de la règle. Participer à l'élaboration de règles de vie de classe.", knowledge: "Règlement intérieur du collège. Notion de droit et de devoir. La règle comme protection.", socleSkills: "Domaine 3 : Comprendre le sens des règles. Domaine 2 : S'impliquer dans un projet collectif." },
+            4: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Les symboles de la République française", hook: "Pourquoi le drapeau est-il bleu, blanc, rouge ? Que racontent les paroles de la Marseillaise ?", skills: "Identifier les symboles de la République. Expliquer leur signification.", knowledge: "Le drapeau tricolore. l'hymne national (la Marseillaise). la devise. Marianne. la fête nationale du 14 juillet.", socleSkills: "Domaine 5 : Comprendre l'organisation politique de la République. Domaine 1 : Comprendre les langages des arts." },
+            5: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Introduction aux institutions de la République", hook: "Qui prend les décisions dans notre pays ? Comment sont choisies les personnes qui nous gouvernent ?", skills: "Identifier les principaux acteurs de la République. Comprendre le rôle du maire dans sa commune.", knowledge: "Les pouvoirs principaux (exécutif, législatif). Le rôle de la commune et de la mairie.", socleSkills: "Domaine 3 : La formation du citoyen. Domaine 5 : Se repérer dans le fonctionnement des institutions." },
+            6: { theme: "Axe 3 : Le Jugement, l'Esprit Critique et les Médias", title: "Se construire un avis personnel", hook: "As-tu le droit de ne pas être d'accord ? Comment se faire sa propre opinion sur un sujet ?", skills: "Exprimer son opinion de manière argumentée. Écouter et respecter l'opinion des autres.", knowledge: "Différence entre un fait et une opinion. Notion de débat argumenté.", socleSkills: "Domaine 3 : Développer son esprit critique. Domaine 1 : S'exprimer à l'oral de manière claire et argumentée." },
+            7: { theme: "Axe 3 : Le Jugement, l'Esprit Critique et les Médias", title: "S'informer : les premiers pas", hook: "Comment savoir si une information vue sur internet ou à la télé est vraie ?", skills: "Citer différents moyens de s'informer. Se questionner sur l'origine d'une information.", knowledge: "Les différents médias (presse, TV, radio, internet). Introduction à la notion de source.", socleSkills: "Domaine 2 : Les méthodes et outils pour apprendre (s'informer). Domaine 3 : Agir en citoyen numérique responsable." },
+            8: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "S'engager dans le collège", hook: "Comment peux-tu participer à la vie de ta classe et de ton collège ? Découvrons le rôle des délégués !", skills: "Expliquer le rôle et les missions d'un délégué de classe. Participer à une élection.", knowledge: "Le rôle du conseil de classe. Le Conseil de la Vie Collégienne (CVC). Le principe de l'élection et de la représentation.", socleSkills: "Domaine 3 : S'engager et prendre des responsabilités. Domaine 2 : Coopérer et s'impliquer dans la vie de l'établissement." }
+        },
+        "4e": {
+            9: { theme: "Axe 1 : Le respect d'autrui et les valeurs morales", title: "Distinguer inégalité et discrimination", hook: "Est-ce la même chose de ne pas avoir les mêmes chances et d'être traité différemment à cause de qui l'on est ?", skills: "Définir les termes inégalité et discrimination. Donner des exemples concrets.", knowledge: "Les inégalités sociales et économiques. Les critères de discrimination interdits par la loi.", socleSkills: "Domaine 3 : Réfléchir sur la question de l'égalité. Domaine 1 : Argumenter à l'écrit." },
+            10: { theme: "Axe 1 : Le respect d'autrui et les valeurs morales", title: "La lutte contre le harcèlement", hook: "Que faire si l'on est témoin ou victime de harcèlement ? Comment briser la loi du silence ?", skills: "Identifier une situation de harcèlement. Connaître les interlocuteurs à qui en parler.", knowledge: "Définition du harcèlement et du cyberharcèlement. Le rôle de la victime, du harceleur et des témoins.", socleSkills: "Domaine 3 : Adopter un comportement éthique et responsable. Domaine 2 : Savoir demander de l'aide." },
+            11: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Les libertés et droits fondamentaux", hook: "Quels sont ces droits essentiels que la loi nous garantit à tous ?", skills: "Identifier les principales libertés individuelles et collectives. Comprendre que sa liberté s'arrête là où commence celle des autres.", knowledge: "La Déclaration des Droits de l'Homme et du Citoyen (DDHC). Exemples de libertés (expression, conscience, circulation...).", socleSkills: "Domaine 3 : Comprendre les principes de la République. Domaine 5 : Connaître les textes fondateurs." },
+            12: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Le principe de Laïcité", hook: "Pourquoi dit-on que l'école est laïque ? Que signifie ce principe qui permet de croire ou de ne pas croire librement ?", skills: "Expliquer le principe de laïcité. Appliquer ce principe dans des situations concrètes.", knowledge: "La loi de 1905 sur la séparation des Églises et de l'État. La laïcité comme liberté de conscience et neutralité de l'État.", socleSkills: "Domaine 3 : Partager les valeurs de la République. Domaine 1 : Participer à un débat." },
+            13: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Le principe d'Égalité", hook: "L'égalité, est-ce que ça veut dire que nous sommes tous pareils ?", skills: "Expliquer le principe d'égalité. Illustrer l'égalité filles-garçons.", knowledge: "L'égalité devant la loi. La parité. Les politiques de lutte contre les inégalités.", socleSkills: "Domaine 3 : Comprendre le principe d'égalité. Domaine 5 : Analyser les évolutions de la société." },
+            14: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Le fonctionnement de la Justice", hook: "Que se passe-t-il quand on ne respecte pas la loi ?", skills: "Distinguer la justice civile et la justice pénale. Identifier les acteurs d'un tribunal.", knowledge: "Les principes de la justice (indépendance, gratuité, égalité). Le rôle des juges, avocats, procureurs.", socleSkills: "Domaine 3 : Connaître les institutions de la Justice. Domaine 5 : Comprendre l'organisation de la société." },
+            15: { theme: "Axe 3 : Le Jugement, l'Esprit Critique et les Médias", title: "La liberté de la presse et d'expression", hook: "Peut-on tout dire et tout écrire ? Quelle est l'importance d'avoir une presse libre ?", skills: "Expliquer le rôle de la liberté de la presse. Connaître les limites de la liberté d'expression.", knowledge: "Les lois sur la liberté de la presse. La diffamation, l'injure, l'incitation à la haine. Le rôle des caricatures.", socleSkills: "Domaine 3 : Exercer son jugement critique. Domaine 2 : Mener une recherche d'information." },
+            16: { theme: "Axe 3 : Le Jugement, l'Esprit Critique et les Médias", title: "Vérifier et croiser les informations", hook: "Comment devenir un détective du web pour débusquer les 'fake news' ?", skills: "Appliquer une méthode de vérification de l'information. Croiser plusieurs sources.", knowledge: "Notion de 'fake news' (infox) et de théorie du complot. Les outils de fact-checking.", socleSkills: "Domaine 2 : Évaluer la fiabilité des sources. Domaine 3 : Agir en citoyen numérique éclairé." },
+            17: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "Le vote : un droit et un devoir", hook: "Comment le droit de vote a-t-il été conquis et pourquoi est-il si important ?", skills: "Expliquer l'importance du vote dans une démocratie. Décrire les grandes étapes de la conquête du droit de vote.", knowledge: "Le suffrage censitaire, le suffrage universel masculin (1848), le droit de vote des femmes (1944). L'abstention.", socleSkills: "Domaine 3 : La formation du citoyen. Domaine 5 : Se repérer dans le temps." },
+            18: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "L'engagement associatif", hook: "Comment les associations permettent-elles aux citoyens d'agir ensemble ?", skills: "Donner des exemples d'associations. Expliquer le principe du bénévolat.", knowledge: "La loi de 1901 sur les associations. Les différents domaines d'action (sportif, culturel, humanitaire...).", socleSkills: "Domaine 3 : S'engager dans la vie sociale. Domaine 2 : Réaliser des projets." }
+        },
+        "3e": {
+            19: { theme: "Axe 1 : Le respect d'autrui et les valeurs morales", title: "La responsabilité et l'éthique", hook: "Quelles sont les questions morales à se poser face aux nouvelles technologies ?", skills: "Analyser un dilemme moral. Comprendre la notion de responsabilité collective.", knowledge: "Notion d'éthique et de déontologie. Les enjeux éthiques des nouvelles technologies (IA, réseaux sociaux).", socleSkills: "Domaine 3 : Développer son discernement. Domaine 4 : Comprendre les implications des technologies." },
+            20: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "La citoyenneté française et européenne", hook: "Être citoyen, qu'est-ce que ça implique en France et en Europe ?", skills: "Décrire les droits et les devoirs du citoyen. Expliquer les apports de la citoyenneté européenne.", knowledge: "Les conditions d'acquisition de la nationalité française. Le traité de Maastricht. Les droits du citoyen européen.", socleSkills: "Domaine 3 : Connaître les attributs de la citoyenneté. Domaine 5 : Comprendre le fonctionnement de l'UE." },
+            21: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Les valeurs de la République : la Fraternité", hook: "Comment la fraternité se traduit-elle dans notre société ?", skills: "Expliquer le principe de fraternité. Donner des exemples de politiques de solidarité.", knowledge: "La Sécurité Sociale. Les politiques de redistribution. Le rôle des ONG.", socleSkills: "Domaine 3 : Partager la valeur de solidarité. Domaine 5 : Comprendre les politiques publiques." },
+            22: { theme: "Axe 2 : Les Principes et Valeurs de la République", title: "Les institutions de la Vème République", hook: "Comment le pouvoir est-il organisé en France pour garantir la démocratie ?", skills: "Schématiser l'organisation des pouvoirs. Expliquer le parcours d'une loi.", knowledge: "Rôle du Président, du Premier Ministre. Le Parlement (Assemblée, Sénat). Le Conseil Constitutionnel.", socleSkills: "Domaine 3 : Connaître les institutions de la République. Domaine 5 : Comprendre l'organisation politique de la France." },
+            23: { theme: "Axe 3 : Le Jugement, l'Esprit Critique et les Médias", title: "L'identité numérique et ses enjeux", hook: "Chaque clic, chaque post laisse une trace. Comment maîtriser son identité numérique ?", skills: "Définir l'identité numérique. Adopter des bonnes pratiques pour protéger ses données.", knowledge: "Les traces numériques. L'e-réputation. Le droit à l'image et à la vie privée. Le RGPD.", socleSkills: "Domaine 2 : Utiliser les médias et les informations de manière autonome. Domaine 3 : Être un citoyen numérique responsable." },
+            24: { theme: "Axe 3 : Le Jugement, l'Esprit Critique et les Médias", title: "Distinguer intérêt particulier et intérêt général", hook: "Comment l'État arbitre-t-il entre nos intérêts personnels et le bien de tous ?", skills: "Analyser une situation de conflit d'intérêts. Argumenter en faveur de l'intérêt général.", knowledge: "Définition de l'intérêt général. Le rôle de l'impôt. Les services publics.", socleSkills: "Domaine 3 : Participer à la vie démocratique. Domaine 5 : Comprendre les enjeux économiques et sociaux." },
+            25: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "L'engagement politique et syndical", hook: "Comment les citoyens peuvent-ils participer à la vie politique et défendre leurs droits ?", skills: "Distinguer le rôle d'un parti politique et d'un syndicat. Expliquer l'importance du pluralisme.", knowledge: "Les partis politiques. Les syndicats (droit de grève, négociation). Le dialogue social.", socleSkills: "Domaine 3 : S'engager dans la vie démocratique. Domaine 2 : S'organiser pour mener un projet." },
+            26: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "La Défense et la sécurité nationale", hook: "À quoi sert l'armée aujourd'hui ? Comment la France assure-t-elle sa défense ?", skills: "Décrire les grandes missions de la Défense nationale. Comprendre les enjeux de la sécurité collective.", knowledge: "Les différentes composantes de l'armée. Les opérations extérieures (OPEX). Le rôle de l'ONU et de l'OTAN.", socleSkills: "Domaine 3 : Comprendre les enjeux de la Défense. Domaine 5 : Se situer dans le monde." },
+            27: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "L'engagement pour le développement durable", hook: "Comment notre engagement peut-il faire la différence face à l'urgence climatique ?", skills: "Proposer des actions concrètes en faveur du développement durable. Analyser les enjeux des accords sur le climat.", knowledge: "Les Objectifs de Développement Durable (ODD). La COP. La notion de transition écologique.", socleSkills: "Domaine 5 : Comprendre la responsabilité humaine face à l'environnement. Domaine 3 : S'engager dans des projets citoyens." },
+            28: { theme: "Axe 4 : L'Engagement individuel et collectif", title: "Les causes des conflits et les enjeux de la paix", hook: "Pourquoi les hommes se font-ils la guerre et comment construire une paix durable ?", skills: "Identifier les différentes natures de conflits. Expliquer le rôle de la diplomatie.", knowledge: "Le rôle du Conseil de Sécurité de l'ONU. La justice pénale internationale. Le rôle des casques bleus.", socleSkills: "Domaine 5 : Comprendre les relations internationales. Domaine 3 : Promouvoir les valeurs de paix." }
+        }
+    };
+
+    const gradeSelect = document.getElementById('gradeSelect');
+    const sequenceSelect = document.getElementById('sequenceSelect');
+    const studyCaseInput = document.getElementById('studyCaseInput');
+    const planInput = document.getElementById('planInput');
+    const videoLinks = document.getElementById('videoLinks');
+    const websiteLinks = document.getElementById('websiteLinks');
+    const rawText = document.getElementById('rawText');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+    const designCheckbox = document.getElementById('designCheckbox');
+    const designCheckboxLabel = document.querySelector('label[for="designCheckbox"]');
+
+    function populateModules(grade) {
+        sequenceSelect.innerHTML = '<option value="">-- Choisir un axe puis une séance --</option>';
+        sequenceSelect.disabled = true;
+        if (grade && modulesData[grade]) {
+            const modulesForGrade = modulesData[grade];
+            const themes = [...new Set(Object.values(modulesForGrade).map(item => item.theme))];
+            
+            themes.forEach(theme => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = theme;
+                
+                Object.keys(modulesForGrade).forEach(key => {
+                    const moduleItem = modulesForGrade[key];
+                    if (moduleItem.theme === theme) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = moduleItem.title;
+                        optgroup.appendChild(option);
+                    }
+                });
+                sequenceSelect.appendChild(optgroup);
+            });
+            
+            sequenceSelect.disabled = false;
+        }
+    }
+
+    gradeSelect.addEventListener('change', () => populateModules(gradeSelect.value));
+
+    document.querySelectorAll('input[name="outputFormat"]').forEach(radio => {
+        radio.addEventListener('change', handleDesignCheckboxState);
+    });
+
+    function handleDesignCheckboxState() {
+        const selectedFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+        if (selectedFormat === 'html') {
+            designCheckbox.disabled = false;
+            designCheckboxLabel.style.color = 'var(--neutral-700)';
+            designCheckboxLabel.style.cursor = 'pointer';
+        } else {
+            designCheckbox.disabled = true;
+            designCheckbox.checked = false;
+            designCheckboxLabel.style.color = 'var(--neutral-300)';
+            designCheckboxLabel.style.cursor = 'not-allowed';
+        }
+    }
+
+    function formatToList(text) {
+        if (!text) return 'N/A';
+        const items = text.split('.').map(item => item.trim()).filter(item => item.length > 0);
+        return '\n   - ' + items.join('\n   - ');
+    }
+
+    generateButton.addEventListener('click', () => {
+        const selectedGrade = gradeSelect.value;
+        const selectedModuleKey = sequenceSelect.value;
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!selectedGrade || !selectedModuleKey || !outputFormatRadio) { 
+            alert("Veuillez choisir un niveau, une séance et un format de sortie."); return;
+        }
+        
+        const moduleDetails = modulesData[selectedGrade]?.[selectedModuleKey];
+        if (!moduleDetails) {
+            alert("Détails de la séance non trouvés."); return;
+        }
+
+        const studyCase = studyCaseInput.value.trim();
+        const plan = planInput.value.trim();
+        const videos = videoLinks.value.trim();
+        const websites = websiteLinks.value.trim();
+        const text = rawText.value.trim();
+        const outputFormat = outputFormatRadio.value;
+        const includeDesign = designCheckbox.checked;
+
+        let promptText = `**RÔLE ET MISSION DE HAUT NIVEAU**
+Tu es un **concepteur pédagogique expert en ingénierierie de la formation**, agissant en tant qu'auteur principal pour un éditeur de manuels scolaires de premier plan. Tu es également **Professeur agrégé d'EMC**, spécialiste de la didactique du débat et de l'éthique, et tu maîtrises parfaitement les programmes de l'Éducation Nationale française ainsi que les sciences cognitives.
+
+Ta mission est de rédiger une **fiche de préparation de séance complète, exhaustive et multi-facettes** pour un élève de **${selectedGrade}**. Ce document doit être une ressource de référence, alliant rigueur conceptuelle, clarté pédagogique et un engagement fort pour l'élève.\n\n`;
+
+        const hasImperativeInstructions = studyCase || plan || videos || websites || text;
+        if (hasImperativeInstructions) {
+            promptText += `**INSTRUCTIONS IMPÉRATIVES DE L'ENSEIGNANT**
+La conception de la séance doit obligatoirement intégrer les éléments suivants :\n`;
+            if (studyCase) {
+                promptText += `- **Étude de cas ou thème transversal centraux :** La séance doit être entièrement articulée autour de l'étude de : **${studyCase}**.\n`;
+            }
+            if (plan) { promptText += `- **Plan imposé :** La structure de la séance doit suivre scrupuleusement ce plan :\n${plan}\n`; }
+            if (videos || websites || text) {
+                promptText += `- **Ressources d'appui imposées :** Le contenu doit se baser sur l'analyse et la synthèse de ces ressources :\n`;
+                if (videos) promptText += `  - Vidéos : \n${videos}\n`;
+                if (websites) promptText += `  - Sites web : \n${websites}\n`;
+                if (text) promptText += `  - Textes : \n${text}\n`;
+            }
+            promptText += "\n";
+        }
+        
+        promptText += `**CAHIER DES CHARGES PÉDAGOGIQUE DE LA SÉANCE**
+- **Niveau :** ${selectedGrade}
+- **Axe Thématique :** ${moduleDetails.theme}
+- **Titre de la Séance :** ${moduleDetails.title}
+- **Accroche / Dilemme moral :** "${moduleDetails.hook}"
+- **Compétences Visées :** ${formatToList(moduleDetails.skills)}
+- **Savoirs & Notions Clés :** ${formatToList(moduleDetails.knowledge)}
+- **Compétences du Socle Commun Travaillées :** ${formatToList(moduleDetails.socleSkills)}\n\n`;
+
+        promptText += `**STRUCTURE DÉTAILLÉE DU DOCUMENT À PRODUIRE**
+Tu dois rédiger la fiche de séance en respectant **impérativement** le format de sortie demandé et la structure complète en 10 points ci-dessous, pensée pour une séance d'EMC interactive.
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n`;
+        if (outputFormat === 'html' && includeDesign) {
+            promptText += `**INSTRUCTIONS SPÉCIFIQUES POUR LE DESIGN HTML :**
+Crée une fiche de séance en HTML/CSS moderne et claire. Utilise une palette de couleurs sobres, des animations CSS simples, des icônes Font Awesome pour illustrer les concepts, des encadrés stylisés pour les notions clés et les activités. Le document doit être un fichier HTML autonome (CSS interne).
+**RÈGLE STRICTE SUR LES IMAGES :** N'utilise PAS de balises \`<img>\` avec des liens externes. À la place, utilise des placeholders stylisés avec une description claire. EXEMPLE : \`<div style="border: 2px dashed #ccc; padding: 2rem; text-align: center; background-color: #f9f9f9; border-radius: 8px; margin: 1rem 0;"><em>Image : Affiche de campagne pour la lutte contre les discriminations.</em></div>\`\n\n`;
+        }
+        promptText += `---
+**DÉBUT DU CONTENU DE LA FICHE DE SÉANCE À RÉDIGER**
+
+**1. TITRE DE LA SÉANCE :** (Titre : ${moduleDetails.title.toUpperCase()})
+
+**2. SITUATION DÉCLENCHANTE / DILEMME MORAL :** Scénarise l'accroche ("${moduleDetails.hook}") en un **dilemme moral concret** ou une **situation-problème** qui interpelle les élèves et les oblige à se questionner.
+
+**3. OBJECTIFS PÉDAGOGIQUES : "Notre boussole pour cette séance..."**
+Présente les objectifs sous forme de listes à puces claires :
+   - **Compétences à maîtriser :** (basé sur : "${moduleDetails.skills}").
+   - **Notions clés à comprendre :** (basé sur : "${moduleDetails.knowledge}").
+   - **Compétences du Socle que nous allons travailler :** (basé sur : "${moduleDetails.socleSkills}").
+
+**4. INTRODUCTION ET PROBLÉMATIQUE CITOYENNE :** Fais le lien avec le dilemme, situe le sujet dans son contexte (légal, social) et formule la **problématique citoyenne** centrale à laquelle la séance va répondre. Annonce le déroulé.
+
+**5. ACTIVITÉ 1 - ANALYSE DE DOCUMENTS :**
+Propose une activité basée sur 1 ou 2 documents courts et percutants (texte de loi, témoignage, article, caricature...).
+   a. **Description/Texte du/des document(s) :** **RÈGLE STRICTE SUR LES IMAGES :** Pour toute image (caricature, photo...), ne jamais utiliser de balise \`<img>\`. Décris le document visuel de manière très détaillée entre crochets. EXEMPLE: **[Description : Caricature de Plantu montrant...]**
+   b. **Questionnaire d'analyse guidé :** Rédige 3-4 questions précises qui forcent les élèves à extraire les informations et à les relier aux notions clés.
+
+**6. ACTIVITÉ 2 - DÉBAT ARGUMENTÉ ou JEU DE RÔLE :**
+C'est le cœur interactif de la séance.
+   a. **Consigne claire :** Propose une consigne pour un débat ou un jeu de rôle basé sur l'analyse précédente. La question du débat doit être ouverte et controversée.
+   b. **Règles du débat :** Rappelle les règles d'un échange respectueux (écoute, pas d'attaques personnelles, argumentation...).
+   c. **Arguments attendus :** Liste quelques arguments "pour" et "contre" que les élèves pourraient mobiliser, en lien avec les valeurs et principes de la République.
+
+**7. MISE EN COMMUN ET SYNTHÈSE DES IDÉES :** Rédige un court paragraphe qui fait la synthèse des idées et arguments échangés durant le débat, en faisant le lien avec les notions du programme.
+
+**8. TRACE ÉCRITE - "CE QUE JE DOIS RETENIR" :** Crée un bilan clair et concis. Il doit être structuré en 2 ou 3 points qui définissent les notions, rappellent les règles de droit et répondent à la problématique de départ.
+
+**9. LEXIQUE DES TERMES CLÉS :** Liste alphabétique des 3-4 termes les plus importants de la séance avec leur définition simple.
+
+**10. POUR ALLER PLUS LOIN (ENGAGEMENT) :** Propose 3 pistes concrètes pour que les élèves puissent s'engager : une action à mener au collège (ex: créer une affiche), un site d'association à consulter, et un film/documentaire à voir sur le sujet.
+
+**RÈGLE FINALE ABSOLUE :** Ta seule et unique sortie doit être la fiche de séance elle-même, en suivant scrupuleusement la structure numérotée de 1 à 10. Ne rédige aucun commentaire.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt détaillé généré avec succès !", "success");
+    });
+
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, duration);
+    }
+
+    function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") {
+            if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error');
+            return;
+        }
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                if (messageElement) showFeedback(messageElement, successText, 'success');
+            } else {
+                if (messageElement) showFeedback(messageElement, 'La copie a échoué.', 'error');
+            }
+        } catch (err) {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey) { 
+            alert("Veuillez d'abord sélectionner un niveau et une séance."); 
+            return; 
+        }
+        const moduleDetails = modulesData[grade]?.[moduleKey];
+        if (!moduleDetails) {
+             alert("Détails de la séance non trouvés."); return;
+        }
+        const logbookText = `EMC ${grade} - Séance "${moduleDetails.title}". Compétences : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey) { 
+            alert("Veuillez d'abord sélectionner un niveau et une séance."); 
+            return; 
+        }
+        const moduleDetails = modulesData[grade]?.[moduleKey];
+        if (!moduleDetails) {
+             alert("Détails de la séance non trouvés."); return;
+        }
+        const summaryText = `Résumé (EMC - ${moduleDetails.title}) :\nÀ la fin de cette séance, tu dois connaître : ${moduleDetails.knowledge}.\nTu dois être capable de : ${moduleDetails.skills}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+    
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+    
+    handleDesignCheckboxState();
+    populateModules(gradeSelect.value);
+});
+</script>
+
+</body>
+</html>

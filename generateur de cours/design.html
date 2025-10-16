@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier d'Amélioration & Design de Cours</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #06b6d4 100%);
+            --secondary-gradient: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --success-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --danger-gradient: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            --warm-gradient: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+            --primary-500: #1e40af; --primary-600: #1d4ed8; --primary-700: #1e3a8a;
+            --secondary-500: #f97316; --secondary-600: #ea580c;
+            --accent-500: #7c3aed; --accent-600: #7c2d12;
+            --neutral-50: #fafafa; --neutral-100: #f5f5f5; --neutral-200: #e5e5e5; --neutral-300: #d4d4d4; --neutral-400: #a3a3a3; --neutral-500: #737373; --neutral-600: #525252; --neutral-700: #404040; --neutral-800: #262626; --neutral-900: #171717;
+            --white: #ffffff; --success-500: #059669; --danger-500: #dc2626;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-soft: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-colored: 0 10px 30px -5px rgba(30, 64, 175, 0.3);
+            --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.4);
+            --radius-xs: 0.25rem; --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-2xl: 1.5rem; --radius-3xl: 2rem; --radius-full: 9999px;
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --transition-elastic: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --glass-bg: rgba(255, 255, 255, 0.1); --glass-border: rgba(255, 255, 255, 0.2); --glass-blur: blur(20px);
+            --shadow-focus-ring: 0 0 0 3px rgba(30, 64, 175, 0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { font-family: var(--font-secondary); background: var(--primary-gradient); color: #334155; line-height: 1.6; margin: 0; padding: 2rem; min-height: 100vh; position: relative; overflow-x: hidden; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.3) 0%, transparent 50%); pointer-events: none; z-index: -1; animation: backgroundShift 20s ease-in-out infinite; }
+        @keyframes backgroundShift { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }
+        body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent), radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent), radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent); background-repeat: repeat; background-size: 200px 200px; animation: particleFloat 30s linear infinite; pointer-events: none; z-index: -1; }
+        @keyframes particleFloat { 0% { transform: translateY(0px); } 100% { transform: translateY(-200px); } }
+        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .header-container, .section { background: rgba(255, 255, 255, 0.95); backdrop-filter: var(--glass-blur); padding: 2.5rem; border-radius: var(--radius-2xl); box-shadow: var(--shadow-xl); margin-bottom: 2rem; border: 1px solid var(--glass-border); position: relative; overflow: hidden; }
+        .header-container::before, .section::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shine 4s ease-in-out infinite; z-index: 1; pointer-events: none; }
+        @keyframes shine { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
+        .header-container > *, .section > * { position: relative; z-index: 2; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; background: var(--glass-bg); color: var(--primary-700); text-decoration: none; border-radius: var(--radius-lg); font-weight: 600; transition: var(--transition-smooth); border: 1px solid var(--glass-border); backdrop-filter: var(--glass-blur); position: relative; overflow: hidden; }
+        .back-button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(30, 64, 175, 0.1), transparent); transition: var(--transition-smooth); }
+        .back-button:hover::before { left: 100%; }
+        .back-button:hover { background: rgba(30, 64, 175, 0.1); transform: translateX(-5px) scale(1.02); box-shadow: var(--shadow-colored); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; font-weight: 800; }
+        .page-header h1 .icon { background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.2em; animation: iconPulse 3s ease-in-out infinite; }
+        @keyframes iconPulse { 0%, 100% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(5deg); } 50% { transform: scale(1.05) rotate(-2deg); } 75% { transform: scale(1.08) rotate(3deg); } }
+        .page-header-subtitle { text-align: center; font-size: 1.2rem; color: var(--neutral-600); margin-top: 1rem; font-weight: 500; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 2rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-weight: 700; position: relative; }
+        .section h2::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 60px; height: 3px; background: var(--accent-gradient); border-radius: var(--radius-full); }
+        .section h2 i { background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .section h3 { font-family: var(--font-primary); font-size: 1.4rem; color: var(--neutral-800); margin-top: 2.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--primary-500); padding-left: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; position: relative; }
+        .section h3::before { content: ''; position: absolute; left: -4px; top: 0; width: 4px; height: 100%; background: var(--accent-gradient); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+        .section h3 i { background: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .form-group { margin-bottom: 2rem; position: relative; }
+        .label-text { display: block; font-weight: 600; color: var(--neutral-700); margin-bottom: 0.75rem; font-size: 1rem; font-family: var(--font-primary); }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 1rem 1.25rem; border: 2px solid var(--neutral-300); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--neutral-50) 0%, #ffffff 100%); font-size: 1rem; color: var(--neutral-700); transition: var(--transition-smooth); font-family: var(--font-secondary); position: relative; backdrop-filter: blur(10px); }
+        .input-field[type="color"] { padding: 0.5rem; height: 50px; cursor: pointer; border-radius: var(--radius-lg); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); background: linear-gradient(135deg, #ffffff 0%, var(--neutral-50) 100%); transform: translateY(-2px); }
+        .textarea-field { resize: vertical; min-height: 120px; }
+        .btn { padding: 1rem 2rem; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; transition: var(--transition-smooth); font-family: var(--font-primary); font-size: 1rem; position: relative; overflow: hidden; text-decoration: none; }
+        .btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: var(--transition-smooth); }
+        .btn:hover::before { left: 100%; }
+        .btn-primary { background: var(--primary-gradient); color: var(--white); box-shadow: var(--shadow-large); }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px) scale(1.02); box-shadow: var(--shadow-colored); }
+        .btn-secondary { background: var(--secondary-gradient); color: var(--white); box-shadow: var(--shadow-large); }
+        .btn-secondary:hover:not(:disabled) { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px -5px rgba(249, 115, 22, 0.4); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .grid-2-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .sub-section { border-top: 2px dashed var(--neutral-300); margin-top: 3rem; padding-top: 3rem; position: relative; }
+        .sub-section::before { content: ''; position: absolute; top: -1px; left: 0; width: 60px; height: 2px; background: var(--accent-gradient); }
+        .small-text { font-size: 0.9rem; color: var(--neutral-600); font-weight: 500; }
+        .feedback-message { transition: var(--transition-smooth); opacity: 0; font-size: 0.95rem; margin-top: 0.75rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: var(--radius-md); transform: translateY(-10px); }
+        .feedback-message.show { opacity: 1; transform: translateY(0); }
+        .feedback-message.success { color: var(--success-500); background: rgba(5, 150, 105, 0.1); border: 1px solid rgba(5, 150, 105, 0.2); }
+        .feedback-message.error { color: var(--danger-500); background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.2); }
+        .checkbox-group { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, var(--neutral-50) 0%, #ffffff 100%); border-radius: var(--radius-lg); border: 2px solid var(--neutral-200); transition: var(--transition-smooth); flex-wrap: wrap; }
+        .checkbox-group:hover { border-color: var(--primary-500); background: linear-gradient(135deg, #ffffff 0%, var(--neutral-50) 100%); }
+        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary-500); cursor: pointer; }
+        .checkbox-group label { font-weight: 500; cursor: pointer; color: var(--neutral-700); flex: 1; min-width: 150px; }
+        .checkbox-group .input-field { width: 80px; padding: 0.5rem; text-align: center; }
+        .section { animation: slideInUp 0.6s ease-out; }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { body { padding: 1rem; } .header-container, .section { padding: 1.5rem; } .grid-3-cols, .grid-2-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column; gap: 1rem; text-align: center; } .page-header h1 { font-size: 1.8rem; } .btn { width: 100%; justify-content: center; } }
+        @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+        .btn:focus, .input-field:focus, .select-field:focus, .textarea-field:focus { outline: 3px solid var(--primary-500); outline-offset: 2px; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--neutral-100); border-radius: var(--radius-sm); }
+        ::-webkit-scrollbar-thumb { background: var(--neutral-400); border-radius: var(--radius-sm); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neutral-500); }
+        .section:hover { transform: translateY(-2px); box-shadow: var(--shadow-2xl); }
+        .form-group:focus-within .label-text { color: var(--primary-500); transform: translateX(5px); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Retour</a>
+            <h1><i class="fas fa-drafting-compass icon"></i> Atelier d'Amélioration & Design</h1>
+        </header>
+        <p class="page-header-subtitle">Améliorez, enrichissez et personnalisez vos cours générés avec l'IA.</p>
+    </div>
+
+    <section class="section">
+        <h2><i class="fas fa-paste"></i> 1. Cours à Améliorer</h2>
+        <div class="form-group">
+            <label for="inputHtml" class="label-text">Collez ici le code HTML complet de votre cours :</label>
+            <textarea id="inputHtml" class="textarea-field" rows="8" placeholder="<!DOCTYPE html>...</html>"></textarea>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2><i class="fas fa-tools"></i> 2. Boîte à Outils d'Amélioration</h2>
+
+        <h3><i class="fas fa-palette"></i> Design Visuel</h3>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <label for="primaryColor" class="small-text">Couleur Primaire</label>
+                <input type="color" id="primaryColor" class="input-field" value="#1e40af">
+            </div>
+            <div class="form-group">
+                <label for="secondaryColor" class="small-text">Couleur Secondaire</label>
+                <input type="color" id="secondaryColor" class="input-field" value="#f97316">
+            </div>
+            <div class="form-group">
+                <label for="accentColor" class="small-text">Couleur d'Accent</label>
+                <input type="color" id="accentColor" class="input-field" value="#7c3aed">
+            </div>
+        </div>
+         <div class="form-group">
+            <label for="fontChoice" class="label-text">Choisir un duo de polices :</label>
+            <select id="fontChoice" class="select-field">
+                <option value="">(Ne pas changer)</option>
+                <option value="Roboto-Merriweather">Roboto & Merriweather</option>
+                <option value="Lato-Lora">Lato & Lora</option>
+                <option value="Montserrat-Arvo">Montserrat & Arvo</option>
+                <option value="OpenDyslexic">Police pour DYS</option>
+            </select>
+        </div>
+
+        <div class="sub-section">
+            <h3><i class="fas fa-photo-video"></i> Intégration de Médias</h3>
+            <div class="form-group">
+                <label for="videoList" class="label-text">Ajouter des Vidéos</label>
+                <textarea id="videoList" class="textarea-field" rows="3" placeholder="Mettre une vidéo par ligne. Format :&#10;URL_DE_LA_VIDEO --- Lieu d'insertion (ex: après le 2ème paragraphe)"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="imageList" class="label-text">Ajouter des Images</label>
+                <textarea id="imageList" class="textarea-field" rows="3" placeholder="Mettre une image par ligne. Format :&#10;URL_DE_L'IMAGE --- Lieu d'insertion --- Taille (petite, moyenne, ou grande)"></textarea>
+            </div>
+        </div>
+        
+        <div class="sub-section">
+            <h3><i class="fas fa-trash-alt"></i> Opérations de Suppression</h3>
+            <div class="form-group">
+                <label for="specificContentToDelete" class="label-text">Contenu Spécifique à Supprimer</label>
+                <textarea id="specificContentToDelete" class="textarea-field" rows="3" placeholder="Collez ici le texte exact (paragraphe, phrase...) que vous souhaitez retirer du cours."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="structuralElementToDelete" class="label-text">Éléments Structurels à Supprimer (par description)</label>
+                <textarea id="structuralElementToDelete" class="textarea-field" rows="3" placeholder="Décrivez ici les éléments à retirer. Exemples : le cadre d'introduction avec le fond bleu, la section 'Pour Aller Plus Loin', l'image du volcan, etc."></textarea>
+            </div>
+        </div>
+
+        <div class="sub-section">
+            <h3><i class="fas fa-pencil-alt"></i> Instructions Générales (Texte Libre)</h3>
+             <div class="form-group">
+                <label for="generalInstructions" class="label-text">Autres demandes de modification ou de développement</label>
+                <textarea id="generalInstructions" class="textarea-field" rows="4" placeholder="Pour toute autre demande : rédiger une conclusion, développer un point particulier, réorganiser des sections, ajouter une liste à puce sur un sujet, etc."></textarea>
+            </div>
+        </div>
+        
+        <div class="sub-section">
+            <h3><i class="fas fa-question-circle"></i> Ajout d'Exercices Interactifs</h3>
+            <div class="form-group checkbox-group">
+                <label for="exerciseCount">Nombre d'exercices à générer :</label>
+                <input type="number" id="exerciseCount" class="input-field" value="0" min="0" max="10">
+            </div>
+            <div class="form-group">
+                <label class="label-text">Types d'exercices souhaités :</label>
+                <div class="grid-2-cols">
+                    <div class="checkbox-group"><input type="checkbox" id="exTypeQCM"><label for="exTypeQCM">QCM</label></div>
+                    <div class="checkbox-group"><input type="checkbox" id="exTypeVraiFaux"><label for="exTypeVraiFaux">Vrai / Faux</label></div>
+                    <div class="checkbox-group"><input type="checkbox" id="exTypeTrou"><label for="exTypeTrou">Texte à trous</label></div>
+                    <div class="checkbox-group"><input type="checkbox" id="exTypeOuverte"><label for="exTypeOuverte">Question ouverte (avec indice)</label></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sub-section">
+            <h3><i class="fas fa-magic"></i> Suggestions d'Interactivité et d'Animation</h3>
+            <label class="label-text">Cochez les améliorations à appliquer :</label>
+            <div class="grid-2-cols">
+                <div class="checkbox-group"><input type="checkbox" id="addFlashcards"><label for="addFlashcards"><i class="fas fa-clone"></i> Cartes "Flashcards"</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="addAccordion"><label for="addAccordion"><i class="fas fa-bars"></i> Sections "Accordéon"</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="addImageHotspots"><label for="addImageHotspots"><i class="fas fa-map-marker-alt"></i> Image avec points d'intérêt</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="addTimeline"><label for="addTimeline"><i class="fas fa-stream"></i> Chronologie Interactive</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="addCounters"><label for="addCounters"><i class="fas fa-sort-numeric-up"></i> Compteurs animés</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="addHoverEffects"><label for="addHoverEffects"><i class="fas fa-mouse-pointer"></i> Effets de survol améliorés</label></div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="section">
+        <h2><i class="fas fa-cogs"></i> 3. Génération du Prompt d'Amélioration</h2>
+        <div class="form-group" style="text-align: center;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-wand-magic-sparkles"></i> Générer le Prompt
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt d'Amélioration généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour améliorer votre cours apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <a href="integrateur-visuel.html" class="btn btn-secondary" style="background: var(--accent-gradient);">Accéder à l'Intégrateur Visuel</a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type}`;
+        requestAnimationFrame(() => { element.classList.add('show'); });
+        setTimeout(() => {
+            element.classList.remove('show');
+            setTimeout(() => { if (element.textContent === message) { element.textContent = ''; element.className = 'feedback-message'; } }, 300);
+        }, duration);
+    }
+
+    function copyToClipboardUtil(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") { if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error'); return; }
+        navigator.clipboard.writeText(text).then(() => {
+            if (messageElement) showFeedback(messageElement, successText, 'success');
+        }).catch(err => {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        });
+    }
+    
+    copyButton.addEventListener('click', () => {
+        copyToClipboardUtil(outputPrompt.value, copyMessage);
+    });
+
+    generateButton.addEventListener('click', () => {
+        const inputHtml = document.getElementById('inputHtml').value.trim();
+        if (!inputHtml) {
+            alert("Veuillez coller le code HTML de votre cours dans la première section.");
+            return;
+        }
+
+        let instructions = [];
+        
+        const specificContentToDelete = document.getElementById('specificContentToDelete').value.trim();
+        if (specificContentToDelete) {
+            instructions.push(`**SUPPRESSION DE CONTENU SPÉCIFIQUE :**\nTrouve le bloc de texte suivant et supprime-le intégralement, y compris sa balise HTML parente (ex: le <p> qui le contient).\n\n--- TEXTE À SUPPRIMER ---\n${specificContentToDelete}\n---`);
+        }
+        const structuralElementToDelete = document.getElementById('structuralElementToDelete').value.trim();
+        if (structuralElementToDelete) {
+            instructions.push(`**SUPPRESSION D'ÉLÉMENT STRUCTUREL :**\nAnalyse la description suivante et supprime l'élément structurel correspondant dans le code (ex: une <div>, une <section>, une <figure>). Sois précis pour ne supprimer que l'élément décrit.\n\n--- DESCRIPTION DE L'ÉLÉMENT ---\n${structuralElementToDelete}\n---`);
+        }
+
+        const primaryColor = document.getElementById('primaryColor').value;
+        const secondaryColor = document.getElementById('secondaryColor').value;
+        const accentColor = document.getElementById('accentColor').value;
+        if (primaryColor !== '#1e40af' || secondaryColor !== '#f97316' || accentColor !== '#7c3aed') {
+             instructions.push(`**MODIFICATION DES COULEURS :**\nModifie le CSS pour utiliser la palette suivante :\n- Couleur primaire : ${primaryColor}\n- Couleur secondaire : ${secondaryColor}\n- Couleur d'accent : ${accentColor}`);
+        }
+        const fontChoice = document.getElementById('fontChoice').value;
+        if (fontChoice) {
+            instructions.push(`**CHANGEMENT DE POLICES :**\nModifie le CSS pour utiliser le duo de polices approprié pour "${fontChoice}". Assure-toi d'importer les polices (ex: via Google Fonts).`);
+        }
+
+        const videoList = document.getElementById('videoList').value.trim();
+        if (videoList) {
+             instructions.push(`**INTÉGRATION DE VIDÉOS :**\nInterprète chaque ligne pour insérer les vidéos demandées aux endroits spécifiés :\n${videoList}`);
+        }
+        const imageList = document.getElementById('imageList').value.trim();
+        if (imageList) {
+             instructions.push(`**INTÉGRATION D'IMAGES :**\nInterprète chaque ligne pour insérer les images demandées aux endroits et tailles spécifiés :\n${imageList}`);
+        }
+
+        const generalInstructions = document.getElementById('generalInstructions').value.trim();
+        if(generalInstructions) {
+            instructions.push(`**INSTRUCTIONS GÉNÉRALES :**\nApplique les instructions de modification et de développement suivantes sur l'ensemble du document :\n\n--- INSTRUCTIONS ---\n${generalInstructions}\n---`);
+        }
+        
+        const exerciseCount = document.getElementById('exerciseCount').value;
+        if (exerciseCount > 0) {
+            let exerciseTypes = [];
+            if (document.getElementById('exTypeQCM').checked) exerciseTypes.push('QCM');
+            if (document.getElementById('exTypeVraiFaux').checked) exerciseTypes.push('Vrai / Faux');
+            if (document.getElementById('exTypeTrou').checked) exerciseTypes.push('Texte à trous');
+            if (document.getElementById('exTypeOuverte').checked) exerciseTypes.push('Question ouverte');
+            let detailedInstruction = `Crée une section "Exercices Interactifs" à la fin du cours. Génère ${exerciseCount} exercices pertinents basés sur le contenu. Pour chaque exercice, tu dois fournir le HTML, le CSS pour le feedback, et le JavaScript pour l'interactivité. Les types demandés sont : ${exerciseTypes.join(', ') || 'variés'}.\n\n`;
+            if (exerciseTypes.includes('QCM') || exerciseTypes.includes('Vrai / Faux')) { detailedInstruction += `**Pour les QCM et Vrai/Faux :** Les options doivent être cliquables. La bonne réponse doit être stockée dans un attribut (ex: data-correct="true"). Un bouton "Vérifier" doit déclencher un script qui donne un feedback visuel (vert/rouge) et textuel.\n`; }
+            if (exerciseTypes.includes('Texte à trous')) { detailedInstruction += `**Pour les Textes à trous :** Utilise des champs <input>. La ou les bonnes réponses doivent être stockées dans des attributs data-answer. Un bouton "Vérifier" doit comparer les réponses et colorer les champs en vert/rouge.\n`; }
+            if (exerciseTypes.includes('Question ouverte')) { detailedInstruction += `**Pour les Questions ouvertes :** Ajoute une <textarea> pour la réponse de l'élève. Ajoute un bouton "Afficher un indice" qui révèle un indice pertinent (que tu dois aussi générer). Ajoute un bouton "Comparer avec la réponse type" qui affiche une réponse modèle pour l'auto-évaluation.\n`; }
+            detailedInstruction += `Regroupe tout le code JavaScript nécessaire dans une unique balise <script> à la fin de la section d'exercices.`;
+            instructions.push(`**GÉNÉRATION D'EXERCICES INTERACTIFS :**\n${detailedInstruction}`);
+        }
+
+        if (document.getElementById('addFlashcards').checked) { instructions.push(`**AJOUT DE FLASHCARDS :**\nIdentifie des paires de concepts clés et transforme-les en "cartes à retourner" interactives, en ajoutant le HTML, CSS et JS nécessaires.`); }
+        if (document.getElementById('addAccordion').checked) { instructions.push(`**AJOUT DE SECTIONS ACCORDÉON :**\nTransforme les sections appropriées en un système d'accordéon/dépliant où le contenu est masqué et s'affiche au clic sur le titre.`); }
+        if (document.getElementById('addImageHotspots').checked) { instructions.push(`**AJOUT D'IMAGE AVEC POINTS D'INTÉRÊT :**\nSur l'image la plus complexe, ajoute 3 à 5 "hotspots" qui révèlent une bulle d'information au survol ou au clic.`); }
+        if (document.getElementById('addTimeline').checked) { instructions.push(`**AJOUT DE CHRONOLOGIE INTERACTIVE :**\nSi le cours est séquentiel, crée une section "Chronologie Interactive" visuelle.`); }
+        if (document.getElementById('addCounters').checked) { instructions.push(`**AJOUT DE COMPTEURS ANIMÉS :**\nFais en sorte que les données chiffrées importantes s'animent de 0 à leur valeur finale lorsqu'elles apparaissent à l'écran.`); }
+        if (document.getElementById('addHoverEffects').checked) { instructions.push(`**AMÉLIORATION DES EFFETS DE SURVOL :**\nAjoute des micro-interactions CSS au survol des éléments cliquables pour améliorer le feedback visuel.`); }
+        
+        if (instructions.length === 0) {
+            alert("Veuillez choisir au moins une amélioration à apporter au cours.");
+            return;
+        }
+
+        // CORRECTION DE LA LOGIQUE DE PROMPT POUR PRÉSERVER L'INTÉGRITÉ
+        let baseInstructions = `**RÔLE ET MISSION DE MODIFICATION CHIRURGICALE**
+Tu agis en tant que développeur web front-end et expert en design pédagogique. Ta mission est d'effectuer une **modification chirurgicale** du code HTML fourni.
+
+**RÈGLE D'OR ABSOLUE : PRÉSERVATION DE L'INTÉGRITÉ**
+Tu dois appliquer les instructions ci-dessous avec une précision absolue. **NE JAMAIS RÉSUMER, RACCOURCIR OU ALTÉRER LE CONTENU QUI N'EST PAS DIRECTEMENT VISÉ PAR UNE INSTRUCTION.** La complétude, le détail et la structure du document original doivent être préservés à 100%. Ton travail consiste à modifier le code existant, pas à le réécrire ou le simplifier.
+
+Tu dois renvoyer le code HTML complet et modifié, sans aucun commentaire, juste le code.`;
+
+        let promptText = baseInstructions + "\n\n";
+        promptText += "--- CODE HTML DU COURS INITIAL À MODIFIER ---\n```html\n" + inputHtml + "\n```\n\n--- INSTRUCTIONS D'AMÉLIORATION À APPLIQUER (DANS L'ORDRE DE PRIORITÉ) ---\n\n" + instructions.map((instr, index) => `**Instruction ${index + 1} :**\n${instr.substring(instr.indexOf(':') + 1).trim()}`).join('\n\n');
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt d'amélioration généré et corrigé !", "success");
+    });
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.section').forEach((section, index) => {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(30px)';
+        section.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(section);
+    });
+});
+</script>
+</body>
+</html>

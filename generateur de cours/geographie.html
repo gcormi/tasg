@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - Géographie</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #0d6efd; --primary-600: #0b5ed7; --primary-700: #0a58ca;
+            --secondary-500: #198754; --secondary-600: #157347;
+            --accent-500: #ffc107;
+            --danger-500: #dc3545; --success-500: #22c55e;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(13, 110, 253, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--accent-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--success-500); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { body { padding: 1rem; } .grid-2-cols, .grid-3-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-globe-americas icon"></i>
+                Générateur de Cours - Géographie
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des prompts de chapitres de Géographie pour le collège.</p>
+    </div>
+
+    <section class="section">
+        <h2>1. Sélection du Chapitre (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau (Classe) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Chapitre :</label>
+                <select id="sequenceSelect" class="select-field" disabled>
+                    <option value="">-- Choisir un thème puis un chapitre --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        <div class="form-group">
+            <label for="studyAreaInput" class="label-text">Étude de cas ou Territoire d'étude principal :</label>
+            <input type="text" id="studyAreaInput" class="input-field" placeholder="Ex: La Mégalopole japonaise, le Sahel, la Silicon Valley...">
+        </div>
+        <div class="form-group">
+            <label for="planInput" class="label-text">Déroulé du chapitre (Plan) :</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Dictez la structure exacte du chapitre. Ex: I. Un territoire sous contraintes, II. Des ressources convoitées, III. Vers un développement durable ?..."></textarea>
+        </div>
+        
+        <label class="label-text">Ressources et Documents d'Appui :</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos / documentaires (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens vers des articles, des sites de référence (GEO, IGN...)..."></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (extraits d'articles, données chiffrées...)"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+         <div class="form-group">
+            <label for="designCheckbox" class="label-text" style="display: flex; align-items: center; transition: color 0.3s;">
+                <input type="checkbox" id="designCheckbox" style="margin-right: 0.75rem; width: 1.1rem; height: 1.1rem;">
+                Inclure des instructions de design moderne pour la sortie HTML (facultatif)
+            </label>
+        </div>
+        <div class="form-group" style="text-align: center; margin-top: 2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Chapitre généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération du chapitre apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" id="pedagogicalOutputLabel" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const modulesData = {
+            "5e": {
+                1: { mainTheme: "Thème 1 : La question démographique et l'inégal développement", title: "La répartition de la population mondiale", hook: "Pourquoi certains espaces sont-ils bondés et d'autres vides ?", skills: "Localiser les grands foyers de population et les espaces à faible densité. Expliquer les facteurs de cette répartition.", knowledge: "Foyer de peuplement. désert humain. densité. contraintes naturelles. atouts du territoire.", socleSkills: "Domaine 5 : Se repérer dans l'espace. Domaine 1 : Utiliser des langages (cartes, graphiques)." },
+                2: { mainTheme: "Thème 1 : La question démographique et l'inégal développement", title: "La croissance démographique et ses effets", hook: "Nous sommes 8 milliards ! Quels sont les défis de cette croissance ?", skills: "Analyser l'évolution de la population. Comprendre les enjeux du développement.", knowledge: "Croissance démographique. transition démographique. taux de natalité/mortalité. pyramide des âges. IDH.", socleSkills: "Domaine 2 : Raisonner, justifier une démarche. Domaine 5 : Comprendre les sociétés." },
+                3: { mainTheme: "Thème 1 : La question démographique et l'inégal développement", title: "Répartir la richesse et la pauvreté dans le monde", hook: "Pourquoi de si grandes différences de richesse entre les pays ?", skills: "Identifier les inégalités de développement. Comprendre les indicateurs de richesse.", knowledge: "Développement. sous-développement. PMA. pays émergents. PIB/hab. IDH. seuil de pauvreté.", socleSkills: "Domaine 3 : La formation du citoyen. Domaine 1 : S'exprimer à l'écrit." },
+                4: { mainTheme: "Thème 2 : Des ressources limitées, à gérer et à renouveler", title: "L'enjeu énergétique", hook: "D'où vient notre énergie et comment la rendre plus durable ?", skills: "Identifier les sources d'énergie. Comprendre les enjeux de la transition énergétique.", knowledge: "Énergies fossiles. énergies renouvelables. mix énergétique. transition énergétique. gaz à effet de serre.", socleSkills: "Domaine 5 : Comprendre les enjeux du développement durable. Domaine 4 : Pratiquer une démarche scientifique." },
+                5: { mainTheme: "Thème 2 : Des ressources limitées, à gérer et à renouveler", title: "L'eau, ressource essentielle", hook: "Comment gérer l'eau pour que tout le monde y ait accès ?", skills: "Analyser les inégalités d'accès à l'eau. Comprendre les conflits d'usage.", knowledge: "Eau potable. stress hydrique. pénurie. conflit d'usage. gestion durable de l'eau.", socleSkills: "Domaine 3 : La responsabilité face à l'environnement. Domaine 2 : Extraire des informations." },
+                6: { mainTheme: "Thème 2 : Des ressources limitées, à gérer et à renouveler", title: "Nourrir les hommes", hook: "Comment produire assez de nourriture sans épuiser la planète ?", skills: "Identifier les grands types d'agriculture. Comprendre les enjeux de la sécurité alimentaire.", knowledge: "Agriculture productiviste. agriculture vivrière. agriculture durable. sécurité alimentaire. sous-nutrition.", socleSkills: "Domaine 5 : Analyser les paysages. Domaine 3 : S'engager dans une démarche de développement durable." },
+                7: { mainTheme: "Thème 3 : Prévenir les risques, s'adapter au changement global", title: "Le changement climatique et ses principaux effets", hook: "La planète se réchauffe, mais qu'est-ce que ça change pour nous ?", skills: "Expliquer les causes et conséquences du réchauffement. Identifier les zones vulnérables.", knowledge: "Réchauffement climatique. effet de serre. montée des eaux. fonte des glaces. événements climatiques extrêmes.", socleSkills: "Domaine 4 : Comprendre les systèmes naturels. Domaine 5 : Comprendre la responsabilité humaine." },
+                8: { mainTheme: "Thème 3 : Prévenir les risques, s'adapter au changement global", title: "Prévenir les risques naturels", hook: "Comment les sociétés font-elles face aux colères de la Terre ?", skills: "Identifier les risques naturels. Comprendre la notion de prévention.", knowledge: "Risque naturel. aléa. vulnérabilité. prévention. culture du risque.", socleSkills: "Domaine 5 : Se repérer dans l'espace. Domaine 3 : Adopter un comportement éthique et responsable." },
+                9: { mainTheme: "Thème 3 : Prévenir les risques, s'adapter au changement global", title: "Prévenir les risques industriels et technologiques", hook: "Comment limiter les dangers liés à nos activités ?", skills: "Identifier les risques technologiques. Comprendre les mesures de sécurité.", knowledge: "Risque technologique. risque industriel. risque nucléaire. plan de prévention.", socleSkills: "Domaine 3 : La formation du citoyen. Domaine 4 : Comprendre les implications des technologies." }
+            },
+            "4e": {
+                10: { mainTheme: "Thème 1 : L'urbanisation du monde", title: "L'espace urbain : un espace en expansion", hook: "Comment et pourquoi les villes s'étalent-elles ?", skills: "Décrire le processus d'étalement urbain. Analyser les paysages périurbains.", knowledge: "Urbanisation. croissance urbaine. étalement urbain. périurbanisation. mobilité pendulaire.", socleSkills: "Domaine 5 : Analyser les paysages. Domaine 1 : Utiliser des cartes pour raisonner." },
+                11: { mainTheme: "Thème 1 : L'urbanisation du monde", title: "Les villes dans la mondialisation", hook: "Pourquoi certaines villes sont-elles les 'capitales' du monde ?", skills: "Identifier les caractéristiques d'une ville mondiale. Comprendre leur rôle.", knowledge: "Ville mondiale. métropole. mégalopole. fonctions de commandement. CBD.", socleSkills: "Domaine 5 : Se repérer dans le monde. Domaine 2 : Utiliser des outils numériques." },
+                12: { mainTheme: "Thème 1 : L'urbanisation du monde", title: "Habiter une métropole", hook: "Comment vit-on dans une très grande ville ?", skills: "Décrire les différents paysages d'une métropole. Comprendre les inégalités.", knowledge: "Ségrégation socio-spatiale. gentrification. bidonville. habitat pavillonnaire.", socleSkills: "Domaine 3 : La formation de la personne. Domaine 5 : Comprendre les sociétés." },
+                13: { mainTheme: "Thème 2 : Les mobilités humaines transnationales", title: "Un monde de migrants", hook: "Pourquoi des millions de personnes quittent-elles leur pays ?", skills: "Identifier les flux migratoires. Expliquer les causes des migrations.", knowledge: "Migration internationale. migrant. réfugié. clandestin. flux migratoire.", socleSkills: "Domaine 3 : Comprendre le monde contemporain. Domaine 5 : Se repérer dans l'espace mondial." },
+                14: { mainTheme: "Thème 2 : Les mobilités humaines transnationales", title: "Le tourisme et ses espaces", hook: "Comment le tourisme transforme-t-il les territoires ?", skills: "Identifier les grands flux touristiques. Analyser les impacts du tourisme.", knowledge: "Tourisme de masse. tourisme durable. station balnéaire. station de ski. patrimoine.", socleSkills: "Domaine 5 : Analyser les impacts d'une activité sur un territoire. Domaine 2 : Coopérer." },
+                15: { mainTheme: "Thème 3 : Des espaces transformés par la mondialisation", title: "La mondialisation : acteurs, flux et réseaux", hook: "Comment fonctionne cette immense 'toile' d'échanges ?", skills: "Définir la mondialisation. Identifier ses acteurs et les flux.", knowledge: "Mondialisation. FMN. flux (matériels, immatériels). réseaux. délocalisation.", socleSkills: "Domaine 4 : Comprendre le fonctionnement des systèmes. Domaine 1 : S'exprimer à l'écrit." },
+                16: { mainTheme: "Thème 3 : Des espaces transformés par la mondialisation", title: "Les espaces maritimes : des espaces au cœur de la mondialisation", hook: "Comment les mers sont-elles devenues des zones stratégiques ?", skills: "Expliquer le rôle des espaces maritimes. Localiser les grandes routes.", knowledge: "Façade maritime. conteneurisation. hub portuaire. détroit stratégique. ZEE.", socleSkills: "Domaine 5 : Se repérer sur des planisphères. Domaine 1 : Utiliser des langages cartographiques." },
+                17: { mainTheme: "Thème 3 : Des espaces transformés par la mondialisation", title: "Les États-Unis dans la mondialisation", hook: "Comment les États-Unis dominent-ils le monde ?", skills: "Caractériser la puissance américaine. Identifier les lieux et acteurs.", knowledge: "Superpuissance. hard power. soft power. GAFAM. American way of life.", socleSkills: "Domaine 3 : Exercer son jugement critique. Domaine 5 : Comprendre les relations internationales." },
+                18: { mainTheme: "Thème 3 : Des espaces transformés par la mondialisation", title: "Le continent africain : entre défis et insertion dans la mondialisation", hook: "Comment l'Afrique s'intègre-t-elle à la mondialisation ?", skills: "Analyser les défis et les atouts de l'Afrique. Comprendre les contrastes.", knowledge: "Mal-développement. croissance économique. matières premières. aide au développement. UA.", socleSkills: "Domaine 2 : Raisonner sur des documents. Domaine 5 : Comprendre les enjeux du développement." }
+            },
+            "3e": {
+                19: { mainTheme: "Thème 1 : Dynamiques territoriales de la France contemporaine", title: "Les aires urbaines", hook: "Comment les grandes villes organisent-elles le territoire français ?", skills: "Définir et caractériser une aire urbaine. Analyser les mobilités.", knowledge: "Aire urbaine. métropolisation. périurbanisation. mobilités pendulaires. gentrification.", socleSkills: "Domaine 5 : Se repérer sur le territoire national. Domaine 1 : Réaliser des productions graphiques (croquis)." },
+                20: { mainTheme: "Thème 1 : Dynamiques territoriales de la France contemporaine", title: "Les espaces productifs et leurs évolutions", hook: "Où et comment produit-on en France ?", skills: "Identifier les espaces productifs. Comprendre leurs mutations.", knowledge: "Espace productif. désindustrialisation. technopôle. agriculture productiviste. services.", socleSkills: "Domaine 4 : Comprendre les systèmes productifs. Domaine 2 : Extraire des informations de documents variés." },
+                21: { mainTheme: "Thème 1 : Dynamiques territoriales de la France contemporaine", title: "Les espaces de faible densité et leurs atouts", hook: "Quels sont les défis et atouts des campagnes françaises ?", skills: "Caractériser un espace de faible densité. Identifier ses atouts et contraintes.", knowledge: "Espace de faible densité. déprise. néo-ruraux. tourisme vert. conflits d'usage.", socleSkills: "Domaine 5 : Analyser un paysage. Domaine 3 : S'impliquer dans un projet collectif." },
+                22: { mainTheme: "Thème 2 : Pourquoi et comment aménager le territoire ?", title: "Aménager pour réduire les inégalités territoriales", hook: "Pourquoi aider certains territoires plus que d'autres ?", skills: "Comprendre les objectifs de l'aménagement. Identifier les acteurs et politiques.", knowledge: "Aménagement du territoire. DATAR. décentralisation. politique de la ville. ZRR.", socleSkills: "Domaine 3 : La formation du citoyen. Domaine 5 : Comprendre l'organisation territoriale de la France." },
+                23: { mainTheme: "Thème 2 : Pourquoi et comment aménager le territoire ?", title: "Les territoires ultramarins français", hook: "Comment la France aménage-t-elle ses territoires lointains ?", skills: "Situer les territoires ultramarins. Comprendre leurs spécificités.", knowledge: "DROM-COM. ultra-périphérique. continuité territoriale. ZEE.", socleSkills: "Domaine 5 : Se repérer sur un planisphère. Domaine 1 : S'exprimer à l'oral." },
+                24: { mainTheme: "Thème 3 : La France et l'Union européenne dans le monde", title: "L'Union européenne, un nouveau territoire", hook: "Comment l'UE construit-elle un territoire commun ?", skills: "Expliquer ce qu'est l'UE. Caractériser son territoire.", knowledge: "Union Européenne. Espace Schengen. Euro. marché unique. politique de cohésion.", socleSkills: "Domaine 3 : Le citoyen français, citoyen européen. Domaine 5 : Comprendre le fonctionnement de l'UE." },
+                25: { mainTheme: "Thème 3 : La France et l'Union européenne dans le monde", title: "La France et l'Europe dans le monde", hook: "Comment la France et l'UE exercent-elles leur influence ?", skills: "Identifier les manifestations de la puissance française et européenne.", knowledge: "Puissance. rayonnement culturel. francophonie. soft power. siège au Conseil de sécurité.", socleSkills: "Domaine 5 : Comprendre les relations internationales. Domaine 2 : Mener une recherche d'information." }
+            }
+        };
+
+        const gradeSelect = document.getElementById('gradeSelect');
+        const sequenceSelect = document.getElementById('sequenceSelect');
+        const studyAreaInput = document.getElementById('studyAreaInput');
+        const planInput = document.getElementById('planInput');
+        const videoLinks = document.getElementById('videoLinks');
+        const websiteLinks = document.getElementById('websiteLinks');
+        const rawText = document.getElementById('rawText');
+        const outputFormatGroup = document.getElementById('outputFormatGroup');
+        const generateButton = document.getElementById('generateButton');
+        const outputPrompt = document.getElementById('outputPrompt');
+        const copyButton = document.getElementById('copyButton');
+        const copyMessage = document.getElementById('copyMessage');
+        const logbookButton = document.getElementById('logbookButton');
+        const summaryButton = document.getElementById('summaryButton');
+        const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+        const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+        const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+        const designCheckbox = document.getElementById('designCheckbox');
+        const designCheckboxLabel = document.querySelector('label[for="designCheckbox"]');
+
+        function populateModules(gradeValue) {
+            sequenceSelect.innerHTML = '<option value="">-- Choisir un thème puis un chapitre --</option>';
+            sequenceSelect.disabled = true;
+
+            if (gradeValue && modulesData[gradeValue]) {
+                const modulesForGrade = modulesData[gradeValue];
+                const themes = [...new Set(Object.values(modulesForGrade).map(item => item.mainTheme))];
+                
+                themes.forEach(theme => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = theme;
+                    
+                    Object.keys(modulesForGrade).forEach(key => {
+                        const moduleItem = modulesForGrade[key];
+                        if (moduleItem.mainTheme === theme) {
+                            const option = document.createElement('option');
+                            option.value = key;
+                            option.textContent = moduleItem.title;
+                            optgroup.appendChild(option);
+                        }
+                    });
+                    sequenceSelect.appendChild(optgroup);
+                });
+                
+                sequenceSelect.disabled = false;
+            }
+        }
+
+        gradeSelect.addEventListener('change', () => populateModules(gradeSelect.value));
+        
+        document.querySelectorAll('input[name="outputFormat"]').forEach(radio => {
+            radio.addEventListener('change', handleDesignCheckboxState);
+        });
+
+        function handleDesignCheckboxState() {
+            const selectedFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+            if (selectedFormat === 'html') {
+                designCheckbox.disabled = false;
+                designCheckboxLabel.style.color = 'var(--neutral-700)';
+                designCheckboxLabel.style.cursor = 'pointer';
+            } else {
+                designCheckbox.disabled = true;
+                designCheckbox.checked = false;
+                designCheckboxLabel.style.color = 'var(--neutral-300)';
+                designCheckboxLabel.style.cursor = 'not-allowed';
+            }
+        }
+        
+        function formatToList(text) {
+            if (!text) return 'N/A';
+            const items = text.split('.').map(item => item.trim()).filter(item => item.length > 0);
+            return '\n   - ' + items.join('\n   - ');
+        }
+
+        generateButton.addEventListener('click', () => {
+            const selectedGrade = gradeSelect.value;
+            const selectedModuleKey = sequenceSelect.value;
+            const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+            if (!selectedGrade || !selectedModuleKey || !outputFormatRadio) { 
+                alert("Veuillez choisir un niveau, un chapitre et un format de sortie."); return;
+            }
+            
+            const moduleDetails = modulesData[selectedGrade]?.[selectedModuleKey];
+            if (!moduleDetails) {
+                alert("Détails du chapitre non trouvés."); return;
+            }
+
+            const studyArea = studyAreaInput.value.trim();
+            const plan = planInput.value.trim();
+            const videos = videoLinks.value.trim();
+            const websites = websiteLinks.value.trim();
+            const text = rawText.value.trim();
+            const outputFormat = outputFormatRadio.value;
+            const includeDesign = designCheckbox.checked;
+
+            let promptText = `**RÔLE ET MISSION DE HAUT NIVEAU**
+Tu es un **concepteur pédagogique expert en ingénierierie de la formation**, agissant en tant qu'auteur principal pour un éditeur de manuels scolaires de premier plan. Tu es également **Professeur agrégé de Géographie** et tu maîtrises parfaitement les programmes de l'Éducation Nationale française ainsi que les sciences cognitives appliquées à l'apprentissage des adolescents.
+
+Ta mission est de rédiger un **document de cours complet, exhaustif et multi-facettes** pour un élève de **${selectedGrade}**. Ce document doit être une ressource de référence, alliant rigueur académique, clarté pédagogique et un engagement fort pour l'élève. Il ne s'agit pas d'un simple résumé, mais d'un chapitre de manuel scolaire de très haute qualité.\n\n`;
+
+            const hasImperativeInstructions = studyArea || plan || videos || websites || text;
+            if (hasImperativeInstructions) {
+                promptText += `**INSTRUCTIONS IMPÉRATIVES DE L'ENSEIGNANT**
+La conception du cours doit obligatoirement intégrer les éléments suivants :\n`;
+                if (studyArea) {
+                    promptText += `- **Territoire ou étude de cas centraux :** Le cours doit être entièrement articulé autour de l'étude de : **${studyArea}**.\n`;
+                }
+                if (plan) { promptText += `- **Plan imposé :** La structure du cours doit suivre scrupuleusement ce plan :\n${plan}\n`; }
+                if (videos || websites || text) {
+                    promptText += `- **Ressources d'appui imposées :** Le contenu doit se baser sur l'analyse et la synthèse de ces ressources :\n`;
+                    if (videos) promptText += `  - Vidéos : \n${videos}\n`;
+                    if (websites) promptText += `  - Sites web : \n${websites}\n`;
+                    if (text) promptText += `  - Textes : \n${text}\n`;
+                }
+                promptText += "\n";
+            }
+            
+            promptText += `**CAHIER DES CHARGES PÉDAGOGIQUE DU COURS**
+- **Niveau :** ${selectedGrade}
+- **Thème :** ${moduleDetails.mainTheme}
+- **Titre du Chapitre :** ${moduleDetails.title}
+- **Accroche / Hook :** "${moduleDetails.hook}"
+- **Compétences Visées :** ${formatToList(moduleDetails.skills)}
+- **Savoirs & Connaissances :** ${formatToList(moduleDetails.knowledge)}
+- **Compétences du Socle Commun Travaillées :** ${formatToList(moduleDetails.socleSkills)}\n\n`;
+
+            promptText += `**STRUCTURE DÉTAILLÉE DU DOCUMENT DE COURS À PRODUIRE**
+Tu dois rédiger le cours en respectant **impérativement** le format de sortie demandé et la structure complète en 10 points ci-dessous.
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n`;
+            if (outputFormat === 'html' && includeDesign) {
+                promptText += `**INSTRUCTIONS SPÉCIFIQUES POUR LE DESIGN HTML :**
+Crée un cours en HTML/CSS moderne et attractif. Utilise une palette de couleurs cohérente, des animations CSS simples, des icônes Font Awesome pour illustrer les concepts, des encadrés stylisés pour les notions clés, et une mise en page responsive. Le cours doit être un fichier HTML autonome (CSS interne).
+**RÈGLE STRICTE SUR LES IMAGES :** N'utilise PAS de balises \`<img>\` avec des liens externes. À la place, utilise des placeholders stylisés avec une description claire. EXEMPLE : \`<div style="border: 2px dashed #ccc; padding: 2rem; text-align: center; background-color: #f9f9f9; border-radius: 8px; margin: 1rem 0;"><em>Image : Photographie satellite du delta du Nil</em></div>\`\n\n`;
+            }
+            promptText += `---
+**DÉBUT DU CONTENU DU COURS À RÉDIGER**
+
+**1. TITRE DU CHAPITRE :** (Titre : ${moduleDetails.title.toUpperCase()})
+
+**2. SITUATION DÉCLENCHANTE :** Scénarise l'accroche ("${moduleDetails.hook}") en un court récit engageant, une énigme ou une mise en situation concrète pour que l'élève comprenne immédiatement l'intérêt de la leçon.
+
+**3. OBJECTIFS PÉDAGOGIQUES : "Ta mission, si tu l'acceptes..."**
+Présente les objectifs sous forme de listes à puces claires :
+   - **Compétences à maîtriser :** (basé sur : "${moduleDetails.skills}").
+   - **Savoirs et connaissances à acquérir :** (basé sur : "${moduleDetails.knowledge}").
+   - **Compétences du Socle que tu vas travailler :** (basé sur : "${moduleDetails.socleSkills}").
+
+**4. INTRODUCTION ET PROBLÉMATIQUE :** Fais le lien avec la situation déclenchante, situe le sujet dans son contexte géographique et formule la problématique centrale à laquelle le cours va répondre. Annonce le plan.
+
+**5. DÉVELOPPEMENT DU COURS - EXPLORATION EN PROFONDEUR :**
+Ceci est le cœur du cours. Pour **CHAQUE SAVOIR ET CONNAISSANCE** listé dans "${moduleDetails.knowledge}", tu dois **impérativement** suivre la structure de développement en 8 étapes ci-dessous.
+
+   Pour la notion de **[NOM DE LA NOTION/LIEU]** :
+   **a) 🎓 La Définition de Référence : "Qu'est-ce que c'est exactement ?" :** Présente le concept de manière officielle et précise. Explique son importance et les enjeux spatiaux.
+   **b) 🧠 Analogie et Simplification Pédagogique :** "Traduis" immédiatement la définition en utilisant une métaphore ou une comparaison simple.
+   **c) 🌍 Étude de Cas Concrète :** Montre où et comment cette notion s'applique via un exemple de territoire précis.
+   **d) 📜 Au Cœur du Territoire :** Propose une analyse de document (carte, paysage, graphique) ou un récit détaillé qui illustre le concept. **RÈGLE STRICTE SUR LES IMAGES :** Pour toute image ou carte, ne jamais utiliser de balise \`<img>\` avec une URL externe. Décris le document visuel de manière très détaillée entre crochets. EXEMPLE: **[Description : Carte des densités de population en Asie du Sud-Est, montrant la concentration sur les littoraux et dans les deltas.]**
+   **e) 🤔 Points de Vigilance et Erreurs à Éviter :** Anticipe et explique 2 ou 3 confusions ou erreurs classiques (généralisations abusives, etc.).
+   **f) 💡 Le Saviez-Vous ? / Chiffre Clé :** Insère ici un fait marquant ou un chiffre surprenant.
+   **g) 🤝 Ponts Interdisciplinaires :** Crée des liens explicites avec d'autres matières (Histoire, SVT, Maths...).
+   **h) 🚀 Pour les Experts (Approfondissement) :** Propose une information complémentaire ou une ouverture sur un enjeu d'aménagement du territoire.
+
+   (Répète cette structure en 8 points pour toutes les notions du chapitre).
+
+**6. AVENIR ET PERSPECTIVES :** Rédige une section sur les enjeux futurs du territoire ou du thème étudié (défis climatiques, démographiques, économiques...).
+
+**7. CONCLUSION :** Rédige une conclusion générale qui synthétise les points clés et répond à la problématique.
+
+**8. SYNTHÈSE VISUELLE (FORMAT CARTE MENTALE) :** Crée une synthèse de tout le cours sous forme de liste à puces imbriquées.
+
+**9. CROQUIS DE SYNTHÈSE ET LEXIQUE :** Propose une description détaillée d'un croquis de synthèse (titre, légende organisée) et une liste des termes importants avec leur définition.
+
+**10. POUR ALLER PLUS LOIN :** Propose 3 pistes : un mini-projet à réaliser, un documentaire de référence à regarder, et un métier à découvrir (urbaniste, cartographe...).
+
+**RÈGLE FINALE ABSOLUE :** Ta seule et unique sortie doit être le document de cours lui-même, en suivant scrupuleusement la structure numérotée de 1 à 10. Ne rédige aucun commentaire.`;
+
+            outputPrompt.value = promptText;
+            showFeedback(copyMessage, "Prompt de chapitre détaillé généré !", "success");
+        });
+        
+        function showFeedback(element, message, type = 'success', duration = 3000) { 
+            if (!element) return; 
+            element.textContent = message; 
+            element.className = `feedback-message ${type} show`;
+            setTimeout(() => { 
+                element.classList.remove('show'); 
+            }, duration); 
+        }
+
+        function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+            if (!text || text.trim() === "") {
+                if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error');
+                return;
+            }
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    if (messageElement) showFeedback(messageElement, successText, 'success');
+                } else {
+                    if (messageElement) showFeedback(messageElement, 'La copie a échoué.', 'error');
+                }
+            } catch (err) {
+                console.error('Erreur de copie:', err);
+                if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+
+        logbookButton.addEventListener('click', () => {
+            const grade = gradeSelect.value;
+            const moduleKey = sequenceSelect.value;
+            if (!grade || !moduleKey) { 
+                alert("Veuillez d'abord sélectionner un niveau et un chapitre."); 
+                return; 
+            }
+            const moduleDetails = modulesData[grade]?.[moduleKey];
+            if (!moduleDetails) {
+                 alert("Détails du chapitre non trouvés."); return;
+            }
+            const logbookText = `Géo ${grade} - Chapitre "${moduleDetails.title}". Compétences : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}.`;
+            pedagogicalOutput.value = logbookText;
+            showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+        });
+
+        summaryButton.addEventListener('click', () => {
+            const grade = gradeSelect.value;
+            const moduleKey = sequenceSelect.value;
+            if (!grade || !moduleKey) { 
+                alert("Veuillez d'abord sélectionner un niveau et un chapitre."); 
+                return; 
+            }
+            const moduleDetails = modulesData[grade]?.[moduleKey];
+            if (!moduleDetails) {
+                 alert("Détails du chapitre non trouvés."); return;
+            }
+            const summaryText = `Résumé (Géo - ${moduleDetails.title}) :\nÀ la fin de ce chapitre, tu dois connaître : ${moduleDetails.knowledge}.\nTu dois être capable de : ${moduleDetails.skills}.`;
+            pedagogicalOutput.value = summaryText;
+            showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+        });
+    
+        copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+        
+        handleDesignCheckboxState();
+        populateModules(gradeSelect.value);
+    });
+</script>
+
+</body>
+</html>

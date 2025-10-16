@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Exercices Avancés</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .tool-card {
+            display: block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-8px );
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        /* Styles pour les onglets */
+        .nav-tab {
+            transition: all 0.3s ease-in-out;
+            border-bottom: 4px solid transparent;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #475569; /* slate-600, couleur de texte par défaut pour les inactifs */
+            padding: 1rem 1.5rem;
+            position: relative;
+            top: 1px;
+            background-color: #e2e8f0; /* slate-200, fond pour les onglets inactifs */
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            margin-right: 0.5rem; /* Espacement entre les onglets */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); /* Légère ombre interne pour les inactifs */
+        }
+        .nav-tab:hover:not(.active) {
+            color: #1e293b; /* slate-900, couleur de texte au survol */
+            background-color: #cbd5e1; /* slate-300, fond au survol */
+            transform: translateY(-2px); /* Léger soulèvement au survol */
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .nav-tab.active {
+            border-color: #0ea5e9; /* sky-500 */
+            color: #0284c7; /* sky-700, couleur de texte plus foncée pour l'actif */
+            background-color: white;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05); /* Ombre plus prononcée */
+            z-index: 10; /* Assure que l'onglet actif est au-dessus */
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .feedback-message {
+            display: none; padding: 0.75rem; border-radius: 0.5rem;
+            margin-top: 0.75rem; font-size: 0.9rem; font-weight: 500;
+        }
+        .feedback-message.show { display: block; }
+        .feedback-message.success { background-color: #d1fae5; color: #065f46; }
+        .feedback-message.error { background-color: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <a href="exercices.html" class="absolute top-4 left-4 z-10 inline-flex items-center px-4 py-2 bg-slate-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-slate-700 transition ease-in-out duration-150">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Retour
+    </a>
+
+    <div class="container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        
+        <header class="text-center mb-12">
+            <div class="inline-block bg-sky-100 p-4 rounded-full mb-4 ring-8 ring-white/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                </svg>
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+                Générateurs d'Exercices
+            </h1>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">
+                Outils avancés pour créer des exercices Moodle et des prompts pédagogiques variés.
+            </p>
+        </header>
+
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80">
+            <nav class="flex border-b border-slate-200 bg-slate-50 rounded-t-2xl px-4">
+                <button class="nav-tab active" data-tab="xml-tab">
+                    Prompts XML (Moodle )
+                </button>
+                <button class="nav-tab" data-tab="prompts-tab">
+                    <span class="font-semibold">Contenus Créatifs et Générateurs de Jeux Pédagogiques</span>
+                    <span class="block font-normal text-sm mt-1">
+                        Résumé de Cours, Définitions, Mots Croisés, Mots Mêlés, Jeu d'Association, Memory et autres...
+                    </span>
+                </button>
+            </nav>
+
+            <div id="xml-tab" class="tab-content active p-6 sm:p-8">
+                <div class="text-center mb-8">
+                    
+                    <h2 class="text-2xl font-bold text-slate-800">Générateurs XML pour Moodle</h2>
+                    <p class="text-slate-600 mt-2">Créez des exercices directement importables dans <strong>Léia/Néo</strong>.</p>
+                </div>
+
+                <div class="form-group mb-8">
+                    <label for="courseContentXml" class="text-md font-semibold text-slate-700 block mb-2">Contenu du cours (base pour les exercices)</label>
+                    <textarea id="courseContentXml" class="w-full p-3 h-40 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm" placeholder="Collez ici le contenu qui servira de base..."></textarea>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                         <h3 class="font-bold text-lg text-slate-800 mb-2">QCM Moodle XML</h3>
+                         <p class="text-sm text-slate-500 mb-4">Génère un prompt pour que l'IA crée des QCM au format Moodle XML.</p>
+                         <div class="space-y-4">
+                            <div>
+                                <label for="numMoodleMCQ" class="text-sm font-semibold text-slate-600 block mb-1">Nombre de QCM (1-15)</label>
+                                <input type="number" id="numMoodleMCQ" class="w-full p-2 border border-slate-300 rounded-lg" value="5" min="1" max="15">
+                            </div>
+                            <div>
+                                <label for="numChoicesMCQ" class="text-sm font-semibold text-slate-600 block mb-1">Propositions par QCM</label>
+                                <select id="numChoicesMCQ" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
+                                    <option value="3">3 propositions</option>
+                                    <option value="4" selected>4 propositions</option>
+                                </select>
+                            </div>
+                            <button id="generateMCQXmlBtn" class="w-full bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition">Générer Prompt QCM</button>
+                            <textarea id="mcqXmlOutput" class="w-full p-2 text-xs h-28 bg-slate-100 border border-slate-300 rounded-lg mt-2" readonly></textarea>
+                            <button id="copyMCQXmlBtn" class="w-full bg-slate-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-600 transition text-sm">Copier</button>
+                            <div id="mcqXmlMessage" class="feedback-message"></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                         <h3 class="font-bold text-lg text-slate-800 mb-2">Association Moodle XML</h3>
+                         <p class="text-sm text-slate-500 mb-4">Génère un prompt pour créer des exercices d'association au format Moodle XML.</p>
+                         <div class="space-y-4">
+                             <div>
+                                <label for="numMatchingGroups" class="text-sm font-semibold text-slate-600 block mb-1">Nombre de questions (1-5)</label>
+                                <input type="number" id="numMatchingGroups" class="w-full p-2 border border-slate-300 rounded-lg" value="2" min="1" max="5">
+                             </div>
+                             <div>
+                                <label for="numMatchesPerGroup" class="text-sm font-semibold text-slate-600 block mb-1">Paires par question (3-6)</label>
+                                <input type="number" id="numMatchesPerGroup" class="w-full p-2 border border-slate-300 rounded-lg" value="3" min="3" max="6">
+                             </div>
+                            <button id="generateMatchingXmlBtn" class="w-full bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition">Générer Prompt Association</button>
+                            <textarea id="matchingXmlOutput" class="w-full p-2 text-xs h-28 bg-slate-100 border border-slate-300 rounded-lg mt-2" readonly></textarea>
+                            <button id="copyMatchingXmlBtn" class="w-full bg-slate-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-600 transition text-sm">Copier</button>
+                            <div id="matchingXmlMessage" class="feedback-message"></div>
+                         </div>
+                    </div>
+                </div>
+                <div class="mt-8 bg-slate-100 p-6 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">Télécharger le Fichier XML</h3>
+                    <p class="text-sm text-slate-500 mb-4">Si une IA vous a fourni le code XML, collez-le ici pour le télécharger en tant que fichier `.xml` prêt à l'import.</p>
+                    <textarea id="xmlContent" class="w-full p-3 h-40 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm" placeholder="Collez le contenu XML complet ici..."></textarea>
+                    <button id="downloadXmlBtn" class="w-full mt-4 bg-green-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-700 transition">Télécharger le fichier .xml</button>
+                    <div id="downloadXmlMessage" class="feedback-message"></div>
+                </div>
+            </div>
+
+            <div id="prompts-tab" class="tab-content p-6 sm:p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800">Autres Outils de Prompts</h2>
+                    <p class="text-slate-600 mt-2">Créez des contenus variés pour des plateformes comme <strong>LearningApps</strong> ou pour vos propres supports.</p>
+                </div>
+                
+                <div class="form-group mb-8">
+                    <label for="courseContentPrompts" class="text-md font-semibold text-slate-700 block mb-2">Contenu du cours (base pour les prompts)</label>
+                    <textarea id="courseContentPrompts" class="w-full p-3 h-40 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 transition shadow-sm" placeholder="Collez ici le contenu qui servira de base..."></textarea>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                         <h3 class="font-bold text-lg text-slate-800 mb-2">Résumé de Cours</h3>
+                         <p class="text-sm text-slate-500 mb-4">Idéal pour créer un texte à trous ou un support de révision.</p>
+                         <div>
+                            <label for="numWordsSummary" class="text-sm font-semibold text-slate-600 block mb-1">Nombre de mots (50-500)</label>
+                            <input type="number" id="numWordsSummary" class="w-full p-2 border border-slate-300 rounded-lg" value="200" min="50" max="500">
+                         </div>
+                         <button id="generateSummaryBtn" class="w-full mt-4 bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition">Générer Prompt Résumé</button>
+                         <textarea id="summaryOutput" class="w-full p-2 text-xs h-28 bg-slate-100 border border-slate-300 rounded-lg mt-4" readonly></textarea>
+                         <button id="copySummaryBtn" class="w-full mt-2 bg-slate-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-600 transition text-sm">Copier</button>
+                         <div id="summaryMessage" class="feedback-message"></div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                         <h3 class="font-bold text-lg text-slate-800 mb-2">Définitions et Mots Clés</h3>
+                         <p class="text-sm text-slate-500 mb-4">Parfait pour des mots croisés ou un jeu d'association.</p>
+                         <div>
+                            <label for="numDefinitions" class="text-sm font-semibold text-slate-600 block mb-1">Nombre de définitions (3-12)</label>
+                            <input type="number" id="numDefinitions" class="w-full p-2 border border-slate-300 rounded-lg" value="5" min="3" max="12">
+                         </div>
+                         <button id="generateDefinitionsBtn" class="w-full mt-4 bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition">Générer Prompt Définitions</button>
+                         <textarea id="definitionsOutput" class="w-full p-2 text-xs h-28 bg-slate-100 border border-slate-300 rounded-lg mt-4" readonly></textarea>
+                         <button id="copyDefinitionsBtn" class="w-full mt-2 bg-slate-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-600 transition text-sm">Copier</button>
+                         <div id="definitionsMessage" class="feedback-message"></div>
+                    </div>
+                </div>
+                 <section class="mt-12 border-t border-slate-200 pt-8">
+                    <h3 class="text-2xl font-bold text-slate-800 text-center mb-8">Accès aux générateurs de jeux</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <a href="motscroises.html" class="tool-card group block bg-white p-6 rounded-xl shadow-md border border-slate-200/80 text-left">
+                            <h4 class="text-lg font-bold text-slate-900">Mots Croisés</h4>
+                            <p class="mt-1 text-slate-600 text-sm">Créez un prompt pour une grille de mots croisés.</p>
+                        </a>
+                        <a href="motsmeles.html" class="tool-card group block bg-white p-6 rounded-xl shadow-md border border-slate-200/80 text-left">
+                            <h4 class="text-lg font-bold text-slate-900">Mots Mêlés</h4>
+                            <p class="mt-1 text-slate-600 text-sm">Créez un prompt pour une grille de mots cachés.</p>
+                        </a>
+                        <a href="association.html" class="tool-card group block bg-white p-6 rounded-xl shadow-md border border-slate-200/80 text-left">
+                            <h4 class="text-lg font-bold text-slate-900">Jeu d'Association</h4>
+                            <p class="mt-1 text-slate-600 text-sm">Créez un prompt pour un jeu de tri par glisser-déposer.</p>
+                        </a>
+                        <a href="Memory.html" class="tool-card group block bg-white p-6 rounded-xl shadow-md border border-slate-200/80 text-left">
+                           <h4 class="text-lg font-bold text-slate-900">Jeu de Memory</h4>
+                           <p class="mt-1 text-slate-600 text-sm">Créez un prompt pour un jeu de recherche de paires.</p>
+                        </a>
+                        <a href="jeupeda.html" class="tool-card group block bg-white p-6 rounded-xl shadow-md border border-slate-200/80 text-left">
+                           <h4 class="text-lg font-bold text-slate-900">Jeu Pédagogique Complet</h4>
+                           <p class="mt-1 text-slate-600 text-sm">Créez un prompt pour un quiz interactif multi-formats.</p>
+                        </a>
+                        <a href="generateurjeux.html" class="tool-card group block bg-white p-6 rounded-xl shadow-md border border-slate-200/80 text-left">
+                            <h4 class="text-lg font-bold text-slate-900">Plateforme multi-jeux pédagogiques</h4>
+                            <p class="mt-1 text-slate-600 text-sm">Combinez plusieurs jeux (Mots Croisés, Memory, etc.) en un seul parcours d'apprentissage.</p>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation entre onglets
+            const tabs = document.querySelectorAll('.nav-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tab.dataset.tab) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+                if (!text || text.trim() === "" || text.startsWith('[')) {
+                    showFeedback(messageElement, "Rien à copier. Veuillez d'abord générer un prompt.", 'error');
+                    return;
+                }
+                navigator.clipboard.writeText(text).then(() => {
+                    showFeedback(messageElement, successText, 'success');
+                }).catch(err => {
+                    showFeedback(messageElement, 'Erreur de copie.', 'error');
+                });
+            }
+
+            function showFeedback(element, message, type = 'success', duration = 2500) {
+                if (!element) return;
+                element.textContent = message;
+                element.className = `feedback-message ${type} show`;
+                setTimeout(() => { element.classList.remove('show'); }, duration);
+            }
+
+            function cleanUserInputText(htmlOrText) {
+                if (typeof htmlOrText !== 'string') return '';
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlOrText;
+                tempDiv.querySelectorAll('script, style').forEach(element => element.remove());
+                const body = tempDiv.querySelector('body');
+                let text = (body || tempDiv).textContent || "";
+                return text.replace(/\s\s+/g, ' ').trim();
+            }
+
+            function triggerDownload(content, filename, mimeType = 'application/xml') {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                document.body.appendChild(a);
+                a.style.display = "none";
+                a.href = url;
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+            
+            function getPrompt(type, params) {
+                const { courseContent } = params;
+                if (!courseContent) {
+                    alert('Veuillez d\'abord saisir le contenu du cours.');
+                    return null;
+                }
+                switch (type) {
+                    case 'mcq':
+                        return `Tu es un expert en création d'exercices pédagogiques. En te basant strictement sur le contenu de cours suivant, crée ${params.numQuestions} questions à choix multiples (QCM) au format Moodle XML.
+
+CONTENU DU COURS :
+${courseContent}
+
+INSTRUCTIONS PRÉCISES :
+1. Chaque QCM doit avoir exactement ${params.numChoices} propositions de réponse.
+2. Une seule bonne réponse par question.
+3. Les questions doivent couvrir les points essentiels du cours.
+4. Utilise le format Moodle XML standard avec les balises appropriées.
+5. Assure-toi que le XML est bien formé et valide.`;
+                    case 'matching':
+                        return `Tu es un expert en création d'exercices pédagogiques. En te basant strictement sur le contenu de cours suivant, crée ${params.numGroups} exercice(s) d'association au format Moodle XML.
+
+CONTENU DU COURS :
+${courseContent}
+
+INSTRUCTIONS PRÉCISES :
+1. Crée ${params.numGroups} question(s) de type "matching" (association).
+2. Chaque question doit contenir exactement ${params.numMatches} paires à associer.
+3. Les associations doivent être basées sur le contenu du cours fourni.
+4. Utilise le format Moodle XML standard.`;
+                    case 'summary':
+                        return `Tu es un expert en pédagogie. En te basant strictement sur le contenu de cours suivant, crée un résumé pédagogique d'environ ${params.numWords} mots.
+
+CONTENU DU COURS :
+${courseContent}
+
+INSTRUCTIONS PRÉCISES :
+1. Le résumé doit faire approximativement ${params.numWords} mots.
+2. Il doit couvrir les points essentiels du cours.
+3. Utilise un vocabulaire adapté aux élèves.`;
+                    case 'definitions':
+                        return `Tu es un expert en création de supports pédagogiques. En te basant strictement sur le contenu de cours suivant, identifie et définis ${params.numDefinitions} mots-clés essentiels.
+
+CONTENU DU COURS :
+${courseContent}
+
+INSTRUCTIONS PRÉCISES :
+1. Sélectionne ${params.numDefinitions} mots-clés ou concepts essentiels du cours.
+2. Pour chaque mot, fournis une définition claire et précise au format "Définition :: MotClé".
+3. Les définitions doivent être adaptées au niveau des élèves.`;
+                    default:
+                        return '';
+                }
+            }
+
+            // --- LOGIQUE POUR L'ONGLET XML ---
+            document.getElementById('generateMCQXmlBtn').addEventListener('click', () => {
+                const prompt = getPrompt('mcq', {
+                    courseContent: cleanUserInputText(document.getElementById('courseContentXml').value),
+                    numQuestions: document.getElementById('numMoodleMCQ').value,
+                    numChoices: document.getElementById('numChoicesMCQ').value
+                });
+                if (prompt) document.getElementById('mcqXmlOutput').value = prompt;
+            });
+
+            document.getElementById('copyMCQXmlBtn').addEventListener('click', () => copyToClipboard(document.getElementById('mcqXmlOutput').value, document.getElementById('mcqXmlMessage')));
+            
+            document.getElementById('generateMatchingXmlBtn').addEventListener('click', () => {
+                const prompt = getPrompt('matching', {
+                    courseContent: cleanUserInputText(document.getElementById('courseContentXml').value),
+                    numGroups: document.getElementById('numMatchingGroups').value,
+                    numMatches: document.getElementById('numMatchesPerGroup').value
+                });
+                if (prompt) document.getElementById('matchingXmlOutput').value = prompt;
+            });
+
+            document.getElementById('copyMatchingXmlBtn').addEventListener('click', () => copyToClipboard(document.getElementById('matchingXmlOutput').value, document.getElementById('matchingXmlMessage')));
+            
+            document.getElementById('downloadXmlBtn').addEventListener('click', () => {
+                const xmlContent = document.getElementById('xmlContent').value.trim();
+                if (!xmlContent) { showFeedback(document.getElementById('downloadXmlMessage'), 'Veuillez d\'abord coller le contenu XML.', 'error'); return; }
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                const filename = `exercices-moodle-${timestamp}.xml`;
+                triggerDownload(xmlContent, filename);
+                showFeedback(document.getElementById('downloadXmlMessage'), `Fichier ${filename} téléchargé !`, 'success');
+            });
+
+            // --- LOGIQUE POUR L'ONGLET AUTRES PROMPTS ---
+            document.getElementById('generateSummaryBtn').addEventListener('click', () => {
+                const prompt = getPrompt('summary', {
+                    courseContent: cleanUserInputText(document.getElementById('courseContentPrompts').value),
+                    numWords: document.getElementById('numWordsSummary').value
+                });
+                if (prompt) document.getElementById('summaryOutput').value = prompt;
+            });
+            
+            document.getElementById('copySummaryBtn').addEventListener('click', () => copyToClipboard(document.getElementById('summaryOutput').value, document.getElementById('summaryMessage')));
+
+            document.getElementById('generateDefinitionsBtn').addEventListener('click', () => {
+                const prompt = getPrompt('definitions', {
+                    courseContent: cleanUserInputText(document.getElementById('courseContentPrompts').value),
+                    numDefinitions: document.getElementById('numDefinitions').value
+                });
+                if (prompt) document.getElementById('definitionsOutput').value = prompt;
+            });
+            
+            document.getElementById('copyDefinitionsBtn').addEventListener('click', () => copyToClipboard(document.getElementById('definitionsOutput').value, document.getElementById('definitionsMessage')));
+        });
+    </script>
+</body>
+</html>

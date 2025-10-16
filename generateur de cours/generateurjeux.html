@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Générateur de Jeux Pédagogiques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .prompt-output::-webkit-scrollbar { width: 8px; height: 8px; }
+      .prompt-output::-webkit-scrollbar-track { background: #f1f5f9; }
+      .prompt-output::-webkit-scrollbar-thumb { background-color: #94a3b8; border-radius: 4px; }
+      .prompt-output::-webkit-scrollbar-thumb:hover { background-color: #64748b; }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); max-height: 0; }
+        to { opacity: 1; transform: translateY(0); max-height: 1000px; }
+      }
+      .animate-slide-down {
+        overflow: hidden;
+        animation: slideDown 0.6s ease-in-out forwards;
+      }
+      
+      input[type='range'] {
+        -webkit-appearance: none; appearance: none;
+        width: 100%; height: 6px;
+        background: #e2e8f0;
+        border-radius: 5px; outline: none;
+        transition: background 0.3s;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none;
+        width: 20px; height: 20px;
+        background: #3b82f6;
+        border-radius: 50%; cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        transition: transform 0.2s;
+      }
+       input[type='range']::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+      }
+      input[type='range']::-moz-range-thumb {
+        width: 20px; height: 20px;
+        background: #3b82f6;
+        border-radius: 50%; cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
+  }
+}
+</script>
+</head>
+<body class="bg-slate-50 text-slate-700 min-h-screen">
+    <div id="root"></div>
+
+<script type="module">
+import React, { useState, useCallback, useMemo } from 'react';
+import ReactDOM from 'react-dom/client';
+
+// --- ICONS ---
+const SparklesIcon = ({ className = "w-6 h-6" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor" }, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.562L16.5 21.75l-.398-1.188a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.188-.398a2.25 2.25 0 001.423-1.423L16.5 15.75l.398 1.188a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.188.398a2.25 2.25 0 00-1.423 1.423z" }));
+const ClipboardIcon = ({ className = "w-5 h-5" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:2, stroke:"currentColor" }, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" }));
+const CheckIcon = ({ className = "w-5 h-5" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:3, stroke:"currentColor" }, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M5 13l4 4L19 7" }));
+const DocumentTextIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" }));
+const CheckCircleIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }));
+const PuzzleIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M14.25 6.75a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H15a.75.75 0 01-.75-.75V6.75zM14.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H15a.75.75 0 01-.75-.75v-.01zM14.25 17.25a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H15a.75.75 0 01-.75-.75v-.01zM4.5 12a2.25 2.25 0 002.25 2.25H9a2.25 2.25 0 002.25-2.25v-1.5A2.25 2.25 0 009 8.25H6.75A2.25 2.25 0 004.5 10.5v1.5zm15-1.5a2.25 2.25 0 01-2.25-2.25H15a2.25 2.25 0 01-2.25-2.25V5.25A2.25 2.25 0 0112.75 3H15a2.25 2.25 0 012.25 2.25v1.5a2.25 2.25 0 012.25 2.25v1.5a2.25 2.25 0 01-2.25 2.25h-1.5zM4.5 17.25a2.25 2.25 0 002.25 2.25H9a2.25 2.25 0 002.25-2.25v-1.5A2.25 2.25 0 009 15.75H6.75a2.25 2.25 0 00-2.25 2.25v1.5z" }));
+const InformationCircleIcon = ({ className="w-5 h-5"}) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", viewBox:"0 0 24 24", strokeWidth:1.5, stroke:"currentColor"}, React.createElement('path', { strokeLinecap:"round", strokeLinejoin:"round", d:"M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" }));
+
+// Icônes spécialisées colorées pour chaque jeu
+const MemoryIcon = ({ className="w-10 h-10", color="#ec4899" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:color, viewBox:"0 0 24 24"}, React.createElement('path', { d:"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"}));
+const HangmanIcon = ({ className="w-10 h-10", color="#f59e0b" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", stroke:color, strokeWidth:"1.5", viewBox:"0 0 24 24"}, React.createElement('circle', { cx:"12", cy:"7", r:"2"}), React.createElement('path', { d:"M12 9v7"}), React.createElement('path', { d:"m9 19 3-2 3 2"}), React.createElement('path', { d:"m9 14 6 0"}), React.createElement('path', { d:"M6 4h12"}), React.createElement('path', { d:"M8 4V2"}));
+const IntrusIcon = ({ className="w-10 h-10", color="#10b981" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:color, viewBox:"0 0 24 24"}, React.createElement('path', { d:"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"}), React.createElement('circle', { cx:"12", cy:"12", r:"1.5", fill:"white"}));
+const AssociationIcon = ({ className="w-10 h-10", color="#3b82f6" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:"none", stroke:color, strokeWidth:"1.5", viewBox:"0 0 24 24"}, React.createElement('path', { d:"M7 7H5a2 2 0 00-2 2v8h2v-4h2v4h2V9a2 2 0 00-2-2z"}), React.createElement('path', { d:"M17 7h-2a2 2 0 00-2 2v8h2v-4h2a2 2 0 002-2V9a2 2 0 00-2-2z"}), React.createElement('path', { d:"M9 10h6", opacity:"0.7"}));
+const WordSearchIcon = ({ className="w-10 h-10", color="#8b5cf6" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:color, viewBox:"0 0 24 24"}, React.createElement('path', { d:"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"}), React.createElement('rect', { x:"6", y:"8", width:"7", height:"1", fill:"white", opacity:"0.8"}), React.createElement('rect', { x:"6", y:"10", width:"5", height:"1", fill:"white", opacity:"0.8"}));
+const CrosswordIcon = ({ className="w-10 h-10", color="#ef4444" }) => React.createElement('svg', { xmlns:"http://www.w3.org/2000/svg", className, fill:color, viewBox:"0 0 24 24"}, React.createElement('path', { d:"M3 3v18h18V3H3zm16 16H5V5h14v14z"}), React.createElement('g', { fill:"white" }, React.createElement('rect', { x:"7", y:"7", width:"2", height:"2"}), React.createElement('rect', { x:"11", y:"7", width:"2", height:"2"}), React.createElement('rect', { x:"15", y:"7", width:"2", height:"2"}), React.createElement('rect', { x:"7", y:"11", width:"2", height:"2"}), React.createElement('rect', { x:"11", y:"11", width:"2", height:"2"}), React.createElement('rect', { x:"15", y:"11", width:"2", height:"2"}), React.createElement('rect', { x:"7", y:"15", width:"2", height:"2"}), React.createElement('rect', { x:"11", y:"15", width:"2", height:"2"}), React.createElement('rect', { x:"15", y:"15", width:"2", height:"2"})));
+
+// Fonction pour obtenir l'icône du jeu
+const getGameIcon = (gameId) => {
+    const iconMap = {
+        memory: MemoryIcon,
+        pendu: HangmanIcon,
+        intrus: IntrusIcon,
+        association: AssociationIcon,
+        motsmeles: WordSearchIcon,
+        motscroises: CrosswordIcon
+    };
+    return iconMap[gameId] || PuzzleIcon;
+};
+
+// --- UI COMPONENTS ---
+const Spinner = () => React.createElement('svg', { className: "animate-spin h-5 w-5 text-white", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24" }, React.createElement('circle', { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }), React.createElement('path', { className: "opacity-75", fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" }));
+const Card = ({ children, className = '' }) => React.createElement('div', { className: `bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 ${className}` }, children);
+const SectionTitle = ({ icon, title, subtitle }) => React.createElement('div', { className: 'flex items-start space-x-4' }, React.createElement('div', { className: 'bg-slate-100 p-3 rounded-xl' }, icon), React.createElement('div', null, React.createElement('h3', { className: 'text-lg font-bold text-slate-800' }, title), React.createElement('p', { className: 'text-sm text-slate-500' }, subtitle)));
+const Button = ({ children, isLoading = false, icon, className = '', ...props }) => React.createElement('button', { ...props, disabled: isLoading || props.disabled, className: `w-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out text-base shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/30 ${className}` }, isLoading ? React.createElement(Spinner) : React.createElement(React.Fragment, null, icon && React.createElement('span', { className: "mr-2 -ml-1" }, icon), children));
+const PromptOutput = ({ prompt }) => {
+    const [copySuccess, setCopySuccess] = useState(false);
+    const copyToClipboard = () => { if (!prompt) return; navigator.clipboard.writeText(prompt).then(() => { setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2500); }).catch(err => { console.error('Erreur de copie: ', err); }); };
+    return React.createElement('div', { className: "relative mt-6" }, React.createElement('pre', { className: "bg-slate-800 text-slate-200 p-4 rounded-lg overflow-x-auto max-h-[500px] text-sm prompt-output border border-slate-700" }, React.createElement('code', null, prompt)), React.createElement('button', { onClick: copyToClipboard, className: `absolute top-3 right-3 p-2 rounded-lg transition-colors text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-blue-500 ${copySuccess ? 'bg-green-500 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`, 'aria-label': copySuccess ? "Copié !" : "Copier le prompt" }, copySuccess ? React.createElement(CheckIcon, {className: "w-4 h-4"}) : React.createElement(ClipboardIcon, {className: "w-4 h-4"})));
+};
+const ToggleSwitch = ({ checked, onChange, labelId }) => React.createElement('label', { htmlFor: labelId, className: "relative inline-flex items-center cursor-pointer" }, React.createElement('input', { type: "checkbox", id: labelId, checked: checked, onChange: onChange, className: "sr-only peer" }), React.createElement('div', { className: "w-11 h-6 bg-slate-200 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-offset-white peer-focus:ring-blue-500 transition-colors peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" }));
+
+// --- LOGIC FOR KEYWORD EXTRACTION ---
+const STOP_WORDS = new Set(['a', 'afin', 'ai', 'aie', 'aient', 'aies', 'ait', 'alors', 'apres', 'as', 'au', 'aucun', 'aucune', 'aujourd', 'aura', 'aurai', 'auraient', 'aurais', 'aurait', 'auras', 'aurez', 'auriez', 'aurions', 'aurons', 'auront', 'aussi', 'autre', 'autres', 'aux', 'avaient', 'avais', 'avait', 'avant', 'avec', 'avez', 'aviez', 'avions', 'avoir', 'avons', 'ayant', 'ayez', 'ayons', 'bon', 'car', 'ce', 'ceci', 'cela', 'celle', 'celles', 'celui', 'cependant', 'certain', 'certaine', 'certaines', 'certains', 'ces', 'cet', 'cette', 'ceux', 'chaque', 'ci', 'comme', 'comment', 'd', 'dans', 'de', 'deja', 'depuis', 'des', 'deux', 'devant', 'devrait', 'doit', 'donc', 'dont', 'du', 'elle', 'elles', 'en', 'encore', 'entre', 'est', 'et', 'etaient', 'etais', 'etait', 'etant', 'ete', 'etes', 'etiez', 'etions', 'etre', 'eu', 'eue', 'eues', 'eurent', 'eus', 'eusse', 'eussent', 'eusses', 'eussiez', 'eussions', 'eut', 'eux', 'faire', 'fais', 'faisaient', 'faisant', 'fait', 'faites', 'fois', 'font', 'furent', 'fus', 'fusse', 'fussent', 'fusses', 'fussiez', 'fussions', 'fut', 'haut', 'hors', 'hui', 'il', 'ils', 'j', 'je', 'l', 'la', 'le', 'les', 'leur', 'leurs', 'lui', 'm', 'ma', 'mais', 'me', 'meme', 'memes', 'mes', 'mien', 'mienne', 'miennes', 'miens', 'moi', 'moins', 'mon', 'mot', 'n', 'ne', 'ni', 'nom', 'non', 'nos', 'notre', 'notres', 'nous', 'on', 'ont', 'ou', 'par', 'parce', 'pas', 'pendant', 'personne', 'peu', 'peut', 'plus', 'plutot', 'pour', 'pourquoi', 'puis', 'qu', 'quand', 'que', 'quel', 'quelle', 'quelles', 'quels', 'qui', 's', 'sa', 'sans', 'se', 'sera', 'serai', 'seraient', 'serais', 'serait', 'seras', 'serez', 'seriez', 'serions', 'serons', 'seront', 'ses', 'si', 'sien', 'sienne', 'siennes', 'siens', 'soi', 'soient', 'sois', 'soit', 'sommes', 'son', 'sont', 'soyez', 'soyons', 'suis', 'sur', 't', 'ta', 'tandis', 'te', 'tel', 'telle', 'telles', 'tels', 'tes', 'toi', 'ton', 'tous', 'tout', 'toute', 'toutes', 'tres', 'tu', 'un', 'une', 'va', 'vais', 'vas', 'vers', 'voici', 'voila', 'vont', 'vos', 'votre', 'votres', 'vous', 'y']);
+const normalizeWord = (word) => word.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, '');
+
+function extractKeywords(text, count, forcedWordsStr) {
+    const forcedWords = new Set((forcedWordsStr || '').split(',').map(w => normalizeWord(w.trim())).filter(w => w.length > 0));
+    const words = text.toLowerCase().split(/\s+/).map(word => word.replace(/[^\w]/g, '')).filter(word => word.length > 2 && !STOP_WORDS.has(word));
+    const wordCount = {};
+    words.forEach(word => { wordCount[word] = (wordCount[word] || 0) + 1; });
+    const sortedWords = Object.entries(wordCount).sort((a, b) => b[1] - a[1]).map(([word]) => word);
+    const result = [];
+    forcedWords.forEach(word => { if (word) result.push(word); });
+    for (const word of sortedWords) {
+        const normalized = normalizeWord(word);
+        if (!forcedWords.has(normalized) && result.length < count) {
+            result.push(normalized);
+        }
+    }
+    return result.slice(0, count);
+}
+
+// --- PROMPT CONSTRUCTORS ---
+const PromptConstructors = {
+    memory: ({ numPairs, timerMinutes, magicWord }) => `
+**Mot magique à révéler en cas de succès :** ${magicWord}
+
+Créez un jeu de Memory avec ${numPairs} paires de cartes (${numPairs * 2} cartes au total).
+${timerMinutes ? `**Chronomètre :** ${timerMinutes} minutes maximum.` : ''}
+
+**Instructions :**
+- Générez ${numPairs} paires d'éléments liés au contenu du cours
+- Chaque paire doit être constituée d'un concept et de sa définition/explication
+- Mélangez les cartes et numérotez-les de 1 à ${numPairs * 2}
+- L'élève doit cliquer sur deux cartes pour les retourner
+- Si elles forment une paire, elles restent visibles
+- Sinon, elles se retournent après 2 secondes
+- Le jeu est gagné quand toutes les paires sont trouvées
+- Incluez un bouton "Passer" qui révèle la solution sans donner le mot magique
+
+**Format attendu :**
+- Interface avec grille de cartes cliquables
+- Compteur de paires trouvées
+- Bouton "Passer le jeu"
+${timerMinutes ? `- Chronomètre dégressif de ${timerMinutes} minutes` : ''}
+- Modale de victoire révélant le mot magique "${magicWord}"
+`,
+
+    pendu: ({ numWords, timerMinutes, magicWord }) => `
+**Mot magique à révéler en cas de succès :** ${magicWord}
+
+Créez un jeu du Pendu avec ${numWords} mots tirés du contenu du cours.
+${timerMinutes ? `**Chronomètre :** ${timerMinutes} minutes maximum.` : ''}
+
+**Instructions :**
+- Sélectionnez ${numWords} mots-clés importants du cours
+- Pour chaque mot, fournissez un indice basé sur le cours
+- L'élève a 6 erreurs maximum par mot (dessin du pendu)
+- Proposez un clavier virtuel pour saisir les lettres
+- Le jeu est gagné si tous les mots sont trouvés
+- Incluez un bouton "Passer" qui révèle la solution sans donner le mot magique
+
+**Format attendu :**
+- Interface avec mot à trous, dessin du pendu, clavier virtuel
+- Compteur de mots trouvés sur ${numWords}
+- Affichage des erreurs restantes
+- Bouton "Passer le jeu"
+${timerMinutes ? `- Chronomètre dégressif de ${timerMinutes} minutes` : ''}
+- Modale de victoire révélant le mot magique "${magicWord}"
+`,
+
+    intrus: ({ numSets, timerMinutes, magicWord }) => `
+**Mot magique à révéler en cas de succès :** ${magicWord}
+
+Créez un jeu "Trouve l'intrus" avec ${numSets} séries d'éléments.
+${timerMinutes ? `**Chronomètre :** ${timerMinutes} minutes maximum.` : ''}
+
+**Instructions :**
+- Créez ${numSets} groupes de 4-5 éléments chacun
+- Dans chaque groupe, un élément ne correspond pas aux autres (l'intrus)
+- Les éléments doivent être tirés du contenu du cours
+- L'élève doit identifier l'intrus dans chaque série
+- Le jeu est gagné si tous les intrus sont trouvés
+- Incluez un bouton "Passer" qui révèle la solution sans donner le mot magique
+
+**Format attendu :**
+- Interface avec ${numSets} groupes d'éléments cliquables
+- Compteur de séries résolues
+- Feedback immédiat (correct/incorrect)
+- Bouton "Passer le jeu"
+${timerMinutes ? `- Chronomètre dégressif de ${timerMinutes} minutes` : ''}
+- Modale de victoire révélant le mot magique "${magicWord}"
+`,
+
+    association: ({ numZones, numItemsPerZone, timerMinutes, magicWord }) => `
+**Mot magique à révéler en cas de succès :** ${magicWord}
+
+Créez un jeu d'association avec ${numZones} catégories de ${numItemsPerZone} éléments chacune.
+${timerMinutes ? `**Chronomètre :** ${timerMinutes} minutes maximum.` : ''}
+
+**Instructions :**
+- Créez ${numZones} catégories thématiques basées sur le cours
+- Chaque catégorie contient ${numItemsPerZone} éléments
+- Mélangez tous les éléments (${numZones * numItemsPerZone} au total)
+- L'élève doit glisser-déposer les éléments dans les bonnes catégories
+- Le jeu est gagné quand tous les éléments sont bien classés
+- Incluez un bouton "Passer" qui révèle la solution sans donner le mot magique
+
+**Format attendu :**
+- Interface avec zones de dépôt étiquetées et éléments à glisser
+- Feedback visuel pour les bonnes/mauvaises associations
+- Compteur d'éléments bien placés
+- Bouton "Passer le jeu"
+${timerMinutes ? `- Chronomètre dégressif de ${timerMinutes} minutes` : ''}
+- Modale de victoire révélant le mot magique "${magicWord}"
+`,
+
+    motsmeles: ({ numWords, words, forcedWords, timerMinutes, magicWord }) => `
+**Mot magique à révéler en cas de succès :** ${magicWord}
+
+Créez une grille de mots mêlés avec les mots suivants : ${words.join(', ')}.
+${timerMinutes ? `**Chronomètre :** ${timerMinutes} minutes maximum.` : ''}
+${forcedWords ? `**Mots forcés inclus :** ${forcedWords}` : ''}
+
+**Instructions :**
+- Utilisez une grille 12x12 pour cacher les ${numWords} mots
+- Les mots peuvent être horizontaux, verticaux ou diagonaux
+- Remplissez les cases vides avec des lettres aléatoires
+- L'élève doit sélectionner les mots en cliquant-glissant
+- Le jeu est gagné quand tous les mots sont trouvés
+- Incluez un bouton "Passer" qui révèle la solution sans donner le mot magique
+
+**Format attendu :**
+- Grille interactive 12x12 avec sélection par clic-glissé
+- Liste des mots à trouver avec cases à cocher
+- Compteur de mots trouvés
+- Bouton "Passer le jeu"
+${timerMinutes ? `- Chronomètre dégressif de ${timerMinutes} minutes` : ''}
+- Modale de victoire révélant le mot magique "${magicWord}"
+`,
+
+    motscroises: ({ numWords, words, forcedWords, timerMinutes, magicWord }) => `
+**Mot magique à révéler en cas de succès :** ${magicWord}
+
+Créez une grille de mots croisés avec les mots suivants : ${words.join(', ')}.
+${timerMinutes ? `**Chronomètre :** ${timerMinutes} minutes maximum.` : ''}
+${forcedWords ? `**Mots forcés inclus :** ${forcedWords}` : ''}
+
+**Instructions :**
+- Créez une grille de mots croisés avec intersections
+- Fournissez des définitions basées sur le contenu du cours
+- Numérotez les cases de départ (horizontal/vertical)
+- L'élève doit remplir la grille avec les bonnes réponses
+- Le jeu est gagné quand la grille est complètement remplie
+- Incluez un bouton "Passer" qui révèle la solution sans donner le mot magique
+
+**Format attendu :**
+- Grille interactive avec cases à remplir
+- Listes des définitions horizontales et verticales
+- Validation automatique des réponses
+- Bouton "Passer le jeu"
+${timerMinutes ? `- Chronomètre dégressif de ${timerMinutes} minutes` : ''}
+- Modale de victoire révélant le mot magique "${magicWord}"
+`
+};
+
+// --- GAME CONFIG COMPONENTS ---
+const GameConfigSection = ({ title, icon, children }) => (
+    React.createElement('div', { className: 'bg-slate-50/50 rounded-xl p-4 border border-slate-200' },
+        React.createElement('div', { className: 'flex items-center space-x-3 mb-4' },
+            React.createElement('div', { className: 'p-2 bg-slate-100 rounded-lg' }, icon),
+            React.createElement('h3', { className: 'text-base font-bold text-slate-700' }, title)
+        ),
+        React.createElement('div', { className: 'space-y-4' }, children)
+    )
+);
+
+const TimerConfig = ({ config, onUpdate }) => (
+    React.createElement('div', null,
+        React.createElement('div', { className: "flex items-center justify-between mb-2" },
+            React.createElement('label', { className: "text-sm font-semibold text-slate-600" }, 'Chronomètre'),
+            React.createElement(ToggleSwitch, { checked: config.timerEnabled, onChange: (e) => onUpdate({ ...config, timerEnabled: e.target.checked }), labelId: `timer-${config.id || 'default'}` })
+        ),
+        config.timerEnabled && React.createElement('div', { className: "animate-fade-in" },
+            React.createElement('label', { className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Durée (minutes)"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.timerMinutes} min`)
+            ),
+            React.createElement('input', { type: "range", min: "3", max: "30", value: config.timerMinutes, onChange: e => onUpdate({ ...config, timerMinutes: Number(e.target.value) }), className: "w-full" })
+        )
+    )
+);
+
+const MagicWordConfig = ({ config, onUpdate }) => (
+    React.createElement('div', null,
+        React.createElement('label', { className: "block font-semibold mb-2 text-sm text-slate-600" }, "Mot magique de récompense"),
+        React.createElement('input', {
+            type: "text",
+            className: "w-full p-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-700 placeholder-slate-400 text-sm",
+            value: config.magicWord,
+            onChange: e => onUpdate({ ...config, magicWord: e.target.value }),
+            placeholder: "Ex: BRAVO, VICTOIRE..."
+        })
+    )
+);
+
+// Composants de configuration spécifiques pour chaque jeu
+const MemoryConfig = ({ config, onUpdate }) => (
+    React.createElement(GameConfigSection, { title: "Memory", icon: React.createElement(MemoryIcon, { className: 'w-5 h-5', color: 'currentColor' }) },
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-pairs", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Nombre de paires"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numPairs} paires`)
+            ),
+            React.createElement('input', { id: "num-pairs", type: "range", min: "4", max: "12", value: config.numPairs, onChange: e => onUpdate({ ...config, numPairs: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement(TimerConfig, { config, onUpdate }),
+        React.createElement(MagicWordConfig, { config, onUpdate })
+    )
+);
+
+const PenduConfig = ({ config, onUpdate }) => (
+    React.createElement(GameConfigSection, { title: "Pendu", icon: React.createElement(HangmanIcon, { className: 'w-5 h-5', color: 'currentColor' }) },
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-words-pendu", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Nombre de mots"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numWords} mots`)
+            ),
+            React.createElement('input', { id: "num-words-pendu", type: "range", min: "3", max: "8", value: config.numWords, onChange: e => onUpdate({ ...config, numWords: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement(TimerConfig, { config, onUpdate }),
+        React.createElement(MagicWordConfig, { config, onUpdate })
+    )
+);
+
+const IntrusConfig = ({ config, onUpdate }) => (
+    React.createElement(GameConfigSection, { title: "Intrus", icon: React.createElement(IntrusIcon, { className: 'w-5 h-5', color: 'currentColor' }) },
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-sets", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Nombre de séries"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numSets} séries`)
+            ),
+            React.createElement('input', { id: "num-sets", type: "range", min: "3", max: "8", value: config.numSets, onChange: e => onUpdate({ ...config, numSets: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement(TimerConfig, { config, onUpdate }),
+        React.createElement(MagicWordConfig, { config, onUpdate })
+    )
+);
+
+const AssociationConfig = ({ config, onUpdate }) => (
+     React.createElement(GameConfigSection, { title: "Association", icon: React.createElement(AssociationIcon, { className: 'w-5 h-5', color: 'currentColor' }) },
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-zones", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Nombre de catégories"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numZones} catégories`)
+            ),
+            React.createElement('input', { id: "num-zones", type: "range", min: "3", max: "6", value: config.numZones, onChange: e => onUpdate({ ...config, numZones: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-items-per-zone", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Éléments par catégorie"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numItemsPerZone} éléments`)
+            ),
+            React.createElement('input', { id: "num-items-per-zone", type: "range", min: "3", max: "8", value: config.numItemsPerZone, onChange: e => onUpdate({ ...config, numItemsPerZone: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement(TimerConfig, { config, onUpdate }),
+        React.createElement(MagicWordConfig, { config, onUpdate })
+    )
+);
+
+const MotsMelesConfig = ({ config, onUpdate }) => (
+    React.createElement(GameConfigSection, { title: "Mots Mêlés", icon: React.createElement(WordSearchIcon, { className: 'w-5 h-5', color: 'currentColor' }) },
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-words-motsmeles", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Nombre de mots"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numWords} mots`)
+            ),
+            React.createElement('input', { id: "num-words-motsmeles", type: "range", min: "8", max: "15", value: config.numWords, onChange: e => onUpdate({ ...config, numWords: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "forced-words-motsmeles", className: "block font-semibold mb-2 text-sm text-slate-600" }, "Mots forcés (optionnel)"),
+            React.createElement('textarea', {
+                id: "forced-words-motsmeles",
+                className: "w-full p-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-700 placeholder-slate-400 text-sm",
+                value: config.forcedWords,
+                onChange: e => onUpdate({ ...config, forcedWords: e.target.value }),
+                placeholder: "Mots à inclure, séparés par des virgules...",
+                rows: 2
+            })
+        ),
+        React.createElement(TimerConfig, { config, onUpdate }),
+        React.createElement(MagicWordConfig, { config, onUpdate })
+    )
+);
+
+const MotsCroisesConfig = ({ config, onUpdate }) => (
+    React.createElement(GameConfigSection, { title: "Mots Croisés", icon: React.createElement(CrosswordIcon, { className: 'w-5 h-5', color: 'currentColor' }) },
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "num-words-motscroises", className: "flex justify-between font-semibold mb-2 text-sm text-slate-600" },
+                React.createElement('span', null, "Nombre de mots"),
+                React.createElement('span', { className: "font-bold text-blue-600" }, `${config.numWords} mots`)
+            ),
+            React.createElement('input', { id: "num-words-motscroises", type: "range", min: "6", max: "12", value: config.numWords, onChange: e => onUpdate({ ...config, numWords: Number(e.target.value) }), className: "w-full" })
+        ),
+        React.createElement('div', null,
+            React.createElement('label', { htmlFor: "forced-words-motscroises", className: "block font-semibold mb-2 text-sm text-slate-600" }, "Mots forcés (optionnel)"),
+            React.createElement('textarea', {
+                id: "forced-words-motscroises",
+                className: "w-full p-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-700 placeholder-slate-400 text-sm",
+                value: config.forcedWords,
+                onChange: e => onUpdate({ ...config, forcedWords: e.target.value }),
+                placeholder: "Mots à inclure, séparés par des virgules...",
+                rows: 2
+            })
+        ),
+        React.createElement(TimerConfig, { config, onUpdate }),
+        React.createElement(MagicWordConfig, { config, onUpdate })
+    )
+);
+
+const HowToPlaySection = () => (
+    React.createElement(Card, { className: 'animate-fade-in' },
+        React.createElement(SectionTitle, {
+            icon: React.createElement(InformationCircleIcon, { className: "w-6 h-6 text-slate-500" }),
+            title: "Comment Jouer ? Les Règles pour l'Élève",
+            subtitle: "Voici comment le parcours fonctionnera une fois généré."
+        }),
+        React.createElement('div', { className: 'mt-4 text-sm text-slate-600 space-y-3' },
+            React.createElement('p', null, "Bienvenue dans ton parcours d'apprentissage ! Tu vas découvrir plusieurs jeux pédagogiques basés sur le cours. L'objectif est de réussir un maximum de jeux pédagogiques pour collecter des \"mots magiques\" et prouver tes connaissances."),
+            React.createElement('dl', { className: 'space-y-3 mt-3' },
+                React.createElement('div', null,
+                    React.createElement('dt', { className: 'font-semibold text-slate-700' }, "Choix du jeu pédagogique :"),
+                    React.createElement('dd', { className: 'pl-3 pr-2 py-1 border-l-2 border-blue-200 ml-1 bg-blue-50/70 rounded-r-md' }, "En haut de la page, tu verras des onglets pour chaque jeu pédagogique (Memory, Pendu, etc.). Tu es libre de commencer par le jeu pédagogique que tu préfères et de passer d'un jeu pédagogique à l'autre à tout moment. Il n'y a pas d'ordre imposé.")
+                ),
+                React.createElement('div', null,
+                    React.createElement('dt', { className: 'font-semibold text-slate-700' }, "Récompenses :"),
+                    React.createElement('dd', { className: 'pl-3 pr-2 py-1 border-l-2 border-blue-200 ml-1 bg-blue-50/70 rounded-r-md' }, "Chaque fois que tu termines un jeu pédagogique avec succès, un mot magique te sera révélé en récompense. Collectionne-les tous !")
+                ),
+                React.createElement('div', null,
+                    React.createElement('dt', { className: 'font-semibold text-slate-700' }, "Passer un jeu pédagogique :"),
+                    React.createElement('dd', { className: 'pl-3 pr-2 py-1 border-l-2 border-blue-200 ml-1 bg-blue-50/70 rounded-r-md' }, "Si un défi te semble trop compliqué ou si tu veux simplement avancer, chaque jeu pédagogique dispose d'un bouton pour \"Passer\" ou \"Abandonner\". Attention, si tu choisis cette option, tu ne pourras pas remporter le mot magique associé à ce jeu pédagogique.")
+                ),
+                React.createElement('div', null,
+                    React.createElement('dt', { className: 'font-semibold text-slate-700' }, "Fin du parcours :"),
+                    React.createElement('dd', { className: 'pl-3 pr-2 py-1 border-l-2 border-blue-200 ml-1 bg-blue-50/70 rounded-r-md' }, "Une fois que tu as essayé tous les jeux pédagogiques, clique sur le bouton \"Terminer le Parcours\". Un bilan final s'affichera avec la liste de tous les mots magiques que tu as réussi à gagner.")
+                )
+            )
+        )
+    )
+);
+
+
+// --- MAIN APP COMPONENT ---
+const App = () => {
+    const [courseText, setCourseText] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [generatedPrompt, setGeneratedPrompt] = useState('');
+
+    const [games, setGames] = useState({
+        memory: { id: 'memory', label: 'Memory', selected: false, component: MemoryConfig, config: { numPairs: 8, timerEnabled: false, timerMinutes: 5, magicWord: 'MEMORIA' } },
+        pendu: { id: 'pendu', label: 'Pendu', selected: false, component: PenduConfig, config: { numWords: 5, timerEnabled: false, timerMinutes: 10, magicWord: 'VICTOIRE' } },
+        intrus: { id: 'intrus', label: 'Intrus', selected: false, component: IntrusConfig, config: { numSets: 5, timerEnabled: false, timerMinutes: 8, magicWord: 'LOGIQUE' } },
+        association: { id: 'association', label: 'Association', selected: false, component: AssociationConfig, config: { numZones: 4, numItemsPerZone: 5, timerEnabled: false, timerMinutes: 10, magicWord: 'ASSOCIO' } },
+        motsmeles: { id: 'motsmeles', label: 'Mots Mêlés', selected: false, component: MotsMelesConfig, config: { numWords: 10, forcedWords: '', timerEnabled: false, timerMinutes: 15, magicWord: 'INCOGNITO' } },
+        motscroises: { id: 'motscroises', label: 'Mots Croisés', selected: false, component: MotsCroisesConfig, config: { numWords: 8, forcedWords: '', timerEnabled: false, timerMinutes: 20, magicWord: 'CRUCIS' } }
+    });
+
+    const textWarning = useMemo(() => {
+        if (!courseText.trim()) return null;
+        const wordCount = courseText.trim().split(/\s+/).length;
+        if (wordCount < 50) return "Attention : Le texte semble assez court. Pour de meilleurs résultats, utilisez un texte d'au moins 50 mots.";
+        return null;
+    }, [courseText]);
+
+    const handleGameSelectionChange = useCallback((gameId) => {
+        setGames(prev => ({
+            ...prev,
+            [gameId]: { ...prev[gameId], selected: !prev[gameId].selected }
+        }));
+    }, []);
+
+    const handleConfigUpdate = useCallback((gameId, newConfig) => {
+        setGames(prev => ({
+            ...prev,
+            [gameId]: { ...prev[gameId], config: newConfig }
+        }));
+    }, []);
+    
+    const handleGenerateSuperPrompt = useCallback(() => {
+        const selectedGames = Object.values(games).filter(g => g.selected);
+        if (selectedGames.length === 0) {
+            setError("Veuillez sélectionner au moins un jeu à générer.");
+            return;
+        }
+        if (!courseText.trim()) {
+            setError("Veuillez fournir un texte de référence pour générer les jeux.");
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        setGeneratedPrompt('');
+
+        setTimeout(() => {
+            try {
+                let superPrompt = `**Titre :** Prompt pour la création d'un parcours de jeux pédagogiques interactifs en HTML
+
+**Objectif :** Générer une page web HTML autonome complète (un seul fichier) qui contient plusieurs jeux éducatifs organisés en onglets. Le code doit être moderne, responsive, et sans dépendances externes.
+
+---
+
+### Contexte Global : Texte du Cours
+
+Ce texte sert de base pour la création de TOUS les jeux ci-dessous.
+\`\`\`
+${courseText}
+\`\`\`
+
+---
+
+### Structure et Règles Générales de la Page
+
+**0. Affichage des Règles :** Avant la barre d'onglets, affichez un encadré bien visible avec le titre "Comment jouer ? Les règles pour l'élève". Ce bloc doit contenir les explications suivantes :
+- **Introduction :** "Bienvenue dans ton parcours d'apprentissage ! Tu vas découvrir plusieurs jeux pédagogiques basés sur le cours. L'objectif est de réussir un maximum de jeux pédagogiques pour collecter des 'mots magiques' et prouver tes connaissances."
+- **Choix du jeu pédagogique :** "En haut de la page, tu verras des onglets pour chaque jeu pédagogique (Memory, Pendu, etc.). Tu es libre de commencer par le jeu pédagogique que tu préfères et de passer d'un jeu pédagogique à l'autre à tout moment. Il n'y a pas d'ordre imposé."
+- **Récompenses :** "Chaque fois que tu termines un jeu pédagogique avec succès, un **mot magique** te sera révélé en récompense. Collectionne-les tous !"
+- **Passer un jeu pédagogique :** "Si un défi te semble trop compliqué ou si tu veux simplement avancer, chaque jeu pédagogique dispose d'un bouton pour 'Passer' ou 'Abandonner'. Attention, si tu choisis cette option, tu ne pourras pas remporter le mot magique associé à ce jeu pédagogique."
+- **Fin du parcours :** "Une fois que tu as essayé tous les jeux pédagogiques, clique sur le bouton **'Terminer le Parcours'**. Un bilan final s'affichera avec la liste de tous les mots magiques que tu as réussi à gagner."
+- **Conclusion :** "L'important est de participer et de s'amuser tout en révisant. Bonne chance !"
+
+**1.  Navigation par Onglets :** La page doit avoir une barre d'onglets en haut pour chaque jeu : ${selectedGames.map(g => `"${g.label}"`).join(', ')}. L'élève doit pouvoir naviguer librement entre les jeux, même sans les avoir terminés.
+**2.  Chronomètre :** Pour chaque jeu, si un chronomètre est activé, il doit être **scrupuleusement respecté**. Il démarre avec le jeu et l'arrête si le temps est écoulé, ce qui équivaut à un échec.
+**3.  Récompenses Individuelles :** À la fin de chaque jeu réussi, une modale doit apparaître pour révéler le mot magique spécifique à ce jeu. Le jeu doit mémoriser en interne (via une variable JavaScript) chaque mot magique débloqué.
+**4.  Bouton "Passer le Jeu" :** Chaque jeu doit contenir un bouton "Passer" ou "Abandonner". Au clic, une fenêtre de confirmation doit apparaître ("Êtes-vous sûr de vouloir abandonner ? Vous ne gagnerez pas le mot magique pour ce jeu."). Si l'élève confirme, le jeu est marqué comme terminé (sans succès) et l'élève peut voir la solution si applicable. L'abandon ne bloque pas la navigation vers d'autres jeux.
+**5.  Bilan Final :** Un bouton "Terminer le Parcours" doit être présent et visible en permanence. Au clic, il ouvre une modale de bilan qui récapitule la liste de tous les mots magiques que l'élève a gagnés. Si aucun mot n'a été gagné, il affiche un message d'encouragement.
+
+---
+`;
+                selectedGames.forEach((game, index) => {
+                    const constructor = PromptConstructors[game.id];
+                    if (!constructor) return;
+
+                    let gamePromptPart = `\n### JEU ${index + 1} : ${game.label} (dans l'onglet "${game.label}")\n`;
+                    let constructorParams = { 
+                        ...game.config,
+                        timerMinutes: game.config.timerEnabled ? game.config.timerMinutes : null
+                    };
+
+                    if (game.id === 'motsmeles' || game.id === 'motscroises') {
+                        const words = extractKeywords(courseText, game.config.numWords, game.config.forcedWords);
+                        if (words.length < game.config.numWords) {
+                            throw new Error(`Pour le jeu "${game.label}", seulement ${words.length} mots sur les ${game.config.numWords} demandés ont pu être trouvés. Essayez avec un texte plus riche ou en forçant des mots.`);
+                        }
+                        constructorParams.words = words;
+                    }
+                    
+                    gamePromptPart += constructor(constructorParams);
+                    superPrompt += gamePromptPart;
+                });
+
+                superPrompt += "\n---\n\nProduisez maintenant le code complet et unique pour ce fichier `index.html`. Assurez-vous que la structure à onglets est fonctionnelle et que chaque jeu est autonome dans son onglet.";
+                setGeneratedPrompt(superPrompt);
+
+            } catch (e) {
+                console.error(e);
+                setError(e.message);
+            } finally {
+                setIsLoading(false);
+            }
+        }, 200);
+    }, [games, courseText]);
+
+    return (
+        React.createElement('div', { className: "min-h-screen font-sans p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-indigo-50 via-white to-blue-50" },
+            React.createElement('div', { className: "max-w-3xl mx-auto space-y-8" },
+                React.createElement('header', { className: "text-center py-10" },
+                    React.createElement('div', {className: 'inline-block bg-white p-4 rounded-2xl mb-6 shadow-md border border-slate-100'}, 
+                        React.createElement(SparklesIcon, {className: 'w-10 h-10 text-blue-600'})
+                    ),
+                    React.createElement('h1', { className: 'text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text' }, 'Super Générateur'),
+                    React.createElement('h2', { className: 'text-2xl sm:text-3xl font-semibold text-slate-700 mt-1' }, 'de Jeux Pédagogiques'),
+                    React.createElement('p', { className: 'text-base text-slate-500 max-w-2xl mx-auto mt-4 leading-relaxed' }, 
+                        'Transformez vos cours en parcours de jeux interactifs ! Sélectionnez les jeux que vous souhaitez, configurez-les selon vos besoins, et générez un prompt complet pour créer une expérience d\'apprentissage gamifiée.'
+                    )
+                ),
+                
+                React.createElement(HowToPlaySection, null),
+
+                React.createElement(Card, { className: 'animate-fade-in' },
+                    React.createElement(SectionTitle, { 
+                        icon: React.createElement(DocumentTextIcon, { className: "w-6 h-6 text-slate-500" }), 
+                        title: "1. Texte du cours", 
+                        subtitle: "Collez ici le contenu de votre cours pour générer les jeux" 
+                    }),
+                    React.createElement('div', { className: 'mt-6' },
+                        React.createElement('textarea', {
+                            className: "w-full h-36 p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-700 placeholder-slate-400 resize-y",
+                            value: courseText,
+                            onChange: e => setCourseText(e.target.value),
+                            placeholder: "Collez ici le texte de votre cours, leçon, ou tout contenu pédagogique...",
+                        }),
+                        textWarning && React.createElement('div', { className: 'mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg' },
+                            React.createElement('div', { className: 'flex items-start space-x-3' },
+                                React.createElement(InformationCircleIcon, { className: "w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" }),
+                                React.createElement('p', { className: 'text-sm text-amber-700' }, textWarning)
+                            )
+                        )
+                    )
+                ),
+
+                React.createElement(Card, { className: 'animate-fade-in' },
+                    React.createElement(SectionTitle, { 
+                        icon: React.createElement(PuzzleIcon, { className: "w-6 h-6 text-slate-500" }), 
+                        title: "2. Sélection des jeux", 
+                        subtitle: "Choisissez les types de jeux à inclure dans votre parcours" 
+                    }),
+                    React.createElement('div', { className: 'grid grid-cols-2 md:grid-cols-3 gap-4 mt-6' },
+                        Object.values(games).map(game => {
+                            const IconComponent = getGameIcon(game.id);
+                            return React.createElement('div', {
+                                key: game.id,
+                                className: `text-center rounded-xl p-4 cursor-pointer transition-all duration-200 border-2 ${game.selected ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'}`,
+                                onClick: () => handleGameSelectionChange(game.id)
+                            },
+                                React.createElement('div', { className: 'flex flex-col items-center justify-between h-full' },
+                                    React.createElement('div', { className: 'flex-grow flex flex-col items-center justify-center' },
+                                        React.createElement(IconComponent, null),
+                                        React.createElement('h3', { className: 'font-bold text-slate-700 text-sm mt-2' }, game.label)
+                                    ),
+                                    React.createElement('div', { className: 'mt-4 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0', style: { borderColor: game.selected ? '#3b82f6' : '#cbd5e1' } },
+                                        game.selected && React.createElement('div', { className: "w-2.5 h-2.5 bg-blue-600 rounded-full" })
+                                    )
+                                )
+                            );
+                        })
+                    )
+                ),
+
+                Object.values(games).filter(game => game.selected).length > 0 && React.createElement(Card, { className: 'animate-fade-in' },
+                    React.createElement(SectionTitle, { 
+                        icon: React.createElement(CheckCircleIcon, { className: "w-6 h-6 text-slate-500" }), 
+                        title: "3. Configuration des jeux", 
+                        subtitle: "Personnalisez les paramètres des jeux sélectionnés" 
+                    }),
+                    React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-6 mt-6' },
+                        Object.values(games).filter(game => game.selected).map(game => {
+                            const ConfigComponent = game.component;
+                            return React.createElement(ConfigComponent, {
+                                key: game.id,
+                                config: { ...game.config, id: game.id },
+                                onUpdate: (newConfig) => handleConfigUpdate(game.id, newConfig)
+                            });
+                        })
+                    )
+                ),
+
+                React.createElement('div', { className: 'py-6' },
+                    React.createElement(Button, {
+                        onClick: handleGenerateSuperPrompt,
+                        isLoading: isLoading,
+                        disabled: Object.values(games).filter(g => g.selected).length === 0 || !courseText.trim(),
+                        icon: React.createElement(SparklesIcon, { className: "w-5 h-5" })
+                    }, isLoading ? 'Génération...' : '4. Générer le Super-Prompt')
+                ),
+
+                error && React.createElement('div', { className: 'p-4 bg-red-100 border border-red-300 rounded-lg animate-fade-in' },
+                    React.createElement('div', { className: 'flex items-start space-x-3' },
+                        React.createElement('div', { className: 'w-5 h-5 text-red-600 mt-0.5 flex-shrink-0' }, '⚠️'),
+                        React.createElement('p', { className: 'text-sm font-semibold text-red-800' }, error)
+                    )
+                ),
+
+                generatedPrompt && React.createElement(Card, { className: 'animate-fade-in' },
+                    React.createElement(SectionTitle, { 
+                        icon: React.createElement(CheckCircleIcon, { className: "w-6 h-6 text-green-500" }), 
+                        title: "Votre super-prompt est prêt !", 
+                        subtitle: "Copiez ce prompt et utilisez-le avec votre IA préférée" 
+                    }),
+                    React.createElement(PromptOutput, { prompt: generatedPrompt }),
+                    React.createElement('div', { className: 'mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg' },
+                        React.createElement('div', { className: 'flex items-start space-x-3' },
+                            React.createElement(InformationCircleIcon, { className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" }),
+                            React.createElement('div', { className: 'text-sm text-blue-800' },
+                                React.createElement('p', { className: 'font-semibold mb-1' }, 'Comment utiliser ce prompt :'),
+                                React.createElement('ol', { className: 'list-decimal list-inside space-y-1' },
+                                    React.createElement('li', null, 'Copiez le prompt généré ci-dessus.'),
+                                    React.createElement('li', null, 'Collez-le dans votre IA (ChatGPT, Claude, Gemini...).'),
+                                    React.createElement('li', null, 'L\'IA créera un fichier HTML complet avec tous vos jeux.'),
+                                    React.createElement('li', null, 'Sauvegardez ce code dans un fichier .html et ouvrez-le.'),
+                                    React.createElement('li', null, React.createElement('strong', null, 'Votre parcours de jeux est prêt !'))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    );
+};
+
+// --- RENDER APP ---
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>

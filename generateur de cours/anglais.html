@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constructeur de Séquence - Français</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Palette "Lettres Classiques" */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #800020; --primary-600: #66001a; --primary-700: #4d0013;
+            --secondary-500: #D4AF37; --secondary-600: #b89830;
+            --accent-500: #4a5568; 
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #fdfbf7; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(128, 0, 32, 0.4);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: #334155; line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container, .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: #334155; text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: #cbd5e1; transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: #1e293b; display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: #64748b; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .section h3 { font-family: var(--font-primary); font-size: 1.4rem; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; border-left: 4px solid var(--primary-500); padding-left: 1rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: #334155; margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid #cbd5e1; border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: #334155; transition: all 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer; border:none; transition: all 0.3s ease-in-out; }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .btn-secondary { background-color: var(--secondary-500); color: #1e293b; font-weight: 700; }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--success-500); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { .grid-2-cols { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Retour</a>
+            <h1><i class="fas fa-book-open icon"></i> Constructeur de Séquence - Français</h1>
+        </header>
+        <p class="page-header-subtitle">Composez votre séquence sur mesure en choisissant vos objectifs littéraires, linguistiques et de production.</p>
+    </div>
+
+    <section class="section">
+        <h2>Construction de la Séquence</h2>
+        <div class="form-group">
+            <label for="gradeSelect" class="label-text">Niveau de la classe :</label>
+            <select id="gradeSelect" class="select-field">
+                <option value="">-- Choisir un niveau --</option>
+                <option value="5e">5ème</option>
+                <option value="4e">4ème</option>
+                <option value="3e">3ème</option>
+            </select>
+        </div>
+
+        <h3>1. Le Cœur Littéraire</h3>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="objetEtudeSelect" class="label-text">Objet d'étude principal :</label>
+                <select id="objetEtudeSelect" class="select-field" disabled>
+                    <option>-- Choisir un niveau d'abord --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="oeuvreInput" class="label-text">Œuvre ou Auteur d'appui (Optionnel) :</label>
+                <input type="text" id="oeuvreInput" class="input-field" placeholder="Ex: L'Odyssée, Molière, un poème de Rimbaud...">
+            </div>
+        </div>
+
+        <h3>2. L'Objectif d'Étude de la Langue</h3>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="langueObjectifSelect" class="label-text">Point de langue à travailler :</label>
+                <select id="langueObjectifSelect" class="select-field">
+                    <option value="">-- Choisir un objectif --</option>
+                    <option value="la conjugaison des temps du récit (passé simple/imparfait)">Conjugaison : Les temps du récit</option>
+                    <option value="les valeurs et emplois du présent de l'indicatif">Conjugaison : Les valeurs du présent</option>
+                    <option value="la concordance des temps et les modes (subjonctif, conditionnel)">Conjugaison : Concordance des temps et modes</option>
+                    <option value="la phrase complexe (propositions subordonnées)">Grammaire : La phrase complexe</option>
+                    <option value="les accords dans le groupe nominal et le groupe verbal">Grammaire : Les accords (GN/GV)</option>
+                    <option value="les fonctions grammaticales (sujet, compléments...)">Grammaire : Les fonctions</option>
+                    <option value="les figures de style (métaphore, comparaison...)">Lexique : Les figures de style</option>
+                    <option value="le champ lexical">Lexique : Les champs lexicaux</option>
+                    <option value="les registres de langue">Lexique : Les registres de langue</option>
+                </select>
+            </div>
+             <div class="form-group">
+                <label for="languePrecisionInput" class="label-text">Précision sur le point de langue (Optionnel) :</label>
+                <input type="text" id="languePrecisionInput" class="input-field" placeholder="Ex: le plus-que-parfait, l'ironie, la personnification...">
+            </div>
+        </div>
+        
+        <h3>3. La Production Finale Attendue</h3>
+        <div class="form-group">
+             <label for="ecritFinalSelect" class="label-text">Compétence d'écriture principale :</label>
+             <select id="ecritFinalSelect" class="select-field">
+                <option value="rédiger un récit d'aventure.">Rédiger un récit d'aventure</option>
+                <option value="rédiger le portrait d'un personnage.">Rédiger un portrait</option>
+                <option value="écrire un dialogue théâtral.">Écrire un dialogue théâtral</option>
+                <option value="développer une argumentation structurée.">Développer une argumentation</option>
+                <option value="écrire un poème en vers ou en prose.">Écrire un poème</option>
+                <option value="rédiger la suite d'un texte.">Rédiger la suite d'un texte</option>
+             </select>
+        </div>
+
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Génération du Prompt de Séquence</h2>
+        <div class="form-group" style="text-align: center;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Générer le Prompt de Séquence
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séquence généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séquence apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const objetsEtudeData = {
+        "5e": [
+            "Le voyage et l'aventure : pourquoi aller vers l'inconnu ?",
+            "Avec autrui : familles, amis, réseaux",
+            "Imaginer des univers nouveaux",
+            "Héros / héroïnes et héroïsmes"
+        ],
+        "4e": [
+            "La ville, lieu de tous les possibles ?",
+            "Individu et société : confrontation de valeurs",
+            "La fiction pour interroger le réel",
+            "Informer, s'informer, déformer ?"
+        ],
+        "3e": [
+            "Se raconter, se représenter",
+            "Dénoncer les travers de la société",
+            "Agir dans la cité : individu et pouvoir",
+            "Progrès et rêves scientifiques"
+        ]
+    };
+
+    // --- SCRIPT COMPLET AVEC TOUTES LES FONCTIONNALITÉS ---
+    const gradeSelect = document.getElementById('gradeSelect');
+    const objetEtudeSelect = document.getElementById('objetEtudeSelect');
+    const oeuvreInput = document.getElementById('oeuvreInput');
+    const langueObjectifSelect = document.getElementById('langueObjectifSelect');
+    const languePrecisionInput = document.getElementById('languePrecisionInput');
+    const ecritFinalSelect = document.getElementById('ecritFinalSelect');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+
+    function populateObjetsEtude() {
+        const selectedGrade = gradeSelect.value;
+        objetEtudeSelect.innerHTML = '<option value="">-- Choisir un objet d\'étude --</option>';
+        objetEtudeSelect.disabled = true;
+
+        if (selectedGrade && objetsEtudeData[selectedGrade]) {
+            objetsEtudeData[selectedGrade].forEach(objet => {
+                const option = document.createElement('option');
+                option.value = objet;
+                option.textContent = objet;
+                objetEtudeSelect.appendChild(option);
+            });
+            objetEtudeSelect.disabled = false;
+        }
+    }
+
+    gradeSelect.addEventListener('change', populateObjetsEtude);
+
+    generateButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const objetEtude = objetEtudeSelect.value;
+        const oeuvre = oeuvreInput.value.trim();
+        const langueObjectif = langueObjectifSelect.value;
+        const languePrecision = languePrecisionInput.value.trim();
+        const ecritFinal = ecritFinalSelect.value;
+        const outputFormatRadio = outputFormatGroup.querySelector('input[name="outputFormat"]:checked');
+
+        if (!grade || !objetEtude || !langueObjectif || !ecritFinal || !outputFormatRadio) {
+            alert("Veuillez remplir tous les champs principaux de la séquence.");
+            return;
+        }
+
+        const outputFormat = outputFormatRadio.value;
+        let finalLangueObjectif = langueObjectif;
+        if(languePrecision) {
+            finalLangueObjectif += ` (en particulier : ${languePrecision})`;
+        }
+        
+        let promptText = `**RÔLE ET MISSION**
+Tu agis en tant que professeur de Lettres agrégé, expert en didactique du français. Ta mission est de **rédiger l'intégralité d'un chapitre de cours** destiné à des élèves de ${grade}. Ce chapitre doit articuler de manière experte une étude littéraire et un point de langue précis, pour aboutir à une production d'écriture. Le ton doit être engageant et le contenu prêt à être utilisé directement par un élève.\n\n` +
+
+`**PARAMÈTRES DE LA SÉQUENCE FOURNIS PAR L'ENSEIGNANT**
+- **Niveau :** ${grade}
+- **Objet d'étude principal :** ${objetEtude}
+${oeuvre ? `- **Œuvre ou support d'appui principal :** L'ensemble de la séquence doit s'articuler autour de : **${oeuvre}**.\n` : `- **Œuvre ou support d'appui :** Tu choisiras une œuvre ou un groupement de textes emblématique et pertinent pour cet objet d'étude.\n`}` +
+`- **Objectif d'étude de la langue :** ${finalLangueObjectif}
+- **Production finale attendue :** ${ecritFinal}\n` +
+`- **Format de sortie :** ${outputFormat.toUpperCase()}\n\n` +
+
+`---
+**STRUCTURE ET CONTENU DÉTAILLÉ À RÉDIGER POUR L'ÉLÈVE**\n\n` +
+
+`**1. TITRE DE LA SÉQUENCE**
+Propose un titre engageant et littéraire pour la séquence.\n\n` +
+
+`**2. INTRODUCTION RÉDIGÉE**
+Rédige une introduction captivante qui présente l'objet d'étude et pose une **problématique littéraire** claire qui guidera toute la séquence.\n\n` +
+
+`**3. LECTURE ET ANALYSE (CORPS DU COURS)**
+Rédige une analyse littéraire structurée en 2 ou 3 parties. Pour chaque partie :
+   a) Propose un **extrait de texte court et pertinent** (de l'œuvre d'appui si fournie, sinon de ton choix).
+   b) Rédige une **analyse de cet extrait**, destinée à l'élève, qui met en lumière un aspect de la problématique.
+   c) Termine chaque analyse par **2 ou 3 questions de compréhension** pour l'élève.\n\n` +
+
+`**4. LEÇON : ÉTUDE DE LA LANGUE**
+Rédige une leçon complète et claire sur **"${finalLangueObjectif}"**.
+   a) **Règle Impérative :** Tous les exemples que tu utiliseras pour expliquer la leçon doivent être **directement et exclusivement tirés des extraits de textes** que tu as présentés dans la partie "Lecture et Analyse".
+   b) Inclus un encadré de synthèse **"À retenir"** qui résume la règle.\n\n` +
+
+`**5. ATELIER D'ÉCRITURE**
+Rédige une section qui prépare à la production finale : **"${ecritFinal}"**.
+   a) Formule une **consigne d'écriture détaillée et stimulante**.
+   b) Fournis une **"boîte à outils"** avec du vocabulaire, des figures de style ou des amorces de phrases utiles.
+   c) Liste des **critères de réussite** clairs.\n\n` +
+
+`**6. CONCLUSION RÉDIGÉE**
+Rédige un court paragraphe de conclusion qui répond à la problématique et synthétise les apprentissages de la séquence.\n\n`;
+
+        if (outputFormat === 'html') {
+            promptText += `**CONSIGNES HTML :** Le résultat doit être un fichier HTML unique et bien structuré. Les encadrés "À retenir" et "Boîte à outils" doivent être visuellement distincts (par exemple avec une bordure et un fond de couleur légère).`;
+        } else { // DOCX
+            promptText += `**CONSIGNES DOCX :** Le résultat doit être un texte brut bien structuré avec des titres clairs. Les encadrés "À retenir" et "Boîte à outils" doivent être précédés d'un titre en majuscules.`;
+        }
+
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt de séquence détaillé généré !", "success");
+    });
+
+    // --- Fonctions Utilitaires et listeners des boutons annexes ---
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, duration);
+    }
+
+    function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") { if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error'); return; }
+        navigator.clipboard.writeText(text).then(() => {
+            if (messageElement) showFeedback(messageElement, successText, 'success');
+        }).catch(err => {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        });
+    }
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const objetEtude = objetEtudeSelect.value;
+        const langueObjectif = langueObjectifSelect.value;
+        if (!grade || !objetEtude) { alert("Veuillez choisir un niveau et un objet d'étude."); return; }
+        
+        const logbookText = `Français ${grade} - Séquence sur "${objetEtude}". Objectif langue : ${langueObjectif}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const objetEtude = objetEtudeSelect.value;
+        if (!grade || !objetEtude) { alert("Veuillez choisir un niveau et un objet d'étude."); return; }
+
+        const summaryText = `Résumé de la séquence pour les élèves (Français - ${grade}) :\nThème étudié : ${objetEtude}.\nPoint de langue abordé : ${langueObjectifSelect.value}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+    
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+    
+    populateObjetsEtude();
+});
+</script>
+
+</body>
+</html>

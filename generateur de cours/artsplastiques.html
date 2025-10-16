@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - Arts Plastiques</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS Inchangé */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --primary-500: #d94646; --primary-600: #b92a2a; --primary-700: #a12424;
+            --secondary-500: #e5a142; --secondary-600: #c48a37;
+            --accent-500: #3b82f6; --accent-600: #2563eb;
+            --danger-500: #ef4444; --success-500: #16a34a;
+            --neutral-50: #f8fafc; --neutral-100: #f1f5f9; --neutral-200: #e2e8f0; --neutral-300: #cbd5e1; --neutral-500: #64748b; --neutral-700: #334155; --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif; --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius-lg: 0.75rem; --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(217, 70, 70, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+        body { font-family: var(--font-secondary); background-color: var(--neutral-100); color: var(--neutral-700); line-height: 1.6; margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neutral-200); padding-bottom: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: var(--neutral-200); color: var(--neutral-700); text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: var(--transition-default); }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 { font-family: var(--font-primary); font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--neutral-800); display: flex; align-items: center; gap: 1rem; margin: 0; text-align: center; flex-grow: 1; justify-content: center; }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle { text-align: center; font-size: 1.1rem; color: var(--neutral-500); }
+        .section { background-color: var(--white); padding: 2rem; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); margin-bottom: 2rem; }
+        .section h2 { font-family: var(--font-primary); font-size: 1.8rem; color: var(--primary-700); margin-bottom: 1.5rem; border-bottom: 1px solid var(--neutral-200); padding-bottom: 0.75rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text { display: block; font-weight: 500; color: var(--neutral-700); margin-bottom: 0.5rem; }
+        .input-field, .select-field, .textarea-field { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-md); background-color: var(--neutral-50); font-size: 0.95rem; color: var(--neutral-700); transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; font-family: var(--font-secondary); }
+        .input-field:focus, .select-field:focus, .textarea-field:focus { outline: none; border-color: var(--primary-500); box-shadow: var(--shadow-focus-ring); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-md); font-weight: 600; font-family: var(--font-secondary); transition: var(--transition-default); border: 1px solid transparent; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: var(--shadow-xs); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message { transition: all 0.3s; opacity: 0; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500; max-height: 0; overflow: hidden;}
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--secondary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .discipline-button { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; border-radius: var(--border-radius-lg); background-color: var(--neutral-50); border: 1px solid var(--neutral-200); text-decoration: none; color: var(--neutral-800); text-align: center; transition: var(--transition-default); }
+        .discipline-button:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-500); color: var(--accent-500); }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        @media (max-width: 768px) { .grid-2-cols { grid-template-columns: 1fr; } .page-header { flex-direction: column-reverse; gap: 1rem; } .page-header h1 {font-size: 1.8rem;} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+            <h1>
+                <i class="fas fa-palette icon"></i>
+                Générateur de Cours - Arts Plastiques
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des séquences de cours d'Arts Plastiques pour le collège (cycle 4).</p>
+    </div>
+    
+    <section class="section">
+        <h2>1. Sélection de la Séquence (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="gradeSelect" class="label-text">Niveau (Classe) :</label>
+                <select id="gradeSelect" class="select-field">
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="5e">5ème</option>
+                    <option value="4e">4ème</option>
+                    <option value="3e">3ème</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Séquence :</label>
+                <select id="sequenceSelect" class="select-field" disabled>
+                    <option value="">-- Choisir un questionnement puis une séquence --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        <div class="form-group">
+            <label for="studyReferenceInput" class="label-text">Artiste(s), mouvement ou œuvre de référence :</label>
+            <input type="text" id="studyReferenceInput" class="input-field" placeholder="Ex: Picasso, le Surréalisme, Guernica, Banksy...">
+        </div>
+        <div class="form-group">
+            <label for="planInput" class="label-text">Déroulé de la séquence (Plan) :</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Dictez la structure exacte de la séquence. Ex: 1. Phase exploratoire, 2. Phase de pratique guidée, 3. Verbalisation..."></textarea>
+        </div>
+        
+        <label class="label-text">Ressources et Documents d'Appui :</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens vers des sites de musées, des portfolios..."></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (critiques d'art, propos d'artistes...)"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+        <div class="form-group" style="text-align: center; margin-top:2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séquence généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séquence apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Connaissances Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modulesData = {
+        "5e": {
+            1: { theme: "La représentation ; les images, la réalité et la fiction", title: "Le dessin d'observation", hook: "Un simple crayon peut-il capturer le monde qui nous entoure ? Apprenons à réellement *voir* les objets pour les faire naître sur le papier.", skills: "Mettre en œuvre des techniques de dessin (ligne, valeur). Développer sa capacité d'observation. Rendre compte des proportions.", knowledge: "Vocabulaire (premier plan, arrière-plan, point de vue). Notions de hachures, d'ombres et de lumières." },
+            2: { theme: "La représentation ; les images, la réalité et la fiction", title: "Le portrait et l'autoportrait", hook: "Comment un dessin peut-il nous ressembler et en même temps raconter qui nous sommes ?", skills: "Représenter un visage en respectant les proportions. Exprimer une émotion à travers un portrait.", knowledge: "Proportions du visage. La ressemblance. L'expression des sentiments." },
+            3: { theme: "La représentation ; les images, la réalité et la fiction", title: "Imaginer des mondes fictifs", hook: "Et si nous inventions une créature ou un paysage qui n'existe pas ? Comment rendre crédible ce qui sort de notre imagination ?", skills: "Traduire une idée en image. Combiner des éléments réels pour créer de l'imaginaire.", knowledge: "Le bestiaire médiéval. Les paysages surréalistes. Notion de vraisemblance." },
+            4: { theme: "La représentation ; les images, la réalité et la fiction", title: "La figure humaine en mouvement", hook: "Comment dessiner un corps qui court, saute ou danse sans qu'il paraisse figé ?", skills: "Saisir une pose rapidement par le croquis. Suggérer le mouvement par la ligne et le flou.", knowledge: "Le croquis rapide. La décomposition du mouvement (chronophotographie)." },
+            5: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "Découverte de la couleur", hook: "Le monde est en couleur ! Mais comment les couleurs fonctionnent-elles ensemble pour créer des harmonies ou des contrastes ?", skills: "Créer et utiliser le cercle chromatique. Composer avec des couleurs chaudes et froides.", knowledge: "Couleurs primaires, secondaires, tertiaires. Couleurs complémentaires. Le cercle chromatique." },
+            6: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "La matière et ses effets", hook: "Lisse, rugueux, doux, piquant... Comment l'artiste peut-il utiliser la texture pour nous faire 'sentir' une œuvre avec les yeux ?", skills: "Créer des effets de texture par différentes techniques (frottage, grattage). Utiliser la matière pour exprimer une sensation.", knowledge: "La texture visuelle et la texture tactile. La matité et la brillance." },
+            7: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "Le modelage : donner forme", hook: "Avec un simple bloc de terre, on peut tout créer ! Comment passer d'une masse informe à un objet en trois dimensions ?", skills: "Pratiquer les techniques de base du modelage (pincement, colombin). Créer du volume.", knowledge: "Le volume, la masse. La sculpture en ronde-bosse. Le travail de l'argile." },
+            8: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "Le collage et l'assemblage", hook: "Et si on créait une image non pas en dessinant, mais en découpant et en collant des fragments du monde ?", skills: "Composer une image à partir d'éléments préexistants (photos, journaux). Donner un nouveau sens aux images.", knowledge: "Le collage cubiste (Picasso, Braque). Le photomontage. Notion de fragmentation." },
+            9: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "La composition d'une image", hook: "Pourquoi certains éléments d'une image attirent-ils plus notre regard ? Apprenons à organiser l'espace de la feuille pour guider l'œil.", skills: "Organiser les éléments dans un format donné. Utiliser les lignes de force et les plans.", knowledge: "Le cadrage (gros plan, plan d'ensemble). Les différents plans (premier, second, arrière-plan). La règle des tiers." },
+            10: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "Présenter son travail", hook: "Une œuvre n'est vraiment terminée que lorsqu'elle est montrée. Comment un simple cadre ou un fond de couleur peut-il changer notre regard ?", skills: "Choisir un mode de présentation adapté à sa production. Justifier ses choix de présentation.", knowledge: "Le support, le format, le cadre. L'importance du titre. La scénographie d'exposition." },
+            11: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "Le statut de l'image", hook: "Une photo dans un journal, une peinture dans un musée, une pub sur un bus... Est-ce que toutes ces images ont la même fonction ?", skills: "Différencier une image artistique, une image de presse et une image publicitaire. Analyser le but d'une image.", knowledge: "Fonction informative, incitative, expressive, artistique. Le contexte de diffusion d'une image." }
+        },
+        "4e": {
+            12: { theme: "La représentation ; les images, la réalité et la fiction", title: "La narration visuelle", hook: "Comment une simple image peut-elle raconter toute une histoire ? Et comment plusieurs images peuvent-elles construire un récit complexe ?", skills: "Identifier les éléments d'un récit dans une image. Créer une courte bande dessinée ou un storyboard.", knowledge: "L'ellipse narrative. Le champ et le hors-champ. Les codes de la bande dessinée." },
+            13: { theme: "La représentation ; les images, la réalité et la fiction", title: "Image unique, images multiples", hook: "Pourquoi un artiste comme Andy Warhol répète-t-il la même image ? Quel est l'intérêt de créer des séries ?", skills: "Créer une série d'images en faisant varier un paramètre. Analyser les effets de la répétition.", knowledge: "La série en art (Monet, Warhol). La variation. Le polyptyque." },
+            14: { theme: "La représentation ; les images, la réalité et la fiction", title: "Figuration et abstraction", hook: "Quand une peinture ne représente plus rien de reconnaissable, que nous donne-t-elle à voir ? Explorons le passage du figuratif à l'abstrait.", skills: "Simplifier progressivement une forme figurative jusqu'à l'abstraction. Interpréter une œuvre abstraite.", knowledge: "L'art abstrait (Kandinsky, Mondrian). La couleur, la forme et la ligne comme sujet." },
+            15: { theme: "La représentation ; les images, la réalité et la fiction", title: "La symbolique des images", hook: "Une colombe pour la paix, un crâne pour la mort... Comment les artistes utilisent-ils des symboles pour faire passer des messages cachés ?", skills: "Identifier et interpréter des symboles dans une œuvre. Utiliser des symboles dans une création personnelle.", knowledge: "Le symbole et l'allégorie. Les vanités dans la peinture. Les codes iconographiques." },
+            16: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "L'objet dans l'art", hook: "Une roue de vélo peut-elle devenir une œuvre d'art ? Comment le regard de l'artiste transforme-t-il l'objet le plus banal ?", skills: "Détourner un objet de sa fonction usuelle. Mettre en scène un objet pour lui donner un nouveau sens.", knowledge: "La nature morte. Le 'ready-made' (Duchamp). L'assemblage d'objets (Arman)." },
+            17: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "L'hybridation des matériaux", hook: "Et si on mélangeait du bois avec du plastique ? Qu'est-ce que ces rencontres inattendues de matières racontent ?", skills: "Associer des matériaux de natures et d'origines diverses. Explorer les qualités expressives de ces assemblages.", knowledge: "L'assemblage. Le collage de matériaux. Les sculptures de Picasso." },
+            18: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "La lumière comme matériau", hook: "Comment sculpter avec de la lumière ou dessiner avec une ombre ? Explorons comment les artistes utilisent la lumière comme un véritable matériau.", skills: "Utiliser la lumière pour révéler ou transformer un volume. Pratiquer la photographie pour jouer avec les ombres.", knowledge: "Le clair-obscur (Caravage). Les installations lumineuses (Dan Flavin). Le 'light painting'." },
+            19: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "La couleur expressive et symbolique", hook: "Pourquoi Picasso a-t-il eu une 'période bleue' ? Découvrons la puissance émotionnelle de la couleur.", skills: "Utiliser la couleur de manière non-imitative pour exprimer un sentiment. Analyser la palette d'un artiste.", knowledge: "Le Fauvisme (Matisse). L'Expressionnisme. La dimension psychologique des couleurs." },
+            20: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "La place du corps du spectateur", hook: "Certaines œuvres nous demandent de bouger, de les toucher. Comment notre corps est-il engagé face à l'art ?", skills: "Décrire son parcours et ses sensations face à une installation. Concevoir une production qui prend en compte le déplacement du spectateur.", knowledge: "L'installation artistique. L'art cinétique. Les environnements immersifs." },
+            21: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "L'œuvre et son lieu d'exposition", hook: "Une même sculpture a-t-elle le même sens dans un musée ou dans un supermarché ?", skills: "Analyser l'interaction entre une œuvre et son lieu de présentation. Proposer différents lieux pour une même œuvre et justifier.", knowledge: "Le 'White Cube'. L'art 'in situ'. Le Land Art." },
+            22: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "L'intention de l'artiste", hook: "L'artiste a-t-il toujours un message à faire passer ? Comment essayer de comprendre sa démarche ?", skills: "Mettre en relation une œuvre avec les propos de son auteur. Confronter son interprétation à l'intention de l'artiste.", knowledge: "La démarche artistique. Le cartel. La notion de style." }
+        },
+        "3e": {
+            23: { theme: "La représentation ; les images, la réalité et la fiction", title: "Images et pouvoir", hook: "Comment une affiche ou une photographie peut-elle servir à convaincre, à dénoncer ou à manipuler ?", skills: "Analyser une image de propagande ou une affiche engagée. Créer une image pour défendre une cause.", knowledge: "La propagande. L'art engagé (Goya, Picasso). La caricature." },
+            24: { theme: "La représentation ; les images, la réalité et la fiction", title: "Le réel manipulé", hook: "Cette photo est-elle vraie ? Comment les artistes jouent-ils avec la réalité pour nous troubler ou nous tromper ?", skills: "Identifier les procédés de manipulation d'une image. Mettre en scène une photographie pour créer une illusion.", knowledge: "La retouche numérique. La mise en scène photographique (Jeff Wall). La notion de 'fake'." },
+            25: { theme: "La représentation ; les images, la réalité et la fiction", title: "L'autoportrait comme fiction de soi", hook: "Se représenter, est-ce se montrer tel que l'on est, ou tel que l'on voudrait être ?", skills: "Réaliser un autoportrait qui explore une facette de sa personnalité. Analyser les stratégies de l'autoportrait (Cindy Sherman, Frida Kahlo).", knowledge: "L'autoportrait dans l'histoire de l'art. Le travestissement, le masque. L'identité numérique." },
+            26: { theme: "La représentation ; les images, la réalité et la fiction", title: "La citation et la référence dans l'art", hook: "Pourquoi les artistes 'copient'-ils ou s'inspirent-ils d'œuvres du passé ?", skills: "Reconnaître une référence à une œuvre célèbre. Détourner une œuvre classique pour un nouveau propos.", knowledge: "La citation, le détournement, le pastiche. Le post-modernisme." },
+            27: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "La dématérialisation de l'œuvre", hook: "Une œuvre d'art peut-elle n'être qu'une idée, une action, ou un simple fichier numérique ?", skills: "Comprendre ce qu'est une œuvre immatérielle. Mettre en œuvre un protocole pour une action artistique.", knowledge: "L'art conceptuel. La performance. L'art numérique et les NFT." },
+            28: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "Le processus de création", hook: "Le chef-d'œuvre final cache souvent des recherches, des doutes, des ratés. Pourquoi est-il intéressant de montrer le processus ?", skills: "Documenter les étapes de sa propre création. Analyser des esquisses d'artistes.", knowledge: "Le carnet de croquis. L'esquisse. L'importance de l'erreur dans la création." },
+            29: { theme: "La matérialité de l’œuvre ; l’objet et l’œuvre", title: "L'œuvre éphémère", hook: "Une sculpture de sable, un graffiti... Si l'œuvre est destinée à disparaître, que reste-t-il d'elle ?", skills: "Concevoir une production à durée de vie limitée. Réfléchir à la manière de garder une trace de l'éphémère.", knowledge: "Le Land Art (Christo). L'art de la performance. La trace et l'archive." },
+            30: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "L'art dans l'espace public", hook: "L'art n'est pas que dans les musées ! Comment s'intègre-t-il dans nos villes, sur nos murs, dans nos parcs ?", skills: "Analyser une œuvre d'art dans son contexte urbain. Proposer un projet d'intervention artistique dans le collège.", knowledge: "Le Street Art. La commande publique. La sculpture monumentale." },
+            31: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "Concevoir une installation", hook: "Comment une simple salle peut-elle devenir une œuvre d'art ? Apprenons à créer un environnement immersif.", skills: "Organiser des éléments plastiques variés dans un espace défini. Penser la circulation du spectateur.", knowledge: "L'installation artistique (Kabakov). La scénographie. L'art immersif." },
+            32: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "Le rôle du spectateur-acteur", hook: "Et si l'œuvre n'existait pas sans vous ? Découvrons ces créations qui demandent au public de participer.", skills: "Participer à une œuvre interactive. Concevoir un protocole qui inclut une action du spectateur.", knowledge: "L'art participatif et relationnel. Le happening. Les œuvres ouvertes." },
+            33: { theme: "L’œuvre, l’espace, l’auteur, le spectateur", title: "Développer un projet artistique personnel", hook: "C'est à vous de jouer ! Comment passer d'une idée personnelle à une œuvre aboutie et la présenter pour le Brevet ?", skills: "Mener une démarche personnelle de la recherche à la réalisation. Argumenter ses choix. S'exprimer à l'oral sur sa pratique.", knowledge: "La construction d'un projet. Le portfolio. La préparation à l'oral du DNB." }
+        }
+    };
+
+    // --- SCRIPT DE GESTION DE LA PAGE (LOGIQUE CORRIGÉE ET VÉRIFIÉE) ---
+    const gradeSelect = document.getElementById('gradeSelect');
+    const sequenceSelect = document.getElementById('sequenceSelect');
+    const studyReferenceInput = document.getElementById('studyReferenceInput');
+    const planInput = document.getElementById('planInput');
+    const videoLinks = document.getElementById('videoLinks');
+    const websiteLinks = document.getElementById('websiteLinks');
+    const rawText = document.getElementById('rawText');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+
+    function populateModules(grade) {
+        sequenceSelect.innerHTML = '<option value="">-- Choisir un questionnement puis une séquence --</option>';
+        sequenceSelect.disabled = true;
+        if (grade && modulesData[grade]) {
+            const modulesForGrade = modulesData[grade];
+            const themes = [...new Set(Object.values(modulesForGrade).map(item => item.theme))];
+            
+            themes.forEach(theme => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `Questionnement : ${theme}`;
+                
+                Object.keys(modulesForGrade).forEach(key => {
+                    const moduleItem = modulesForGrade[key];
+                    if (moduleItem.theme === theme) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = moduleItem.title;
+                        optgroup.appendChild(option);
+                    }
+                });
+                sequenceSelect.appendChild(optgroup);
+            });
+            
+            sequenceSelect.disabled = false;
+        }
+    }
+
+    gradeSelect.addEventListener('change', () => populateModules(gradeSelect.value));
+
+    generateButton.addEventListener('click', () => {
+        const selectedGrade = gradeSelect.value;
+        const selectedModuleKey = sequenceSelect.value;
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!selectedGrade || !selectedModuleKey || !outputFormatRadio) {
+            alert("Veuillez choisir un niveau, une séquence et un format de sortie.");
+            return;
+        }
+        
+        const moduleDetails = modulesData[selectedGrade]?.[selectedModuleKey];
+        if (!moduleDetails) {
+            alert("Détails de la séquence non trouvés."); return;
+        }
+
+        const studyReference = studyReferenceInput.value.trim();
+        const plan = planInput.value.trim();
+        const videos = videoLinks.value.trim();
+        const websites = websiteLinks.value.trim();
+        const text = rawText.value.trim();
+        const outputFormat = outputFormatRadio.value;
+
+        let promptText = `**RÔLE ET MISSION**
+Tu agis en tant que professeur d'Arts Plastiques, agrégé, et spécialiste en didactique de la création artistique. Ta mission est de **concevoir une fiche de préparation de séquence complète, inspirante et directement utilisable** pour un cours destiné à des élèves de ${selectedGrade}.\n\n`;
+
+        const hasImperativeInstructions = studyReference || plan || videos || websites || text;
+        if (hasImperativeInstructions) {
+            promptText += `**INSTRUCTIONS IMPÉRATIVES FOURNIES PAR L'ENSEIGNANT**
+Tu dois **impérativement** baser ta conception sur les éléments suivants :\n`;
+            if (studyReference) {
+                promptText += `- **Références imposées :** La séquence doit être entièrement centrée sur l'étude de : **${studyReference}**. Toutes les analyses et exemples doivent s'y rapporter.\n`;
+            }
+            if (plan) {
+                promptText += `- **Déroulé imposé :** La séquence doit suivre scrupuleusement le plan suivant :\n${plan}\n`;
+            }
+            if (videos || websites || text) {
+                promptText += `- **Ressources d'appui imposées :** Le contenu de la séquence doit se baser en priorité sur l'analyse et la synthèse des ressources suivantes :\n`;
+                if (videos) promptText += `  - Vidéos à analyser : \n${videos}\n`;
+                if (websites) promptText += `  - Sites web/portfolios à consulter : \n${websites}\n`;
+                if (text) promptText += `  - Textes de référence (critiques, propos d'artistes...) : \n${text}\n`;
+            }
+            promptText += "\n";
+        }
+        
+        promptText += `**CONTENU DE BASE DE LA SÉQUENCE**
+- **Niveau :** ${selectedGrade}
+- **Questionnement Principal du Programme :** ${moduleDetails.theme}
+- **Titre de la Séquence :** ${moduleDetails.title}
+- **Accroche / Incitation initiale :** "${moduleDetails.hook}"
+- **Compétences à maîtriser :** ${moduleDetails.skills}
+- **Savoirs & Notions à acquérir :** ${moduleDetails.knowledge}\n\n`;
+
+        promptText += `**STRUCTURE DÉTAILLÉE ET FORMAT DE SORTIE EXIGÉ**
+Tu dois rédiger la fiche de cours en respectant **impérativement** le format de sortie demandé et la structure pédagogique en 5 points ci-dessous.
+
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n` +
+`---
+**DÉBUT DU CONTENU À RÉDIGER**
+
+**1. TITRE DE LA SÉQUENCE**
+(Rédige ici le titre : ${moduleDetails.title.toUpperCase()})
+
+**2. PROBLÉMATIQUE ARTISTIQUE ET INCITATION**
+   a. **Problématique :** Partant de l'accroche ("${moduleDetails.hook}"), formule une **problématique artistique claire** sous forme de question (ex: "Comment la matière peut-elle devenir le sujet principal de l'œuvre ?").
+   b. **Incitation :** Transforme cette problématique en une **consigne de pratique (incitation) ouverte et inspirante** pour les élèves, qui les invite à l'expérimentation.
+
+**3. CULTURE ARTISTIQUE : RÉFÉRENCES ET ANALYSE**
+   a. **Présentation des références :** Présente 2 ou 3 œuvres d'artistes qui répondent à la problématique. ${studyReference ? `Celles-ci doivent être impérativement liées à **${studyReference}**.` : ''}
+   b. **Description des documents :**
+      - **Si le format est DOCX :** Décris précisément les œuvres. Ex: **[IMAGE : "Composition IV" de Vassily Kandinsky, 1911, huile sur toile]**.
+      - **Si le format est HTML :** Génère un **fichier HTML complet et auto-contenu**. Pour les œuvres, utilise des placeholders clairs comme \`<div class="placeholder-artwork"><img src="placeholder.jpg" alt="Description de l'oeuvre..."></div>\`.
+   c. **Analyse guidée :** Pour chaque œuvre, pose une ou deux questions qui aident les élèves à analyser comment l'artiste a traité la problématique.
+
+**4. PHASE DE PRATIQUE : EXPÉRIMENTATION**
+   a. **Matériel :** Liste le matériel nécessaire.
+   b. **Consignes techniques :** Donne quelques pistes ou contraintes techniques pour guider la pratique des élèves sans brider leur créativité.
+   c. **Critères d'évaluation :** Définis 3 ou 4 critères clairs et observables sur lesquels le travail des élèves sera évalué (ex: Richesse des textures, Pertinence de la réponse à la consigne, Originalité de la proposition, Soin de la présentation).
+
+**5. VERBALISATION ET SYNTHÈSE**
+Rédige un court paragraphe de synthèse qui reprend les notions clés ("${moduleDetails.knowledge}") et qui servira de base à la discussion collective (verbalisation) autour des travaux d'élèves.
+
+**RÈGLE FINALE :** Ton texte doit être immédiatement utilisable. Ne rédige **aucune note pour le professeur**. Ton unique sortie est le cours lui-même.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt détaillé généré avec succès !", "success");
+    });
+    
+    // --- Fonctions utilitaires ---
+    function showFeedback(element, message, type = 'success', duration = 3000) { if (!element) return; element.textContent = message; element.className = `feedback-message ${type}`; requestAnimationFrame(() => { element.classList.add('show'); }); setTimeout(() => { element.classList.remove('show'); setTimeout(() => { if (element.textContent === message) { element.textContent = ''; element.className = 'feedback-message'; } }, 300); }, duration); }
+    function copyToClipboardUtil(text, messageElement, successText = "Copié avec succès !") { if (!text || text.trim() === "") { if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error'); return; } navigator.clipboard.writeText(text).then(() => { if (messageElement) showFeedback(messageElement, successText, 'success'); }).catch(err => { console.error('Erreur de copie:', err); if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error'); }); }
+    
+    copyButton.addEventListener('click', () => copyToClipboardUtil(outputPrompt.value, copyMessage));
+
+    logbookButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey) { alert("Sélectionnez un niveau et une séquence."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const logbookText = `Arts Plastiques ${grade} - Séquence "${moduleDetails.title}". Compétences : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const grade = gradeSelect.value;
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey) { alert("Sélectionnez un niveau et une séquence."); return; }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const summaryText = `Résumé (Arts - ${moduleDetails.title}) :\nDurant cette séance, nous avons exploré : ${moduleDetails.knowledge}.\nTu as appris à : ${moduleDetails.skills}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+    
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboardUtil(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+
+});
+</script>
+
+</body>
+</html>
+}

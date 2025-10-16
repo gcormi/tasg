@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lanceur de Génération IA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 2rem; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { font-family: 'Poppins', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; color: #3730a3; }
+        textarea { width: 100%; min-height: 200px; padding: 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; font-family: monospace; }
+        button { background-color: #16a34a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        #resultContainer { margin-top: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background-color: #f8fafc; min-height: 100px; }
+        #loadingIndicator { text-align: center; padding: 2rem; display: none; }
+        .back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: #e2e8f0; color: #334155; text-decoration: none; border-radius: 0.5rem; font-weight: 500; transition: all 0.3s; margin-bottom: 2rem; }
+        .back-button:hover { background-color: #cbd5e1; }
+        .btn-download { background-color: #0d6efd; } /* Couleur bleue pour le bouton de téléchargement */
+        .btn-download:hover { background-color: #0b5ed7; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-button"><i class="fas fa-home"></i> Retour à l'accueil</a>
+        <h1><i class="fas fa-rocket"></i> Lanceur de Génération IA</h1>
+        
+        <div>
+            <label for="promptInput" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Collez le prompt généré ici :</label>
+            <textarea id="promptInput" placeholder="Collez le prompt détaillé que vous avez copié depuis un générateur..."></textarea>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <button id="generateBtn"><i class="fas fa-play"></i> Lancer la Génération</button>
+        </div>
+
+        <div id="resultContainer" style="display: none;">
+            <div id="loadingIndicator">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #4f46e5;"></i>
+                <p style="margin-top: 1rem; font-weight: 500;">Génération en cours... Cela peut prendre jusqu'à une minute.</p>
+            </div>
+            
+            <div id="resultActions" style="text-align: center; margin-bottom: 1rem; display: none;">
+                <button id="downloadBtn" class="btn-download"><i class="fas fa-download"></i> Télécharger le Fichier HTML</button>
+            </div>
+            
+            <iframe id="finalResultFrame" style="width: 100%; height: 600px; border: 1px solid #cbd5e1; border-radius: 0.5rem; display: none;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIQUE D'APPEL À L'API ET DE TÉLÉCHARGEMENT ---
+        
+        const API_KEY = "AIzaSyCd4YgsjGzv-Bx7nolq5VixKVBqlLg83h0";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${API_KEY}`;
+
+        // Références aux éléments
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resultActions = document.getElementById('resultActions');
+        const promptInput = document.getElementById('promptInput');
+        const resultContainer = document.getElementById('resultContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const finalResultFrame = document.getElementById('finalResultFrame'); 
+
+        // Variable pour stocker le contenu du cours
+        let generatedCourseContent = null;
+
+        // Logique du clic sur "Lancer la Génération"
+        generateBtn.addEventListener('click', async () => {
+            const promptText = promptInput.value.trim();
+
+            if (!promptText) {
+                alert("Veuillez d'abord coller un prompt !");
+                return;
+            }
+            if (API_KEY === "VOTRE_CLE_API_PERSONNELLE") {
+                alert("Erreur : Veuillez remplacer 'VOTRE_CLE_API_PERSONNELLE' par votre vraie clé API.");
+                return;
+            }
+
+            resultContainer.style.display = 'block';
+            loadingIndicator.style.display = 'block';
+            resultActions.style.display = 'none';
+            finalResultFrame.style.display = 'none'; 
+            generateBtn.disabled = true;
+            generatedCourseContent = null; // Réinitialiser le contenu
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({"contents": [{"parts": [{"text": promptText}]}]})
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Erreur de l'API : ${errorData.error.message}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+                    generatedCourseContent = data.candidates[0].content.parts[0].text;
+                    finalResultFrame.srcdoc = generatedCourseContent;
+                    finalResultFrame.style.display = 'block';
+                    resultActions.style.display = 'block'; // Affiche le bouton de téléchargement
+
+                } else {
+                    finalResultFrame.style.display = 'none';
+                    resultContainer.innerHTML = "<p style='color: orange; font-weight: bold;'>L'IA a renvoyé une réponse vide.</p>";
+                }
+            } catch (error) {
+                resultContainer.innerHTML = `<p style="color: red; font-weight: bold;">Une erreur est survenue : ${error.message}</p>`;
+            } finally {
+                loadingIndicator.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        });
+
+        // NOUVEAU : Logique du clic sur "Télécharger le Fichier HTML"
+        downloadBtn.addEventListener('click', () => {
+            if (!generatedCourseContent) {
+                alert("Aucun contenu à télécharger. Veuillez d'abord générer un cours.");
+                return;
+            }
+
+            // 1. Créer un "Blob", qui est un objet de type fichier
+            const blob = new Blob([generatedCourseContent], { type: 'text/html' });
+
+            // 2. Créer une URL temporaire pour ce fichier
+            const url = URL.createObjectURL(blob);
+
+            // 3. Créer un lien invisible et le configurer pour le téléchargement
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cours_genere.html'; // Nom du fichier qui sera téléchargé
+            
+            // 4. Ajouter le lien à la page, le cliquer, puis le supprimer
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // 5. Libérer l'URL temporaire de la mémoire
+            URL.revokeObjectURL(url);
+        });
+
+    </script>
+</body>
+</html>

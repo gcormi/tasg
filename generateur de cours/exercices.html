@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Exercices - Assistant Pédagogique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap' );
+
+        :root {
+            /* Modern unified color palette */
+            --primary-general: #667eea;
+            --primary-general-dark: #5a6fd8;
+            --primary-light: #8bb5ff;
+            --primary-500: #667eea;
+            --primary-600: #5a6fd8;
+            --primary-700: #4f46e5;
+            --accent-general: #764ba2;
+            --accent-light: #9d6bc7;
+            --accent-500: #764ba2;
+            --accent-600: #6b46c1;
+            --secondary-500: #64748b;
+            --secondary-600: #475569;
+            --success: #22c55e;
+            --success-light: #4ade80;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --danger: #ef4444;
+            
+            /* Neutral colors */
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b;
+            --neutral-900: #0f172a;
+            --white: #ffffff;
+            
+            /* Typography */
+            --font-primary: 'Poppins', sans-serif;
+            --font-secondary: 'Inter', sans-serif;
+            
+            /* Modern shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            
+            /* Border radius */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-2xl: 1.5rem;
+            
+            /* Transitions */
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--neutral-700);
+            line-height: 1.6;
+            padding: 3rem;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--border-radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-container {
+            background: linear-gradient(135deg, var(--primary-general) 0%, var(--primary-general-dark) 50%, var(--accent-general) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1 )"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: headerGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes headerGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-30%, -30%) scale(1.2); opacity: 0.1; }
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius-lg);
+            font-weight: 600;
+            transition: var(--transition-default);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-4px);
+        }
+
+        .back-button i {
+            transition: var(--transition-default);
+        }
+
+        .back-button:hover i {
+            transform: translateX(-2px);
+        }
+
+        .page-header h1 {
+            font-family: var(--font-primary);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: var(--neutral-800);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+            justify-content: center;
+        }
+        
+        .page-header h1 .icon {
+            color: var(--primary-500);
+        }
+
+        .page-header-subtitle {
+             text-align: center;
+             font-size: 1.1rem;
+             color: var(--neutral-500);
+        }
+
+        .section {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            font-family: var(--font-primary);
+            font-size: 1.75rem;
+            color: var(--primary-700);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--neutral-200);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .label-text {
+            display: block;
+            font-weight: 500;
+            color: var(--neutral-700);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-field, .select-field, .textarea-field {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--neutral-300);
+            border-radius: var(--border-radius-md);
+            background-color: var(--neutral-50);
+            font-size: 0.95rem;
+            color: var(--neutral-700);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            font-family: var(--font-secondary);
+        }
+
+        .input-field:focus, .select-field:focus, .textarea-field:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .textarea-field {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            font-family: var(--font-secondary);
+            transition: var(--transition-default);
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-500);
+            color: var(--white);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-600);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-500);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--secondary-600);
+        }
+
+        .btn-accent {
+            background-color: var(--accent-500);
+            color: var(--white);
+        }
+
+        .btn-accent:hover:not(:disabled) {
+            background-color: var(--accent-600);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .grid-2-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .grid-3-cols {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .exercise-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-item {
+            padding: 1rem;
+            background-color: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--border-radius-md);
+        }
+
+        .config-item label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--neutral-600);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .config-item input, .config-item select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--neutral-300);
+            border-radius: var(--border-radius-md);
+            font-size: 0.9rem;
+        }
+
+        .exercise-preview {
+            background-color: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--border-radius-md);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .exercise-preview h3 {
+            color: var(--primary-700);
+            margin-bottom: 1rem;
+            font-family: var(--font-primary);
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: var(--transition-default);
+        }
+
+        .checkbox-group:hover {
+            border-color: var(--primary-500);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin: 0;
+            accent-color: var(--primary-500);
+        }
+
+        .feedback-message {
+            transition: opacity 0.3s;
+            opacity: 0;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .feedback-message.show {
+            opacity: 1;
+        }
+
+        .feedback-message.success {
+            color: var(--success);
+        }
+
+        .feedback-message.error {
+            color: var(--danger);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: #e8f2ff;
+            border-color: var(--primary-500);
+            color: var(--primary-700);
+        }
+
+        .alert-warning {
+            background-color: #fef3c7;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .grid-2-cols, .grid-3-cols {
+                grid-template-columns: 1fr;
+            }
+            .page-header {
+                flex-direction: column-reverse;
+                gap: 1rem;
+            }
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+            .export-options {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
+        <a href="index.html" style="
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        " onmouseover="this.style.background='rgba(90, 111, 216, 0.9)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.9)'">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header-container">
+            
+            <header class="page-header" style="justify-content: center;">
+                <div class="header-content" style="text-align: center;">
+                    <h1 class="page-title">
+                        Création assistée d'exercices
+                    </h1>
+                    <p class="page-subtitle">
+                        Convertissez facilement vos cours en exercices visuels pour Léia/Néo
+                    </p>
+                </div>
+            </header>
+            
+            <p class="page-header-subtitle" style="color: rgba(255, 255, 255, 0.9); font-weight: 400;">Créez des exercices à partir de vos cours générés : questions courtes, QCM, et texte à trous.</p>
+        </div>
+
+        <div class="content-wrapper" style="padding: 4rem 5rem;">
+            <div class="info-card" style="padding: 3.5rem 4rem; margin: 3rem 0;">
+                <div class="info-card-header">
+                    <div class="info-card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h2 class="info-card-title">Création assistée pour Léia/Néo</h2>
+                </div>
+                <div class="info-card-content">
+                    <p><strong>Générateur de prompts pour exercices visuels :</strong></p>
+                    <p>Collez le contenu d'un cours généré par les modules de discipline, choisissez le type d'exercice et configurez les paramètres. L'outil génère un prompt optimisé qui vous aidera à créer des <strong>images d'exercices</strong> à importer directement dans <strong>Léia/Néo</strong> via la fonction "Création assistée".<div style="text-align: center; margin-top: 1.5rem; margin-bottom: 1.5rem;">
+    <img src="exercicesia.jpg" alt="Exemple d'exercices générés par l'assistant" style="max-width: 600px; width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</div></p>
+                    <div style="text-align: center; margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <p style="color: #4A90E2; font-weight: 600; margin: 0;">Création assistée</p>
+                    </div>
+                </div>
+            </div>
+
+        <section class="section" style="padding: 3.5rem 4rem;">
+            <h2><i class="fas fa-paste"></i> Étape 1 : Contenu du Cours</h2>
+            <div class="form-group">
+                <label for="courseContent" class="label-text">
+                    <i class="fas fa-book"></i>
+                    Collez ici le contenu de votre cours (texte ou HTML) :
+                </label>
+                <textarea id="courseContent" class="textarea-field" placeholder="Collez ici le contenu complet de votre cours généré par les modules de discipline..."></textarea>
+            </div>
+        </section>
+
+        <section class="section" style="padding: 3.5rem 4rem;">
+            <h2><i class="fas fa-cog"></i> Étape 2 : Configuration de l'Exercice</h2>
+            <div class="grid-2-cols">
+                <div class="form-group">
+                    <label for="exerciseType" class="label-text">
+                        <i class="fas fa-list"></i>
+                        Type d'exercice :
+                    </label>
+                    <select id="exerciseType" class="select-field">
+                        <option value="">-- Choisir un type --</option>
+                        <option value="simple">Questions courtes (réponses en un mot)</option>
+                        <option value="qcm">Questions à choix multiples (QCM)</option>
+                        <option value="cloze">Texte à trous</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="difficulty" class="label-text">
+                        <i class="fas fa-signal"></i>
+                        Niveau de difficulté :
+                    </label>
+                    <select id="difficulty" class="select-field">
+                        <option value="facile">Facile</option>
+                        <option value="moyen" selected>Moyen</option>
+                        <option value="difficile">Difficile</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="exerciseConfig" class="exercise-config" style="display: none;">
+                </div>
+
+            <div class="form-group" style="text-align: center;">
+                <button id="generatePromptBtn" class="btn btn-primary" disabled>
+                    <i class="fas fa-magic"></i> Générer le Prompt
+                </button>
+            </div>
+        </section>
+
+        <section class="section" id="promptSection" style="display: none; padding: 3.5rem 4rem;">
+            <h2><i class="fas fa-clipboard"></i> Étape 3 : Prompt Généré</h2>
+            <div class="form-group">
+                <label for="generatedPrompt" class="label-text">
+                    <i class="fas fa-robot"></i>
+                    Copiez ce prompt et donnez-le à votre IA (ChatGPT, Claude, etc.) :
+                </label>
+                <textarea id="generatedPrompt" class="textarea-field" readonly></textarea>
+                <button id="copyPromptBtn" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                    <i class="fas fa-copy"></i> Copier le Prompt
+                </button>
+                <div id="copyFeedback" class="feedback-message"></div>
+            </div>
+        </section>
+
+        <section class="section" id="responseSection" style="display: none; padding: 3.5rem 4rem;">
+            <h2><i class="fas fa-reply"></i> Étape 4 : Réponse de l'IA</h2>
+            <div class="form-group">
+                <label for="aiResponse" class="label-text">
+                    <i class="fas fa-paste"></i>
+                    Collez ici la réponse JSON de votre IA :
+                </label>
+                <textarea id="aiResponse" class="textarea-field" placeholder='{"title": "...", "questions": [...], ...}'></textarea>
+            </div>
+            <div class="form-group" style="text-align: center;">
+                <button id="processResponseBtn" class="btn btn-accent">
+                    <i class="fas fa-play"></i> Traiter la Réponse
+                </button>
+            </div>
+            <div id="processFeedback" class="feedback-message"></div>
+        </section>
+
+        <section class="section" id="previewSection" style="display: none; padding: 3.5rem 4rem;">
+            <h2><i class="fas fa-eye"></i> Aperçu de l'Exercice</h2>
+            <div id="exercisePreview" class="exercise-preview">
+                </div>
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; font-family: var(--font-primary); color: var(--primary-700);">
+                <i class="fas fa-download"></i> Exporter l'Exercice
+            </h3>
+            <div class="export-options">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="includeCorrections" checked>
+                    <span>Inclure les corrections</span>
+                </label>
+                <label class="checkbox-group">
+                    <input type="checkbox" id="includeInstructions" checked>
+                    <span>Inclure les instructions</span>
+                </label>
+                <button id="exportPngBtn" class="btn btn-secondary">
+                    <i class="fas fa-image"></i> Exporter en PNG
+                </button>
+                <button id="exportDocxBtn" class="btn btn-primary">
+                    <i class="fas fa-file-word"></i> Exporter en DOCX
+                </button>
+                <button id="exportPdfBtn" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Exporter en PDF
+                </button>
+            </div>
+            <div id="exportFeedback" class="feedback-message"></div>
+        </section>
+    </div>
+
+    <script>
+        let currentExercise = null;
+
+        // Configuration des types d'exercices
+        const exerciseConfigs = {
+            simple: {
+                numQuestions: { label: 'Nombre de questions', default: 10, min: 5, max: 20 }
+            },
+            qcm: {
+                numQuestions: { label: 'Nombre de questions', default: 8, min: 5, max: 15 },
+                numOptions: { label: 'Nombre d\'options par question', default: 4, min: 3, max: 5 }
+            },
+            cloze: {
+                numHoles: { label: 'Nombre de mots à enlever', default: 15, min: 10, max: 25 },
+                textLength: { label: 'Longueur du texte (en mots)', default: 150, min: 100, max: 300 }
+            }
+        };
+
+        // ... (Le reste du script JavaScript reste inchangé) ...
+    </script>
+</body>
+</html>
