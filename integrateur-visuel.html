@@ -44,12 +44,14 @@
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
+            align-items: center;
         }
         .toolbar-group {
             display: flex;
             gap: 5px;
             padding: 0 5px;
             border-right: 1px solid #d1d5db;
+            align-items: center;
         }
         .toolbar-group:last-child {
             border-right: none;
@@ -63,6 +65,7 @@
             font-size: 14px;
             color: #4b5563;
             transition: all 0.2s;
+            position: relative;
         }
         .toolbar-btn-small:hover {
             background: #e5e7eb;
@@ -73,6 +76,20 @@
             color: white;
             border-color: #3b82f6;
         }
+        .toolbar-select {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .toolbar-select:hover {
+            background: #e5e7eb;
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -112,7 +129,12 @@
     <div class="flex flex-col h-screen">
         <header class="bg-white shadow p-4">
             <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-gray-700">Mon Atelier Web : Éditeur Visuel de Pages</h1>
+                <div class="flex items-center">
+                    <a href="boite.html" class="text-xl text-gray-500 hover:text-gray-800 transition-colors duration-200 mr-4" title="Retour à la boîte à outils">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-700">Mon Atelier Web : Éditeur Visuel de Pages</h1>
+                </div>
                 <div class="flex items-center gap-4">
                     <input type="file" id="htmlFile" accept=".html" class="hidden">
                     <button onclick="loadHTML()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -139,6 +161,29 @@
                 <button onclick="formatText('underline')" class="toolbar-btn-small" title="Souligné">
                     <i class="fas fa-underline"></i>
                 </button>
+            </div>
+
+            <div class="toolbar-group">
+                <select onchange="formatText('fontName', this.value)" class="toolbar-select" title="Police">
+                    <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+                <select onchange="formatText('fontSize', this.value)" class="toolbar-select" title="Taille du texte">
+                    <option value="1">Très petite</option>
+                    <option value="2">Petite</option>
+                    <option value="3" selected>Normale</option>
+                    <option value="4">Moyenne</option>
+                    <option value="5">Grande</option>
+                    <option value="6">Très grande</option>
+                    <option value="7">Maximale</option>
+                </select>
+                <label class="toolbar-btn-small" title="Couleur du texte">
+                    <i class="fas fa-palette"></i>
+                    <input type="color" oninput="formatText('foreColor', this.value)" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
+                </label>
             </div>
             
             <div class="toolbar-group">
@@ -548,8 +593,8 @@
             }
         });
 
-        function formatText(command) {
-            editorFrame.contentDocument.execCommand(command, false, null);
+        function formatText(command, value = null) {
+            editorFrame.contentDocument.execCommand(command, false, value);
         }
 
         function saveHistory() {
