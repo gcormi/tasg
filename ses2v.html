@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cours - SES (2nde)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS adapté pour un thème SES (Lycée) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+        
+        :root {
+            /* Palette SES : Bleu (éco), Teal (socio), Rouge (pol) */
+            --primary-500: #0d9488; /* Teal */
+            --primary-600: #0f766e;
+            --primary-700: #134e4a;
+            --secondary-500: #1d4ed8; /* Blue */
+            --secondary-600: #1e40af;
+            --accent-500: #b91c1c; /* Red */
+            --accent-600: #991b1b;
+            --danger-500: #ef4444;
+            --success-500: #16a34a;
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-500: #64748b;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b;
+            --white: #ffffff;
+            --font-primary: 'Poppins', sans-serif;
+            --font-secondary: 'Inter', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --border-radius-lg: 0.75rem;
+            --border-radius-md: 0.5rem;
+            --transition-default: all 0.3s ease-in-out;
+            --shadow-focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.4);
+            --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.03);
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background-color: var(--neutral-100);
+            color: var(--neutral-700);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--neutral-200);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--neutral-200);
+            color: var(--neutral-700);
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            transition: var(--transition-default);
+        }
+        .back-button:hover { background-color: var(--neutral-300); transform: translateX(-3px); }
+        .page-header h1 {
+            font-family: var(--font-primary);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: var(--neutral-800);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+            justify-content: center;
+        }
+        .page-header h1 .icon { color: var(--primary-500); }
+        .page-header-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--neutral-500);
+        }
+        .section {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+        .section h2 {
+            font-family: var(--font-primary);
+            font-size: 1.8rem;
+            color: var(--primary-700);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--neutral-200);
+            padding-bottom: 0.75rem;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .label-text {
+            display: block;
+            font-weight: 500;
+            color: var(--neutral-700);
+            margin-bottom: 0.5rem;
+        }
+        .input-field, .select-field, .textarea-field {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--neutral-300);
+            border-radius: var(--border-radius-md);
+            background-color: var(--neutral-50);
+            font-size: 0.95rem;
+            color: var(--neutral-700);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            font-family: var(--font-secondary);
+        }
+        .input-field:focus, .select-field:focus, .textarea-field:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: var(--shadow-focus-ring);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            font-family: var(--font-secondary);
+            transition: var(--transition-default);
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-xs);
+        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-primary { background-color: var(--primary-500); color: var(--white); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: var(--white); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
+        .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .radio-group { display: flex; align-items: center; gap: 1rem; }
+        .radio-group label { font-weight: 500; cursor: pointer; }
+        .feedback-message {
+            transition: all 0.3s;
+            opacity: 0;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .feedback-message.show { opacity: 1; max-height: 30px;}
+        .feedback-message.success { color: var(--secondary-600); }
+        .feedback-message.error { color: var(--danger-500); }
+        .subsection-tools h2 { color: var(--secondary-600); }
+        .discipline-button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .discipline-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: var(--border-radius-lg);
+            background-color: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            text-decoration: none;
+            color: var(--neutral-800);
+            text-align: center;
+            transition: var(--transition-default);
+        }
+        .discipline-button:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-500);
+            color: var(--accent-500);
+        }
+        .discipline-button .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .discipline-button .title { font-family: var(--font-primary); font-size: 1.2rem; font-weight: 600; }
+        
+        .object-input-group { display: flex; gap: 0.5rem; }
+        .object-input-group .input-field { flex-grow: 1; }
+        .btn-add {
+            padding: 0.8rem;
+            background-color: var(--accent-500);
+            color: white;
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .btn-add:hover { background-color: var(--accent-600); }
+        #selectedObjectsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            min-height: 20px;
+        }
+        .selected-item {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--secondary-500);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .remove-item-btn {
+            margin-left: 0.75rem;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0;
+        }
+        .suggestion-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .suggestion-item {
+            padding: 0.4rem 0.8rem;
+            background-color: var(--primary-500);
+            color: var(--white);
+            border-radius: var(--border-radius-md);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-default);
+            user-select: none;
+        }
+        .suggestion-item:hover { background-color: var(--primary-600); transform: translateY(-1px); }
+        
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .grid-2-cols, .grid-3-cols { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column-reverse; gap: 1rem; }
+            .page-header h1 {font-size: 1.8rem;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <header class="page-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <h1>
+                <i class="fas fa-chart-line icon"></i>
+                Générateur de Cours - SES (2nde)
+            </h1>
+        </header>
+        <p class="page-header-subtitle">Un outil pour générer des prompts de séquences de cours de SES pour le lycée.</p>
+    </div>
+
+    <section class="section">
+        <h2>1. Sélection de la Séquence (Obligatoire)</h2>
+        <div class="grid-2-cols">
+            <div class="form-group">
+                <label for="themeSelect" class="label-text">Thème du Programme :</label>
+                <select id="themeSelect" class="select-field">
+                    <option value="">-- Tous les Thèmes --</option>
+                    <!-- Les thèmes seront chargés ici par JS -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sequenceSelect" class="label-text">Séquence :</label>
+                <select id="sequenceSelect" class="select-field" disabled>
+                    <option value="">-- Chargement des séquences --</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Personnalisation du Contenu (Optionnel)</h2>
+        
+        <!-- CHAMP MODIFIÉ -->
+        <div class="form-group">
+            <label for="startingDocumentInput" class="label-text">1. Document de Démarrage (Optionnel)</label>
+            <textarea id="startingDocumentInput" rows="4" class="textarea-field" placeholder="Collez un texte, un lien (URL), ou décrivez un document (ex: 'Graphique INSEE : Évolution du PIB de 2000 à 2018')."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="studyObjectInput" class="label-text">Concepts, Auteurs ou Exemples Spécifiques (6 max)</label>
+            <div class="object-input-group">
+                <input type="text" id="studyObjectInput" class="input-field" placeholder="Entrez un concept, auteur, pays... puis '+'">
+                <button id="addObjectButton" class="btn btn-add" title="Ajouter l'objet"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="selectedObjectsContainer"></div>
+            <div id="suggestionContainer" class="suggestion-container"></div>
+            <p id="objectFeedback" class="feedback-message"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="planInput" class="label-text">Plan Détaillé (Optionnel)</label>
+            <textarea id="planInput" rows="4" class="textarea-field" placeholder="Si vous le souhaitez, dictez la structure exacte du '3. Déroulement du cours'. Ex: I. Définitions et mesures, II. Les causes..., III. Les conséquences..."></textarea>
+        </div>
+        
+        <label class="label-text">2. Documents d'Activités (Optionnel)</label>
+        <div class="grid-3-cols">
+            <div class="form-group">
+                <textarea id="videoLinks" rows="3" class="textarea-field" placeholder="Liens de vidéos (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="websiteLinks" rows="3" class="textarea-field" placeholder="Liens de sites web (un par ligne)"></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="rawText" rows="3" class="textarea-field" placeholder="Texte brut (articles, données, extraits d'auteurs...) pour les 'Activités Pédagogiques'."></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>3. Génération du Prompt</h2>
+        <div class="form-group">
+            <label class="label-text">Format de sortie souhaité (Obligatoire) :</label>
+            <div class="radio-group" id="outputFormatGroup">
+                <label><input type="radio" name="outputFormat" value="docx" checked> DOCX</label>
+                <label><input type="radio" name="outputFormat" value="html"> HTML</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="designCheckbox" class="label-text" style="display: flex; align-items: center; transition: color 0.3s;">
+                <input type="checkbox" id="designCheckbox" style="margin-right: 0.75rem; width: 1.1rem; height: 1.1rem;">
+                Inclure des instructions de design moderne pour la sortie HTML (facultatif)
+            </label>
+        </div>
+        
+        <div class="form-group" style="text-align: center; margin-top: 2rem;">
+            <button id="generateButton" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Générer le Prompt Détaillé
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="outputPrompt" class="label-text">Prompt de Séquence généré :</label>
+            <textarea id="outputPrompt" rows="15" class="textarea-field" readonly placeholder="Le prompt détaillé pour la génération de la séquence apparaîtra ici..."></textarea>
+            <button id="copyButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier le Prompt
+            </button>
+            <p id="copyMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section subsection-tools">
+        <h2>Outils Pédagogiques Annexes</h2>
+        <div class="grid-2-cols">
+            <button id="logbookButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-book"></i> Phrase Cahier de Texte
+            </button>
+            <button id="summaryButton" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-lightbulb"></i> Résumé Notions Élèves
+            </button>
+        </div>
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="pedagogicalOutput" class="label-text">Sortie des outils annexes :</label>
+            <textarea id="pedagogicalOutput" rows="6" class="textarea-field" readonly placeholder="Le contenu généré par les outils annexes apparaîtra ici..."></textarea>
+            <button id="copyPedagogicalOutputButton" class="btn btn-secondary" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copier Texte Annexe
+            </button>
+            <p id="copyPedagogicalOutputMessage" class="feedback-message"></p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Votre Boîte à Outils Pédagogiques</h2>
+        <div class="discipline-button-container">
+            <a href="boite.html" class="discipline-button">
+                <i class="fas fa-toolbox icon"></i>
+                <span class="title">Votre Boîte à Outils Pédagogiques</span>
+                <p>Accédez rapidement à l'ensemble de vos générateurs et éditeurs pour créer du contenu sur mesure.</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /**
+     * modulesData - Squelette pédagogique pour le Générateur de Cours SES 2nde
+     * Basé sur le programme officiel (BO spécial n° 1 du 22 janvier 2019)
+     * et les fiches d'accompagnement Eduscol.
+     * Découpage en 17 séquences pour un rythme de 1h30 hebdomadaire.
+     */
+    const modulesData = {
+        "2nde": {
+            // =============== THÈME 1 : INTRODUCTION ===============
+            // (Basé sur programme.pdf et 1.pdf)
+            101: {
+                mainTheme: "Introduction : Comment les économistes, les sociologues et les politistes raisonnent-ils et travaillent-ils ?",
+                title: "Un monde, trois regards (Éco, Socio, Sc. Po)",
+                hook: "Acheter un nouveau smartphone : est-ce un calcul économique (rapport qualité/prix), un acte social (rejoindre un groupe) ou un choix politique (soutenir une marque) ? Pourquoi un seul acte intéresse-t-il trois sciences sociales ?",
+                skills: "Comprendre les questions de base de l'économie ('allocation efficace des ressources rares'), de la sociologie ('comment fait-on société ?', 'comment expliquer les comportements sociaux ?') et de la science politique ('conquête et exercice du pouvoir politique').",
+                knowledge: "Économie, Sociologie, Science Politique, Ressources rares, Allocation, Comportement social, Pouvoir politique",
+                methodes: "Formuler des hypothèses. Poser une question de recherche simple à partir d'un exemple."
+            },
+            102: {
+                mainTheme: "Introduction : Comment les économistes, les sociologues et les politistes raisonnent-ils et travaillent-ils ?",
+                title: "Les 'outils' des sciences sociales : modèles et enquêtes",
+                hook: "Une carte de métro n'est pas le territoire réel, mais elle est utile pour s'y déplacer. Un 'modèle' en économie, c'est pareil. Mais comment un sociologue 'mesure'-t-il l'amitié ou le pouvoir ?",
+                skills: "Comprendre que les économistes utilisent des 'modèles' (représentations simplifiées) et que les sociologues/politistes réalisent des 'enquêtes' (utilisant des données).",
+                knowledge: "Modèle (économique), Enquête (quantitative, qualitative), Données",
+                methodes: "Comprendre la méthodologie d'une enquête simple (échantillon, questionnaire...). Distinguer une approche quantitative (combien ?) d'une approche qualitative (pourquoi ?)."
+            },
+            103: {
+                mainTheme: "Introduction : Comment les économistes, les sociologues et les politistes raisonnent-ils et travaillent-ils ?",
+                title: "Le piège des évidences : Corrélation et Causalité",
+                hook: "Statistiquement, on observe que la vente de glaces et le nombre de noyades augmentent en même temps. Faut-il interdire les glaces pour sauver des vies ? Évidemment non. C'est le piège de la 'corrélation'.",
+                skills: "À partir d'exemples, comprendre la distinction fondamentale between corrélation (un lien statistique) et causalité (un lien de cause à effet). Savoir mettre en évidence un lien de causalité simple.",
+                knowledge: "Corrélation (positive/négative), Causalité, Variable de confusion (ou 'variable cachée')",
+                methodes: "Lecture critique d'un graphique ou d'un tableau croisé. Formuler une hypothèse de causalité et identifier une possible variable tierce."
+            },
+
+            // =============== THÈME 2 : SCIENCE ÉCONOMIQUE (Richesse) ===============
+            // (Basé sur programme.pdf et 2.pdf)
+            201: {
+                mainTheme: "Science Économique : Comment crée-t-on des richesses et comment les mesure-t-on ?",
+                title: "Qui produit les richesses ? (Marchand et Non-Marchand)",
+                hook: "Votre boulanger produit du pain (vendu pour un profit). Votre lycée produit de l'éducation (financée par l'impôt). Une association caritative produit de l'aide (pour l'utilité sociale). Pourquoi ces trois organisations sont-elles toutes des 'productrices' ?",
+                skills: "Savoir illustrer la diversité des producteurs (entreprises, administrations publiques, économie sociale et solidaire). Connaître la distinction entre production marchande et non marchande (finalité, financement).",
+                knowledge: "Production, Production marchande, Production non marchande, Entreprise, Administration publique, Économie Sociale et Solidaire (ESS)",
+                methodes: "Classer des organisations (ex: Google, Hôpital public, Restos du Cœur) selon leur type de production et leur statut."
+            },
+            202: {
+                mainTheme: "Science Économique : Comment crée-t-on des richesses et comment les mesure-t-on ?",
+                title: "La 'recette' de la production : Facteurs et Valeur Ajoutée",
+                hook: "Pour faire un pain, il faut : un boulanger (Travail), un four (Capital), de la farine (Consommation Intermédiaire) et un savoir-faire (Technologie). Comment l'entreprise mesure-t-elle la richesse qu'elle a *vraiment* créée ?",
+                skills: "Savoir que la production résulte de la combinaison de travail, de capital, de technologie et de ressources naturelles. Connaître les indicateurs de l'entreprise (Chiffre d'affaires, Valeur Ajoutée, Bénéfice).",
+                knowledge: "Facteurs de production, Travail, Capital (fixe), Consommations intermédiaires (capital circulant), Technologie, Ressources naturelles, Chiffre d'Affaires (CA), Valeur Ajoutée (VA), Bénéfice",
+                methodes: "Calculer et interpréter une Valeur Ajoutée simple (VA = CA - CI). Distinguer CA, VA et Bénéfice."
+            },
+            203: {
+                mainTheme: "Science Économique : Comment crée-t-on des richesses et comment les mesure-t-on ?",
+                title: "Le PIB : comment mesurer la richesse d'un pays ?",
+                hook: "On entend partout 'La France a une croissance de 1%'. Comment arrive-t-on à un seul chiffre pour résumer des millions de productions, du pain aux avions en passant par les cours au lycée ?",
+                skills: "Savoir que le PIB correspond à la somme des valeurs ajoutées. Savoir que la croissance économique est la variation du PIB. Connaître les grandes tendances mondiales de la croissance sur plusieurs siècles.",
+                knowledge: "Produit Intérieur Brut (PIB), Somme des valeurs ajoutées, Croissance économique, PIB en volume (réel), PIB en valeur (nominal)",
+                methodes: "Lecture et interprétation d'un graphique de séries chronologiques (évolution du PIB). Calculer un taux de variation (taux de croissance)."
+            },
+            204: {
+                mainTheme: "Science Économique : Comment crée-t-on des richesses et comment les mesure-t-on ?",
+                title: "La croissance à tout prix ? Les limites sociales et écologiques du PIB",
+                hook: "Un pays peut avoir un PIB en forte hausse... mais aussi une pollution record, des inégalités explosives et une population épuisée. Le PIB mesure-t-il vraiment notre 'bien-être' ?",
+                skills: "Savoir que le PIB est un indicateur global qui ne rend pas compte des inégalités de revenus. Connaître les principales limites écologiques de la croissance.",
+                knowledge: "Limites du PIB (inégalités, travail domestique, bénévolat, etc.), Externalités négatives, Épuisement des ressources naturelles, Développement durable",
+                methodes: "Interpréter une moyenne arithmétique simple et en voir les limites. Lecture d'un indice synthétique (ex: IDH, à titre d'illustration)."
+            },
+
+            // =============== THÈME 3 : SCIENCE ÉCONOMIQUE (Marché) ===============
+            // (Basé sur programme.pdf et 3.pdf)
+            301: {
+                mainTheme: "Science Économique : Comment se forment les prix sur un marché ?",
+                title: "La 'loi' du marché : rencontre de l'offre et de la demande",
+                hook: "Pourquoi les fraises sont-elles chères en hiver et bon marché en mai ? Pourquoi le prix d'un billet d'avion change-t-il tous les jours ? Plongeon dans le 'modèle de marché'.",
+                skills: "Savoir illustrer la notion de marché. Comprendre que la demande décroît avec le prix et que l'offre croît avec le prix. Comprendre comment se fixe et s'ajuste le prix d'équilibre. Être capable de représenter ce modèle graphiquement.",
+                knowledge: "Marché, Offre, Demande, Prix d'équilibre, Quantité d'équilibre, Pénurie, Excédent",
+                methodes: "Construire et interpréter un graphique avec courbes d'offre et de demande. Identifier le prix et la quantité d'équilibre."
+            },
+            302: {
+                mainTheme: "Science Économique : Comment se forment les prix sur un marché ?",
+                title: "L'État peut-il changer les prix ? (Taxes et subventions)",
+                hook: "Le gouvernement veut réduire la pollution : il 'taxe' l'essence. Il veut encourager le vélo : il 'subventionne' l'achat de vélos électriques. Quel est l'impact de ces décisions sur les prix et les quantités vendues ?",
+                skills: "À l'aide d'un exemple, comprendre les effets sur l'équilibre de la mise en place d'une taxe forfaitaire ou d'une subvention.",
+                knowledge: "Taxe forfaitaire, Subvention",
+                methodes: "Représenter graphiquement un déplacement de courbe (offre ou demande) et identifier le nouvel équilibre (prix, quantité)."
+            },
+
+            // =============== THÈME 4 : SOCIOLOGIE ET SCIENCE POLITIQUE (Socialisation) ===============
+            // (Basé sur programme.pdf et 4.pdf)
+            401: {
+                mainTheme: "Sociologie et Science Politique : Comment devenons-nous des acteurs sociaux ?",
+                title: "Devenir social : le rôle de la famille et de l'école",
+                hook: "Un enfant ne naît pas 'poli' ou 'studieux', il le devient. Comment la famille et l'école nous transmettent-elles, souvent sans même qu'on s'en rende compte, les 'règles du jeu' de la vie en société ?",
+                skills: "Savoir que la socialisation est un processus d'apprentissage et d'intériorisation des normes et valeurs. Connaître le rôle spécifique de la famille et de l'école comme instances de socialisation (primaire).",
+                knowledge: "Socialisation, Processus, Normes (sociales, juridiques), Valeurs, Intériorisation, Inculcation, Instances de socialisation, Socialisation primaire, Famille, École",
+                methodes: "Analyser un document (texte, témoignage, extrait de film) illustrant une transmission de normes/valeurs."
+            },
+            402: {
+                mainTheme: "Sociologie et Science Politique : Comment devenons-nous des acteurs sociaux ?",
+                title: "Pluralité et différences : l'influence des pairs, des médias et du milieu",
+                hook: "Vos parents vous disent 'fais ceci', mais vos amis vous disent 'fais cela'. En même temps, TikTok et les séries vous montrent d'autres façons de vivre. Qui 'gagne' ? Et pourquoi ne sommes-nous pas tous socialisés de la même façon ?",
+                skills: "Illustrer la pluralité des instances (médias, groupe de pairs) et comprendre qu'elles peuvent être en concurrence. Savoir illustrer le caractère différencié de la socialisation en fonction du milieu social et du genre.",
+                knowledge: "Groupe de pairs, Médias, Socialisation secondaire, Socialisation différenciée, Genre, Milieu social",
+                methodes: "Lecture et interprétation d'un tableau à double-entrée (ex: 'pratiques de loisirs' selon le 'genre' ou le 'milieu social')."
+            },
+
+            // =============== THÈME 5 : SOCIOLOGIE ET SCIENCE POLITIQUE (Vie politique) ===============
+            // (Basé sur programme.pdf et 5.pdf)
+            501: {
+                mainTheme: "Sociologie et Science Politique : Comment s'organise la vie politique ?",
+                title: "Qu'est-ce que le pouvoir politique ?",
+                hook: "Pourquoi obéit-on à la loi ? Qu'est-ce qui rend le pouvoir de l'État 'légitime' et spécifique, par rapport au pouvoir d'un professeur dans sa classe ou d'un parent à la maison ?",
+                skills: "Connaître les principales spécificités du pouvoir politique (s'exerce sur toute la société, monopole de la violence physique légitime).",
+                knowledge: "Pouvoir, Pouvoir politique, Légitimité, État, Monopole de la violence légitime",
+                methodes: "Distinguer différents types de pouvoir à partir d'exemples concrets."
+            },
+            502: {
+                mainTheme: "Sociologie et Science Politique : Comment s'organise la vie politique ?",
+                title: "Qui gouverne ? Les institutions de la Ve République",
+                hook: "En France, qui fait quoi entre le Président, le Premier ministre et le Parlement ? Comment les pouvoirs sont-ils séparés pour (tenter d') éviter les abus ?",
+                skills: "Connaître les principales institutions politiques de la Ve République (rôle et composition). Comprendre le principe de la séparation des pouvoirs (exécutif, législatif, judiciaire).",
+                knowledge: "Institutions politiques, Constitution, Séparation des pouvoirs, Pouvoir exécutif, Pouvoir législatif, Pouvoir judiciaire, Président de la République, Gouvernement, Parlement (Assemblée Nationale, Sénat)",
+                methodes: "Lire et comprendre un organigramme simple des institutions de la Ve République."
+            },
+            503: {
+                mainTheme: "Sociologie et Science Politique : Comment s'organise la vie politique ?",
+                title: "Les 'règles du jeu' électoral : les modes de scrutin",
+                hook: "Aux législatives (majoritaire), un parti avec 20% des voix peut n'avoir presque aucun député. Aux européennes (proportionnel), le même parti aura 20% des sièges. Comment la 'règle du jeu' (le scrutin) change-t-elle le résultat de l'élection ?",
+                skills: "Comprendre comment les modes de scrutin (proportionnel, majoritaire) déterminent la représentation politique et structurent la vie politique.",
+                knowledge: "Mode de scrutin, Scrutin majoritaire, Scrutin proportionnel, Représentativité, Gouvernabilité",
+                methodes: "Calculer une proportion (pourcentage de répartition) de sièges simple. Comparer deux résultats d'élection issus de modes de scrutin différents."
+            },
+            504: {
+                mainTheme: "Sociologie et Science Politique : Comment s'organise la vie politique ?",
+                title: "Qui 'fait' la politique ? (Partis, associations, médias)",
+                hook: "La politique, ce n'est pas que les élections. Quand une association (ex: pour le climat) manifeste, qu'un syndicat négocie ou que les médias enquêtent, ils 'font' aussi de la politique. Quel est le rôle de ces différents acteurs ?",
+                skills: "Comprendre que la vie politique repose sur la contribution de différents acteurs (partis politiques, société civile organisée, médias).",
+                knowledge: "Acteurs politiques, Partis politiques, Société civile organisée (syndicats, associations, groupes d'intérêt), Médias",
+                methodes: "Analyser un article de presse pour identifier les différents acteurs à l'œuvre sur un enjeu public."
+            },
+
+            // =============== THÈME 6 : REGARDS CROISÉS (Diplôme, Empi, Salaire) ===============
+            // (Basé sur programme.pdf et 6.pdf)
+            601: {
+                mainTheme: "Regards Croisés : Quelles relations entre le diplôme, l'emploi et le salaire ?",
+                title: "Le diplôme, un investissement ? (Le regard de l'économiste)",
+                hook: "Faire de longues études, c'est 'coûteux' (temps, argent, effort). Pourquoi le faire ? L'économiste répond : c'est un 'investissement' qui 'rapporte'. Est-ce si simple ?",
+                skills: "Comprendre que la poursuite d'études est un investissement en capital humain. Comprendre que le salaire est (en partie) déterminé par le niveau de formation. Apprécier la rentabilité en termes de salaire et de 'capabilités'.",
+                knowledge: "Diplôme, Investissement, Capital humain, Salaire, Productivité, Capabilités (A. Sen)",
+                methodes: "Lecture et interprétation d'un graphique (ex: 'Salaire moyen selon le niveau de diplôme'). Calculer un coefficient multiplicateur pour comparer les salaires."
+            },
+            602: {
+                mainTheme: "Regards Croisés : Quelles relations entre le diplôme, l'emploi et le salaire ?",
+                title: "Le diplôme, un passeport pour l'emploi et contre le chômage ?",
+                hook: "Le diplôme protège-t-il vraiment du chômage ? Et à diplôme égal, comment expliquer les écarts de salaire persistants entre hommes et femmes, ou selon le type d'entreprise ?",
+                skills: "Savoir que le manque de qualification est une cause du chômage. Savoir qu'à niveau de diplôme égal, le salaire peut varier selon l'expérience, le type d'entreprise et le genre.",
+                knowledge: "Chômage, Qualification, Expérience, Genre, Discriminations",
+                methodes: "Lecture et interprétation d'un graphique (ex: 'Taux de chômage selon le niveau de diplôme'). Lire des données sur les écarts de salaires."
+            },
+            603: {
+                mainTheme: "Regards Croisés : Quelles relations entre le diplôme, l'emploi et le salaire ?",
+                title: "L'accès au diplôme : tous égaux ? (Le regard du sociologue)",
+                hook: "On dit que l'école récompense le 'mérite'. Mais statistiquement, un enfant d'ouvrier a moins de chances d'aller en prépa qu'un enfant de cadre, même avec de bonnes notes. Comment le sociologue explique-t-il ce phénomène ?",
+                skills: "Comprendre que les chances d'accès aux formations diplômantes sont socialement différenciées (en lien avec le milieu social et le genre, rappel Ch.4).",
+                knowledge: "Inégalités (d'accès à la formation), Socialisation différenciée (rappel), Massification scolaire",
+                methodes: "Lecture et interprétation d'un tableau à double-entrée (ex: 'Origine sociale des élèves en Grandes Écoles')."
+            }
+        }
+    };
+    
+    // Base de données de suggestions pour les SES
+    const suggestionDatabase = {
+        'général': ["France", "Union Européenne", "Chômage", "Croissance", "Inégalités", "Famille", "École"],
+        'éco': ["Marché", "Prix", "PIB", "Entreprise", "Monnaie", "Banque", "Offre", "Demande", "Taxe"],
+        'socio': ["Socialisation", "Normes", "Valeurs", "Milieu social", "Genre", "Groupe de pairs", "Rôle"],
+        'politiste': ["État", "Pouvoir", "Démocratie", "Vote", "Parti politique", "Constitution", "Scrutin"],
+        'méthodes': ["Corrélation", "Causalité", "Taux de variation", "Tableau statistique", "Graphique", "Modèle", "Enquête"],
+        'auteurs': ["Durkheim", "Weber", "Bourdieu", "Adam Smith", "Keynes", "Amartya Sen"]
+    };
+
+    // --- DOM Elements ---
+    const themeSelect = document.getElementById('themeSelect');
+    const sequenceSelect = document.getElementById('sequenceSelect');
+    const studyObjectInput = document.getElementById('studyObjectInput');
+    // NOUVEL ÉLÉMENT
+    const startingDocumentInput = document.getElementById('startingDocumentInput');
+    const planInput = document.getElementById('planInput');
+    const videoLinks = document.getElementById('videoLinks');
+    const websiteLinks = document.getElementById('websiteLinks');
+    const rawText = document.getElementById('rawText');
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    const generateButton = document.getElementById('generateButton');
+    const outputPrompt = document.getElementById('outputPrompt');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    const logbookButton = document.getElementById('logbookButton');
+    const summaryButton = document.getElementById('summaryButton');
+    const pedagogicalOutput = document.getElementById('pedagogicalOutput');
+    const copyPedagogicalOutputButton = document.getElementById('copyPedagogicalOutputButton');
+    const copyPedagogicalOutputMessage = document.getElementById('copyPedagogicalOutputMessage');
+    const designCheckbox = document.getElementById('designCheckbox');
+    const designCheckboxLabel = document.querySelector('label[for="designCheckbox"]');
+
+    const addObjectButton = document.getElementById('addObjectButton');
+    const suggestionContainer = document.getElementById('suggestionContainer');
+    const selectedObjectsContainer = document.getElementById('selectedObjectsContainer');
+    const objectFeedback = document.getElementById('objectFeedback');
+    
+    let selectedObjects = [];
+    const MAX_OBJECTS = 6;
+
+    // --- Logique d'ajout/suppression d'objets d'étude ---
+    function renderSelectedObjects() {
+        selectedObjectsContainer.innerHTML = '';
+        selectedObjects.forEach((objectName, index) => {
+            const item = document.createElement('span');
+            item.className = 'selected-item';
+            item.textContent = objectName;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-item-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+            removeBtn.title = 'Retirer cet objet';
+            removeBtn.onclick = () => {
+                selectedObjects.splice(index, 1);
+                renderSelectedObjects();
+            };
+            
+            item.appendChild(removeBtn);
+            selectedObjectsContainer.appendChild(item);
+        });
+    }
+
+    function addObject(name) {
+        const cleanedName = name.trim();
+        if (!cleanedName) return;
+
+        if (selectedObjects.length >= MAX_OBJECTS) {
+            showFeedback(objectFeedback, `Limite de ${MAX_OBJECTS} objets atteinte.`, 'error');
+            return;
+        }
+
+        if (selectedObjects.includes(cleanedName)) {
+            showFeedback(objectFeedback, `"${cleanedName}" est déjà dans la liste.`, 'error');
+            return;
+        }
+
+        selectedObjects.push(cleanedName);
+        renderSelectedObjects();
+        studyObjectInput.value = '';
+        studyObjectInput.focus();
+    }
+
+    addObjectButton.addEventListener('click', () => addObject(studyObjectInput.value));
+    studyObjectInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addObject(studyObjectInput.value);
+        }
+    });
+
+    // --- Logique de suggestion ---
+    function displaySuggestions(suggestions) {
+        suggestionContainer.innerHTML = '';
+        if (suggestions.length === 0) return;
+
+        const label = document.createElement('span');
+        label.className = 'label-text';
+        label.textContent = 'Suggestions :';
+        label.style.marginBottom = '0';
+        label.style.fontSize = '0.9rem';
+        suggestionContainer.appendChild(label);
+
+        suggestions.forEach(text => {
+            const item = document.createElement('span');
+            item.className = 'suggestion-item';
+            item.textContent = text;
+            item.onclick = () => addObject(text);
+            suggestionContainer.appendChild(item);
+        });
+    }
+
+    function generateSuggestions(moduleDetails) {
+        if (!moduleDetails) {
+            displaySuggestions([]);
+            return;
+        }
+        const relevantText = `${moduleDetails.title.toLowerCase()} ${moduleDetails.knowledge.toLowerCase()}`;
+        const suggestions = new Set(suggestionDatabase['général']);
+        
+        // Map de mots-clés pour les SES
+        const keywordMap = {
+            'éco': ['économie', 'marché', 'prix', 'richesse', 'pib', 'salaire', 'emploi', 'croissance', 'entreprise', 'taxe'],
+            'socio': ['sociologie', 'socialisation', 'normes', 'valeurs', 'famille', 'école', 'genre', 'milieu social', 'pairs'],
+            'politiste': ['politiste', 'politique', 'pouvoir', 'état', 'institutions', 'scrutin', 'partis', 'démocratie'],
+            'méthodes': ['corrélation', 'causalité', 'modèle', 'enquête', 'données', 'graphique', 'tableau', 'variation'],
+            'auteurs': ['durkheim', 'weber', 'bourdieu', 'smith', 'keynes', 'sen']
+        };
+
+        for (const key in keywordMap) {
+            if (keywordMap[key].some(keyword => relevantText.includes(keyword))) {
+                suggestionDatabase[key].forEach(item => suggestions.add(item));
+            }
+        }
+        const finalSuggestions = Array.from(suggestions).sort(() => 0.5 - Math.random()).slice(0, 10);
+        displaySuggestions(finalSuggestions);
+    }
+    
+    // --- Logique de remplissage des sélecteurs ---
+    function populateThemes() {
+        themeSelect.innerHTML = '<option value="">-- Tous les Thèmes --</option>';
+        const modulesForGrade = modulesData["2nde"];
+        const themes = [...new Set(Object.values(modulesForGrade).map(item => item.mainTheme))];
+        
+        themes.forEach(theme => {
+            const option = document.createElement('option');
+            option.value = theme;
+            option.textContent = theme;
+            themeSelect.appendChild(option);
+        });
+    }
+
+    function populateSequences(selectedTheme) {
+        sequenceSelect.innerHTML = '<option value="">-- Choisir une séquence --</option>';
+        sequenceSelect.disabled = true;
+        displaySuggestions([]);
+        selectedObjects = [];
+        renderSelectedObjects();
+        
+        const modulesForGrade = modulesData["2nde"];
+        
+        if (selectedTheme === "") {
+            // Option "Tous les Thèmes" : on groupe par thème
+            const themes = [...new Set(Object.values(modulesForGrade).map(item => item.mainTheme))];
+            themes.forEach(theme => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = theme;
+                Object.keys(modulesForGrade).forEach(key => {
+                    const moduleItem = modulesForGrade[key];
+                    if (moduleItem.mainTheme === theme) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = moduleItem.title;
+                        optgroup.appendChild(option);
+                    }
+                });
+                sequenceSelect.appendChild(optgroup);
+            });
+        } else {
+            // Un thème spécifique est sélectionné : on liste juste les séquences
+            Object.keys(modulesForGrade).forEach(key => {
+                const moduleItem = modulesForGrade[key];
+                if (moduleItem.mainTheme === selectedTheme) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = moduleItem.title;
+                    sequenceSelect.appendChild(option);
+                }
+            });
+        }
+        sequenceSelect.disabled = false;
+    }
+
+    // --- Utilitaires (feedback, clipboard) ---
+    function showFeedback(element, message, type = 'success', duration = 3000) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = `feedback-message ${type} show`;
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, duration);
+    }
+
+    function copyToClipboard(text, messageElement, successText = "Copié avec succès !") {
+        if (!text || text.trim() === "") { 
+            if (messageElement) showFeedback(messageElement, "Rien à copier.", 'error'); 
+            return; 
+        }
+        
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.top = "-9999px";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            if (messageElement) showFeedback(messageElement, successText, 'success');
+        } catch (err) {
+            console.error('Erreur de copie:', err);
+            if (messageElement) showFeedback(messageElement, 'Erreur de copie.', 'error');
+        }
+    }
+
+
+    // --- Logique de génération de Prompt (REFAITE) ---
+    generateButton.addEventListener('click', () => {
+        const selectedGrade = "2nde"; // Fixé sur Seconde
+        const selectedModuleKey = sequenceSelect.value;
+        const outputFormatRadio = document.querySelector('input[name="outputFormat"]:checked');
+        
+        if (!selectedGrade || !selectedModuleKey || !outputFormatRadio) { 
+            showFeedback(copyMessage, "Veuillez choisir une séquence et un format de sortie.", "error"); 
+            return;
+        }
+
+        const moduleDetails = modulesData[selectedGrade]?.[selectedModuleKey];
+        if (!moduleDetails) { 
+            showFeedback(copyMessage, "Détails de la séquence non trouvés.", "error"); 
+            return; 
+        }
+
+        // Récupération de TOUTES les personnalisations
+        const startingDocument = startingDocumentInput.value.trim();
+        const studyObjectsList = selectedObjects.join(', ');
+        const plan = planInput.value.trim();
+        const videos = videoLinks.value.trim();
+        const websites = websiteLinks.value.trim();
+        const text = rawText.value.trim();
+        const outputFormat = outputFormatRadio.value;
+        const includeDesign = designCheckbox.checked;
+
+        let promptText = `**RÔLE ET MISSION DE HAUT NIVEAU**
+Tu es un **concepteur pédagogique expert en ingénierierie de la formation**, agissant en tant qu'auteur principal pour un éditeur de manuels scolaires de premier plan. Tu es également **Professeur agrégé de Sciences Économiques et Sociales (SES)** et tu maîtrises parfaitement les programmes de l'Éducation Nationale française pour le lycée (niveau Seconde), ainsi que la pédagogie inductive basée sur l'analyse de documents.
+
+Ta mission est de rédiger un **chapitre de manuel scolaire complet et dynamique** pour un élève de **Seconde**, en suivant scrupuleusement la structure pédagogique des SES (investigation, notions, auteurs, synthèse). Ce n'est PAS un cours encyclopédique, mais un outil de travail engageant.\n\n`;
+
+        // --- INSTRUCTIONS IMPÉRATIVES (MISES À JOUR) ---
+        const hasImperativeInstructions = startingDocument || studyObjectsList || plan || videos || websites || text;
+        if (hasImperativeInstructions) {
+            promptText += `**INSTRUCTIONS IMPÉRATIVES DE L'ENSEIGNANT**
+La conception du cours doit obligatoirement intégrer les éléments suivants :\n`;
+            
+            if (startingDocument) {
+                promptText += `- **1. Document de Démarrage Imposé :** La séquence DOIT commencer par l'analyse de ce document : "${startingDocument}".\n`;
+            }
+            if (studyObjectsList) {
+                promptText += `- **Concepts, Auteurs ou Exemples centraux :** Le cours doit être articulé autour des exemples suivants : **${studyObjectsList}**.\n`;
+            }
+            if (plan) {
+                promptText += `- **Plan imposé pour le 'Déroulement du cours' :** La structure du point '3. Déroulement du cours' doit suivre scrupuleusement ce plan :\n${plan}\n`;
+            }
+            if (videos || websites || text) {
+                promptText += `- **Ressources d'appui pour les 'Activités Pédagogiques' :** Les activités doivent se baser sur l'analyse et la synthèse de ces ressources :\n`;
+                if (videos) promptText += `  - Vidéos : \n${videos}\n`;
+                if (websites) promptText += `  - Sites web : \n${websites}\n`;
+                if (text) promptText += `  - Textes / Données : \n${text}\n`;
+            }
+            promptText += "\n";
+        }
+        
+        // --- CAHIER DES CHARGES PÉDAGOGIQUE (INCHANGÉ) ---
+        promptText += `**CAHIER DES CHARGES PÉDAGOGIQUE DU COURS**
+- **Niveau :** Seconde
+- **Thème :** ${moduleDetails.mainTheme}
+- **Titre de la Séquence :** ${moduleDetails.title}
+- **Savoir-faire notionnels :** ${moduleDetails.skills}
+- **Savoirs & Connaissances (Concepts) :** ${moduleDetails.knowledge}
+- **Méthodes & Outils mobilisés :** ${moduleDetails.methodes}\n\n`;
+
+        // --- NOUVELLE STRUCTURE DE PROMPT (BASÉE SUR LE DOCX) ---
+        promptText += `**STRUCTURE DÉTAILLÉE DU DOCUMENT DE COURS À PRODUIRE (Structure inductive type SES)**
+Tu dois rédiger le cours en respectant **impérativement** le format de sortie demandé et la structure complète en 7 points ci-dessous.
+**Format de Sortie Final Requis : ${outputFormat.toUpperCase()}**\n\n`;
+        if (outputFormat === 'html' && includeDesign) {
+            promptText += `**INSTRUCTIONS SPÉCIFIQUES POUR LE DESIGN HTML :**
+Crée un cours en HTML/CSS moderne et attractif. Utilise une palette de couleurs professionnelle (ex: bleus, teals), des typographies claires (Poppins, Inter), des icônes Font Awesome, et des encadrés stylisés pour : "Point notion", "Activité pédagogique", "Que dit la recherche ?", "En synthèse". Le cours doit être un fichier HTML autonome (CSS interne).\n\n`;
+        }
+        promptText += `---
+**DÉBUT DU CONTENU DU COURS À RÉDIGER**
+
+**Titre de la Séquence : ${moduleDetails.title.toUpperCase()}**
+
+**En résumé :**
+*Rédige un encadré (en italique si DOCX) qui résume les concepts clés qui seront abordés, basé sur : "${moduleDetails.knowledge}". Chaque concept doit être résumé en une phrase ou deux.*
+
+**1. Situation de démarrage**
+${startingDocument 
+? `*Base-toi IMPÉRATIVEMENT sur le document fourni par l'enseignant : "${startingDocument}". Présente ce document (s'il est décrit), sa source, puis pose 1 ou 2 questions simples pour lancer la réflexion.*` 
+: `*Scénarise l'accroche ("${moduleDetails.hook}") sous forme d'un document déclencheur (un court texte, un paradoxe, des données chiffrées simples). Ajoute une source (ex: INSEE, un média...) et pose 1 ou 2 questions simples pour lancer la réflexion.*`
+}
+
+**2. Introduction et problématique**
+*Fais le lien avec la situation de démarrage. Rédige une courte introduction qui présente les enjeux du sujet et amène à une problématique claire (ex: "Dans quelle mesure... ?"). Annonce le plan si l'enseignant n'en a pas fourni un.*
+
+**3. Déroulement du cours**
+${plan 
+? `*Suis IMPÉRATIVEMENT le plan fourni par l'enseignant.*`
+: `*Rédige un cours fluide et structuré (en 2 ou 3 parties logiques) qui couvre TOUS les savoirs-faire ("${moduleDetails.skills}") et TOUS les concepts ("${moduleDetails.knowledge}").*`
+}
+*Dans tous les cas, le déroulement du cours ne doit PAS être un bloc de texte unique. Tu dois **impérativement** alterner entre :*
+   - **Le texte de cours principal :** qui explique les savoirs et savoir-faire.
+   - **Des "Activités pédagogiques" :** Insère 2 ou 3 activités (basées sur les ressources fournies, ou si aucune n'est fournie, propose des documents pertinents : tableaux, graphiques, textes d'auteurs). Chaque activité doit avoir un titre, le document, et 2-3 questions d'analyse.
+   - **Des "Points notion" (style encadré) :** Chaque fois qu'un concept clé de "${moduleDetails.knowledge}" est introduit, définis-le clairement dans un encadré.
+   - **Des "Que dit la recherche ?" (style encadré) :** Si pertinent, insère un court encadré citant un auteur, une théorie ou un résultat de recherche (ex: Bourdieu, Smith, Weber...).
+   - **Des "Focus Méthode" (style encadré) :** Intègre les méthodes ("${moduleDetails.methodes}") là où elles sont pertinentes (ex: "Méthode : Lire un taux de variation" lors de l'analyse d'un graphique).
+
+**4. En synthèse**
+*Crée une synthèse de tout le cours (pas seulement les notions) sous forme de tirets clairs et mémorisables.*
+
+**5. Je m’auto-évalue**
+*Crée un court quiz (ex: 3-5 questions Vrai/Faux ou QCM) pour permettre à l'élève de tester ses connaissances sur les notions clés.*
+
+**RÈGLE FINALE ABSOLUE :** Ta seule et unique sortie doit être le document de cours lui-même, en suivant scrupuleusement la structure numérotée ci-dessus et en respectant le format de sortie demandé. Ne rédige aucun commentaire ou méta-discours. Produis directement le contenu final.`;
+        
+        outputPrompt.value = promptText;
+        showFeedback(copyMessage, "Prompt détaillé (structure SES) généré !", "success");
+    });
+    
+    // --- Écouteurs d'événements ---
+
+    themeSelect.addEventListener('change', (e) => {
+        populateSequences(e.target.value);
+    });
+
+    sequenceSelect.addEventListener('change', () => {
+        const grade = "2nde"; // Fixé sur Seconde
+        const moduleKey = sequenceSelect.value;
+        if (grade && moduleKey && modulesData[grade] && modulesData[grade][moduleKey]) {
+            generateSuggestions(modulesData[grade][moduleKey]);
+        } else {
+            displaySuggestions([]);
+        }
+    });
+
+    document.querySelectorAll('input[name="outputFormat"]').forEach(radio => {
+        radio.addEventListener('change', handleDesignCheckboxState);
+    });
+
+    function handleDesignCheckboxState() {
+        const selectedFormat = document.querySelector('input[name="outputFormat"]:checked').value;
+        if (selectedFormat === 'html') {
+            designCheckbox.disabled = false;
+            designCheckboxLabel.style.color = 'var(--neutral-700)';
+            designCheckboxLabel.style.cursor = 'pointer';
+        } else {
+            designCheckbox.disabled = true;
+            designCheckbox.checked = false;
+            designCheckboxLabel.style.color = 'var(--neutral-300)';
+            designCheckboxLabel.style.cursor = 'not-allowed';
+        }
+    }
+
+    copyButton.addEventListener('click', () => copyToClipboard(outputPrompt.value, copyMessage));
+    
+    // --- Outils Annexes ---
+    logbookButton.addEventListener('click', () => {
+        const grade = "2nde"; // Fixé sur Seconde
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey || !modulesData[grade] || !modulesData[grade][moduleKey]) {
+             showFeedback(copyPedagogicalOutputMessage, "Sélectionnez une séquence.", "error"); return; 
+        }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const logbookText = `SES 2nde - Séquence "${moduleDetails.title}". Savoir-faire : ${moduleDetails.skills}. Notions : ${moduleDetails.knowledge}. Méthodes : ${moduleDetails.methodes}.`;
+        pedagogicalOutput.value = logbookText;
+        showFeedback(copyPedagogicalOutputMessage, "Phrase pour cahier de texte générée !", "success");
+    });
+
+    summaryButton.addEventListener('click', () => {
+        const grade = "2nde"; // Fixé sur Seconde
+        const moduleKey = sequenceSelect.value;
+        if (!grade || !moduleKey || !modulesData[grade] || !modulesData[grade][moduleKey]) { 
+            showFeedback(copyPedagogicalOutputMessage, "Sélectionnez une séquence.", "error"); return; 
+        }
+        const moduleDetails = modulesData[grade][moduleKey];
+        const summaryText = `Résumé (SES - ${moduleDetails.title}) :\nÀ la fin de cette séquence, tu dois connaître : ${moduleDetails.knowledge}.\nTu dois être capable de : ${moduleDetails.skills}.\nTu sauras utiliser les méthodes : ${moduleDetails.methodes}.`;
+        pedagogicalOutput.value = summaryText;
+        showFeedback(copyPedagogicalOutputMessage, "Résumé pour élèves généré !", "success");
+    });
+
+    copyPedagogicalOutputButton.addEventListener('click', () => copyToClipboard(pedagogicalOutput.value, copyPedagogicalOutputMessage, "Texte annexe copié !"));
+
+    // --- Initialisation ---
+    handleDesignCheckboxState();
+    // Population initiale au chargement de la page
+    populateThemes();
+    populateSequences(themeSelect.value); // Charge toutes les séquences au début
+});
+</script>
+
+</body>
+</html>
+
