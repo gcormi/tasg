@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interface IA Multi-Modèle</title>
-    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ajout de Font Awesome pour l'icône retour -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Police Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,6 +13,8 @@
         /* Définition de la police Inter par défaut */
         body {
             font-family: 'Inter', sans-serif;
+            /* Important: S'assurer que le fond est blanc pour l'iframe */
+            background-color: #ffffff; 
         }
         /* Style simple pour le spinner de chargement */
         #loading-spinner {
@@ -37,19 +36,16 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body class="">
 
-    <!-- Ajout de "relative" pour positionner la flèche -->
-    <div class="bg-white w-full max-w-3xl p-6 sm:p-8 rounded-xl shadow-lg relative">
+    <div class="bg-white w-full relative">
         
-        <!-- Flèche de retour vers index.html -->
-        <a href="index.html" title="Retour à l'accueil" class="absolute top-5 left-6 text-gray-400 hover:text-gray-600 transition-colors">
+        <a id="back-arrow-link" href="index.html" title="Retour à l'accueil" class="absolute top-1 -left-1 sm:top-5 sm:left-6 text-gray-400 hover:text-gray-600 transition-colors">
             <i class="fas fa-arrow-left text-xl"></i>
         </a>
 
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Interface IA 🤖</h1>
 
-        <!-- Section pour la configuration de l'IA (cachée si déjà sauvegardée) -->
         <div id="config-section">
             <h2 class="text-lg font-semibold text-gray-700 mb-3">Configuration de l'IA</h2>
             <p class="text-sm text-gray-600 mb-4">Choisissez votre fournisseur d'IA et entrez votre clé API. Elle sera sauvegardée dans votre navigateur.</p>
@@ -60,6 +56,8 @@
                 <option value="chatgpt">OpenAI (ChatGPT)</option>
                 <option value="mistral">Mistral</option>
                 <option value="claude">Anthropic (Claude)</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="perplexity">Perplexity</option>
             </select>
 
             <label for="api-key-input" class="block text-sm font-medium text-gray-700 mb-1">Clé API</label>
@@ -72,7 +70,6 @@
             <p class="text-xs text-gray-500 mt-3">⚠️ Votre clé est stockée localement. Ne l'utilisez pas sur un appareil public.</p>
         </div>
 
-        <!-- Section pour le prompt (cachée si pas de clé) -->
         <div id="prompt-section" class="hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2 id="config-status-text" class="text-lg font-semibold text-green-700"></h2>
@@ -87,26 +84,20 @@
             </button>
         </div>
 
-        <!-- Section pour les résultats -->
         <div id="results-section" class="mt-6 hidden">
-            <!-- Spinner de chargement -->
             <div id="loading-spinner" class="mx-auto my-4 hidden"></div>
 
-            <!-- Onglets pour basculer entre l'aperçu et le texte brut -->
             <div class="flex border-b border-gray-200">
                 <button id="tab-preview" class="py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600">Aperçu</button>
-                <button id="tab-raw" class="py-2 px-4 font-semibold text-gray-500">Texte Brut</button>
+                <button id="tab-raw" class="py-2 px-4 font-semibold text-gray-500">Texte ou Code</button>
             </div>
 
-            <!-- Contenu de l'aperçu -->
             <div id="preview-output" class="mt-4 p-4 border border-gray-200 rounded-lg min-h-[150px] bg-gray-50">
-                <!-- Le HTML généré sera injecté ici -->
-            </div>
+                </div>
 
-            <!-- Contenu du texte brut -->
             <div id="raw-output-container" class="mt-4 hidden">
                 <pre class="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code id="raw-output" class="text-sm"></code></pre>
-                <button id="copy-text-button" class="mt-2 bg-gray-600 text-white text-xs font-medium py-1 px-3 rounded-md hover:bg-gray-700">Copier le texte</button>
+                <button id="copy-text-button" class="mt-2 bg-gray-600 text-white text-xs font-medium py-1 px-3 rounded-md hover:bg-gray-700">Copier le texte ou code</button>
             </div>
         </div>
 
@@ -119,6 +110,8 @@
         const STORAGE_CHATGPT_KEY = 'chatgptApiKey';
         const STORAGE_MISTRAL_KEY = 'mistralApiKey';
         const STORAGE_CLAUDE_KEY = 'claudeApiKey';
+        const STORAGE_DEEPSEEK_KEY = 'deepseekApiKey';
+        const STORAGE_PERPLEXITY_KEY = 'perplexityApiKey';
 
         // --- Références aux éléments du DOM ---
         const configSection = document.getElementById('config-section');
@@ -153,7 +146,7 @@
             'gemini': {
                 name: "Google (Gemini)",
                 storageKey: STORAGE_GEMINI_KEY,
-                getApiUrl: (cleApi) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${cleApi}`,
+                getApiUrl: (cleApi) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${cleApi}`,
                 getHeaders: (cleApi) => ({ 'Content-Type': 'application/json' }),
                 getPayload: (prompt) => ({
                     contents: [{ parts: [{ text: prompt }] }],
@@ -192,6 +185,7 @@
             'mistral': {
                 name: "Mistral",
                 storageKey: STORAGE_MISTRAL_KEY,
+                // CORRECTION: httpss:// -> https://
                 getApiUrl: () => 'https://api.mistral.ai/v1/chat/completions',
                 getHeaders: (cleApi) => ({
                     'Content-Type': 'application/json',
@@ -231,6 +225,52 @@
                         throw new Error("Réponse de l'API Anthropic invalide.");
                     }
                     return result.content[0].text;
+                }
+            },
+            'deepseek': {
+                name: "DeepSeek",
+                storageKey: STORAGE_DEEPSEEK_KEY,
+                // Utilise une API compatible OpenAI
+                getApiUrl: () => 'https://api.deepseek.com/v1/chat/completions',
+                getHeaders: (cleApi) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cleApi}`
+                }),
+                getPayload: (prompt) => ({
+                    model: 'deepseek-chat', 
+                    messages: [
+                        { role: 'system', content: systemPrompt }, 
+                        { role: 'user', content: prompt }
+                    ]
+                }),
+                parseResponse: (result) => {
+                    if (!result.choices || !result.choices[0].message.content) {
+                        throw new Error("Réponse de l'API DeepSeek invalide.");
+                    }
+                    return result.choices[0].message.content;
+                }
+            },
+            'perplexity': {
+                name: "Perplexity",
+                storageKey: STORAGE_PERPLEXITY_KEY,
+                // Utilise une API compatible OpenAI
+                getApiUrl: () => 'https://api.perplexity.ai/chat/completions',
+                getHeaders: (cleApi) => ({
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cleApi}`
+                }),
+                getPayload: (prompt) => ({
+                    model: 'llama-3-sonar-large-32k-online', // Un modèle puissant avec accès web
+                    messages: [
+                        { role: 'system', content: systemPrompt }, 
+                        { role: 'user', content: prompt }
+                    ]
+                }),
+                parseResponse: (result) => {
+                    if (!result.choices || !result.choices[0].message.content) {
+                        throw new Error("Réponse de l'API Perplexity invalide.");
+                    }
+                    return result.choices[0].message.content;
                 }
             }
         };
@@ -302,6 +342,12 @@
         function updateApiKeyInput() {
             const selectedAI = aiSelector.value;
             const config = AI_CONFIGS[selectedAI];
+            // Gère le cas où la config n'existerait pas (sécurité)
+            if (!config) {
+                apiKeyInput.value = '';
+                apiKeyInput.placeholder = 'Veuillez sélectionner une IA valide...';
+                return;
+            }
             const cleSauvegardee = localStorage.getItem(config.storageKey);
             
             apiKeyInput.value = cleSauvegardee || '';
@@ -364,23 +410,23 @@
                 
                 // Nettoyer le HTML (l'IA ajoute parfois ````html` au début/fin)
                 const cleanHtml = textContent
-                    .replace(/^```html\n?/, '')
+                    .replace(/^```(html|xml)\n?/, '') // Gère html ou xml
                     .replace(/```$/, '')
                     .trim();
 
                 // Toujours remplir le texte brut
                 rawOutput.textContent = cleanHtml;
 
-                // Détecter si la réponse est du HTML
-                const isHtml = cleanHtml.startsWith('<') && cleanHtml.endsWith('>');
+                // Détecter si la réponse est du HTML/XML
+                const isHtmlOrXml = cleanHtml.startsWith('<') && cleanHtml.endsWith('>');
 
-                if (isHtml) {
+                if (isHtmlOrXml) {
                     // Afficher l'aperçu HTML
                     previewOutput.innerHTML = cleanHtml;
                     afficherOnglet('preview');
                 } else {
                     // Afficher le texte brut
-                    previewOutput.innerHTML = `<p class="text-gray-500 italic">(La réponse n'est pas au format HTML)</p>`;
+                    previewOutput.innerHTML = `<p class="text-gray-500 italic">(La réponse n'est pas au format HTML/XML)</p>`;
                     afficherOnglet('raw');
                 }
 
@@ -419,19 +465,20 @@
         // Copier le texte brut
         function copierTexte() {
             const text = rawOutput.textContent;
+            const buttonText = "Copier le texte ou code"; // Texte par défaut
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => {
                     copyTextButton.textContent = "Copié !";
-                    setTimeout(() => { copyTextButton.textContent = "Copier le texte"; }, 2000);
+                    setTimeout(() => { copyTextButton.textContent = buttonText; }, 2000);
                 }).catch(err => {
-                    fallbackCopyTextToClipboard(text);
+                    fallbackCopyTextToClipboard(text, buttonText);
                 });
             } else {
-                fallbackCopyTextToClipboard(text);
+                fallbackCopyTextToClipboard(text, buttonText);
             }
         }
         
-        function fallbackCopyTextToClipboard(text) {
+        function fallbackCopyTextToClipboard(text, buttonText) {
             try {
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
@@ -445,7 +492,7 @@
                 document.body.removeChild(textArea);
                 
                 copyTextButton.textContent = "Copié !";
-                setTimeout(() => { copyTextButton.textContent = "Copier le texte"; }, 2000);
+                setTimeout(() => { copyTextButton.textContent = buttonText; }, 2000);
             } catch (e) {
                 alert("La copie a échoué. Veuillez copier manuellement.");
             }
@@ -456,11 +503,30 @@
         
         // Au chargement de la page
         document.addEventListener('DOMContentLoaded', () => {
+            // Logique pour adapter l'affichage (dans modal ou seul)
+            if (window.self !== window.top) {
+                // -- ON EST DANS L'IFRAME (MODAL) --
+                const backArrow = document.getElementById('back-arrow-link');
+                if (backArrow) {
+                    backArrow.style.display = 'none';
+                }
+                // Ajouter le padding interne pour la modale
+                document.body.classList.add('p-4', 'sm:p-6');
+            } else {
+                 // -- ON EST EN PAGE SEULE --
+                // Ajouter les styles de centrage et de fond
+                document.body.classList.add('bg-gray-100', 'min-h-screen', 'flex', 'items-center', 'justify-center', 'p-4');
+                // Ajouter les styles de carte (ombre, coins arrondis, etc.)
+                document.body.querySelector('div').classList.add('max-w-3xl', 'p-6', 'sm:p-8', 'rounded-xl', 'shadow-lg');
+            }
+
+            // Logique d'initialisation de l'IA
             const selectedAI = localStorage.getItem(STORAGE_SELECTED_AI) || 'gemini';
             aiSelector.value = selectedAI;
             
             const config = AI_CONFIGS[selectedAI];
-            const cleSauvegardee = localStorage.getItem(config.storageKey);
+            // S'assurer que la config existe avant de lire la clé
+            const cleSauvegardee = config ? localStorage.getItem(config.storageKey) : null;
 
             if (cleSauvegardee) {
                 basculerSections(true, selectedAI);
@@ -491,4 +557,3 @@
     </script>
 </body>
 </html>
-
