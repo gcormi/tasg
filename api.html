@@ -151,7 +151,10 @@
                 getPayload: (prompt) => ({
                     contents: [{ parts: [{ text: prompt }] }],
                     systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: { responseMimeType: "text/plain" }
+                    generationConfig: { 
+                        responseMimeType: "text/plain",
+                        maxOutputTokens: 8192 // Ajout d'une limite par sécurité
+                    }
                 }),
                 parseResponse: (result) => {
                     if (!result.candidates || !result.candidates[0].content.parts[0].text) {
@@ -173,7 +176,8 @@
                     messages: [
                         { role: 'system', content: systemPrompt }, 
                         { role: 'user', content: prompt }
-                    ]
+                    ],
+                    max_tokens: 4096 // Ajout d'une limite
                 }),
                 parseResponse: (result) => {
                     if (!result.choices || !result.choices[0].message.content) {
@@ -185,7 +189,6 @@
             'mistral': {
                 name: "Mistral",
                 storageKey: STORAGE_MISTRAL_KEY,
-                // CORRECTION: httpss:// -> https://
                 getApiUrl: () => 'https://api.mistral.ai/v1/chat/completions',
                 getHeaders: (cleApi) => ({
                     'Content-Type': 'application/json',
@@ -196,7 +199,8 @@
                     messages: [
                         { role: 'system', content: systemPrompt }, 
                         { role: 'user', content: prompt }
-                    ]
+                    ],
+                    max_tokens: 4096 // <-- MODIFICATION AJOUTÉE
                 }),
                 parseResponse: (result) => {
                     if (!result.choices || !result.choices[0].message.content) {
@@ -218,7 +222,7 @@
                     model: 'claude-3-haiku-20240307', 
                     system: systemPrompt, 
                     messages: [ { role: 'user', content: prompt } ],
-                    max_tokens: 4096
+                    max_tokens: 4096 // Limite déjà présente ici
                 }),
                 parseResponse: (result) => {
                      if (!result.content || !result.content[0].text) {
@@ -230,7 +234,6 @@
             'deepseek': {
                 name: "DeepSeek",
                 storageKey: STORAGE_DEEPSEEK_KEY,
-                // Utilise une API compatible OpenAI
                 getApiUrl: () => 'https://api.deepseek.com/v1/chat/completions',
                 getHeaders: (cleApi) => ({
                     'Content-Type': 'application/json',
@@ -241,7 +244,8 @@
                     messages: [
                         { role: 'system', content: systemPrompt }, 
                         { role: 'user', content: prompt }
-                    ]
+                    ],
+                    max_tokens: 4096 // <-- MODIFICATION AJOUTÉE
                 }),
                 parseResponse: (result) => {
                     if (!result.choices || !result.choices[0].message.content) {
@@ -253,18 +257,18 @@
             'perplexity': {
                 name: "Perplexity",
                 storageKey: STORAGE_PERPLEXITY_KEY,
-                // Utilise une API compatible OpenAI
                 getApiUrl: () => 'https://api.perplexity.ai/chat/completions',
                 getHeaders: (cleApi) => ({
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${cleApi}`
                 }),
                 getPayload: (prompt) => ({
-                    model: 'llama-3-sonar-large-32k-online', // Un modèle puissant avec accès web
+                    model: 'llama-3-sonar-large-32k-online', 
                     messages: [
                         { role: 'system', content: systemPrompt }, 
                         { role: 'user', content: prompt }
-                    ]
+                    ],
+                    max_tokens: 4096 // <-- MODIFICATION AJOUTÉE
                 }),
                 parseResponse: (result) => {
                     if (!result.choices || !result.choices[0].message.content) {
@@ -276,7 +280,7 @@
         };
 
         /**
-         * Fonction principale d'appel API (inchangée)
+         * Fonction principale d'appel API
          */
         async function callGenerationAPI(promptUtilisateur, cleApi, aiType) {
             const config = AI_CONFIGS[aiType];
@@ -288,43 +292,35 @@
             const headers = config.getHeaders(cleApi);
             const payload = config.getPayload(promptUtilisateur);
 
-            // Gestion de l'API avec exponentiel backoff
-            let response;
-            let delay = 1000; // 1 seconde
-            for (let i = 0; i < 5; i++) { // 5 tentatives max
-                try {
-                    response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(payload)
-                    });
+            // On retire la logique de "réessai" (backoff) pour l'instant
+            // car elle peut masquer des erreurs 429 (rate limiting)
+            // et compliquer le débogage. On fait un appel direct.
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
 
-                    if (response.ok) {
-                        const result = await response.json();
-                        // Chaque IA a sa propre façon de parser la réponse
-                        return config.parseResponse(result);
-                    } else if (response.status === 429) { // Too Many Requests
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2; // Double le délai
-                    } else {
-                        // Erreur non récupérable
-                        const errorBody = await response.text();
-                        throw new Error(`Erreur API: ${response.status} ${response.statusText}. Détails: ${errorBody}`);
-                    }
-                } catch (error) {
-                    if (i === 4) { // Dernière tentative
-                        throw error;
-                    }
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
+                if (response.ok) {
+                    const result = await response.json();
+                    return config.parseResponse(result);
+                } else {
+                    // Si l'API renvoie une erreur (429, 503, 401...), on la capture ici
+                    const errorBody = await response.text();
+                    console.error("Détails de l'erreur API:", errorBody);
+                    // On lance une erreur claire pour l'utilisateur
+                    throw new Error(`Erreur API: ${response.status} ${response.statusText}.`);
                 }
+            } catch (error) {
+                // Gère les erreurs réseau (ex: CORS si jamais il est ré-activé)
+                console.error("Erreur réseau ou fetch:", error);
+                throw new Error(`Erreur réseau: ${error.message}. Vérifiez la console (F12) pour un blocage CORS.`);
             }
-            throw new Error("Échec de l'appel API après plusieurs tentatives.");
         }
 
         // --- Logique de l'application ---
 
-        // (Fonctions basculerSections, updateApiKeyInput, sauvegarderCle, changerIA sont inchangées)
         function basculerSections(cleExiste, aiType = '') {
             if (cleExiste && aiType) {
                 configSection.classList.add('hidden');
@@ -342,7 +338,6 @@
         function updateApiKeyInput() {
             const selectedAI = aiSelector.value;
             const config = AI_CONFIGS[selectedAI];
-            // Gère le cas où la config n'existerait pas (sécurité)
             if (!config) {
                 apiKeyInput.value = '';
                 apiKeyInput.placeholder = 'Veuillez sélectionner une IA valide...';
@@ -404,6 +399,9 @@
             generateButton.disabled = true;
             generateButton.textContent = "Envoi en cours...";
 
+            // Réinitialiser l'état des onglets (Aperçu par défaut)
+            afficherOnglet('preview'); 
+
             try {
                 // Appeler la fonction de génération
                 const textContent = (await callGenerationAPI(prompt, cleApi, activeAI)).trim();
@@ -420,13 +418,14 @@
                 // Détecter si la réponse est du HTML/XML
                 const isHtmlOrXml = cleanHtml.startsWith('<') && cleanHtml.endsWith('>');
 
-                if (isHtmlOrXml) {
+                if (isHtmlOrXml && cleanHtml.length > 10) { // Petite vérification de longueur
                     // Afficher l'aperçu HTML
                     previewOutput.innerHTML = cleanHtml;
                     afficherOnglet('preview');
                 } else {
                     // Afficher le texte brut
-                    previewOutput.innerHTML = `<p class="text-gray-500 italic">(La réponse n'est pas au format HTML/XML)</p>`;
+                    previewOutput.innerHTML = `<pre class="text-sm text-gray-800 whitespace-pre-wrap">${cleanHtml}</pre>`;
+                    // Si ce n'est pas du HTML, on montre le texte dans l'aperçu mais on bascule l'onglet actif sur "Texte ou Code"
                     afficherOnglet('raw');
                 }
 
@@ -434,7 +433,8 @@
                 console.error("Erreur lors de la génération :", error);
                 rawOutput.textContent = `Erreur : ${error.message}`;
                 previewOutput.innerHTML = `<p class="text-red-600 font-semibold">Erreur :</p><p class="text-red-500 text-sm">${error.message}</p>`;
-                afficherOnglet('raw'); // Afficher l'erreur dans l'onglet brut
+                // En cas d'erreur, on bascule sur l'onglet "Texte ou Code" pour voir le message
+                afficherOnglet('raw'); 
             } finally {
                 // Cacher le chargement et réactiver le bouton
                 loadingSpinner.classList.add('hidden');
