@@ -213,7 +213,9 @@ Produisez maintenant le code complet et unique pour ce fichier \`index.html\`. L
                                                     React.createElement('span', null, "Nombre de catégories"),
                                                     React.createElement('span', { className: "font-bold text-sky-600" }, numZones)
                                                   ),
-                                                  React.createElement('input', { id: "num-zones", type: "range", min: "2", max: "4", value: numZones, onChange: (e) => setNumZones(Number(e.D.value)), className: "w-full" })
+                                                  // --- VRAIE CORRECTION APPLIQUÉE ICI ---
+                                                  // Remplacement de e.D.value par e.target.value
+                                                  React.createElement('input', { id: "num-zones", type: "range", min: "2", max: "4", value: numZones, onChange: (e) => setNumZones(Number(e.target.value)), className: "w-full" })
                                                ),
                                                React.createElement('div', null,
                                                   React.createElement('label', { htmlFor: "num-items", className: "flex justify-between text-md font-semibold mb-2 text-slate-700" },
@@ -277,4 +279,3 @@ Produisez maintenant le code complet et unique pour ce fichier \`index.html\`. L
     </script>
 </body>
 </html>
-}

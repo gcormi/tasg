@@ -5,61 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portail des Outils Pédagogiques</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- On utilise déjà Font Awesome, c'est parfait pour les icônes CC -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Style de base pour une apparence épurée */
+        /* ... (Les styles CSS restent identiques) ... */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa; /* Gris très clair, plus neutre */
-            color: #334155; /* Gris ardoise pour le texte */
+            background-color: #f8f9fa;
+            color: #334155;
         }
         h1, h2, h3 {
             font-family: 'Poppins', sans-serif;
-            color: #1e293b; /* Gris ardoise plus foncé pour les titres */
+            color: #1e293b;
         }
-
-        /* Style des cartes d'outils */
         .tool-card {
             background-color: #ffffff;
-            border: 1px solid #e2e8f0; /* Bordure subtile */
-            border-radius: 0.75rem; /* Coins plus arrondis */
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
-            overflow: hidden; /* Pour les éléments décoratifs */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100%;
         }
         .tool-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07); /* Ombre plus douce */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07);
         }
-
-        /* Contenu de la carte */
         .card-content {
-            /* On augmente le padding à droite pour que le titre ne passe pas sous le badge */
             padding: 1.5rem 6rem 1.5rem 1.5rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .card-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .card-title {
             font-size: 1.125rem;
@@ -70,8 +51,6 @@
             line-height: 1.6;
             flex-grow: 1;
         }
-
-        /* Badge de type de fichier */
         .output-badge {
             position: absolute;
             top: 1rem;
@@ -89,8 +68,9 @@
         .badge-xml { background-color: #fef9c3; color: #854d0e; }
     </style>
 </head>
-<body>
-    <div class="container mx-auto max-w-6xl px-4 py-12">
+<body class="flex flex-col min-h-screen">
+    <!-- Contenu principal poussé pour laisser place au footer -->
+    <div class="container mx-auto max-w-6xl px-4 py-12 flex-grow">
         
         <a href="index.html" class="mb-12 inline-flex items-center gap-2 bg-white text-slate-700 font-semibold py-2 px-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
             <i class="fas fa-arrow-left"></i>
@@ -104,129 +84,168 @@
             </p>
         </header>
 
-        <!-- Section 1: Générateurs de Jeux Interactifs -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
-                <i class="fas fa-gamepad text-purple-500"></i>
-                Générateurs de Jeux Interactifs (HTML)
-            </h2>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Carte: Parcours Multi-Jeux -->
-                <a href="generateurjeux.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Parcours Multi-Jeux</h3>
-                        <p class="card-description">Créez une page web contenant plusieurs jeux éducatifs en onglets.</p>
-                    </div>
-                </a>
-                <!-- Carte: Jeu Pédagogique Complet -->
-                <a href="escapegame.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Jeu Pédagogique Complet</h3>
-                        <p class="card-description">Générez un quiz interactif complet de type "escape game".</p>
-                    </div>
-                </a>
-                <!-- Carte: Mots Croisés -->
-                <a href="motscroises.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Mots Croisés</h3>
-                        <p class="card-description">Outil spécialisé pour générer un jeu de mots croisés interactif.</p>
-                    </div>
-                </a>
-                <!-- Carte: Mots Mêlés -->
-                <a href="motsmeles.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Mots Mêlés</h3>
-                        <p class="card-description">Outil spécialisé pour générer un jeu de mots mêlés interactif.</p>
-                    </div>
-                </a>
-                <!-- Carte: Jeu d'Association -->
-                <a href="association.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Jeu d'Association</h3>
-                        <p class="card-description">Générez un jeu de tri ou d'association par glisser-déposer.</p>
-                    </div>
-                </a>
-                <!-- Carte: Jeu de Memory -->
-                <a href="memory.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Jeu de Memory</h3>
-                        <p class="card-description">Créez un jeu de Memory classique avec des paires de cartes.</p>
-                    </div>
-                </a>
-            </div>
-        </section>
+        <!-- GRILLE PRINCIPALE À 3 COLONNES -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        <!-- Section 2: Générateurs d'Exercices et Documents -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
-                <i class="fas fa-file-alt text-blue-500"></i>
-                Générateurs d'Exercices & Documents
-            </h2>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Carte: Exercices Visuels -->
-                <a href="exercices.html" class="tool-card">
-                    <span class="output-badge badge-img-doc">PNG/DOCX</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Exercices Visuels</h3>
-                        <p class="card-description">Générez des exercices (QCM, etc.) à exporter en image ou document.</p>
-                    </div>
-                </a>
-                <!-- Carte: Exercices Avancés & Moodle -->
-                <a href="exercices2.html" class="tool-card">
-                    <span class="output-badge badge-xml">XML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Exercices Avancés & Moodle</h3>
-                        <p class="card-description">Générez des fichiers XML pour Moodle ou d'autres contenus créatifs.</p>
-                    </div>
-                </a>
-                <!-- CARTE SUPPRIMÉE DE CETTE SECTION -->
-            </div>
-        </section>
+            <!-- COLONNE 1: Outils d'Édition -->
+            <section>
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
+                    <i class="fas fa-tools text-green-500"></i>
+                    Outils d'Édition & d'Amélioration Web
+                </h2>
+                <div class="flex flex-col gap-6">
+                    <a href="integrateur-visuel.html" class="tool-card">
+                        <span class="output-badge badge-html">HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Éditeur Visuel de Page Web</h3>
+                            <p class="card-description">Chargez une page HTML pour modifier les textes et les images directement, comme dans un traitement de texte, sans toucher au code.</p>
+                        </div>
+                    </a>
+                    <a href="design.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Amélioration HTML</h3>
+                            <p class="card-description">Générez un prompt pour modifier le design ou le contenu d'un cours HTML.</p>
+                        </div>
+                    </a>
+                    <a href="ameliorer_docx.html" class="tool-card">
+                        <span class="output-badge badge-docx">Prompt → DOCX</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Amélioration Texte/DOCX</h3>
+                            <p class="card-description">Utilisez un prompt pour réécrire et enrichir un texte brut ou un document.</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
 
-        <!-- Section 3: Outils d'Édition et d'Amélioration Web -->
-        <section>
-            <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
-                <i class="fas fa-tools text-green-500"></i>
-                Outils d'Édition & d'Amélioration Web
-            </h2>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                 <!-- Carte: Intégrateur Visuel -->
-                <a href="integrateur-visuel.html" class="tool-card">
-                     <span class="output-badge badge-html">HTML</span>
-                     <div class="card-content">
-                        <h3 class="card-title mb-2">Éditeur Visuel de Page Web</h3>
-                        <p class="card-description">Chargez une page HTML pour modifier les textes et les images directement, comme dans un traitement de texte, sans toucher au code.</p>
-                    </div>
+            <!-- COLONNE 2: Générateurs de Jeux -->
+            <section>
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
+                    <i class="fas fa-gamepad text-purple-500"></i>
+                    Générateurs de Jeux Interactifs (HTML)
+                </h2>
+                <div class="flex flex-col gap-6">
+                    <a href="generateurjeux.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Parcours Multi-Jeux</h3>
+                            <p class="card-description">Créez une page web contenant plusieurs jeux éducatifs en onglets.</p>
+                        </div>
+                    </a>
+                    <a href="escapegame.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Jeu Pédagogique Complet</h3>
+                            <p class="card-description">Générez un quiz interactif complet de type "escape game".</p>
+                        </div>
+                    </a>
+                    <a href="motscroises.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Mots Croisés</h3>
+                            <p class="card-description">Outil spécialisé pour générer un jeu de mots croisés interactif.</p>
+                        </div>
+                    </a>
+                    <a href="motsmeles.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Mots Mêlés</h3>
+                            <p class="card-description">Outil spécialisé pour générer un jeu de mots mêlés interactif.</p>
+                        </div>
+                    </a>
+                    <a href="association.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Jeu d'Association</h3>
+                            <p class="card-description">Générez un jeu de tri ou d'association par glisser-déposer.</p>
+                        </div>
+                    </a>
+                    <a href="memory.html" class="tool-card">
+                        <span class="output-badge badge-prompt">Prompt → HTML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Jeu de Memory</h3>
+                            <p class="card-description">Créez un jeu de Memory classique avec des paires de cartes.</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- COLONNE 3: Générateurs d'Exercices -->
+            <section>
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
+                    <i class="fas fa-file-alt text-blue-500"></i>
+                    Générateurs d'Exercices import direct Leia & Documents
+                </h2>
+                <div class="flex flex-col gap-6">
+                    <a href="exercices.html" class="tool-card">
+                        <span class="output-badge badge-img-doc">PNG/DOCX</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Exercices Visuels</h3>
+                            <p class="card-description">Générez des exercices (QCM, etc.) à exporter en image ou document.</p>
+                        </div>
+                    </a>
+                    <a href="exercices2.html" class="tool-card">
+                        <span class="output-badge badge-xml">XML</span>
+                        <div class="card-content">
+                            <h3 class="card-title mb-2">Exercices Avancés & Moodle</h3>
+                            <p class="card-description">Générez des fichiers XML pour Moodle ou d'autres contenus créatifs.</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+        </div> <!-- Fin de la grille principale -->
+
+    </div> <!-- Fin du container mx-auto -->
+
+
+    <!-- PIED DE PAGE MIS À JOUR AVEC ICÔNES ET LIENS CC -->
+    <footer class="text-center py-10 mt-16 border-t border-slate-200">
+        <div class="container mx-auto max-w-6xl px-4 text-slate-600">
+
+            <!-- Section 1: Liens (CGU / Contact) -->
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mb-6">
+                <a href="cgu.html" class="font-medium hover:text-blue-600 hover:underline transition-colors">
+                    Conditions Générales d'Utilisation (CGU)
                 </a>
+                <span class="text-slate-300 hidden sm:inline">|</span>
+                <p>
+                    <strong>Contact & Conception :</strong> Gilles.Cormi@ac-corse.fr
+                </p>
+            </div>
+
+            <!-- Section 2: Pictogrammes Creative Commons (EXEMPLE) -->
+            <div class="mb-4">
+                <p class="font-medium mb-3">Sauf mention contraire, le contenu de ce site est sous licence :</p>
                 
-                 <!-- Carte: Amélioration HTML -->
-                <a href="design.html" class="tool-card">
-                    <span class="output-badge badge-prompt">Prompt → HTML</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Amélioration HTML</h3>
-                        <p class="card-description">Générez un prompt pour modifier le design ou le contenu d'un cours HTML.</p>
-                    </div>
-                </a>
-
-                <!-- CARTE AJOUTÉE ICI -->
-                <!-- Carte: Amélioration Texte/DOCX -->
-                <a href="ameliorer_docx.html" class="tool-card">
-                    <span class="output-badge badge-docx">Prompt → DOCX</span>
-                    <div class="card-content">
-                        <h3 class="card-title mb-2">Amélioration Texte/DOCX</h3>
-                        <p class="card-description">Utilisez un prompt pour réécrire et enrichir un texte brut ou un document.</p>
-                    </div>
-                </a>
-                <!-- CARTE SUPPRIMÉE -->
+                <!-- 
+                  EXEMPLE: Licence "Attribution - Pas d'Utilisation Commerciale" (CC BY-NC)
+                  C'est un bon choix pour l'éducation : on peut réutiliser, mais pas en faire commerce, et il faut citer l'auteur.
+                -->
+                <div class="flex justify-center items-center gap-3 text-4xl text-slate-500">
+                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" title="Creative Commons">
+                        <i class="fab fa-creative-commons hover:text-black transition-colors"></i>
+                    </a>
+                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" title="Attribution (BY)">
+                        <i class="fab fa-creative-commons-by hover:text-black transition-colors"></i>
+                    </a>
+                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" title="Pas d'Utilisation Commerciale (NC)">
+                        <i class="fab fa-creative-commons-nc hover:text-black transition-colors"></i>
+                    </a>
+                </div>
+                <p class="text-sm mt-2">
+                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" class="hover:underline">
+                        Attribution - Pas d'Utilisation Commerciale 4.0 International
+                    </a>
+                </p>
             </div>
-        </section>
 
-    </div>
+            <!-- Section 3: Copyright -->
+            <p class="mt-6 text-sm text-slate-500">
+                &copy; 2025 - Tous droits réservés
+            </p>
+        </div>
+    </footer>
+
 </body>
 </html>
