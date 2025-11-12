@@ -101,6 +101,7 @@
                             <p class="card-description">Chargez une page HTML pour modifier les textes et les images directement, comme dans un traitement de texte, sans toucher au code.</p>
                         </div>
                     </a>
+                    <!-- Carte Amélioration HTML (corrigée) -->
                     <a href="design.html" class="tool-card">
                         <span class="output-badge badge-prompt">Prompt → HTML</span>
                         <div class="card-content">
@@ -139,32 +140,20 @@
                             <p class="card-description">Générez un quiz interactif complet de type "escape game".</p>
                         </div>
                     </a>
-                    <a href="motscroises.html" class="tool-card">
+                    <!-- Carte modifiée -->
+                    <a href="generateuractivités.html" class="tool-card">
                         <span class="output-badge badge-prompt">Prompt → HTML</span>
                         <div class="card-content">
-                            <h3 class="card-title mb-2">Mots Croisés</h3>
-                            <p class="card-description">Outil spécialisé pour générer un jeu de mots croisés interactif.</p>
+                            <h3 class="card-title mb-2">Générateur d'activités</h3>
+                            <p class="card-description">Créez divers types d'activités interactives à partir d'un simple prompt.</p>
                         </div>
                     </a>
-                    <a href="motsmeles.html" class="tool-card">
+                    <!-- Carte Jeux Pédagogiques (corrigée, ouvre la modale) -->
+                    <a href="#" id="open-jeux-modal" class="tool-card">
                         <span class="output-badge badge-prompt">Prompt → HTML</span>
                         <div class="card-content">
-                            <h3 class="card-title mb-2">Mots Mêlés</h3>
-                            <p class="card-description">Outil spécialisé pour générer un jeu de mots mêlés interactif.</p>
-                        </div>
-                    </a>
-                    <a href="association.html" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Jeu d'Association</h3>
-                            <p class="card-description">Générez un jeu de tri ou d'association par glisser-déposer.</p>
-                        </div>
-                    </a>
-                    <a href="memory.html" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Jeu de Memory</h3>
-                            <p class="card-description">Créez un jeu de Memory classique avec des paires de cartes.</p>
+                            <h3 class="card-title mb-2">Jeux pédagogiques</h3>
+                            <p class="card-description">Memory, Associations, mots mêlés et mots croisés.</p>
                         </div>
                     </a>
                 </div>
@@ -246,6 +235,77 @@
             </p>
         </div>
     </footer>
+
+    <!-- ======== MODALE JEUX PÉDAGOGIQUES ======== -->
+    <div id="jeux-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
+        <!-- Panneau de la modale -->
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+            
+            <!-- En-tête -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-800" style="font-family: 'Poppins', sans-serif;">
+                    <i class="fas fa-gamepad text-purple-500 mr-3"></i>
+                    Jeux Pédagogiques
+                </h3>
+                <button id="close-jeux-modal" class="text-slate-400 hover:text-slate-700 transition-colors">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+
+            <!-- Grille de liens -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a href="memory.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
+                    <i class="fas fa-clone mr-2"></i>
+                    Memory
+                </a>
+                <a href="association.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
+                    <i class="fas fa-link mr-2"></i>
+                    Association
+                </a>
+                <a href="motsmeles.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
+                    <i class="fas fa-search mr-2"></i>
+                    Mots Mêlés
+                </a>
+                <a href="motscroises.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
+                    <i class="fas fa-th mr-2"></i>
+                    Mots Croisés
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- ========================================== -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openModalBtn = document.getElementById('open-jeux-modal');
+            const closeModalBtn = document.getElementById('close-jeux-modal');
+            const modal = document.getElementById('jeux-modal');
+
+            if (openModalBtn && closeModalBtn && modal) {
+                // Ouvre la modale
+                openModalBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); // Empêche le lien de suivre href="#"
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex'); // Ajoute flex pour le centrage
+                });
+
+                // Ferme la modale (bouton X)
+                closeModalBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                });
+
+                // Ferme la modale (clic sur le fond)
+                modal.addEventListener('click', (e) => {
+                    // Si on clique sur le fond (modal) et non sur le panneau intérieur
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
