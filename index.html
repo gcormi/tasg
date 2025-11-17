@@ -10,15 +10,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Définition des polices personnalisées via une classe pour une meilleure intégration avec Tailwind */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Couleur de fond gris très clair (slate-50) */
+            background-color: #f8fafc; 
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Poppins', sans-serif;
         }
-        /* Style pour la transition douce du modal */
         .modal-transition {
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
@@ -34,10 +32,8 @@
         }
     </style>
 </head>
-<!-- AJOUT: flex flex-col min-h-screen pour que le footer reste en bas -->
 <body class="text-slate-800 antialiased flex flex-col min-h-screen">
 
-    <!-- AJOUT: flex-grow pour pousser le footer en bas -->
     <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-20 flex-grow">
         
         <header class="text-center mb-16 md:mb-24">
@@ -46,7 +42,7 @@
                 <span>Assistant Pédagogique</span>
             </h1>
             <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-                Créez des cours structurés, des projets sur mesure et des exercices personnalisés en quelques clics. Votre allié pour une pédagogie moderne et efficace.
+                Concevez en toute simplicité des cours structurés, des projets personnalisés et des exercices adaptés à vos besoins, pour accompagner une pédagogie moderne et efficace. Ces solutions sont intégrables dans Léia By Néo, l'ENT Académique, mais peuvent également être exploitées sur d’autres plateformes numériques ou sur des feuilles imprimées.
             </p>
             <button id="openGuideBtn" class="mt-8 inline-flex items-center gap-2 bg-white text-slate-700 font-semibold py-2 px-5 rounded-full border border-slate-200 shadow-sm hover:bg-slate-50 hover:shadow-md transition-all duration-300 transform hover:scale-105">
                 <i class="fas fa-book-open text-sky-500"></i>
@@ -54,173 +50,173 @@
             </button>
         </header>
 
-        <main>
-            <!-- SECTION 1: Générateurs de Cours (Inchangée) -->
-            <section class="mb-16 md:mb-24">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Générateurs de Cours</h2>
-                    <p class="mt-3 text-md text-slate-600 max-w-2xl mx-auto">Choisissez une discipline pour commencer à construire des séquences pédagogiques structurées, module par module.</p>
-                </div>
-                
-                <div class="space-y-12">
-                    <!-- ... Tout le contenu des générateurs de cours (Sciences, Humaines, Langues, etc.) reste ici ... -->
-                    <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-atom text-blue-500"></i>Sciences et Technologies</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                            <a href="technologie.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-blue-500">
-                                <i class="fas fa-laptop-code text-3xl text-blue-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Technologie</span>
-                            </a>
-                            <a href="svt.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-green-500">
-                                <i class="fas fa-microscope text-3xl text-green-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">SVT</span>
-                            </a>
-                            <a href="physique-chimie.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-indigo-500">
-                                <i class="fas fa-flask text-3xl text-indigo-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Physique-Chimie</span>
-                            </a>
-                            <a href="mathematiques.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-gray-500">
-                                <i class="fas fa-calculator text-3xl text-gray-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Mathématiques</span>
-                            </a>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
 
-                    <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-globe text-orange-500"></i>Sciences Humaines</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                            <a href="histoire.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-amber-600">
-                                <i class="fas fa-landmark text-3xl text-amber-600 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Histoire</span>
-                            </a>
-                            <a href="geographie.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-cyan-500">
-                                <i class="fas fa-globe-americas text-3xl text-cyan-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Géographie</span>
-                            </a>
-                            <a href="emc.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-gray-700">
-                                <i class="fas fa-gavel text-3xl text-gray-700 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">EMC</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-                         <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-comments text-rose-500"></i>Langues et Arts</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                            <a href="francais.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-red-500">
-                                <i class="fas fa-book-open text-3xl text-red-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Français</span>
-                            </a>
-                            <a href="anglais.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-blue-800">
-                                <i class="fas fa-flag text-3xl text-blue-800 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Anglais</span>
-                            </a>
-                            <a href="espagnol.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-orange-400">
-                                <i class="fas fa-guitar text-3xl text-orange-400 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Espagnol</span>
-                            </a>
-                            <a href="italien.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-green-800">
-                                <i class="fas fa-monument text-3xl text-green-800 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Italien</span>
-                            </a>
-                            <a href="lcc.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-yellow-600">
-                                <i class="fas fa-mountain-sun text-3xl text-yellow-600 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Langue et Culture Corse</span>
-                            </a>
-                            <a href="artsplastiques.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-purple-500">
-                                <i class="fas fa-paint-brush text-3xl text-purple-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Arts Plastiques</span>
-                            </a>
-                             <a href="educmus.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-pink-500">
-                                <i class="fas fa-music text-3xl text-pink-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Éducation Musicale</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-school text-violet-500"></i>Discipline du Lycée</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                            <a href="snt.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-violet-500">
-                                <i class="fas fa-network-wired text-3xl text-violet-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">SNT</span>
-                            </a>
-                            
-                            <a href="sesv2.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-teal-500">
-                                <i class="fas fa-chart-line text-3xl text-teal-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">SES</span>
-                            </a>
-                            </div>
+            <main class="lg:col-span-2">
+                <section>
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Générateurs de Cours</h2>
+                        <p class="mt-3 text-md text-slate-600 max-w-2xl mx-auto">Choisissez une discipline pour commencer à construire des séquences pédagogiques structurées, module par module.</p>
                     </div>
                     
-                    <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-star text-amber-500"></i>Pédagogie de Projet & Création Libre</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                            <a href="projet.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-teal-500">
-                                <i class="fas fa-project-diagram text-3xl text-teal-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Générateur de Projet</span>
-                            </a>
-                            <a href="squelette.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-gray-400">
-                                <i class="fas fa-stream text-3xl text-gray-400 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
-                                <span class="font-semibold text-slate-700">Squelette de cours</span>
-                            </a>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-atom text-blue-500"></i>Sciences et Technologies</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+                                <a href="technologie.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-blue-500">
+                                    <i class="fas fa-laptop-code text-3xl text-blue-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Technologie</span>
+                                </a>
+                                <a href="svt.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-green-500">
+                                    <i class="fas fa-microscope text-3xl text-green-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">SVT</span>
+                                </a>
+                                <a href="physique-chimie.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-indigo-500">
+                                    <i class="fas fa-flask text-3xl text-indigo-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Physique-Chimie</span>
+                                </a>
+                                <a href="mathematiques.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-gray-500">
+                                    <i class="fas fa-calculator text-3xl text-gray-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Mathématiques</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-globe text-orange-500"></i>Sciences Humaines</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+                                <a href="histoire.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-amber-600">
+                                    <i class="fas fa-landmark text-3xl text-amber-600 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Histoire</span>
+                                </a>
+                                <a href="geographie.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-cyan-500">
+                                    <i class="fas fa-globe-americas text-3xl text-cyan-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Géographie</span>
+                                </a>
+                                <a href="emc.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-gray-700">
+                                    <i class="fas fa-gavel text-3xl text-gray-700 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">EMC</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                             <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-comments text-rose-500"></i>Langues et Arts</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+                                <a href="francais.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-red-500">
+                                    <i class="fas fa-book-open text-3xl text-red-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Français</span>
+                                </a>
+                                <a href="anglais.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-blue-800">
+                                    <i class="fas fa-flag text-3xl text-blue-800 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Anglais</span>
+                                </a>
+                                <a href="espagnol.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-orange-400">
+                                    <i class="fas fa-guitar text-3xl text-orange-400 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Espagnol</span>
+                                </a>
+                                <a href="italien.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-green-800">
+                                    <i class="fas fa-monument text-3xl text-green-800 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Italien</span>
+                                </a>
+                                <a href="lcc.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-yellow-600">
+                                    <i class="fas fa-mountain-sun text-3xl text-yellow-600 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Langue et Culture Corse</span>
+                                </a>
+                                <a href="artsplastiques.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-purple-500">
+                                    <i class="fas fa-paint-brush text-3xl text-purple-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Arts Plastiques</span>
+                                </a>
+                                 <a href="educmus.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-pink-500">
+                                    <i class="fas fa-music text-3xl text-pink-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Éducation Musicale</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-school text-violet-500"></i>Discipline du Lycée</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+                                <a href="snt.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-violet-500">
+                                    <i class="fas fa-network-wired text-3xl text-violet-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">SNT</span>
+                                </a>
+                                <a href="sesv2.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-teal-500">
+                                    <i class="fas fa-chart-line text-3xl text-teal-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">SES</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4"><i class="fas fa-star text-amber-500"></i>Pédagogie de Projet & Création Libre</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+                                <a href="projet.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-teal-500">
+                                    <i class="fas fa-project-diagram text-3xl text-teal-500 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Générateur de Projet</span>
+                                </a>
+                                <a href="squelette.html" class="group flex flex-col items-center p-4 bg-slate-50 rounded-lg text-center transition-all duration-300 hover:bg-white hover:shadow-lg hover:scale-105 border border-transparent hover:border-gray-400">
+                                    <i class="fas fa-stream text-3xl text-gray-400 mb-3 transition-transform duration-300 group-hover:scale-110"></i>
+                                    <span class="font-semibold text-slate-700 text-sm leading-snug">Squelette de cours</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </main>
+            <aside class="lg:col-span-1 space-y-12 lg:sticky lg:top-12 self-start">
+                
+                <section>
+                     <div class="text-center">
+                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Outils Transversaux</h2>
+                        <p class="mt-3 text-md text-slate-600 max-w-2xl mx-auto">Accédez à des utilitaires pour compléter et enrichir vos préparations.</p>
+                    </div>
+                    <div class="mt-8 flex justify-center">
+                        <a href="boite.html" class="group bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 text-xl">
+                            <i class="fas fa-toolbox transition-transform duration-300 group-hover:rotate-6"></i>
+                            <span>Votre Boîte à Outils Pédagogiques</span>
+                        </a>
+                    </div>
+                </section>
 
-            <!-- SECTION 2: Outils Transversaux (REMONTEE ICI) -->
-            <section class="mb-16 md:mb-24"> <!-- Changement de classe pour marge -->
-                 <div class="text-center">
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Outils Transversaux</h2>
-                    <p class="mt-3 text-md text-slate-600 max-w-2xl mx-auto">Accédez à des utilitaires pour compléter et enrichir vos préparations.</p>
-                </div>
-                <div class="mt-8 flex justify-center">
-                    <a href="boite.html" class="group bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 text-xl">
-                        <i class="fas fa-toolbox transition-transform duration-300 group-hover:rotate-6"></i>
-                        <span>Votre Boîte à Outils Pédagogiques</span>
-                    </a>
-                </div>
-            </section>
+                <section>
+                    <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3 border-b border-slate-200 pb-4">
+                            <i class="fas fa-bolt text-yellow-500"></i>
+                            Automatisation (Optionnel)
+                        </h3>
+                        
+                        <p class="text-slate-600 text-center mb-6">
+                            Connectez votre clé API pour une génération de contenu directe, sans copier-coller.
+                        </p>
 
-            <!-- SECTION 3: Automatisation (DESCENTE ICI) -->
-            <section class="mb-16 md:mb-24">
-                <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-                    <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4">
-                        <i class="fas fa-bolt text-yellow-500"></i>
-                        Automatisation (Optionnel)
-                    </h3>
-                    <div class="md:flex md:items-center md:gap-8">
-                        <div class="md:flex-1">
-                            <h4 class="text-lg font-semibold text-slate-700">Connectez votre propre Clé API</h4>
-                            <p class="text-slate-600 mt-2">
-                                Pour éviter l'étape du "copier-coller", vous pouvez utiliser le générateur de cours avancé. 
-                                Cet outil vous permet d'entrer votre propre clé API (pour Gemini, ChatGPT, Claude, etc.) 
-                                qui sera **stockée de manière sécurisée dans votre navigateur** (`localStorage`).
-                                Vous n'aurez à l'entrer qu'une seule fois (sauf si vous videz le cache de votre navigateur).
-                            </p>
-                            <p class="text-slate-600 mt-2 text-sm">
-                                Votre clé n'est jamais envoyée sur un serveur, elle reste privée sur votre machine.
-                            </p>
-                        </div>
-                        <div class="mt-6 md:mt-0 md:flex-shrink-0">
-                            <button id="openApiModalBtn" class="group w-full md:w-auto inline-flex items-center justify-center gap-3 bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-sky-700 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            
+                            <button id="openApiModalBtn" class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                                 <i class="fas fa-key"></i>
-                                <span>Ouvrir le Générateur API</span>
+                                <span>Générateur API</span>
+                            </button>
+                            
+                            <button id="openApiInfoBtn" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold py-3 px-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                                <i class="fas fa-info-circle text-sky-500"></i>
+                                <span>Plus d'infos</span>
                             </button>
                         </div>
+
+                        <div class="mt-8 pt-6 border-t border-slate-200 flex flex-col items-center text-center gap-4">
+                            <p class="text-slate-600 text-sm">
+                                Les fichiers produits sont intégrables à :
+                            </p>
+                            <img src="1.jpg" alt="Logo Léia By Néo" class="h-16 max-w-full" />
+                            <img src="2.png" alt="Logo Edifice Néo" class="h-20 max-w-full mt-2" />
+                        </div>
                     </div>
-                </div>
-            </section>
-        </main>
-    </div> <!-- Fin du conteneur flex-grow -->
+                </section>
 
-    <!-- PIED DE PAGE AJOUTÉ (identIQUE à boite.html) -->
-    <!-- MODIFIÉ: Marge du haut réduite de mt-16 à mt-12 -->
-    <footer class="text-center py-10 mt-12 border-t border-slate-200">
+            </aside>
+            </div> </div> <footer class="text-center py-10 mt-12 border-t border-slate-200">
         <div class="container mx-auto max-w-6xl px-4 text-slate-600">
-
-            <!-- Section 1: Liens (CGU / Contact) -->
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mb-6">
                 <a href="cgu.html" class="font-medium hover:text-blue-600 hover:underline transition-colors">
                     Conditions Générales d'Utilisation (CGU)
@@ -230,8 +226,6 @@
                     <strong>Contact & Conception :</strong> Gilles.Cormi@ac-corse.fr
                 </p>
             </div>
-
-            <!-- Section 2: Pictogrammes Creative Commons -->
             <div class="mb-4">
                 <p class="font-medium mb-3">Sauf mention contraire, le contenu de ce site est sous licence :</p>
                 <div class="flex justify-center items-center gap-3 text-4xl text-slate-500">
@@ -251,25 +245,18 @@
                     </a>
                 </p>
             </div>
-
-            <!-- Section 3: Copyright -->
             <p class="mt-6 text-sm text-slate-500">
                 &copy; 2025 - Tous droits réservés
             </p>
         </div>
     </footer>
-    <!-- FIN DU PIED DE PAGE AJOUTÉ -->
 
 
-    <!-- Modals (Inchangés) -->
     <div id="guideModal" class="modal-transition modal-hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <!-- MODIFIÉ: max-w-3xl (plus large), max-h-[90vh] et flex flex-col pour scrolling -->
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full mx-auto relative max-h-[90vh] flex flex-col">
             <button class="close-button absolute top-4 right-4 text-slate-500 hover:text-slate-800 transition-colors z-10">
                 <i class="fas fa-times text-2xl"></i>
             </button>
-            
-            <!-- MODIFIÉ: En-tête de la modale (titre changé) -->
             <div class="flex items-start gap-4 mb-6">
                 <div class="flex-shrink-0 w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center">
                      <i class="fas fa-book-open text-2xl text-sky-600"></i>
@@ -279,65 +266,29 @@
                     <p class="text-slate-500">Philosophie, notice Léia et bonnes pratiques</p>
                 </div>
             </div>
-            
-            <!-- MODIFIÉ: Contenu scrollable -->
             <div class="space-y-6 text-slate-600 overflow-y-auto pr-2">
-                
-                <!-- Section 1: Philosophie (Contenu existant) -->
                 <h4 class="text-lg font-semibold text-slate-800 mt-6">Votre Assistant Pédagogique : Notre Philosophie</h4>
                 <p>Cet outil est conçu comme un véritable <strong>assistant</strong> pour vous faire gagner un temps précieux sur la structuration, la mise en forme et la création de contenu. Cependant, il ne remplace pas votre expertise.</p>
                 <p class="font-semibold text-slate-700 bg-slate-100 p-3 rounded-lg">Vous restez le seul maître de vos choix pédagogiques, des contenus et des objectifs.</p>
                 <p>Utilisez cet outil comme un point de départ puissant, puis affinez, adaptez et appropriez-vous les contenus pour qu'ils correspondent parfaitement à votre vision et aux besoins de vos élèves.</p>
-                
-                <!-- NOUVEAU: Section 2 (de la notice) -->
                 <h4 class="text-lg font-semibold text-slate-800 pt-4 border-t border-slate-200">2. Un Écosystème Pensé pour l'ENT Léia by Néo</h4>
                 <p>Bien que polyvalente, cette application a été optimisée pour une intégration fluide avec l'environnement numérique de travail <strong>Léia by Néo</strong>. La plupart des modules de création d'exercices sont spécifiquement conçus pour exploiter au mieux les fonctionnalités de cet ENT.</p>
-
-                <!-- NOUVEAU: Section 3 (de la notice) -->
                 <h4 class="text-lg font-semibold text-slate-800 pt-4 border-t border-slate-200">3. Les Possibilités: Que Pouvez-vous Créer?</h4>
                 <ul class="list-disc list-inside space-y-2">
-                    <li>
-                        <strong>Générer des Cours et Projets :</strong> Créez des séquences complètes pour plus de 10 disciplines (Technologie, Histoire, SVT, Langues...) ou bâtissez des projets transversaux sur mesure.
-                    </li>
-                    <li>
-                        <strong>Améliorer vos Contenus :</strong> Affinez le texte de vos cours (Atelier DOCX) ou modernisez le design d'une page (Atelier HTML).
-                    </li>
-                    <li>
-                        <strong>Évaluer les Acquis :</strong>
-                        <ul class="list-['-_'] list-inside ml-6 space-y-1 mt-1">
-                            <li>Exercices "Création Assistée" (PNG pour Léia).</li>
-                            <li>Exercices Moodle (XML importables dans le "Test" Léia).</li>
-                            <li>Jeux Pédagogiques Autonomes (Mots Croisés, Memory, Quiz...).</li>
-                        </ul>
-                    </li>
+                    <li><strong>Générer des Cours et Projets :</strong> Créez des séquences complètes pour plus de 10 disciplines (Technologie, Histoire, SVT, Langues...) ou bâtissez des projets transversaux sur mesure.</li>
+                    <li><strong>Améliorer vos Contenus :</strong> Affinez le texte de vos cours (Atelier DOCX) ou modernisez le design d'une page (Atelier HTML).</li>
+                    <li><strong>Évaluer les Acquis :</strong><ul class="list-['-_'] list-inside ml-6 space-y-1 mt-1"><li>Exercices "Création Assistée" (PNG pour Léia).</li><li>Exercices Moodle (XML importables dans le "Test" Léia).</li><li>Jeux Pédagogiques Autonomes (Mots Croisés, Memory, Quiz...).</li></ul></li>
                 </ul>
-
-                <!-- NOUVEAU: Section 4 (de la notice) -->
                 <h4 class="text-lg font-semibold text-slate-800 pt-4 border-t border-slate-200">4. Guide Pratique: Intégration dans Léia by Néo</h4>
                 <div class="space-y-4">
-                    <div>
-                        <h5 class="font-semibold text-slate-700">4.1. Les Exercices "Création Assistée" (Format PNG)</h5>
-                        <p>Cet outil est idéal pour l'activité "Création assistée" de Léia. Générez l'exercice en PNG, importez-le comme fond dans Léia, puis ajoutez les zones de réponses par-dessus.</p>
-                    </div>
-                    <div>
-                        <h5 class="font-semibold text-slate-700">4.2. Les Exercices Moodle (Format XML)</h5>
-                        <p>Pour une correction automatique. Générez le code XML, utilisez l'outil "Télécharger le Fichier XML", puis importez ce fichier dans la banque de questions d'un "Test" Léia.</p>
-                    </div>
-                    <div>
-                        <h5 class="font-semibold text-slate-700">4.3. Les Jeux Pédagogiques (HTML + Mot Magique)</h5>
-                        <p>Hébergez votre jeu (ex: dans votre espace de stockage Léia). Dans un "Test" Léia, créez une question "Réponse courte". Mettez le lien vers le jeu dans l'énoncé et demandez à l'élève de saisir le "mot magique" (défini lors de la création du jeu) pour valider.</p>
-                    </div>
+                    <div><h5 class="font-semibold text-slate-700">4.1. Les Exercices "Création Assistée" (Format PNG)</h5><p>Cet outil est idéal pour l'activité "Création assistée" de Léia. Générez l'exercice en PNG, importez-le comme fond dans Léia, puis ajoutez les zones de réponses par-dessus.</p></div>
+                    <div><h5 class="font-semibold text-slate-700">4.2. Les Exercices Moodle (Format XML)</h5><p>Pour une correction automatique. Générez le code XML, utilisez l'outil "Télécharger le Fichier XML", puis importez ce fichier dans la banque de questions d'un "Test" Léia.</p></div>
+                    <div><h5 class="font-semibold text-slate-700">4.3. Les Jeux Pédagogiques (HTML + Mot Magique)</h5><p>Hébergez votre jeu (ex: dans votre espace de stockage Léia). Dans un "Test" Léia, créez une question "Réponse courte". Mettez le lien vers le jeu dans l'énoncé et demandez à l'élève de saisir le "mot magique" (défini lors de la création du jeu) pour valider.</p></div>
                 </div>
-
-                <!-- NOUVEAU: Section 5 (de la notice) -->
                 <h4 class="text-lg font-semibold text-slate-800 pt-4 border-t border-slate-200">5. Bonnes Pratiques</h4>
                 <ul class="list-disc list-inside space-y-2">
-                    <li>
-                        <strong>La Qualité du Prompt est la Clé :</strong> La qualité du résultat dépend de la précision de votre demande. Soyez aussi directif que possible.
-                    </li>
-                    <li>
-                        <strong>Usage de l'API :</strong> La génération directe via l'API (sans copier-coller) est une fonctionnalité avancée soumise à des quotas.
-                    </li>
+                    <li><strong>La Qualité du Prompt est la Clé :</strong> La qualité du résultat dépend de la précision de votre demande. Soyez aussi directif que possible.</li>
+                    <li><strong>Usage de l'API :</strong> La génération directe via l'API (sans copier-coller) est une fonctionnalité avancée soumise à des quotas.</li>
                 </ul>
             </div>
         </div>
@@ -345,7 +296,6 @@
 
     <div id="apiModal" class="modal-transition modal-hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden">
-            
             <div class="flex justify-between items-center p-4 sm:p-5 border-b border-slate-200">
                 <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
                     <i class="fas fa-key text-sky-500"></i>
@@ -355,112 +305,21 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
             <div class="w-full h-full flex-1 overflow-auto">
                 <iframe src="about:blank" class="w-full h-full border-0" title="Générateur API"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- Script (Inchangé) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Logique pour le Modal Guide ---
-            const guideModal = document.getElementById("guideModal");
-            const openGuideBtn = document.getElementById("openGuideBtn");
-            const closeGuideBtn = guideModal.querySelector(".close-button");
-
-            const openGuideModal = () => {
-                if (guideModal) {
-                    guideModal.classList.remove('modal-hidden');
-                    guideModal.classList.add('modal-visible');
-                }
-            };
-
-            const closeGuideModal = () => {
-                if (guideModal) {
-                    guideModal.classList.add('modal-hidden');
-                    guideModal.classList.remove('modal-visible');
-                }
-            };
-
-            if (openGuideBtn) {
-                openGuideBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openGuideModal();
-                });
-            }
-
-            if (closeGuideBtn) {
-                closeGuideBtn.addEventListener('click', closeGuideModal);
-            }
-
-            // Fermer le modal Guide en cliquant à l'extérieur
-            if (guideModal) {
-                guideModal.addEventListener('click', (event) => {
-                    if (event.target === guideModal) {
-                        closeGuideModal();
-                    }
-                });
-            }
-
-            // --- AJOUT: Logique pour le Modal API ---
-            const apiModal = document.getElementById("apiModal");
-            const openApiBtn = document.getElementById("openApiModalBtn");
-            const closeApiBtn = document.getElementById("closeApiModalBtn");
-            const apiIframe = apiModal ? apiModal.querySelector('iframe') : null;
-
-            const openApiModal = () => {
-                if (apiModal && apiIframe) {
-                    // On recharge l'iframe pour avoir un état frais
-                    apiIframe.src = "api.html"; 
-                    apiModal.classList.remove('modal-hidden');
-                    apiModal.classList.add('modal-visible');
-                }
-            };
-
-            const closeApiModal = () => {
-                if (apiModal && apiIframe) {
-                    apiModal.classList.add('modal-hidden');
-                    apiModal.classList.remove('modal-visible');
-                    // Vider l'iframe pour arrêter tout script/chargEMENT
-                    apiIframe.src = "about:blank";
-                }
-            };
-
-            if (openApiBtn) {
-                openApiBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openApiModal();
-                });
-            }
-
-            if (closeApiBtn) {
-                closeApiBtn.addEventListener('click', closeApiModal);
-            }
-
-            // Fermer le modal API en cliquant à l'extérieur
-            if (apiModal) {
-                apiModal.addEventListener('click', (event) => {
-                    // Ne ferme que si on clique sur le fond sombre
-                    if (event.target === apiModal) {
-                        closeApiModal();
-                    }
-                });
-            }
-
-            // MODIFIÉ: Fermer les modals avec la touche 'Echap'
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    if (guideModal && guideModal.classList.contains('modal-visible')) {
-                        closeGuideModal();
-                    }
-                    if (apiModal && apiModal.classList.contains('modal-visible')) {
-                        closeApiModal();
-                    }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+    <div id="apiInfoModal" class="modal-transition modal-hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full mx-auto relative max-h-[90vh] flex flex-col">
+            <button class="close-button absolute top-4 right-4 text-slate-500 hover:text-slate-800 transition-colors z-10">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <div class="flex items-start gap-4 mb-6">
+                <div class="flex-shrink-0 w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center">
+                     <i class="fas fa-key text-2xl text-sky-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900">Clé API : Fonctionnement</h3>
+                    <p class="
