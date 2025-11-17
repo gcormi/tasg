@@ -195,7 +195,7 @@
                             
                             <button id="openApiModalBtn" class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                                 <i class="fas fa-key"></i>
-                                <span>Générateur API</span>
+                                <span>Utiliser votre API</span>
                             </button>
                             
                             <button id="openApiInfoBtn" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold py-3 px-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -322,4 +322,123 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-slate-900">Clé API : Fonctionnement</h3>
-                    <p class="
+                    <p class="text-slate-500">Stockage local et sécurité</p>
+                </div>
+            </div>
+            <div class="space-y-6 text-slate-600 overflow-y-auto pr-2">
+                <h4 class="text-lg font-semibold text-slate-700">Connectez votre propre Clé API</h4>
+                <p class="text-slate-600">
+                    Pour éviter l'étape du "copier-coller", vous pouvez utiliser le générateur de cours avancé. 
+                    Cet outil vous permet d'entrer votre propre clé API (pour Gemini, ChatGPT, Claude, etc.) 
+                    qui sera **stockée de manière sécurisée dans votre navigateur** (`localStorage`).
+                </p>
+                <p class="font-semibold text-slate-700 bg-slate-100 p-3 rounded-lg">
+                    Vous n'aurez à l'entrer qu'une seule fois (sauf si vous videz le cache de votre navigateur).
+                </p>
+                <p class="text-slate-600 mt-2 text-sm">
+                    <i class="fas fa-shield-alt"></i> Votre clé n'est jamais envoyée sur un serveur, elle reste privée et sécurisée sur votre machine.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Logique pour le Modal Guide ---
+            const guideModal = document.getElementById("guideModal");
+            const openGuideBtn = document.getElementById("openGuideBtn");
+            const closeGuideBtn = guideModal.querySelector(".close-button");
+
+            const openGuideModal = () => {
+                if (guideModal) {
+                    guideModal.classList.remove('modal-hidden');
+                    guideModal.classList.add('modal-visible');
+                }
+            };
+
+            const closeGuideModal = () => {
+                if (guideModal) {
+                    guideModal.classList.add('modal-hidden');
+                    guideModal.classList.remove('modal-visible');
+                }
+            };
+
+            if (openGuideBtn) openGuideBtn.addEventListener('click', openGuideModal);
+            if (closeGuideBtn) closeGuideBtn.addEventListener('click', closeGuideModal);
+            if (guideModal) guideModal.addEventListener('click', (event) => {
+                if (event.target === guideModal) closeGuideModal();
+            });
+
+            // --- Logique pour le Modal API (Iframe) ---
+            const apiModal = document.getElementById("apiModal");
+            const openApiBtn = document.getElementById("openApiModalBtn");
+            const closeApiBtn = document.getElementById("closeApiModalBtn");
+            const apiIframe = apiModal ? apiModal.querySelector('iframe') : null;
+
+            const openApiModal = () => {
+                if (apiModal && apiIframe) {
+                    apiIframe.src = "api.html"; 
+                    apiModal.classList.remove('modal-hidden');
+                    apiModal.classList.add('modal-visible');
+                }
+            };
+
+            const closeApiModal = () => {
+                if (apiModal && apiIframe) {
+                    apiModal.classList.add('modal-hidden');
+                    apiModal.classList.remove('modal-visible');
+                    apiIframe.src = "about:blank";
+                }
+            };
+
+            if (openApiBtn) openApiBtn.addEventListener('click', openApiModal);
+            if (closeApiBtn) closeApiBtn.addEventListener('click', closeApiModal);
+            if (apiModal) apiModal.addEventListener('click', (event) => {
+                if (event.target === apiModal) closeApiModal();
+            });
+
+            // --- Logique pour le Modal Info API ---
+            const apiInfoModal = document.getElementById("apiInfoModal");
+            const openApiInfoBtn = document.getElementById("openApiInfoBtn");
+            const closeApiInfoBtn = apiInfoModal.querySelector(".close-button");
+
+            const openApiInfoModal = () => {
+                if (apiInfoModal) {
+                    apiInfoModal.classList.remove('modal-hidden');
+                    apiInfoModal.classList.add('modal-visible');
+                }
+            };
+
+            const closeApiInfoModal = () => {
+                if (apiInfoModal) {
+                    apiInfoModal.classList.add('modal-hidden');
+                    apiInfoModal.classList.remove('modal-visible');
+                }
+            };
+
+            if (openApiInfoBtn) openApiInfoBtn.addEventListener('click', openApiInfoModal);
+            if (closeApiInfoBtn) closeApiInfoBtn.addEventListener('click', closeApiInfoModal);
+            if (apiInfoModal) apiInfoModal.addEventListener('click', (event) => {
+                if (event.target === apiInfoModal) closeApiInfoModal();
+            });
+
+
+            // --- Logique 'Echap' ---
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (guideModal && guideModal.classList.contains('modal-visible')) {
+                        closeGuideModal();
+                    }
+                    if (apiModal && apiModal.classList.contains('modal-visible')) {
+                        closeApiModal();
+                    }
+                    if (apiInfoModal && apiInfoModal.classList.contains('modal-visible')) {
+                        closeApiInfoModal();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
