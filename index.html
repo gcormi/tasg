@@ -184,7 +184,7 @@
                     <div class="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3 border-b border-slate-200 pb-4">
                             <i class="fas fa-bolt text-yellow-500"></i>
-                            Automatisation (Optionnel)
+                            Automatisation (Bêta)
                         </h3>
                         
                         <p class="text-slate-600 text-center mb-6">
@@ -193,10 +193,10 @@
 
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                             
-                            <button id="openApiModalBtn" class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                            <a href="api.html" target="_blank" class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                                 <i class="fas fa-key"></i>
                                 <span>Utiliser votre API</span>
-                            </button>
+                            </a>
                             
                             <button id="openApiInfoBtn" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold py-3 px-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                                 <i class="fas fa-info-circle text-sky-500"></i>
@@ -294,22 +294,7 @@
         </div>
     </div>
 
-    <div id="apiModal" class="modal-transition modal-hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden">
-            <div class="flex justify-between items-center p-4 sm:p-5 border-b border-slate-200">
-                <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                    <i class="fas fa-key text-sky-500"></i>
-                    <span>Générateur API</span>
-                </h3>
-                <button id="closeApiModalBtn" class="text-slate-500 hover:text-slate-800 transition-colors p-2 rounded-full hover:bg-slate-100">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="w-full h-full flex-1 overflow-auto">
-                <iframe src="about:blank" class="w-full h-full border-0" title="Générateur API"></iframe>
-            </div>
-        </div>
-    </div>
+    <!-- MODALE API SUPPRIMÉE ICI car remplacée par lien direct -->
 
     <div id="apiInfoModal" class="modal-transition modal-hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full mx-auto relative max-h-[90vh] flex flex-col">
@@ -322,21 +307,36 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold text-slate-900">Clé API : Fonctionnement</h3>
-                    <p class="text-slate-500">Stockage local et sécurité</p>
+                    <p class="text-slate-500">Options Gratuites et Avancées</p>
                 </div>
             </div>
             <div class="space-y-6 text-slate-600 overflow-y-auto pr-2">
-                <h4 class="text-lg font-semibold text-slate-700">Connectez votre propre Clé API</h4>
+                <h4 class="text-lg font-semibold text-slate-700">Fonctionnalité en Bêta</h4>
                 <p class="text-slate-600">
-                    Pour éviter l'étape du "copier-coller", vous pouvez utiliser le générateur de cours avancé. 
-                    Cet outil vous permet d'entrer votre propre clé API (pour Gemini, ChatGPT, Claude, etc.) 
-                    qui sera **stockée de manière sécurisée dans votre navigateur** (`localStorage`).
+                    <i class="fas fa-sync-alt mr-1 text-yellow-500"></i> Cet outil d'automatisation est actuellement en cours de construction et d'évolution. De nouvelles fonctionnalités et optimisations seront ajoutées régulièrement.
                 </p>
-                <p class="font-semibold text-slate-700 bg-slate-100 p-3 rounded-lg">
-                    Vous n'aurez à l'entrer qu'une seule fois (sauf si vous videz le cache de votre navigateur).
+                
+                <h4 class="text-lg font-semibold text-slate-700 pt-4 border-t border-slate-100">Connectez votre Intelligence Artificielle</h4>
+                <p class="text-slate-600">
+                    Ce générateur est compatible avec plusieurs fournisseurs d'IA pour s'adapter à vos besoins et à votre budget :
                 </p>
-                <p class="text-slate-600 mt-2 text-sm">
-                    <i class="fas fa-shield-alt"></i> Votre clé n'est jamais envoyée sur un serveur, elle reste privée et sécurisée sur votre machine.
+
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h5 class="font-semibold text-blue-800 mb-1"><i class="fas fa-bolt mr-2"></i>Option Gratuite : Google Gemini</h5>
+                    <p class="text-sm text-blue-700">
+                        Idéal pour commencer. Vous pouvez obtenir une clé API gratuite via <strong>Google AI Studio</strong>. C'est rapide et suffisant pour la plupart des cours.
+                    </p>
+                </div>
+
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                    <h5 class="font-semibold text-indigo-800 mb-1"><i class="fas fa-star mr-2"></i>Option Avancée : OpenRouter</h5>
+                    <p class="text-sm text-indigo-700">
+                        Pour une qualité maximale (Claude, GPT-4o...). Nécessite un compte <strong>OpenRouter</strong>. Attention : cette option implique des coûts d'utilisation (variables selon le modèle choisi), bien que cela reste généralement très accessible.
+                    </p>
+                </div>
+
+                <p class="text-xs text-slate-500 mt-4 italic">
+                    <i class="fas fa-info-circle mr-1"></i> L'interface détectera automatiquement le type de clé et vous proposera les options adaptées (modèles, niveau de détail...).
                 </p>
             </div>
         </div>
@@ -370,33 +370,13 @@
                 if (event.target === guideModal) closeGuideModal();
             });
 
-            // --- Logique pour le Modal API (Iframe) ---
-            const apiModal = document.getElementById("apiModal");
-            const openApiBtn = document.getElementById("openApiModalBtn");
-            const closeApiBtn = document.getElementById("closeApiModalBtn");
-            const apiIframe = apiModal ? apiModal.querySelector('iframe') : null;
-
-            const openApiModal = () => {
-                if (apiModal && apiIframe) {
-                    apiIframe.src = "api.html"; 
-                    apiModal.classList.remove('modal-hidden');
-                    apiModal.classList.add('modal-visible');
-                }
-            };
-
-            const closeApiModal = () => {
-                if (apiModal && apiIframe) {
-                    apiModal.classList.add('modal-hidden');
-                    apiModal.classList.remove('modal-visible');
-                    apiIframe.src = "about:blank";
-                }
-            };
-
-            if (openApiBtn) openApiBtn.addEventListener('click', openApiModal);
-            if (closeApiBtn) closeApiBtn.addEventListener('click', closeApiModal);
-            if (apiModal) apiModal.addEventListener('click', (event) => {
-                if (event.target === apiModal) closeApiModal();
-            });
+            // --- NETTOYAGE DES ANCIENNES MODALES API ---
+            // Si une ancienne div 'apiModal' traîne encore dans le HTML statique, on la supprime
+            // pour être sûr qu'elle n'interfère pas.
+            const oldApiModal = document.getElementById("apiModal");
+            if (oldApiModal) {
+                oldApiModal.remove();
+            }
 
             // --- Logique pour le Modal Info API ---
             const apiInfoModal = document.getElementById("apiInfoModal");
@@ -429,9 +409,6 @@
                 if (e.key === 'Escape') {
                     if (guideModal && guideModal.classList.contains('modal-visible')) {
                         closeGuideModal();
-                    }
-                    if (apiModal && apiModal.classList.contains('modal-visible')) {
-                        closeApiModal();
                     }
                     if (apiInfoModal && apiInfoModal.classList.contains('modal-visible')) {
                         closeApiInfoModal();
