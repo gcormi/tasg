@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,23 +8,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* ... (Les styles CSS restent identiques) ... */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
             color: #334155;
         }
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             font-family: 'Poppins', sans-serif;
-            color: #1e293b;
+            color: #0f172a;
         }
+        
+        /* Animations */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        /* Cartes Outils */
         .tool-card {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             display: flex;
@@ -32,248 +48,369 @@
             height: 100%;
         }
         .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
         }
         .card-content {
-            padding: 1.5rem 6rem 1.5rem 1.5rem;
+            padding: 1.75rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
         .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            padding-right: 3rem; /* Espace pour le badge si besoin */
         }
         .card-description {
             color: #64748b;
-            line-height: 1.6;
+            font-size: 0.95rem;
+            line-height: 1.5;
             flex-grow: 1;
         }
+        
+        /* Badges de format */
         .output-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
             border-radius: 9999px;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            width: fit-content;
         }
-        .badge-html { background-color: #e0f2fe; color: #0369a1; }
-        .badge-docx { background-color: #dbeafe; color: #1e40af; }
-        .badge-img-doc { background-color: #dcfce7; color: #15803d; }
-        .badge-prompt { background-color: #f3e8ff; color: #581c87; }
-        .badge-xml { background-color: #fef9c3; color: #854d0e; }
+        .badge-html { background-color: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+        .badge-docx { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-img-doc { background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-prompt { background-color: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+        .badge-xml { background-color: #fefce8; color: #a16207; border: 1px solid #fef08a; }
+
+        /* Modale */
+        .modal-transition { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .modal-hidden { opacity: 0; pointer-events: none; }
+        .modal-visible { opacity: 1; pointer-events: auto; }
+        .modal-content { transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-visible .modal-content { transform: scale(1); }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
-    <div class="container mx-auto max-w-6xl px-4 py-12 flex-grow">
+
+    <!-- Bouton Retour Flottant (Mobile) -->
+    <a href="index.html" class="fixed bottom-6 left-6 z-40 md:hidden w-12 h-12 bg-white text-slate-700 rounded-full shadow-lg flex items-center justify-center border border-slate-200 active:scale-95 transition-transform">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 py-10 md:py-16 flex-grow">
         
-        <a href="index.html" class="mb-12 inline-flex items-center gap-2 bg-white text-slate-700 font-semibold py-2 px-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-            <i class="fas fa-arrow-left"></i>
-            Retour à l'accueil
-        </a>
+        <!-- Navigation Desktop -->
+        <div class="hidden md:block mb-8 fade-in-up">
+            <a href="index.html" class="inline-flex items-center gap-2 text-slate-500 hover:text-sky-600 font-medium transition-colors duration-300 group">
+                <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:border-sky-200 group-hover:bg-sky-50 transition-colors">
+                    <i class="fas fa-arrow-left text-sm transition-transform group-hover:-translate-x-1"></i>
+                </div>
+                <span>Retour à l'accueil</span>
+            </a>
+        </div>
         
-        <header class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold">Boîte à Outils Pédagogiques</h1>
-            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-                Créez, modifiez et améliorez vos supports de cours interactifs et documents.
+        <header class="text-center mb-12 fade-in-up">
+            <div class="inline-block p-3 bg-white rounded-2xl shadow-sm mb-6 border border-slate-100">
+                <div class="w-12 h-12 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg mx-auto">
+                    <i class="fas fa-toolbox"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Boîte à Outils Pédagogiques
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+                L'atelier de l'enseignant : créez, modifiez et convertissez vos supports de cours en quelques clics.
             </p>
+
+            <!-- Barre de Recherche -->
+            <div class="max-w-xl mx-auto relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-slate-400 group-focus-within:text-sky-500 transition-colors"></i>
+                </div>
+                <input type="text" id="toolSearch" 
+                       class="block w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-full leading-5 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all duration-300 shadow-sm text-slate-700" 
+                       placeholder="Rechercher un outil (ex: XML, Moodle, Jeu, HTML)...">
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
-            <section>
-                <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
-                    <i class="fas fa-tools text-green-500"></i>
-                    Outils d'Édition & d'Amélioration Web
-                </h2>
-                <div class="flex flex-col gap-6">
-                    <a href="integrateur-visuel.html" class="tool-card">
-                        <span class="output-badge badge-html">HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Éditeur Visuel de Page Web</h3>
-                            <p class="card-description">Chargez une page HTML pour modifier les textes et les images directement, comme dans un traitement de texte, sans toucher au code.</p>
-                        </div>
-                    </a>
-                    <a href="design.html" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Amélioration HTML</h3>
-                            <p class="card-description">Générez un prompt pour modifier le design ou le contenu d'un cours HTML.</p>
-                        </div>
-                    </a>
-                    <a href="ameliorer_docx.html" class="tool-card">
-                        <span class="output-badge badge-docx">Prompt → DOCX</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Amélioration Texte/DOCX</h3>
-                            <p class="card-description">Utilisez un prompt pour réécrire et enrichir un texte brut ou un document.</p>
-                        </div>
-                    </a>
+            <!-- Section 1: Web & Édition -->
+            <section class="category-section fade-in-up delay-100">
+                <div class="flex items-center gap-3 mb-6 px-2">
+                    <div class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">Édition Web & Texte</h2>
                 </div>
-            </section>
-
-            <section>
-                <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
-                    <i class="fas fa-gamepad text-purple-500"></i>
-                    Générateurs d'Activités Interactives (HTML)
-                </h2>
-                <div class="flex flex-col gap-6">
-                    <a href="generateurjeux.html" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Parcours d'Activités Pédagogiques</h3>
-                            <p class="card-description">Créez une page web contenant plusieurs activités éducatives en onglets.</p>
-                        </div>
-                    </a>
-                    <a href="escapegame.html" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Scénario d'Apprentissage Interactif</h3>
-                            <p class="card-description">Générez un parcours interactif complet de type "scénario à défis".</p>
-                        </div>
-                    </a>
-                    <a href="generateuractivités.html" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Générateur d'activités</h3>
-                            <p class="card-description">Créez divers types d'activités interactives à partir d'un simple prompt.</p>
-                        </div>
-                    </a>
-                    <a href="#" id="open-jeux-modal" class="tool-card">
-                        <span class="output-badge badge-prompt">Prompt → HTML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Activités de Renforcement Cognitif</h3>
-                            <p class="card-description">Mémorisation, association, recherche de mots et définitions.</p>
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-            <section>
-                <h2 class="text-3xl font-bold mb-8 flex items-center gap-4">
-                    <i class="fas fa-file-alt text-blue-500"></i>
-                    Générateurs d'Exercices import direct Leia & Documents
-                </h2>
-                <div class="flex flex-col gap-6">
-                    <a href="exercices.html" class="tool-card">
-                        <span class="output-badge badge-img-doc">PNG/DOCX</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Exercices Visuels</h3>
-                            <p class="card-description">Générez des exercices (QCM, etc.) à exporter en image ou document.</p>
-                        </div>
-                    </a>
-                    <a href="exercices2.html" class="tool-card">
-                        <span class="output-badge badge-xml">XML</span>
-                        <div class="card-content">
-                            <h3 class="card-title mb-2">Exercices Avancés & Moodle</h3>
-                            <p class="card-description">Générez des fichiers XML pour Moodle ou d'autres contenus créatifs.</p>
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-        </div> </div> <footer class="text-center py-10 mt-16 border-t border-slate-200">
-        <div class="container mx-auto max-w-6xl px-4 text-slate-600">
-
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mb-6">
-                <a href="cgu.html" class="font-medium hover:text-blue-600 hover:underline transition-colors">
-                    Conditions Générales d'Utilisation (CGU)
-                </a>
-                <span class="text-slate-300 hidden sm:inline">|</span>
-                <p>
-                    <strong>Contact & Conception :</strong> Gilles.Cormi@ac-corse.fr
-                </p>
-            </div>
-
-            <div class="mb-4">
-                <p class="font-medium mb-3">Sauf mention contraire, le contenu de ce site est sous licence :</p>
                 
-                <div class="flex justify-center items-center gap-3 text-4xl text-slate-500">
-                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" title="Creative Commons">
-                        <i class="fab fa-creative-commons hover:text-black transition-colors"></i>
+                <div class="flex flex-col gap-5">
+                    <a href="integrateur-visuel.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-html"><i class="fab fa-html5"></i> HTML</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-green-600 transition-colors">Éditeur Visuel Web</h3>
+                            <p class="card-description">Chargez une page HTML pour modifier textes et images visuellement, sans code (WYSIWYG).</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
-                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" title="Attribution (BY)">
-                        <i class="fab fa-creative-commons-by hover:text-black transition-colors"></i>
+
+                    <a href="design.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-prompt"><i class="fas fa-magic"></i> Prompt → HTML</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-green-600 transition-colors">Amélioration HTML</h3>
+                            <p class="card-description">Générez un prompt pour moderniser le design ou restructurer le contenu d'un cours HTML.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
-                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" title="Pas d'Utilisation Commerciale (NC)">
-                        <i class="fab fa-creative-commons-nc hover:text-black transition-colors"></i>
+
+                    <a href="ameliorer_docx.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-docx"><i class="fas fa-file-word"></i> Prompt → DOCX</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-green-600 transition-colors">Amélioration Texte</h3>
+                            <p class="card-description">Utilisez l'IA pour réécrire, simplifier ou enrichir un texte brut ou un document Word.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
                 </div>
-                <p class="text-sm mt-2">
-                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener noreferrer" class="hover:underline">
-                        Attribution - Pas d'Utilisation Commerciale 4.0 International
-                    </a>
-                </p>
-            </div>
+            </section>
 
-            <p class="mt-6 text-sm text-slate-500">
-                &copy; 2025 - Tous droits réservés
-            </p>
+            <!-- Section 2: Interactif -->
+            <section class="category-section fade-in-up delay-200">
+                <div class="flex items-center gap-3 mb-6 px-2">
+                    <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">Activités Interactives</h2>
+                </div>
+
+                <div class="flex flex-col gap-5">
+                    <a href="generateurjeux.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-prompt"><i class="fas fa-layer-group"></i> Prompt → HTML</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-purple-600 transition-colors">Parcours d'Activités</h3>
+                            <p class="card-description">Créez une page web contenant plusieurs onglets d'activités éducatives variées.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-purple-400 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+
+                    <a href="escapegame.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-prompt"><i class="fas fa-dungeon"></i> Prompt → HTML</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-purple-600 transition-colors">Escape Game / Scénario</h3>
+                            <p class="card-description">Générez un parcours interactif immersif de type "scénario à choix" ou enquête.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-purple-400 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+                    
+                    <a href="generateuractivités.html" class="tool-card group">
+                         <div class="card-content">
+                            <span class="output-badge badge-prompt"><i class="fas fa-bolt"></i> Prompt → HTML</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-purple-600 transition-colors">Générateur d'Activités</h3>
+                            <p class="card-description">Créez des modules interactifs simples (QCM, Glisser-Déposer) via un prompt.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-purple-400 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+
+                    <!-- Trigger Modal -->
+                    <a href="#" id="open-jeux-modal" class="tool-card group border-purple-200 bg-purple-50/50">
+                        <div class="card-content relative">
+                            <div class="absolute top-4 right-4 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                            <span class="output-badge badge-prompt"><i class="fas fa-shapes"></i> Prompt → HTML</span>
+                            <h3 class="card-title text-slate-900 group-hover:text-purple-700 transition-colors">Ateliers Cognitifs</h3>
+                            <p class="card-description text-slate-600">Collection d'exercices spécifiques : Memory, Mots Croisés, Association...</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-purple-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Section 3: Exercices & Exports -->
+            <section class="category-section fade-in-up delay-300">
+                <div class="flex items-center gap-3 mb-6 px-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">Exports & Moodle</h2>
+                </div>
+
+                <div class="flex flex-col gap-5">
+                    <a href="exercices.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-img-doc"><i class="fas fa-image"></i> PNG / DOCX</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-blue-600 transition-colors">Exercices Visuels</h3>
+                            <p class="card-description">Parfait pour l'outil "Création Assistée" de Léia. Générez des fonds d'exercices en image.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-blue-400 to-sky-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+
+                    <a href="exercices2.html" class="tool-card group">
+                        <div class="card-content">
+                            <span class="output-badge badge-xml"><i class="fas fa-code"></i> XML Moodle</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-blue-600 transition-colors">Exercices Auto-corrigés</h3>
+                            <p class="card-description">Générez du code XML à importer directement dans les Tests de Léia ou Moodle.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-blue-400 to-sky-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+                </div>
+            </section>
+
+        </div> 
+    </div> 
+
+    <footer class="bg-white border-t border-slate-200 mt-auto py-10 fade-in-up delay-300">
+        <div class="container mx-auto max-w-6xl px-4 text-center">
+            <div class="flex justify-center items-center gap-6 mb-6">
+                <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" class="text-slate-400 hover:text-slate-600 transition-colors"><i class="fab fa-creative-commons text-3xl"></i></a>
+                <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" class="text-slate-400 hover:text-slate-600 transition-colors"><i class="fab fa-creative-commons-by text-3xl"></i></a>
+                <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" class="text-slate-400 hover:text-slate-600 transition-colors"><i class="fab fa-creative-commons-nc text-3xl"></i></a>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 text-sm text-slate-600 font-medium">
+                <a href="cgu.html" class="hover:text-sky-600 transition-colors">CGU</a>
+                <span class="hidden sm:inline text-slate-300">•</span>
+                <span>Contact : Gilles.Cormi@ac-corse.fr</span>
+                <span class="hidden sm:inline text-slate-300">•</span>
+                <span>&copy; 2025 Tous droits réservés</span>
+            </div>
         </div>
     </footer>
 
-    <div id="jeux-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+    <!-- MODALE JEUX (Design Amélioré) -->
+    <div id="jeux-modal" class="modal-hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-transition">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg p-0 relative overflow-hidden">
             
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-slate-800" style="font-family: 'Poppins', sans-serif;">
-                    <i class="fas fa-gamepad text-purple-500 mr-3"></i>
+            <!-- Header Modale -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white relative">
+                 <button id="close-jeux-modal" class="absolute top-4 right-4 text-white/70 hover:text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h3 class="text-2xl font-bold flex items-center gap-3">
+                    <i class="fas fa-puzzle-piece"></i>
                     Ateliers Pédagogiques
                 </h3>
-                <button id="close-jeux-modal" class="text-slate-400 hover:text-slate-700 transition-colors">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
+                <p class="text-purple-100 text-sm mt-1">Choisissez un type d'activité spécifique</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <a href="memory.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
-                    <i class="fas fa-clone mr-2"></i>
-                    Exercice de Mémorisation
-                </a>
-                <a href="association.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
-                    <i class="fas fa-link mr-2"></i>
-                    Exercice d'Association
-                </a>
-                <a href="motsmeles.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
-                    <i class="fas fa-search mr-2"></i>
-                    Recherche de Vocabulaire
-                </a>
-                <a href="motscroises.html" class="block p-4 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-700 hover:bg-slate-100 hover:-translate-y-0.5 transition-all transform">
-                    <i class="fas fa-th mr-2"></i>
-                    Grille de Définitions
-                </a>
+            <div class="p-6 bg-slate-50">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="memory.html" class="flex flex-col items-center p-4 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-purple-300 hover:-translate-y-1 transition-all group text-center">
+                        <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-clone"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 group-hover:text-purple-700 text-sm">Mémorisation</span>
+                    </a>
+                    <a href="association.html" class="flex flex-col items-center p-4 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-purple-300 hover:-translate-y-1 transition-all group text-center">
+                        <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-link"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 group-hover:text-indigo-700 text-sm">Association</span>
+                    </a>
+                    <a href="motsmeles.html" class="flex flex-col items-center p-4 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-pink-300 hover:-translate-y-1 transition-all group text-center">
+                        <div class="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 group-hover:text-pink-700 text-sm">Mots Mêlés</span>
+                    </a>
+                    <a href="motscroises.html" class="flex flex-col items-center p-4 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-orange-300 hover:-translate-y-1 transition-all group text-center">
+                         <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-th"></i>
+                        </div>
+                        <span class="font-bold text-slate-700 group-hover:text-orange-700 text-sm">Mots Croisés</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            /* --- 1. GESTION DE LA MODALE --- */
             const openModalBtn = document.getElementById('open-jeux-modal');
             const closeModalBtn = document.getElementById('close-jeux-modal');
             const modal = document.getElementById('jeux-modal');
 
-            if (openModalBtn && closeModalBtn && modal) {
-                // Ouvre la modale
+            const toggleModal = (show) => {
+                if (!modal) return;
+                if (show) {
+                    modal.classList.remove('modal-hidden');
+                    modal.classList.add('modal-visible');
+                    document.body.style.overflow = 'hidden'; // Bloque le scroll
+                } else {
+                    modal.classList.remove('modal-visible');
+                    modal.classList.add('modal-hidden');
+                    document.body.style.overflow = ''; // Débloque le scroll
+                }
+            };
+
+            if (openModalBtn) {
                 openModalBtn.addEventListener('click', (e) => {
-                    e.preventDefault(); // Empêche le lien de suivre href="#"
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex'); // Ajoute flex pour le centrage
+                    e.preventDefault();
+                    toggleModal(true);
                 });
+            }
 
-                // Ferme la modale (bouton X)
-                closeModalBtn.addEventListener('click', () => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                });
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => toggleModal(false));
+            }
 
-                // Ferme la modale (clic sur le fond)
+            if (modal) {
                 modal.addEventListener('click', (e) => {
-                    // Si on clique sur le fond (modal) et non sur le panneau intérieur
-                    if (e.target === modal) {
-                        modal.classList.add('hidden');
-                        modal.classList.remove('flex');
+                    if (e.target === modal) toggleModal(false);
+                });
+                
+                // Touche Echap
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.classList.contains('modal-visible')) {
+                        toggleModal(false);
                     }
+                });
+            }
+
+            /* --- 2. MOTEUR DE RECHERCHE --- */
+            const searchInput = document.getElementById('toolSearch');
+            const toolCards = document.querySelectorAll('.tool-card');
+            const sections = document.querySelectorAll('.category-section');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+
+                    sections.forEach(section => {
+                        let hasVisibleCards = false;
+                        const cards = section.querySelectorAll('.tool-card');
+
+                        cards.forEach(card => {
+                            const title = card.querySelector('.card-title')?.innerText.toLowerCase() || '';
+                            const desc = card.querySelector('.card-description')?.innerText.toLowerCase() || '';
+                            const badge = card.querySelector('.output-badge')?.innerText.toLowerCase() || '';
+                            
+                            // Recherche large (titre, description ou badge)
+                            if (title.includes(searchTerm) || desc.includes(searchTerm) || badge.includes(searchTerm)) {
+                                card.parentElement.style.display = ''; // Reset display (souvent flex ou block par defaut)
+                                card.classList.remove('hidden');
+                                hasVisibleCards = true;
+                            } else {
+                                card.classList.add('hidden');
+                                card.parentElement.style.display = 'none'; // Cache le wrapper du lien pour conserver le layout grid
+                            }
+                        });
+
+                        // Cache la section entière si vide
+                        if (hasVisibleCards) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
+                    });
                 });
             }
         });
