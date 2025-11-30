@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Infographie de Fin (Bilan & Glossaire)</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5; /* Bleu Indigo cohérent avec l'intro */
+            --secondary-color: #818cf8;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --white: #ffffff;
+            --border-radius: 12px;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #64748b;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-button:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateX(-2px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            letter-spacing: -0.025em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-top: 40px;
+            color: #334155;
+            font-size: 1.25rem;
+        }
+        h2 span {
+            background: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+        .optional-label {
+            font-weight: normal;
+            font-size: 0.85em;
+            color: #94a3b8;
+            margin-left: 5px;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        textarea, select, input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #f8fafc;
+        }
+        textarea:focus, select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background-color: #fff;
+        }
+        textarea {
+            resize: vertical;
+            height: 120px;
+        }
+        .helper-text {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 6px;
+            font-style: italic;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            background: #f1f5f9;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .optional-group {
+            border-left: 3px solid #cbd5e1;
+            padding-left: 15px;
+            margin-top: 15px;
+        }
+        
+        /* --- Styles pour le Color Picker --- */
+        .color-picker-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: opacity 0.3s;
+        }
+        .color-picker-wrapper.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0; 
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .btn-generate {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 40px;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+        .btn-generate:hover {
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+            transform: translateY(-1px);
+        }
+        .btn-generate:active {
+            transform: translateY(1px);
+        }
+
+        #output-section {
+            margin-top: 50px;
+            display: none;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 40px;
+        }
+        .output-container {
+            position: relative;
+        }
+        #final-prompt {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            height: 450px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .btn-copy {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .btn-copy:hover {
+            background-color: rgba(255,255,255,0.25);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bouton Retour -->
+<a href="boite.html" class="back-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    Retour à la Boîte
+</a>
+
+<div class="container">
+    <h1>Générateur d'Infographie de Fin (Synthèse)</h1>
+    <p class="subtitle">Créez le prompt parfait pour une "Fiche de Révision Visuelle" (Résumé + Glossaire).</p>
+
+    <h2><span>1</span> Le Bilan du Cours</h2>
+    <div class="form-group">
+        <label for="conclusionText">Résumé / Conclusion du Cours :</label>
+        <textarea id="conclusionText" placeholder="Ex: Le pont est stable grâce aux triangles. Les matériaux doivent résister à la compression..."></textarea>
+        <div class="helper-text">Le "Key Takeaway" : ce que l'élève doit absolument retenir en une phrase ou deux.</div>
+    </div>
+
+    <div class="form-group">
+        <label for="glossaryList">Glossaire & Mots-Clés :</label>
+        <textarea id="glossaryList" placeholder="Ex:&#10;- Compression : Force qui écrase&#10;- Triangulation : Technique de rigidité&#10;- Cahier des charges : Liste des contraintes"></textarea>
+        <div class="helper-text">Collez ici les définitions clés. L'IA les transformera en cartes ou liste visuelle.</div>
+    </div>
+
+    <h2><span>2</span> Direction Artistique</h2>
+    <div class="options-grid">
+        <!-- Colonne Gauche -->
+        <div>
+            <div class="form-group">
+                <label for="styleSelect">Style d'Illustration :</label>
+                <select id="styleSelect">
+                    <optgroup label="Clarté & Mémorisation">
+                        <option value="flatDesign">Flat Design (Épuré & Lisible)</option>
+                        <option value="mindmap">Mind Map Style (Organique & Connecté)</option>
+                        <option value="blueprint">Plan Technique (Sérieux)</option>
+                    </optgroup>
+                    <optgroup label="Ludique & Visuel">
+                        <option value="stickerArt">Sticker Art (Autocollants Pop)</option>
+                        <option value="isometric3D">3D Isométrique (Mini-monde)</option>
+                        <option value="comicBook">Bande Dessinée (Conclusion Épique)</option>
+                        <option value="claymorphism">3D Claymorphism (Pâte à modeler)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="layoutSelect">Structure de la Mise en Page :</label>
+                <select id="layoutSelect">
+                    <optgroup label="Organisation de l'Information">
+                        <option value="splitTopBottom">Haut/Bas (Résumé en haut, Glossaire en bas)</option>
+                        <option value="checklist">Checklist Visuelle (Liste à cocher)</option>
+                        <option value="bentoGrid">Bento Grid (Cartes modulaires)</option>
+                    </optgroup>
+                    <optgroup label="Relations & Flux">
+                        <option value="centralHub">Hub Central (Concept au centre, Mots autour)</option>
+                        <option value="flowPath">Parcours de Révision (Chemin)</option>
+                        <option value="flashcards">Style Flashcards (Cartes de jeu)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <!-- Colonne Droite -->
+        <div>
+            <div class="form-group">
+                <label for="colorSelect">Ambiance Colorée (Base) :</label>
+                <select id="colorSelect">
+                    <optgroup label="Fonctionnel">
+                        <option value="monochrome">Focus (Gris & 1 Couleur)</option>
+                        <option value="tech">Tech (Bleu & Orange)</option>
+                        <option value="eco">Éco (Vert & Nature)</option>
+                    </optgroup>
+                    <optgroup label="Esthétique">
+                        <option value="pastel">Pastel (Douceur Mémorisation)</option>
+                        <option value="vibrant">Vibrant (Énergie & Pop)</option>
+                        <option value="darkmode">Dark Mode (Moderne)</option>
+                        <option value="warm">Warm (Chaleureux & Rassurant)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Palette Visuelle -->
+            <div class="form-group optional-group">
+                <label style="margin-bottom: 8px;">Couleur Dominante Personnalisée :</label>
+                
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="useCustomColor" onchange="toggleColorPicker()">
+                    <span style="font-size: 0.9em; color: #475569;">Activer la couleur personnalisée</span>
+                </label>
+
+                <div id="colorPickerContainer" class="color-picker-wrapper disabled">
+                    <input type="color" id="customColorPicker" value="#4f46e5" title="Cliquez pour choisir une couleur">
+                    <div class="helper-text">Cette couleur sera imposée à l'IA.</div>
+                </div>
+            </div>
+
+            <!-- Volontés Design -->
+            <div class="form-group optional-group">
+                <label for="customDesign">Volontés Design <span class="optional-label">Optionnel</span> :</label>
+                <textarea id="customDesign" style="height: 80px;" placeholder="Ex: Faire ressembler le glossaire à des cartes Pokémon..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-generate" onclick="generatePrompt()">Générer le Prompt de Synthèse</button>
+
+    <div id="output-section">
+        <h2><span>3</span> Prompt "Zéro Questions"</h2>
+        <div class="output-container">
+            <textarea id="final-prompt" readonly></textarea>
+            <button class="btn-copy" onclick="copyToClipboard()">Copier</button>
+        </div>
+        <p class="helper-text" style="text-align: center; margin-top: 15px;">Ce prompt est optimisé pour créer une fiche de synthèse sans dialogue inutile.</p>
+    </div>
+
+</div>
+
+<script>
+    function toggleColorPicker() {
+        const checkbox = document.getElementById('useCustomColor');
+        const container = document.getElementById('colorPickerContainer');
+        
+        if (checkbox.checked) {
+            container.classList.remove('disabled');
+        } else {
+            container.classList.add('disabled');
+        }
+    }
+
+    // --- 1. DESCRIPTIONS DES STYLES (Adaptés pour la synthèse) ---
+    const styleDescriptions = {
+        "flatDesign": "Corporate Memphis / Flat Design. Extremely clean, simple geometric shapes, high readability text containers, no clutter. Perfect for educational summaries.",
+        "mindmap": "Organic Mind Map style. Central concepts connected by smooth branching lines to sub-concepts. Hand-drawn feel but vector clean.",
+        "blueprint": "Technical Blueprint. White lines on blue grid. Looks like an engineering schematic or architectural plan. Serious and precise.",
+        "stickerArt": "Pop Sticker Art style. Elements look like die-cut stickers with white borders, placed on a simple background. Playful and collectible feel.",
+        "isometric3D": "3D Isometric view. Miniature world look. Elements are small 3D models. Great for showing spatial relationships.",
+        "comicBook": "Comic Book / Graphic Novel ending page style. Bold ink lines, expressive colors, 'The End' vibe.",
+        "claymorphism": "3D Claymorphism. Soft, puffy shapes, matte plastic texture. Very friendly and modern UI look."
+    };
+
+    // --- 2. DESCRIPTIONS DES COULEURS ---
+    const colorDescriptions = {
+        "monochrome": "Strict Monochromatic. Greyscale background with ONE strong accent color (like Highlighter Yellow) to mark key definitions.",
+        "tech": "Tech Palette. Deep blues, cyans, and orange accents.",
+        "eco": "Nature Palette. Sage greens, earth tones, soft whites.",
+        "pastel": "Pastel Palette. Mint, Lavender, Baby Blue. Very soft contrast, easy on the eyes for reading text.",
+        "vibrant": "High Energy Vibrant. Saturated primary colors. Distinct color coding for different sections.",
+        "darkmode": "Dark Mode. Black/Charcoal background with white text and neon accents.",
+        "warm": "Warm Palette. Sunset oranges, yellows, and warm greys."
+    };
+
+    // --- 3. DESCRIPTIONS DES LAYOUTS (Adaptés pour glossaire/résumé) ---
+    const layoutDescriptions = {
+        "splitTopBottom": "Vertical Split Layout. TOP 1/3: The Summary/Conclusion visualized as a main banner scene. BOTTOM 2/3: The Glossary organized in clean columns or a grid.",
+        "checklist": "Visual Checklist Layout. Elements are arranged as items on a clipboard or list, with checkmarks. Very structured and linear.",
+        "bentoGrid": "Bento Grid Layout. Content is compartmentalized into rounded rectangular boxes of different sizes, fitting together like a puzzle. Modern UI look.",
+        "centralHub": "Radial/Central Layout. The Main Conclusion is in the center. Glossary terms float around it, connected by thin lines.",
+        "flowPath": "Winding Path Layout. A road or path representing the course journey. The Summary is the destination, glossary terms are signposts along the way.",
+        "flashcards": "Flashcards/Deck Layout. The image looks like a collection of trading cards or study cards laid out on a table. Each glossary term is a separate 'card'."
+    };
+
+    function generatePrompt() {
+        const conclusion = document.getElementById('conclusionText').value;
+        const glossary = document.getElementById('glossaryList').value;
+        const selectedStyleKey = document.getElementById('styleSelect').value;
+        const selectedColorKey = document.getElementById('colorSelect').value;
+        const selectedLayoutKey = document.getElementById('layoutSelect').value;
+        
+        const useCustomColor = document.getElementById('useCustomColor').checked;
+        const customColorValue = document.getElementById('customColorPicker').value;
+        const customDesign = document.getElementById('customDesign').value.trim();
+
+        if (!conclusion.trim() || !glossary.trim()) {
+            alert("Veuillez remplir le résumé et le glossaire.");
+            return;
+        }
+
+        // --- CONSTRUCTION DU PROMPT AUTORITAIRE (Version Fin de Cours) ---
+        let prompt = `!!! GÉNÉRATION D'IMAGE REQUISE - FICHE DE SYNTHÈSE !!!\n`;
+        prompt += `INSTRUCTION CRITIQUE : Agis comme un générateur d'infographie aveugle. NE POSE AUCUNE QUESTION. Génère l'image directement.\n\n`;
+        
+        prompt += `**Tâche :** Créer une "Fiche de Révision Visuelle" (Course Summary Infographic) qui combine une conclusion visuelle et un glossaire structuré.\n\n`;
+        
+        prompt += `--- 1. PARAMÈTRES VISUELS ---\n`;
+        prompt += `STYLE : ${styleDescriptions[selectedStyleKey]}\n`;
+        
+        if (useCustomColor) {
+            prompt += `COULEURS : Utiliser IMPÉRATIVEMENT cette couleur hex : ${customColorValue}. Construire la palette autour.\n`;
+        } else {
+            prompt += `COULEURS : ${colorDescriptions[selectedColorKey]}\n`;
+        }
+
+        prompt += `STRUCTURE : ${layoutDescriptions[selectedLayoutKey]}\n\n`;
+
+        prompt += `--- 2. CONTENU À INTÉGRER ---\n`;
+        prompt += `ZONE A (LE BILAN) : Visualise ce concept clé (le "Key Takeaway") : "${conclusion}". Cela doit être l'élément visuel dominant.\n`;
+        prompt += `ZONE B (LE GLOSSAIRE) : Organise ces termes sous forme de liste visuelle, de cartes ou d'icônes avec légendes. C'est la "Boîte à Mots" : "${glossary}".\n\n`;
+
+        if (customDesign) {
+             prompt += `--- 3. DEMANDES SPÉCIFIQUES ---\n`;
+             prompt += `IMPORTANT : ${customDesign}\n\n`;
+        }
+
+        prompt += `--- 4. EXÉCUTION ---\n`;
+        prompt += `- Génère l'image MAINTENANT.\n`;
+        prompt += `- Assure-toi que le texte (s'il y en a) ressemble à du texte de titre, ou utilise du faux-texte pour le corps.\n`;
+        prompt += `- Rendu propre, éducatif et synthétique.`;
+
+        document.getElementById('final-prompt').value = prompt;
+        document.getElementById('output-section').style.display = 'block';
+        document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // CORRECTION : Utilisation de document.execCommand pour éviter les erreurs de permission
+    function copyToClipboard() {
+        const copyText = document.getElementById("final-prompt");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+
+        // Fallback pour les environnements restrictifs
+        try {
+            document.execCommand('copy');
+            
+            // UI Feedback
+            const btn = document.querySelector('.btn-copy');
+            const originalText = btn.innerText;
+            btn.innerText = "Copié !";
+            btn.style.background = "#22c55e";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "rgba(255,255,255,0.1)";
+            }, 2000);
+        } catch (err) {
+            console.error("Erreur de copie : ", err);
+            alert("Erreur de copie automatique. Veuillez copier le texte manuellement.");
+        }
+    }
+</script>
+
+</body>
+</html>
