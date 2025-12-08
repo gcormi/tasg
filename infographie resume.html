@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Infographie de Synthèse (Options Avancées)</title>
+    <style>
+        :root {
+            /* On garde le bleu pétrole du Resume A4 pour l'identité, mais avec le style moderne de la V7 */
+            --primary-color: #0891b2; 
+            --secondary-color: #22d3ee;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --white: #ffffff;
+            --border-radius: 12px;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+        
+        /* Bouton Retour (Style V7) */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #64748b;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-button:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateX(-2px);
+            box-shadow: 0 4px 8px rgba(8, 145, 178, 0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            letter-spacing: -0.025em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-top: 40px;
+            color: #334155;
+            font-size: 1.25rem;
+        }
+        h2 span {
+            background: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; font-size: 0.95rem; }
+        
+        .optional-label {
+            font-weight: normal; font-size: 0.85em; color: #94a3b8; margin-left: 5px;
+            background: #f1f5f9; padding: 2px 6px; border-radius: 4px;
+        }
+
+        textarea, select, input[type="text"] {
+            width: 100%; padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px;
+            box-sizing: border-box; font-family: inherit; font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s; background-color: #f8fafc;
+        }
+        textarea:focus, select:focus, input[type="text"]:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1); background-color: #fff;
+        }
+        textarea { resize: vertical; height: 120px; }
+        .helper-text { font-size: 13px; color: #94a3b8; margin-top: 6px; font-style: italic; }
+        
+        .options-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px; background: #f1f5f9; padding: 25px; border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .optional-group {
+            border-left: 3px solid #cbd5e1; padding-left: 15px; margin-top: 15px;
+        }
+
+        /* --- Styles pour les Formats (Radio Buttons de la V7) --- */
+        .format-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 15px; }
+        .format-option {
+            display: flex; align-items: center; background: #f8fafc;
+            border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 15px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .format-option:hover { border-color: var(--secondary-color); background: white; }
+        .format-option input[type="radio"] {
+            margin-right: 15px; accent-color: var(--primary-color); width: 18px; height: 18px;
+        }
+        .format-option input[type="radio"]:checked + .format-info { color: var(--primary-color); }
+        .format-info { display: flex; flex-direction: column; flex: 1; }
+        .format-title { font-weight: 600; font-size: 0.95rem; }
+        .format-desc { font-size: 0.8rem; color: #64748b; }
+        
+        /* --- Styles Palette Multiple (V7) --- */
+        .palette-controls { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .palette-inputs { display: flex; gap: 10px; }
+        .palette-inputs input[type="color"] { flex: 1; height: 45px; border:none; background:none; cursor: pointer; }
+        .palette-section.disabled { opacity: 0.5; pointer-events: none; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer; }
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color); }
+
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em;
+            padding-right: 2.5rem; -webkit-appearance: none; appearance: none;
+        }
+
+        .btn-generate {
+            display: block; width: 100%; padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white; border: none; border-radius: var(--border-radius);
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s; margin-top: 40px;
+            box-shadow: 0 4px 6px -1px rgba(8, 145, 178, 0.2);
+        }
+        .btn-generate:hover {
+            box-shadow: 0 10px 15px -3px rgba(8, 145, 178, 0.3); transform: translateY(-1px);
+        }
+        .btn-generate:active { transform: translateY(1px); }
+
+        #output-section { margin-top: 50px; display: none; border-top: 2px dashed #e2e8f0; padding-top: 40px; }
+        .output-container { position: relative; }
+        #final-prompt {
+            background-color: #1e293b; color: #e2e8f0; font-family: 'Consolas', 'Monaco', monospace;
+            height: 450px; padding: 20px; border-radius: var(--border-radius);
+            white-space: pre-wrap; line-height: 1.5; font-size: 14px;
+        }
+        .btn-copy {
+            position: absolute; top: 15px; right: 15px; padding: 8px 16px;
+            background-color: rgba(255,255,255,0.1); color: #fff;
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+            cursor: pointer; font-size: 13px; transition: background 0.2s;
+        }
+        .btn-copy:hover { background-color: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body>
+
+<!-- Bouton Retour -->
+<a href="boite.html" class="back-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    Retour à la Boîte
+</a>
+
+<div class="container">
+    <h1>Générateur d'Infographie de Synthèse</h1>
+    <p class="subtitle">Version Avancée - Résumé de Cours avec Contrôle Total</p>
+
+    <h2><span>1</span> Le Résumé (Contenu)</h2>
+    
+    <div class="form-group">
+        <label for="courseTitle">Titre Principal de l'Infographie :</label>
+        <input type="text" id="courseTitle" placeholder="Ex: La Photosynthèse - Synthèse">
+        <div class="helper-text">Ce titre sera le point central du visuel.</div>
+    </div>
+
+    <div class="form-group">
+        <label for="summaryPoints">Points Clés (Liste) :</label>
+        <textarea id="summaryPoints" placeholder="Collez ici les points clés. Ex:&#10;1. Absorption de lumière (Soleil)&#10;2. Absorption de CO2 (Air)&#10;3. Production de Sucre (Énergie)&#10;4. Rejet d'Oxygène"></textarea>
+        <div class="helper-text">L'IA créera une section visuelle pour chaque point.</div>
+    </div>
+
+    <h2><span>2</span> Direction Artistique</h2>
+    <div class="options-grid">
+        <!-- Colonne Gauche -->
+        <div>
+            <div class="form-group">
+                <label for="styleSelect">Style Graphique :</label>
+                <select id="styleSelect">
+                    <optgroup label="Clair & Structuré (Idéal Texte)">
+                        <option value="flatDesign">Flat Design Moderne (Recommandé)</option>
+                        <option value="blueprint">Plan Technique (Blueprint)</option>
+                        <option value="isometric3D">3D Isométrique (Maquette)</option>
+                    </optgroup>
+                    <optgroup label="Artistique & Créatif">
+                        <option value="comicBook">Bande Dessinée</option>
+                        <option value="watercolor">Aquarelle & Encre</option>
+                        <option value="cyberpunk">Cyberpunk / Futuriste</option>
+                        <option value="claymorphism">3D Claymorphism (Pâte à modeler)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="layoutSelect">Mise en Page :</label>
+                <select id="layoutSelect">
+                    <optgroup label="Spécial Résumé">
+                        <option value="topDownFlow">Flux Vertical (Logique)</option>
+                        <option value="centralTopic">Sujet Central (Carte Mentale)</option>
+                        <option value="timelineVertical">Chronologie Verticale</option>
+                        <option value="modularGrid">Grille de Modules (Bento)</option>
+                    </optgroup>
+                    <optgroup label="Autres Structures">
+                        <option value="splitLeftRight">Split Screen (Gauche/Droite)</option>
+                        <option value="flowPath">Cheminement (Jeu de l'oie)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- PALETTE PRIORITAIRE (Importé de la V7) -->
+            <div class="form-group optional-group" style="margin-top: 25px; border-left: 3px solid #6366f1; background-color: #e0e7ff; padding: 15px; border-radius: 8px;">
+                <label style="color: #4338ca; margin-bottom: 10px;">Palette Spécifique (Prioritaire)</label>
+                
+                <div class="palette-controls">
+                    <label class="checkbox-wrapper" style="margin:0;">
+                        <input type="checkbox" id="usePalette" onchange="togglePalette()">
+                        <span style="font-size: 0.9em; font-weight: bold;">Activer</span>
+                    </label>
+                    <select id="paletteCount" onchange="updatePaletteInputs()" disabled style="width: auto; padding: 5px 30px 5px 10px; font-size: 14px; height: 35px;">
+                        <option value="1">1 Couleur</option>
+                        <option value="2">2 Couleurs</option>
+                        <option value="3">3 Couleurs</option>
+                    </select>
+                </div>
+
+                <div id="paletteSection" class="palette-section disabled">
+                    <div class="palette-inputs">
+                        <input type="color" id="palColor1" value="#0891b2" title="Couleur Principale">
+                        <input type="color" id="palColor2" value="#f59e0b" style="display:none" title="Couleur Secondaire">
+                        <input type="color" id="palColor3" value="#10b981" style="display:none" title="Couleur Tertiaire">
+                    </div>
+                    <div class="helper-text" style="color: #4338ca;">Remplace l'ambiance choisie à droite.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne Droite -->
+        <div>
+            <div class="form-group">
+                <label for="colorSelect">Ambiance Colorée (Base) :</label>
+                 <select id="colorSelect">
+                    <optgroup label="Fonctionnel">
+                        <option value="tech">Tech (Bleu & Orange)</option>
+                        <option value="eco">Éco/Nature (Verts & Bois)</option>
+                        <option value="monochrome">Sérieux (Gris & Accent Vif)</option>
+                    </optgroup>
+                    <optgroup label="Esthétique">
+                        <option value="vibrant">Vibrant (Multicolore Joyeux)</option>
+                        <option value="pastel">Pastel (Doux & Apaisant)</option>
+                        <option value="darkmode">Dark Mode (Fond sombre)</option>
+                        <option value="warm">Sunset (Tons chauds)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- OVERRIDES DESIGN (Importé de la V7) -->
+            <div class="form-group optional-group" style="background-color: #fff7ed; border-color: #fdba74; padding: 15px; border-radius: 8px;">
+                <label for="customDesign" style="color: #c2410c;">Volontés Design & Overrides <span class="optional-label">Prioritaire</span> :</label>
+                <textarea id="customDesign" style="height: 120px; border-color: #fdba74;" placeholder="Ex: Je veux absolument que le texte soit écrit en police manuscrite, ou je veux un style très minimaliste sans ombres."></textarea>
+                <div class="helper-text" style="color: #ea580c;">Si rempli, ce champ a la priorité absolue sur le style.</div>
+            </div>
+        </div>
+    </div>
+
+    <h2><span>3</span> Format de Sortie</h2>
+    <div class="form-group">
+        <label>Choisissez le format (A4 par défaut) :</label>
+        <div class="format-grid">
+            
+            <label class="format-option" style="border-color: var(--primary-color); background-color: #f0f9ff;">
+                <input type="radio" name="formatOption" value="a4" checked>
+                <div class="format-info">
+                    <span class="format-title">A4 Portrait (ISO Standard)</span>
+                    <span class="format-desc">Le format classique pour fiches de révision et impression PDF.</span>
+                </div>
+                <i class="fas fa-file-pdf" style="opacity: 0.5;"></i>
+            </label>
+
+            <label class="format-option">
+                <input type="radio" name="formatOption" value="blog">
+                <div class="format-info">
+                    <span class="format-title">Infographie Longue (Web)</span>
+                    <span class="format-desc">Vertical (1:2.5) - Pour le défilement sur écran.</span>
+                </div>
+            </label>
+
+            <label class="format-option">
+                <input type="radio" name="formatOption" value="square">
+                <div class="format-info">
+                    <span class="format-title">Carré (1:1)</span>
+                    <span class="format-desc">Pour Instagram ou posts réseaux sociaux.</span>
+                </div>
+            </label>
+
+             <label class="format-option">
+                <input type="radio" name="formatOption" value="widescreen">
+                <div class="format-info">
+                    <span class="format-title">Paysage (16:9)</span>
+                    <span class="format-desc">Pour diapositives PowerPoint ou écrans.</span>
+                </div>
+            </label>
+
+        </div>
+    </div>
+
+    <button class="btn-generate" onclick="generateSummaryPrompt()">Générer le Prompt Complet</button>
+
+    <div id="output-section">
+        <h2><span>4</span> Prompt Final</h2>
+        <div class="output-container">
+            <textarea id="final-prompt" readonly></textarea>
+            <button class="btn-copy" onclick="copyToClipboard()">Copier</button>
+        </div>
+        <p class="helper-text" style="text-align: center; margin-top: 15px;">Prompt optimisé pour inclure le texte et respecter vos contraintes.</p>
+    </div>
+
+</div>
+
+<script>
+    // --- FONCTIONS PALETTE ---
+    function togglePalette() {
+        const checkbox = document.getElementById('usePalette');
+        const select = document.getElementById('paletteCount');
+        const section = document.getElementById('paletteSection');
+        if (checkbox.checked) {
+            select.disabled = false;
+            section.classList.remove('disabled');
+        } else {
+            select.disabled = true;
+            section.classList.add('disabled');
+        }
+    }
+
+    function updatePaletteInputs() {
+        const count = document.getElementById('paletteCount').value;
+        const col2 = document.getElementById('palColor2');
+        const col3 = document.getElementById('palColor3');
+        if (count === "1") { col2.style.display = 'none'; col3.style.display = 'none'; }
+        else if (count === "2") { col2.style.display = 'block'; col3.style.display = 'none'; }
+        else { col2.style.display = 'block'; col3.style.display = 'block'; }
+    }
+
+    // --- DICTIONNAIRES (Fusionnés) ---
+    const styleDescriptions = {
+        "blueprint": "Technical blueprint design. White/Cyan lines on dark blue background. Schematics, grid overlays, precise engineering look.",
+        "flatDesign": "Modern Corporate Memphis Flat Design. Geometric shapes, solid colors, clean white space. Excellent for data and text readability.",
+        "isometric3D": "3D Isometric view. Elements look like high-quality miniature models. Soft lighting, educational toy aesthetic.",
+        "comicBook": "Comic Book illustration. Bold black ink outlines, halftone patterns, expressive colors. Graphic novel style.",
+        "watercolor": "Watercolor and Ink. Soft artistic washes, textured paper background, combined with sharp ink outlines.",
+        "cyberpunk": "Cyberpunk aesthetic. Neon lights, high contrast, dark background, futuristic data streams.",
+        "claymorphism": "3D Claymorphism. Soft, inflated shapes, matte plastic texture, rounded edges, friendly and tactile."
+    };
+
+    const colorDescriptions = {
+        "tech": "Glowing electric blues, deep cyans and safety oranges on dark grey.",
+        "eco": "Natural palette: fresh greens, sky blues, and earthy wood/beige tones.",
+        "monochrome": "Strict grayscale with ONE striking accent color (like yellow or red).",
+        "vibrant": "Cheerful, saturated primary colors (Blue, Red, Yellow). High contrast.",
+        "pastel": "Soft desaturated pastel tones: mint, baby blue, pink. Low contrast background.",
+        "darkmode": "Dark background (charcoal/black). Text in white or light grey.",
+        "warm": "Warm sunset tones: oranges, golds, ambers and soft reds."
+    };
+
+    const layoutDescriptions = {
+        "topDownFlow": "Vertical Flow layout. Title at top. Summary points arranged in sequential stacked modules downwards, connected by arrows.",
+        "centralTopic": "Central Mind-Map layout. Main Title in the center. Points radiate outwards in surrounding modules.",
+        "timelineVertical": "Vertical Timeline. A strong line runs down the center/side. Points branch off chronologically.",
+        "modularGrid": "Bento Grid layout. Organized rectangular panels. Each point gets its own dedicated box.",
+        "splitLeftRight": "Split Screen. Page divided vertically. One side for main visual, other side for list of points.",
+        "flowPath": "Winding Path layout. A game-board style path leading from point 1 to point X."
+    };
+    
+    const formatSettings = {
+        "a4": "--ar 210:297",
+        "blog": "--ar 1:2.5",
+        "square": "--ar 1:1",
+        "widescreen": "--ar 16:9"
+    };
+
+    function generateSummaryPrompt() {
+        const title = document.getElementById('courseTitle').value;
+        const points = document.getElementById('summaryPoints').value;
+        const selectedStyleKey = document.getElementById('styleSelect').value;
+        const selectedLayoutKey = document.getElementById('layoutSelect').value;
+        const selectedFormatKey = document.querySelector('input[name="formatOption"]:checked').value;
+        
+        // Palette Logic
+        const usePalette = document.getElementById('usePalette').checked;
+        const paletteCount = document.getElementById('paletteCount').value;
+        const c1 = document.getElementById('palColor1').value;
+        const c2 = document.getElementById('palColor2').value;
+        const c3 = document.getElementById('palColor3').value;
+
+        // Override Logic
+        const customDesign = document.getElementById('customDesign').value.trim();
+
+        if (!title.trim() || !points.trim()) {
+            alert("Veuillez remplir le Titre et les Points Clés.");
+            return;
+        }
+
+        let prompt = `!!! GÉNÉRATION D'INFOGRAPHIE TEXTUELLE !!!\n`;
+        prompt += `INSTRUCTION : Crée une infographie pédagogique riche contenant du TEXTE LISIBLE.\n\n`;
+        
+        // Priorité Override
+        if (customDesign) {
+            prompt += `#######################################################\n`;
+            prompt += `### DIRECTIVE PRIORITAIRE (DESIGN OVERRIDE) ###\n`;
+            prompt += `L'utilisateur impose : "${customDesign}"\n`;
+            prompt += `#######################################################\n\n`;
+        }
+
+        prompt += `--- 1. CONTENU TEXTUEL (OBLIGATOIRE) ---\n`;
+        prompt += `TITRE : "${title}"\n`;
+        prompt += `POINTS CLÉS (Créer une section visuelle pour chacun) :\n"${points}"\n\n`;
+
+        prompt += `--- 2. PARAMÈTRES VISUELS ---\n`;
+        prompt += `STYLE : ${styleDescriptions[selectedStyleKey]}\n`;
+        prompt += `STRUCTURE : ${layoutDescriptions[selectedLayoutKey]}\n`;
+        
+        if (usePalette) {
+            prompt += `COULEURS (PALETTE FORCÉE) : `;
+            if (paletteCount === "1") prompt += `Monochrome basé sur ${c1}.`;
+            if (paletteCount === "2") prompt += `Duo : ${c1} et ${c2}.`;
+            if (paletteCount === "3") prompt += `Trio : ${c1}, ${c2}, ${c3}.`;
+            prompt += `\n`;
+        } else {
+             // Fallback to standard color selection if palette not active (et override vide)
+             const colorKey = document.getElementById('colorSelect').value;
+             prompt += `COULEURS : ${colorDescriptions[colorKey]}\n`;
+        }
+
+        prompt += `\n--- 3. INSTRUCTIONS TECHNIQUES ---\n`;
+        prompt += `- Assure une lisibilité parfaite du texte.\n`;
+        prompt += `- Pas de "Lorem Ipsum", utilise le texte fourni.\n`;
+        prompt += `- Haute résolution 8k.\n`;
+        prompt += `${formatSettings[selectedFormatKey]}`; // Ajout du ratio à la fin
+
+        document.getElementById('final-prompt').value = prompt;
+        document.getElementById('output-section').style.display = 'block';
+        document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyToClipboard() {
+        const copyText = document.getElementById("final-prompt");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        try {
+            document.execCommand('copy');
+            const btn = document.querySelector('.btn-copy');
+            const originalText = btn.innerText;
+            btn.innerText = "Copié !";
+            btn.style.background = "#22c55e";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "rgba(255,255,255,0.1)";
+            }, 2000);
+        } catch (err) {
+            console.error("Erreur de copie");
+        }
+    }
+</script>
+
+</body>
+</html>
