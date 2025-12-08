@@ -58,6 +58,11 @@
             display: flex;
             flex-direction: column;
         }
+        /* Classe pour réduire la hauteur des cartes infographies */
+        .card-content-compact {
+            padding: 1.25rem !important;
+        }
+        
         .card-title {
             font-size: 1.15rem;
             font-weight: 700;
@@ -272,9 +277,9 @@
                         <div class="h-1 w-full bg-gradient-to-r from-blue-400 to-sky-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
 
-                    <!-- NOUVEAU OUTIL: Infographie Début -->
+                    <!-- NOUVEAU OUTIL: Infographie Début (COMPACT) -->
                     <a href="infographiedebut.html" class="tool-card group">
-                        <div class="card-content">
+                        <div class="card-content card-content-compact">
                             <span class="output-badge badge-img-prompt"><i class="fas fa-paint-brush"></i> Prompt → Image</span>
                             <h3 class="card-title text-slate-800 group-hover:text-blue-600 transition-colors">Infographie d'Accroche</h3>
                             <p class="card-description">Générez un prompt précis pour créer une image d'intro (narratif, compétences, style).</p>
@@ -282,9 +287,19 @@
                         <div class="h-1 w-full bg-gradient-to-r from-rose-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
 
-                    <!-- NOUVEAU OUTIL: Infographie Fin -->
+                    <!-- NOUVEAU OUTIL: Infographie Résumé (COMPACT) -->
+                    <a href="generateur_resume_A4.html" class="tool-card group">
+                        <div class="card-content card-content-compact">
+                            <span class="output-badge badge-img-prompt"><i class="fas fa-file-alt"></i> Prompt → A4</span>
+                            <h3 class="card-title text-slate-800 group-hover:text-blue-600 transition-colors">Infographie Résumé</h3>
+                            <p class="card-description">Créez une fiche de synthèse A4 visuelle et structurée pour vos cours.</p>
+                        </div>
+                        <div class="h-1 w-full bg-gradient-to-r from-rose-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    </a>
+
+                    <!-- NOUVEAU OUTIL: Infographie Fin (COMPACT) -->
                     <a href="infographiefin.html" class="tool-card group">
-                        <div class="card-content">
+                        <div class="card-content card-content-compact">
                             <span class="output-badge badge-img-prompt"><i class="fas fa-flag-checkered"></i> Prompt → Image</span>
                             <h3 class="card-title text-slate-800 group-hover:text-blue-600 transition-colors">Synthèse & Glossaire</h3>
                             <p class="card-description">Générez une infographie de bilan pour clore un chapitre (résumé visuel, définitions).</p>
