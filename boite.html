@@ -107,14 +107,12 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- Bouton Retour Flottant (Mobile) -->
     <a href="index.html" class="fixed bottom-6 left-6 z-40 md:hidden w-12 h-12 bg-white text-slate-700 rounded-full shadow-lg flex items-center justify-center border border-slate-200 active:scale-95 transition-transform">
         <i class="fas fa-arrow-left"></i>
     </a>
 
     <div class="container mx-auto max-w-7xl px-4 sm:px-6 py-10 md:py-16 flex-grow">
         
-        <!-- Navigation Desktop -->
         <div class="hidden md:block mb-8 fade-in-up">
             <a href="index.html" class="inline-flex items-center gap-2 text-slate-500 hover:text-sky-600 font-medium transition-colors duration-300 group">
                 <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:border-sky-200 group-hover:bg-sky-50 transition-colors">
@@ -137,7 +135,6 @@
                 L'atelier de l'enseignant : créez, modifiez et convertissez vos supports de cours en quelques clics.
             </p>
 
-            <!-- Barre de Recherche -->
             <div class="max-w-xl mx-auto relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <i class="fas fa-search text-slate-400 group-focus-within:text-sky-500 transition-colors"></i>
@@ -150,7 +147,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
-            <!-- Section 1: Web & Édition -->
             <section class="category-section fade-in-up delay-100">
                 <div class="flex items-center gap-3 mb-6 px-2">
                     <div class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
@@ -199,7 +195,6 @@
                 </div>
             </section>
 
-            <!-- Section 2: Interactif -->
             <section class="category-section fade-in-up delay-200">
                 <div class="flex items-center gap-3 mb-6 px-2">
                     <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
@@ -236,7 +231,6 @@
                         <div class="h-1 w-full bg-gradient-to-r from-purple-400 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
 
-                    <!-- Trigger Modal -->
                     <a href="#" id="open-jeux-modal" class="tool-card group border-purple-200 bg-purple-50/50">
                         <div class="card-content relative">
                             <div class="absolute top-4 right-4 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
@@ -249,7 +243,6 @@
                 </div>
             </section>
 
-            <!-- Section 3: Exercices & Exports -->
             <section class="category-section fade-in-up delay-300">
                 <div class="flex items-center gap-3 mb-6 px-2">
                     <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
@@ -277,7 +270,6 @@
                         <div class="h-1 w-full bg-gradient-to-r from-blue-400 to-sky-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
 
-                    <!-- NOUVEAU OUTIL: Infographie Début (COMPACT) -->
                     <a href="infographiedebut.html" class="tool-card group">
                         <div class="card-content card-content-compact">
                             <span class="output-badge badge-img-prompt"><i class="fas fa-paint-brush"></i> Prompt → Image</span>
@@ -287,8 +279,7 @@
                         <div class="h-1 w-full bg-gradient-to-r from-rose-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
 
-                    <!-- NOUVEAU OUTIL: Infographie Résumé (COMPACT) -->
-                    <a href="generateur_resume_A4.html" class="tool-card group">
+                    <a href="infographieresume.html" class="tool-card group">
                         <div class="card-content card-content-compact">
                             <span class="output-badge badge-img-prompt"><i class="fas fa-file-alt"></i> Prompt → A4</span>
                             <h3 class="card-title text-slate-800 group-hover:text-blue-600 transition-colors">Infographie Résumé</h3>
@@ -297,7 +288,6 @@
                         <div class="h-1 w-full bg-gradient-to-r from-rose-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </a>
 
-                    <!-- NOUVEAU OUTIL: Infographie Fin (COMPACT) -->
                     <a href="infographiefin.html" class="tool-card group">
                         <div class="card-content card-content-compact">
                             <span class="output-badge badge-img-prompt"><i class="fas fa-flag-checkered"></i> Prompt → Image</span>
@@ -330,11 +320,9 @@
         </div>
     </footer>
 
-    <!-- MODALE JEUX (Design Amélioré) -->
     <div id="jeux-modal" class="modal-hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-transition">
         <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg p-0 relative overflow-hidden">
             
-            <!-- Header Modale -->
             <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white relative">
                  <button id="close-jeux-modal" class="absolute top-4 right-4 text-white/70 hover:text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all">
                     <i class="fas fa-times"></i>
