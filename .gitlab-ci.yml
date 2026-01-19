@@ -1,8 +1,10 @@
 pages:
   stage: deploy
   script:
-    - mkdir -p public
-    - cp -r * public/
+    - mkdir .temp                  # On crée un dossier temporaire
+    - cp -r * .temp/               # On copie tout dedans
+    - rm -rf public                # On supprime l'ancien dossier public s'il existe
+    - mv .temp public              # On renomme le dossier temporaire en public
   artifacts:
     paths:
       - public
