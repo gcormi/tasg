@@ -1,10 +1,9 @@
 pages:
   stage: deploy
   script:
-    - mkdir .temp                  # On crée un dossier neutre
-    - cp -r * .temp/               # On y copie tout votre projet (dont le dossier 3D)
-    - rm -rf public                # On supprime toute ancienne trace du dossier public
-    - mv .temp public              # On renomme le dossier neutre en 'public' pour la Forge
+    - mkdir -p public
+    - cp index.html public/
+    - cp -r 3D/ public/
   artifacts:
     paths:
       - public
