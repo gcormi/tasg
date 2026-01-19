@@ -1,10 +1,10 @@
 pages:
   stage: deploy
   script:
-    - mkdir .temp                  # On crée un dossier temporaire
-    - cp -r * .temp/               # On copie tout dedans
-    - rm -rf public                # On supprime l'ancien dossier public s'il existe
-    - mv .temp public              # On renomme le dossier temporaire en public
+    - mkdir .temp                  # On crée un dossier neutre
+    - cp -r * .temp/               # On y copie tout votre projet (dont le dossier 3D)
+    - rm -rf public                # On supprime toute ancienne trace du dossier public
+    - mv .temp public              # On renomme le dossier neutre en 'public' pour la Forge
   artifacts:
     paths:
       - public
