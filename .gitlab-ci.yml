@@ -1,16 +1,11 @@
 pages:
   stage: deploy
   script:
-    - echo "Sauvegarde et publication de TOUS les dossiers..."
-    # 1. On crée un dossier temporaire caché
     - mkdir .public
-    # 2. On copie TOUT ce qu'il y a dans votre dépôt vers ce dossier
     - cp -r * .public
-    # 3. On renomme ce dossier en 'public' (le nom exigé par la Forge)
     - mv .public public
   artifacts:
     paths:
       - public
   only:
     - main
-    - master ÉTAIT
