@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail IA Éducative | Documentation & Outils</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap');
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Glassmorphism & Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Nav Pills Active State */
+        .nav-pill.active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-weight: 700;
+            border: 1px solid #bfdbfe;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer group" onclick="showSection('home')">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="font-heading font-bold text-xl tracking-tight text-slate-900">Edu<span
+                                class="text-blue-600">Portail</span></h1>
+                        <p class="text-xs text-slate-500 font-medium">Documentation & Outils</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-1 bg-slate-100/80 p-1.5 rounded-full border border-slate-200">
+                    <button onclick="showSection('novapeda')"
+                        class="nav-pill px-3 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-blue-600 transition">NovaPéda</button>
+                    <button onclick="showSection('prompts')"
+                        class="nav-pill px-3 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-cyan-600 transition">Prompts</button>
+                    <button onclick="showSection('dictia')"
+                        class="nav-pill px-3 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-blue-600 transition">DictIA</button>
+                    <button onclick="showSection('caramel')"
+                        class="nav-pill px-3 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-blue-600 transition">Caramel</button>
+                    <button onclick="showSection('hapi')"
+                        class="nav-pill px-3 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-blue-600 transition">HAPI</button>
+                    <button onclick="showSection('audit')"
+                        class="nav-pill px-3 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-rose-600 transition border-l border-slate-300 ml-1 pl-3"><i class="fa-solid fa-brain mr-1"></i>Audit</button>
+
+                </div>
+
+                <!-- Mobile Button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 p-4 space-y-2 shadow-lg">
+            <button onclick="showSection('novapeda'); toggleMobileMenu()"
+                class="block w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-700">NovaPéda</button>
+            <button onclick="showSection('prompts'); toggleMobileMenu()"
+                class="block w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-700">Prompts de Prof</button>
+            <button onclick="showSection('dictia'); toggleMobileMenu()"
+                class="block w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-700">DictIA</button>
+            <button onclick="showSection('caramel'); toggleMobileMenu()"
+                class="block w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-700">Caramel</button>
+            <button onclick="showSection('hapi'); toggleMobileMenu()"
+                class="block w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-700">Hub
+                HAPI</button>
+            <button onclick="showSection('audit'); toggleMobileMenu()"
+                class="block w-full text-left px-4 py-3 rounded-lg hover:bg-rose-50 font-medium text-rose-700 border border-rose-100">Esprit Critique (Audit)</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-28 pb-12 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen">
+
+        <!-- ================= HOME SECTION ================= -->
+        <div id="home" class="section-content block fade-in-up">
+            <div class="text-center py-16">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">
+                    L'Écosystème <br><span class="text-gradient">IA Éducative</span>
+                </h1>
+                <p class="text-xl text-slate-600 max-w-4xl mx-auto mb-12 leading-relaxed">
+                    Une documentation technique détaillée pour maîtriser les outils souverains et les solutions
+                    gratuites performantes.
+                    <br>Apprenez à générer, différencier, scénariser et intégrer vos contenus.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <!-- NovaPeda Card -->
+                <div onclick="showSection('novapeda')"
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-purple-200 transition cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div
+                            class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mr-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">NovaPéda</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">L'orchestrateur pédagogique. Idéal pour créer des séquences de cours,
+                        des évaluations et des assistants virtuels (Chatbots) pour élèves.</p>
+                    <div class="text-sm font-semibold text-purple-600 group-hover:underline">Voir le guide complet
+                        &rarr;</div>
+                </div>
+
+                <!-- Prompts de Prof Card (NEW) -->
+                <div onclick="showSection('prompts')"
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-cyan-200 transition cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div
+                            class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center text-cyan-600 mr-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-quote-right text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">Prompts de Prof</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">La banque de ressources prête à l'emploi. Une collection de prompts optimisés à copier-coller (Lettres, QCM, Administratif).</p>
+                    <div class="text-sm font-semibold text-cyan-600 group-hover:underline">Voir la banque &rarr;
+                    </div>
+                </div>
+
+                <!-- DictIA Card -->
+                <div onclick="showSection('dictia')"
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-green-200 transition cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div
+                            class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600 mr-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-pen-nib text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">DictIA</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">Le spécialiste de la différenciation. Génère des dictées et textes
+                        adaptés (DYS, niveaux multiples) à partir de vos mots-clés.</p>
+                    <div class="text-sm font-semibold text-green-600 group-hover:underline">Voir le guide complet &rarr;
+                    </div>
+                </div>
+
+                <!-- Caramel Card -->
+                <div onclick="showSection('caramel')"
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-orange-200 transition cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div
+                            class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 mr-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-cubes-stacked text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">Caramel</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">L'usine à activités interactives. Transforme documents et textes en
+                        modules H5P, Quiz Moodle et jeux éducatifs.</p>
+                    <div class="text-sm font-semibold text-orange-600 group-hover:underline">Voir le guide complet
+                        &rarr;</div>
+                </div>
+
+                <!-- Hub HAPI Card -->
+                <div onclick="showSection('hapi')"
+                    class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-200 transition cursor-pointer group">
+                    <div class="flex items-center mb-4">
+                        <div
+                            class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mr-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-network-wired text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">Hub HAPI</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">L'atelier multimédia avancé. Création de paquets SCORM légers,
+                        visualisation 3D et fusion de contenus H5P.</p>
+                    <div class="text-sm font-semibold text-blue-600 group-hover:underline">Voir le guide complet &rarr;
+                    </div>
+                </div>
+
+                 <!-- Esprit Critique Card -->
+                 <div onclick="showSection('audit')"
+                 class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-rose-200 transition cursor-pointer group relative overflow-hidden">
+                 <div class="absolute top-0 right-0 bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">NOUVEAU</div>
+                 <div class="flex items-center mb-4">
+                     <div
+                         class="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center text-rose-600 mr-4 group-hover:scale-110 transition">
+                         <i class="fa-solid fa-shield-halved text-xl"></i>
+                     </div>
+                     <h3 class="text-2xl font-bold text-slate-800">Esprit Critique</h3>
+                 </div>
+                 <p class="text-slate-600 mb-4">Le protocole A.U.D.I.T. Des séquences pédagogiques clés en main pour former les "Pilotes de l'IA" et déjouer les pièges (biais, hallucinations).</p>
+                 <div class="text-sm font-semibold text-rose-600 group-hover:underline">Voir le protocole &rarr;
+                 </div>
+             </div>
+
+            </div>
+        </div>
+
+        <!-- ================= NOVAPEDA DETAIL ================= -->
+        <div id="novapeda" class="section-content hidden fade-in-up">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <!-- Header -->
+                <div class="bg-slate-900 text-white p-10 border-b border-purple-500/30 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span
+                                    class="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Prompt
+                                    Engineering</span>
+                                <span
+                                    class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Générateur</span>
+                            </div>
+                            <h2 class="text-4xl font-bold font-heading mb-2">NovaPéda</h2>
+                            <p class="text-slate-400 text-lg">L'assistant pédagogique universel & générateur d'agents
+                                conversationnels.</p>
+                        </div>
+                        <a href="https://novapeda.eu" target="_blank"
+                            class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg flex items-center">
+                            Accéder à l'outil <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                    <!-- Main Column -->
+                    <div class="lg:col-span-8 space-y-12">
+
+                        <!-- Section: What is it really? -->
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-purple-600 pl-4">1.
+                                C'est quoi concrètement ?</h3>
+                            <div class="prose text-slate-600 max-w-none">
+                                <p class="mb-3">
+                                    NovaPéda agit comme un <strong>"Middleware" (une surcouche intelligente)</strong>
+                                    entre vous et les Intelligences Artificielles génériques (ChatGPT, Mistral, Claude).
+                                    Au lieu de devoir rédiger vous-même des prompts complexes ("Agis comme un expert,
+                                    fais-moi un cours..."), NovaPéda vous propose des <strong>formulaires pédagogiques
+                                        simples</strong> (cases à cocher, menus déroulants).
+                                </p>
+                                <p>
+                                    En arrière-plan, l'outil transforme vos clics en un "Super-Prompt" de plus de 50
+                                    lignes, hyper-structuré, optimisé pour obtenir le meilleur résultat possible de
+                                    l'IA.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Section: Detailed Features -->
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-purple-600 pl-4">2.
+                                Fonctionnalités Détaillées</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-100">
+                                    <strong class="text-purple-700 block mb-2"><i
+                                            class="fa-solid fa-robot mr-2"></i>Didak'Bots (Chatbots Élèves)</strong>
+                                    <p class="text-sm text-slate-600 mb-2">Créez une page web de discussion sécurisée
+                                        pour vos élèves.</p>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                        <li><strong>Tuteur de méthode :</strong> Guide l'élève sans donner la réponse.
+                                        </li>
+                                        <li><strong>Personnage Historique :</strong> Incarne Napoléon, Marie Curie...
+                                        </li>
+                                        <li><strong>Débatteur Socratique :</strong> Challenge les arguments de l'élève.
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-100">
+                                    <strong class="text-purple-700 block mb-2"><i
+                                            class="fa-solid fa-person-chalkboard mr-2"></i>Ingénierie de Cours</strong>
+                                    <p class="text-sm text-slate-600 mb-2">Générez toute la documentation enseignante.
+                                    </p>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                        <li><strong>Séquence complète :</strong> Déroulé séance par séance.</li>
+                                        <li><strong>Différenciation :</strong> Adaptation de textes pour DYS /
+                                            Allophones.</li>
+                                        <li><strong>Évaluation :</strong> Création de sujets d'examen avec corrigé.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section: Redundancy Analysis -->
+                        <section class="mt-8">
+                            <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-lg">
+                                <div class="flex items-start">
+                                    <i class="fa-solid fa-scale-balanced text-amber-600 text-xl mt-1 mr-4"></i>
+                                    <div>
+                                        <h4 class="font-bold text-amber-900 mb-2">Comparatif : NovaPéda vs Prompts de Prof</h4>
+                                        <p class="text-sm text-amber-800 mb-3">
+                                            Attention, ces deux outils semblent faire la même chose (fournir des prompts), mais leur usage diffère :
+                                        </p>
+                                        <ul class="list-disc list-inside text-sm text-amber-800 space-y-1">
+                                            <li><strong>Utilisez NovaPéda si :</strong> Vous voulez du "Sur-Mesure". Vous remplissez un formulaire pour que l'IA génère un contenu spécifique à VOS besoins (votre niveau, votre chapitre précis).</li>
+                                            <li><strong>Utilisez Prompts de Prof si :</strong> Vous voulez de la rapidité (Bibliothèque). Vous cherchez un modèle standard ("Prompt type pour corriger des copies") à copier-coller tel quel.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                    <!-- Sidebar: Compatibility & Platforms -->
+                    <div class="lg:col-span-4 space-y-8">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 mb-2">Modèles IA Supportés</h4>
+                            <p class="text-xs text-slate-500 mb-4">NovaPéda ne "contient" pas l'IA, il s'y connecte ou
+                                vous donne le prompt pour elle.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-slate-100 rounded text-xs border border-slate-200">ChatGPT</span>
+                                <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs border border-indigo-200 font-bold">Mistral</span>
+                                <span class="px-2 py-1 bg-slate-100 rounded text-xs border border-slate-200">Claude</span>
+                                <span class="px-2 py-1 bg-slate-100 rounded text-xs border border-slate-200">Gemini</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PROMPTS DE PROF DETAIL (NEW) ================= -->
+        <div id="prompts" class="section-content hidden fade-in-up">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <!-- Header -->
+                <div class="bg-slate-900 text-white p-10 border-b border-cyan-500/30 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="bg-cyan-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Ressource</span>
+                                <span class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Bibliothèque</span>
+                            </div>
+                            <h2 class="text-4xl font-bold font-heading mb-2">Prompts de Prof</h2>
+                            <p class="text-slate-400 text-lg">La grande bibliothèque de prompts prêts à l'emploi.</p>
+                        </div>
+                        <a href="https://prompts-de-prof-9ddf3a.forge.apps.education.fr/index.html" target="_blank"
+                            class="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg flex items-center">
+                            Accéder à la banque <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 space-y-12">
+                        
+                        <!-- Section: Description -->
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-cyan-600 pl-4">1. C'est quoi concrètement ?</h3>
+                            <div class="prose text-slate-600 max-w-none">
+                                <p>
+                                    C'est un <strong>catalogue collaboratif</strong> hébergé sur la Forge. Contrairement à un générateur, il ne vous demande pas de paramètres. Il vous présente une liste de "recettes de cuisine" (prompts) qui ont été testées et validées par d'autres enseignants.
+                                </p>
+                                <p>
+                                    L'interface est minimaliste : vous cherchez un besoin (ex: "Créer un QCM"), vous cliquez, vous copiez le texte, et vous le collez dans votre IA.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Section: Redundancy Analysis (Reverse) -->
+                        <section>
+                             <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-lg">
+                                <div class="flex items-start">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl mt-1 mr-4"></i>
+                                    <div>
+                                        <h4 class="font-bold text-amber-900 mb-2">Point de Vigilance : Redondance avec NovaPéda</h4>
+                                        <p class="text-sm text-amber-800">
+                                            Ne confondez pas les deux outils. "Prompts de Prof" est statique (une liste fixe), alors que "NovaPéda" est dynamique (il écrit le prompt pour vous).
+                                        </p>
+                                        <p class="text-sm text-amber-800 mt-2 font-semibold">
+                                            Conseil d'Expert : Commencez par "Prompts de Prof" pour comprendre la structure d'un prompt, puis passez à "NovaPéda" pour industrialiser votre production.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section: Categories -->
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-cyan-600 pl-4">2. Que trouve-t-on dedans ?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <h5 class="font-bold text-slate-800 mb-2">📚 Pédagogie</h5>
+                                    <ul class="text-sm text-slate-600 list-disc list-inside">
+                                        <li>Créateur de QCM (Format Moodle/Pronote)</li>
+                                        <li>Générateur de plan de cours</li>
+                                        <li>Correcteur orthographique bienveillant</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <h5 class="font-bold text-slate-800 mb-2">👔 Administratif</h5>
+                                    <ul class="text-sm text-slate-600 list-disc list-inside">
+                                        <li>Rédaction de mots aux parents</li>
+                                        <li>Synthèse de bulletins scolaires</li>
+                                        <li>Lettres de projet PACTE</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                    <div class="lg:col-span-4 space-y-8">
+                        <div class="bg-cyan-50 p-6 rounded-2xl border border-cyan-100">
+                            <h4 class="font-bold text-cyan-900 mb-4"><i class="fa-solid fa-users mr-2"></i>Communauté</h4>
+                            <p class="text-sm text-slate-600 mb-4">
+                                Ce projet est collaboratif. Vous pouvez proposer vos propres "meilleurs prompts" pour enrichir la base.
+                            </p>
+                            <div class="text-xs text-slate-500">
+                                <i class="fa-brands fa-git-alt mr-1"></i> Hébergé sur la Forge des Communs Numériques.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= DICTIA DETAIL ================= -->
+        <div id="dictia" class="section-content hidden fade-in-up">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <div class="bg-slate-900 text-white p-10 border-b border-green-500/30 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span
+                                    class="bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Français
+                                    & Langues</span>
+                                <span
+                                    class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Inclusion
+                                    Scolaire</span>
+                            </div>
+                            <h2 class="text-4xl font-bold font-heading mb-2">DictIA</h2>
+                            <p class="text-slate-400 text-lg">Générateur de textes sur-mesure pour la lecture et
+                                l'orthographe.</p>
+                        </div>
+                        <a href="https://educajou.forge.apps.education.fr/dictia/" target="_blank"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg flex items-center">
+                            Accéder à l'outil <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 space-y-12">
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-green-600 pl-4">1. C'est
+                                quoi concrètement ?</h3>
+                            <div class="prose text-slate-600 max-w-none">
+                                <p>
+                                    DictIA résout un problème classique : trouver un texte intéressant qui respecte
+                                    <strong>exactement</strong> les contraintes de votre classe à un instant T (ex: "Je
+                                    veux du Passé Simple, mais pas de mots compliqués, et ça doit parler de Pirates").
+                                </p>
+                                <p>
+                                    C'est un outil de <strong>Différenciation Massive</strong> : en un clic, il vous
+                                    donne non seulement le texte, mais aussi ses versions adaptées pour les élèves en
+                                    difficulté.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-green-600 pl-4">2.
+                                Fonctionnalités Détaillées</h3>
+
+                            <!-- Tab-like display of parameters -->
+                            <div class="space-y-4">
+                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+                                    <h4 class="font-bold text-slate-800 mb-2">🎛️ Paramétrage Fin (Les Entrées)</h4>
+                                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-slate-600">
+                                        <li>• <strong>Niveaux :</strong> Du CP à la 3ème (vocabulaire ajusté).</li>
+                                        <li>• <strong>Temps Verbaux :</strong> Cochez uniquement ce que vous avez étudié
+                                            (ex: Présent + Futur). L'IA n'utilisera AUCUN autre temps.</li>
+                                        <li>• <strong>Mots Imposés :</strong> Collez votre liste de mots de la semaine.
+                                            Ils seront intégrés naturellement dans l'histoire.</li>
+                                        <li>• <strong>Longueur :</strong> Courte (flash), Moyenne ou Longue (brevet).
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-green-50 border border-green-100 p-4 rounded-lg">
+                                    <h4 class="font-bold text-green-900 mb-2">✨ Les 3 Sorties Simultanées (Outputs)</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                                        <div class="bg-white p-3 rounded shadow-sm">
+                                            <div class="font-bold text-slate-800 border-b pb-1 mb-1">Standard</div>
+                                            <div class="text-xs text-slate-500">Texte maître pour l'enseignant.</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded shadow-sm">
+                                            <div class="font-bold text-slate-800 border-b pb-1 mb-1">À Trous</div>
+                                            <div class="text-xs text-slate-500">Ciblage intelligent (verbes,
+                                                pluriels...).</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded shadow-sm">
+                                            <div class="font-bold text-slate-800 border-b pb-1 mb-1">DYS / Adapté</div>
+                                            <div class="text-xs text-slate-500">Police adaptée, espacements, phrases
+                                                simples.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-green-600 pl-4">3.
+                                Matrice Technique</h3>
+                            <div class="overflow-x-auto mb-10 text-slate-600 border border-slate-200 rounded-lg">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-4 py-3">Module</th>
+                                            <th class="px-4 py-3">Entrée</th>
+                                            <th class="px-4 py-3">Sortie</th>
+                                            <th class="px-4 py-3">Usage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Générateur</td>
+                                            <td class="px-4 py-3">Params + Mots</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-mono">Prompt
+                                                    Auto</span></td>
+                                            <td class="px-4 py-3">Vers IA Web</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Adaptation</td>
+                                            <td class="px-4 py-3">Coche "DYS" / "Trous"</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-mono">Texte
+                                                    Formaté</span></td>
+                                            <td class="px-4 py-3">Impression / Projection</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-green-600 pl-4">4.
+                                Tutoriel & Workflow</h3>
+                            <div class="space-y-4">
+                                <h5 class="font-semibold text-slate-700">Comment "Construire" sa dictée :</h5>
+                                <ol class="list-decimal list-inside space-y-3 text-slate-600">
+                                    <li class="pl-2">Ouvrez l'interface. Sélectionnez le niveau (ex: CM1 - Période 3).
+                                    </li>
+                                    <li class="pl-2">Dans "Temps", cochez <strong>Imparfait</strong>. Décochez le reste.
+                                    </li>
+                                    <li class="pl-2">Dans "Mots à inclure", écrivez : <em>château, douves, pont-levis,
+                                            seigneur</em>.</li>
+                                    <li class="pl-2">Dans "Thème", mettez : <em>Une attaque nocturne</em>.</li>
+                                    <li class="pl-2">Cliquez sur le bouton <strong>"Copier le prompt pour
+                                            ChatGPT/Mistral"</strong> ou utilisez le lien direct si configuré.</li>
+                                    <li class="pl-2">Collez ce prompt dans votre IA conversationnelle préférée.</li>
+                                    <li class="pl-2">Copiez-collez le résultat (les 3 versions) dans votre traitement de
+                                        texte habituel (Word/LibreOffice) pour la mise en page finale.</li>
+                                </ol>
+                            </div>
+                        </section>
+
+                        <!-- Community -->
+                        <section class="mt-8">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-green-600 pl-4">5. Ce
+                                qu'en dit la communauté</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-green-50 p-6 rounded-xl border border-green-100">
+                                    <strong class="text-green-900 block mb-2"><i
+                                            class="fa-solid fa-thumbs-up mr-2"></i>Les Points Forts</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-700 space-y-2">
+                                        <li>La "pépite" des professeurs des écoles (PE).</li>
+                                        <li>Gain de temps énorme sur la différenciation (DYS / Trous).</li>
+                                        <li>Possibilité d'imposer les "mots de la semaine" très pratique.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                                    <strong class="text-slate-700 block mb-2"><i
+                                            class="fa-solid fa-circle-info mr-2"></i>Points de Vigilance</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
+                                        <li>Toujours relire le texte : l'IA peut parfois faire des phrases alambiquées
+                                            pour caser un mot imposé.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="text-sm text-slate-500 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <p class="font-bold text-slate-700 mb-1"><i
+                                        class="fa-solid fa-scale-balanced mr-2"></i>Mentions Légales & Données</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>Auteur :</strong> Arnaud Champollion (Éducajou).</li>
+                                    <li><strong>Licence :</strong> GNU GPL v3 (Logiciel Libre).</li>
+                                    <li><strong>Données :</strong> Zéro traceur. Aucune collecte de donnée.</li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="lg:col-span-4 space-y-8">
+                        <div class="bg-green-50 p-6 rounded-2xl border border-green-100">
+                            <h4 class="font-bold text-green-900 mb-4"><i class="fa-solid fa-shapes mr-2"></i>Usage &
+                                Plateformes</h4>
+                            <p class="text-sm text-green-800 mb-4 font-medium">DictIA est un générateur de "Contenu
+                                Brut".</p>
+                            <ul class="space-y-4 text-sm">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-print text-green-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Papier / Crayon</strong>
+                                        <p class="text-slate-600 mt-1">Usage principal. Impression des feuilles DYS pour
+                                            les élèves concernés.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-laptop text-green-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">LMS (Moodle/Éléa)</strong>
+                                        <p class="text-slate-600 mt-1">Le texte "À trous" généré peut être collé dans
+                                            une activité "Texte à Trous" H5P ou Moodle pour correction auto.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CARAMEL DETAIL ================= -->
+        <div id="caramel" class="section-content hidden fade-in-up">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <div class="bg-slate-900 text-white p-10 border-b border-orange-500/30 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span
+                                    class="bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">LMS
+                                    & Interactivité</span>
+                                <span
+                                    class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Productivité</span>
+                            </div>
+                            <h2 class="text-4xl font-bold font-heading mb-2">Caramel</h2>
+                            <p class="text-slate-400 text-lg">Le constructeur automatique d'exercices H5P et Moodle.</p>
+                        </div>
+                        <a href="https://caramel.forge.apps.education.fr/" target="_blank"
+                            class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg flex items-center">
+                            Accéder à l'outil <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 space-y-12">
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-orange-600 pl-4">1.
+                                C'est quoi concrètement ?</h3>
+                            <div class="prose text-slate-600 max-w-none">
+                                <p>
+                                    Caramel est un <strong>convertisseur intelligent</strong>. Il prend vos documents
+                                    statiques (PDF de cours, listes de vocabulaire) et les transforme en
+                                    <strong>fichiers d'activités (.h5p, .mbz)</strong> prêts à être envoyés sur votre
+                                    plateforme d'apprentissage (ENT, Moodle).
+                                </p>
+                                <p>
+                                    Son point fort est l'utilisation de l'IA pour "comprendre" votre cours et inventer
+                                    des questions pertinentes (QCM, Vrai/Faux) automatiquement.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-orange-600 pl-4">2.
+                                Fonctionnalités Détaillées</h3>
+
+                            <div class="w-full overflow-x-auto">
+                                <table
+                                    class="w-full text-sm text-left text-slate-600 border border-slate-200 rounded-lg">
+                                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                                        <tr>
+                                            <th class="px-6 py-3">Type d'Activité</th>
+                                            <th class="px-6 py-3">Ce que ça fait</th>
+                                            <th class="px-6 py-3">Format Export</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bg-white border-b hover:bg-slate-50">
+                                            <td class="px-6 py-4 font-semibold text-slate-900">Quiz (Questions Set)</td>
+                                            <td class="px-6 py-4">Série de QCM, Vrai/Faux générés depuis un texte.</td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-mono">.h5p</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white border-b hover:bg-slate-50">
+                                            <td class="px-6 py-4 font-semibold text-slate-900">Flashcards</td>
+                                            <td class="px-6 py-4">Cartes mémoires (Recto = Question, Verso = Réponse).
+                                            </td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-mono">.h5p</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white border-b hover:bg-slate-50">
+                                            <td class="px-6 py-4 font-semibold text-slate-900">Mots Croisés</td>
+                                            <td class="px-6 py-4">Grille interactive générée depuis des définitions.
+                                            </td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-mono">.h5p</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white border-b hover:bg-slate-50">
+                                            <td class="px-6 py-4 font-semibold text-slate-900">Jeu Millionnaire</td>
+                                            <td class="px-6 py-4">Jeu type TV avec paliers et jokers.</td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-mono">.mbz</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-white border-b hover:bg-slate-50">
+                                            <td class="px-6 py-4 font-semibold text-slate-900">Banque Questions</td>
+                                            <td class="px-6 py-4">Import massif de questions pour tests notés.</td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-mono">.xml</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-orange-600 pl-4">3.
+                                Matrice Technique (Inputs/Outputs)</h3>
+                            <div class="overflow-x-auto mb-10 text-slate-600 border border-slate-200 rounded-lg">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-4 py-3">Activité</th>
+                                            <th class="px-4 py-3">Entrée</th>
+                                            <th class="px-4 py-3">Sortie</th>
+                                            <th class="px-4 py-3">Intégration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">H5P (Quiz)</td>
+                                            <td class="px-4 py-3">PDF (RAG Local) ou Prompt</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-mono">.h5p</span>
+                                            </td>
+                                            <td class="px-4 py-3">Banque contenus -> Téléverser</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Tests & Quiz</td>
+                                            <td class="px-4 py-3">Liste Questions (Texte)</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-mono">.xml
+                                                    / .gift</span></td>
+                                            <td class="px-4 py-3">Banque questions -> Importer</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Jeux & Cours</td>
+                                            <td class="px-4 py-3">Structure du jeu</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-mono">.mbz</span>
+                                            </td>
+                                            <td class="px-4 py-3">Restaurer un cours</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-orange-600 pl-4">4.
+                                Tutoriel : PDF vers Quiz H5P</h3>
+                            <div class="bg-white border-2 border-slate-100 rounded-xl overflow-hidden shadow-sm">
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-start">
+                                        <span class="font-bold text-orange-600 mr-3 text-lg">1.</span>
+                                        <p class="text-slate-600">Sur Caramel, choisissez la tuile <strong>"Quiz
+                                                (Question Set) H5P"</strong>.</p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-bold text-orange-600 mr-3 text-lg">2.</span>
+                                        <p class="text-slate-600">Activez l'option <strong>"À partir d'un
+                                                document"</strong>. Glissez votre fichier PDF (ex: Cours sur la Seconde
+                                            Guerre Mondiale).</p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-bold text-orange-600 mr-3 text-lg">3.</span>
+                                        <p class="text-slate-600">L'IA lit le document localement (votre navigateur
+                                            travaille, rien ne part sur un serveur). Elle extrait les notions clés.</p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-bold text-orange-600 mr-3 text-lg">4.</span>
+                                        <p class="text-slate-600">Cliquez sur <strong>"Générer"</strong>. Une liste de
+                                            questions apparaît à droite. Vous pouvez les modifier, supprimer les
+                                            mauvaises.</p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-bold text-orange-600 mr-3 text-lg">5.</span>
+                                        <p class="text-slate-600">Cliquez sur <strong>"Télécharger le .h5p"</strong>.
+                                        </p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-bold text-orange-600 mr-3 text-lg">6.</span>
+                                        <p class="text-slate-600">Ouvrez votre ENT/Moodle -> Banque de contenus ->
+                                            Téléverser. Votre quiz est prêt et jouable.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Community -->
+                        <section class="mt-8">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-orange-600 pl-4">5. Ce
+                                qu'en dit la communauté</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                                    <strong class="text-orange-900 block mb-2"><i
+                                            class="fa-solid fa-thumbs-up mr-2"></i>Les Points Forts</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-700 space-y-2">
+                                        <li>Révolution de productivité pour Moodle/Éléa.</li>
+                                        <li><strong>RAG Local :</strong> Bluffant (PDF vers Quiz en 1 min).</li>
+                                        <li>Code généré propre et fonctionnel.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                                    <strong class="text-slate-700 block mb-2"><i
+                                            class="fa-solid fa-circle-info mr-2"></i>Vigilance</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
+                                        <li>Interface parfois jugée "Geek" / austère.</li>
+                                        <li>Demande de connaître un peu le vocabulaire (XML, MBZ).</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="text-sm text-slate-500 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <p class="font-bold text-slate-700 mb-1"><i
+                                        class="fa-solid fa-scale-balanced mr-2"></i>Mentions Légales & Données</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>Auteur :</strong> Patrice Debrabant & Communauté.</li>
+                                    <li><strong>Licence :</strong> GNU GPL (Open Source).</li>
+                                    <li><strong>Données :</strong> Local First. Vos documents PDF ne quittent pas votre
+                                        ordinateur.</li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="lg:col-span-4 space-y-8">
+                        <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100">
+                            <h4 class="font-bold text-orange-900 mb-4"><i
+                                    class="fa-solid fa-cloud-arrow-up mr-2"></i>Plateformes Compatibles</h4>
+                            <ul class="space-y-4 text-sm">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-orange-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Éléa (Moodle Éduc. Nat.)</strong>
+                                        <p class="text-slate-600 mt-1">Compatibilité 100%. C'est la cible principale de
+                                            l'outil.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-orange-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Moodle (Générique)</strong>
+                                        <p class="text-slate-600 mt-1">Fonctionne sur n'importe quel Moodle académique
+                                            ou universitaire.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-orange-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">WordPress / Drupal</strong>
+                                        <p class="text-slate-600 mt-1">Si le plugin H5P est installé, les fichiers .h5p
+                                            sont lisibles.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-orange-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Magistère</strong>
+                                        <p class="text-slate-600 mt-1">Parfait pour créer des parcours de formation
+                                            continue.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= HUB HAPI DETAIL ================= -->
+        <div id="hapi" class="section-content hidden fade-in-up">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <div class="bg-slate-900 text-white p-10 border-b border-blue-500/30 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span
+                                    class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Multimédia</span>
+                                <span
+                                    class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Sciences</span>
+                            </div>
+                            <h2 class="text-4xl font-bold font-heading mb-2">Hub HAPI</h2>
+                            <p class="text-slate-400 text-lg">La boîte à outils multimédia pour des exports ultra-légers
+                                (SCORM).</p>
+                        </div>
+                        <a href="https://drane-normandie.forge.apps.education.fr/hub-de-creation-pedagogique/"
+                            target="_blank"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg flex items-center">
+                            Accéder à l'outil <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 space-y-12">
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-blue-600 pl-4">1. C'est
+                                quoi concrètement ?</h3>
+                            <div class="prose text-slate-600 max-w-none">
+                                <p>
+                                    Le Hub HAPI (Normandie) est une suite d'utilitaires pour créer des "grains"
+                                    pédagogiques autonome. Son grand atout est le <strong>SCORM Léger</strong> : créer
+                                    des exercices interactifs qui pèsent quelques kilo-octets (contrairement aux
+                                    logiciels lourds du marché) et qui s'intègrent partout en remontant la note de
+                                    l'élève.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-blue-600 pl-4">2. Les 3
+                                Outils Phares</h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="border border-slate-200 rounded-xl p-5 hover:border-blue-300 transition">
+                                    <div
+                                        class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-3">
+                                        <i class="fa-solid fa-box-open"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Générateur SCORM</h4>
+                                    <p class="text-xs text-slate-500 mb-2">Créez des mini-jeux :</p>
+                                    <ul class="text-xs text-slate-600 list-disc list-inside">
+                                        <li>Tri (Catégorisation)</li>
+                                        <li>Chronologie</li>
+                                        <li>Image Interactive</li>
+                                    </ul>
+                                </div>
+                                <div class="border border-slate-200 rounded-xl p-5 hover:border-blue-300 transition">
+                                    <div
+                                        class="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 mb-3">
+                                        <i class="fa-solid fa-atom"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Visionneuse 3D</h4>
+                                    <p class="text-xs text-slate-500 mb-2">Pour la Physique-Chimie :</p>
+                                    <ul class="text-xs text-slate-600 list-disc list-inside">
+                                        <li>Import fichiers .mol/.pdb</li>
+                                        <li>Recherche par nom ("Eau")</li>
+                                        <li>Export WebGL interactif</li>
+                                    </ul>
+                                </div>
+                                <div class="border border-slate-200 rounded-xl p-5 hover:border-blue-300 transition">
+                                    <div
+                                        class="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mb-3">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Fusion H5P</h4>
+                                    <p class="text-xs text-slate-500 mb-2">Organisation :</p>
+                                    <ul class="text-xs text-slate-600 list-disc list-inside">
+                                        <li>Combine plusieurs .h5p</li>
+                                        <li>Crée un livre numérique</li>
+                                        <li>Fluidifie le parcours</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-blue-600 pl-4">3.
+                                Matrice Technique</h3>
+                            <div class="overflow-x-auto mb-10 text-slate-600 border border-slate-200 rounded-lg">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-4 py-3">Module</th>
+                                            <th class="px-4 py-3">Entrée</th>
+                                            <th class="px-4 py-3">Sortie</th>
+                                            <th class="px-4 py-3">Destination</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Générateur SCORM</td>
+                                            <td class="px-4 py-3">Images / Textes</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-mono">.zip
+                                                    (SCORM)</span></td>
+                                            <td class="px-4 py-3">Tout LMS (Noté)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Visionneuse 3D</td>
+                                            <td class="px-4 py-3">.mol / .pdb</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-mono">.glb
+                                                    / .h5p</span></td>
+                                            <td class="px-4 py-3">Visualisation WebGL</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Générateur H5P</td>
+                                            <td class="px-4 py-3">Texte brut</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-mono">.h5p</span>
+                                            </td>
+                                            <td class="px-4 py-3">Import H5P</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-blue-600 pl-4">4.
+                                Tutorial : Créer un exercice de Tri (Catégorisation)</h3>
+                            <div class="bg-white border-2 border-slate-100 rounded-xl overflow-hidden shadow-sm p-6">
+                                <ol class="list-decimal list-inside space-y-3 text-slate-600">
+                                    <li>Allez sur Hub HAPI -> Générateur SCORM -> <strong>Catégorisation</strong>.</li>
+                                    <li>Définissez vos colonnes (ex: "Acide", "Basique", "Neutre").</li>
+                                    <li>Ajoutez vos éléments à trier. Cela peut être du texte ("Jus de citron") ou des
+                                        images importées.</li>
+                                    <li>Paramétrez les feedbacks (bravo/échec).</li>
+                                    <li>Cliquez sur <strong>Télécharger (ZIP)</strong>.</li>
+                                    <li>Dans Moodle/Éléa : Ajoutez une activité "Paquet SCORM", glissez le ZIP.
+                                        L'exercice s'affiche et la note remonte automatiquement.</li>
+                                </ol>
+                            </div>
+                        </section>
+
+                        <!-- Community -->
+                        <section class="mt-8">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-blue-600 pl-4">5. Ce
+                                qu'en dit la communauté</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                                    <strong class="text-blue-900 block mb-2"><i
+                                            class="fa-solid fa-thumbs-up mr-2"></i>Les Points Forts</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-700 space-y-2">
+                                        <li><strong>Générateur SCORM :</strong> Unique ! Permet des exos légers notés.
+                                        </li>
+                                        <li>Chimie 3D plébiscitée.</li>
+                                        <li>Complément parfait à Éléa.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                                    <strong class="text-slate-700 block mb-2"><i
+                                            class="fa-solid fa-circle-info mr-2"></i>Vigilance</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
+                                        <li>Moins d'intérêt sans LMS (Moodle/Éléa).</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="text-sm text-slate-500 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <p class="font-bold text-slate-700 mb-1"><i
+                                        class="fa-solid fa-scale-balanced mr-2"></i>Mentions Légales & Données</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>Auteur :</strong> DRANE Normandie (Guillaume Hervé).</li>
+                                    <li><strong>Licence :</strong> Open Source (GitLab Académique).</li>
+                                    <li><strong>Compatibilité :</strong> Optimisé pour Éléa mais standard Web.</li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="lg:col-span-4 space-y-8">
+                        <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                            <h4 class="font-bold text-blue-900 mb-4"><i
+                                    class="fa-solid fa-share-nodes mr-2"></i>Interopérabilité Maximale</h4>
+                            <p class="text-sm text-slate-600 mb-4">Le format SCORM 1.2 est le standard mondial. Ces
+                                fichiers fonctionnent sur :</p>
+                            <div class="flex flex-wrap gap-2 text-xs font-bold text-blue-800">
+                                <span class="bg-white px-3 py-1 rounded border border-blue-200">Moodle</span>
+                                <span class="bg-white px-3 py-1 rounded border border-blue-200">Éléa</span>
+                                <span class="bg-white px-3 py-1 rounded border border-blue-200">Chamilo</span>
+                                <span class="bg-white px-3 py-1 rounded border border-blue-200">Canvas</span>
+                                <span class="bg-white px-3 py-1 rounded border border-blue-200">Blackboard</span>
+                                <span class="bg-white px-3 py-1 rounded border border-blue-200">WordPress (avec
+                                    plugin)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- ================= AUDIT IA / ESPRIT CRITIQUE (NEW) ================= -->
+         <div id="audit" class="section-content hidden fade-in-up">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <div class="bg-slate-900 text-white p-10 border-b border-rose-500/30 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span
+                                    class="bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Éthique</span>
+                                <span
+                                    class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Collège/Lycée</span>
+                            </div>
+                            <h2 class="text-4xl font-bold font-heading mb-2">Esprit Critique & IA</h2>
+                            <p class="text-slate-400 text-lg">Le Protocole A.U.D.I.T. : Analyser, Utiliser, Douter, Interroger, Tester.</p>
+                        </div>
+                        <a href="https://audit-ia-6f8fd7.forge.apps.education.fr/" target="_blank"
+                            class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg flex items-center">
+                            Accéder aux ressources <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 space-y-12">
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-rose-600 pl-4">1. C'est
+                                quoi concrètement ?</h3>
+                            <div class="prose text-slate-600 max-w-none">
+                                <p>
+                                    C'est une ressource pédagogique essentielle pour ne pas subir l'IA. Face à des élèves fascinés par la "magie" de ChatGPT, ce site propose des séquences prêtes à l'emploi pour adopter la posture du <strong>"Pilote de l'IA"</strong> plutôt que celle du passager passif.
+                                </p>
+                                <p>
+                                    L'objectif est d'activer le <strong>"Mode Columbo"</strong> : apprendre à traquer les incohérences, vérifier les sources et comprendre que l'IA ne dit pas la vérité, mais prédit le mot le plus probable.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-rose-600 pl-4">2. Le Protocole A.U.D.I.T. Détaillé</h3>
+                            <div class="space-y-4">
+                                <div class="bg-white border-l-4 border-rose-400 p-4 shadow-sm rounded-r-lg">
+                                    <div class="flex items-start">
+                                        <div class="bg-rose-100 text-rose-800 font-bold text-xl w-10 h-10 flex items-center justify-center rounded-full mr-4 flex-shrink-0">A</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800">Analyser</h4>
+                                            <p class="text-sm text-slate-600">Comprendre comment ça marche (probabilités, jetons). Démystifier la "boîte noire".</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white border-l-4 border-rose-400 p-4 shadow-sm rounded-r-lg">
+                                    <div class="flex items-start">
+                                        <div class="bg-rose-100 text-rose-800 font-bold text-xl w-10 h-10 flex items-center justify-center rounded-full mr-4 flex-shrink-0">U</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800">Utiliser</h4>
+                                            <p class="text-sm text-slate-600">Apprendre à prompter. Savoir assigner un rôle, donner un contexte et un format de sortie.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white border-l-4 border-rose-400 p-4 shadow-sm rounded-r-lg">
+                                    <div class="flex items-start">
+                                        <div class="bg-rose-100 text-rose-800 font-bold text-xl w-10 h-10 flex items-center justify-center rounded-full mr-4 flex-shrink-0">D</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800">Douter</h4>
+                                            <p class="text-sm text-slate-600">Le cœur du réacteur. Identifier les <strong>hallucinations</strong> (erreurs factuelles confiantes) et les biais.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white border-l-4 border-rose-400 p-4 shadow-sm rounded-r-lg">
+                                    <div class="flex items-start">
+                                        <div class="bg-rose-100 text-rose-800 font-bold text-xl w-10 h-10 flex items-center justify-center rounded-full mr-4 flex-shrink-0">I</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800">Interroger</h4>
+                                            <p class="text-sm text-slate-600">Questionner l'éthique. D'où viennent les données ? Quel impact environnemental ? Qui modère ?</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white border-l-4 border-rose-400 p-4 shadow-sm rounded-r-lg">
+                                    <div class="flex items-start">
+                                        <div class="bg-rose-100 text-rose-800 font-bold text-xl w-10 h-10 flex items-center justify-center rounded-full mr-4 flex-shrink-0">T</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800">Tester</h4>
+                                            <p class="text-sm text-slate-600">Mettre l'IA à l'épreuve par l'expérimentation concrète en classe.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-rose-600 pl-4">3.
+                                Matrice Pédagogique (Exemples)</h3>
+                            <div class="overflow-x-auto mb-10 text-slate-600 border border-slate-200 rounded-lg">
+                                <table class="w-full text-sm text-left">
+                                    <thead
+                                        class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-4 py-3">Module / Scénario</th>
+                                            <th class="px-4 py-3">Activité Élève</th>
+                                            <th class="px-4 py-3">Compétence Travaillée</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Détecter le style IA</td>
+                                            <td class="px-4 py-3">Comparer un texte humain et un texte machine sur un même sujet.</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-rose-100 text-rose-800 px-2 py-1 rounded text-xs font-mono">Analyse Stylistique</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">L'IA peut-elle mentir ?</td>
+                                            <td class="px-4 py-3">Poser des questions pièges ou mathématiques complexes.</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-rose-100 text-rose-800 px-2 py-1 rounded text-xs font-mono">Vérification des faits</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-semibold">Red Teaming</td>
+                                            <td class="px-4 py-3">Essayer de faire dire des bêtises ou contourner les règles de l'IA (en sécurité).</td>
+                                            <td class="px-4 py-3"><span
+                                                    class="bg-rose-100 text-rose-800 px-2 py-1 rounded text-xs font-mono">Compréhension des limites</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-rose-600 pl-4">4.
+                                Exemple : Le "Mode Columbo"</h3>
+                            <div class="bg-white border-2 border-slate-100 rounded-xl overflow-hidden shadow-sm p-6">
+                                <p class="text-slate-600 italic mb-4">"Dans la série, Columbo connaît le coupable dès le début. Son travail n'est pas de découvrir qui c'est, mais de construire la preuve."</p>
+                                <h5 class="font-bold text-slate-800 mb-2">Application en classe :</h5>
+                                <ul class="list-disc list-inside space-y-2 text-sm text-slate-600">
+                                    <li>L'élève génère une réponse avec l'IA (ex: une démonstration mathématique ou une biographie).</li>
+                                    <li>Il ne doit pas "copier" la réponse, mais l'auditer.</li>
+                                    <li>Il doit surligner les erreurs, les imprécisions ou les "tics de langage" de l'IA.</li>
+                                    <li><strong>Note finale :</strong> Elle n'est pas sur la production de l'IA, mais sur la qualité de la critique de l'élève.</li>
+                                </ul>
+                            </div>
+                        </section>
+
+                        <!-- Community -->
+                        <section class="mt-8">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-rose-600 pl-4">5. Infos Clés</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-rose-50 p-6 rounded-xl border border-rose-100">
+                                    <strong class="text-rose-900 block mb-2"><i
+                                            class="fa-solid fa-thumbs-up mr-2"></i>Points Forts</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-700 space-y-2">
+                                        <li>Approche par le "Faire" (ateliers pratiques).</li>
+                                        <li>Ressources différenciées Collège / Lycée.</li>
+                                        <li>Transversal (Maths, Lettres, EMI, Philo).</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                                    <strong class="text-slate-700 block mb-2"><i
+                                            class="fa-solid fa-circle-info mr-2"></i>Auteur</strong>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
+                                        <li>Philippe Dupeyrat (IA-IPR Mathématiques, Académie de Poitiers).</li>
+                                        <li>Hébergé sur La Forge des Communs Numériques.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="lg:col-span-4 space-y-8">
+                        <div class="bg-rose-50 p-6 rounded-2xl border border-rose-100">
+                            <h4 class="font-bold text-rose-900 mb-4"><i
+                                    class="fa-solid fa-chalkboard-user mr-2"></i>Usages Pédagogiques</h4>
+                            <p class="text-sm text-slate-600 mb-4">Ce protocole s'utilise idéalement en :</p>
+                            <ul class="space-y-4 text-sm">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-rose-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Éducation aux Médias (EMI)</strong>
+                                        <p class="text-slate-600 mt-1">Distinguer le vrai du faux, comprendre les deepfakes.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-rose-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Cours de Spécialité</strong>
+                                        <p class="text-slate-600 mt-1">Utiliser l'IA comme un assistant faillible qu'il faut corriger (Maths, SES, HGGSP).</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-rose-600 mt-1 mr-2"></i>
+                                    <div>
+                                        <strong class="text-slate-800">Vie de classe</strong>
+                                        <p class="text-slate-600 mt-1">Débats sur l'éthique et l'avenir du travail.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 border-t border-slate-200 mt-12 py-12 text-center text-slate-500 text-sm">
+        <p>Documentation non-officielle générée pour la présentation des outils IA Souverains & Gratuits.</p>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-4xl mx-auto px-4">
+            <div class="bg-blue-50 p-3 rounded border border-blue-100">
+                <strong class="text-blue-900 block text-xs mb-1">🏛️ Hébergés sur La Forge (Éducation Nationale)</strong>
+                <p class="text-xs text-blue-800">DictIA, Caramel, Hub HAPI, Prompts de Prof, Audit IA.</p>
+            </div>
+            <div class="bg-purple-50 p-3 rounded border border-purple-100">
+                <strong class="text-purple-900 block text-xs mb-1">🤝 Outils Associatifs & Partenaires</strong>
+                <p class="text-xs text-purple-800">NovaPéda (Hébergé par l'association AFT-RN en Europe).</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showSection(id) {
+            // Update Menu Active State
+            document.querySelectorAll('.nav-pill').forEach(btn => {
+                if (btn.getAttribute('onclick').includes(id)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Toggle Sections
+            const sections = document.querySelectorAll('.section-content');
+            sections.forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('fade-in-up');
+            });
+
+            const target = document.getElementById(id);
+            if (target) {
+                target.classList.remove('hidden');
+                void target.offsetWidth; // Trigger reflow
+                target.classList.add('fade-in-up');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+
+</html>
