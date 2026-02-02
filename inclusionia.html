@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Prompt d'Inclusion Pédagogique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .trouble-card.active { border-color: #2563eb; background-color: #f0f7ff; box-shadow: 0 0 0 2px #3b82f6; }
+        .pulse-success { animation: pulse 0.5s ease-in-out; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        #outputPrompt::selection {
+            background: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-xl shadow-blue-200 shadow-lg">
+                    <i data-lucide="brain-circuit" class="text-white w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-800 leading-none">Inclusion IA</h1>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-tighter font-bold mt-1">Expert Numérique & Pédagogie</p>
+                </div>
+            </div>
+            <div class="hidden sm:block text-right">
+                <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Stratégie IA & Inclusion</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-8">
+        
+        <!-- SECTION 1 : VISION MÉTHODOLOGIQUE DÉVELOPPÉE -->
+        <section class="mb-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-1 shadow-xl">
+            <div class="bg-white rounded-[1.4rem] p-6 sm:p-8">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="microscope" class="text-blue-600 w-6 h-6"></i>
+                            Pourquoi utiliser cet outil ?
+                        </h2>
+                        <div class="text-slate-600 leading-relaxed space-y-4 text-sm sm:text-base">
+                            <p>
+                                Le collège marque une explosion de la <strong>charge cognitive</strong> : les élèves doivent simultanément décoder des textes complexes, organiser leurs idées et maîtriser de nouveaux outils. Pour un élève neuroatypique (Dys, TDAH), l'obstacle n'est souvent pas le concept lui-même, mais la <strong>forme</strong> sous laquelle il est présenté.
+                            </p>
+                            <p>
+                                Cette plateforme pratique la <strong>remédiation cognitive</strong> : par l'usage du Meta-Prompting, nous automatisons l'application de protocoles ergonomiques et linguistiques éprouvés. L'objectif n'est jamais de simplifier le niveau d'exigence, mais de lever les barrières d'accès pour garantir que chaque élève accède à la <strong>totalité du savoir</strong>, conformément aux attendus du socle commun.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-4">
+                            <div class="bg-green-50 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full border border-green-100 flex items-center gap-1">
+                                <i data-lucide="shield-check" class="w-3 h-3"></i> ÉQUITÉ COGNITIVE
+                            </div>
+                            <div class="bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100 flex items-center gap-1">
+                                <i data-lucide="book-open" class="w-3 h-3"></i> INTÉGRITÉ DU PROGRAMME
+                            </div>
+                            <div class="bg-purple-50 text-purple-700 text-[10px] font-bold px-3 py-1 rounded-full border border-purple-100 flex items-center gap-1">
+                                <i data-lucide="users" class="w-3 h-3"></i> ACCESSIBILITÉ UNIVERSELLE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2 : PROTOCOLE D'UTILISATION MIS À JOUR -->
+        <section class="mb-10 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-800 p-4 flex items-center gap-3">
+                <i data-lucide="help-circle" class="text-blue-400 w-5 h-5"></i>
+                <h2 class="text-white font-bold text-sm uppercase tracking-wider">Fonctionnement de l'outil : Mode d'emploi</h2>
+            </div>
+            <div class="p-6 sm:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">1</span>
+                            <h3 class="font-bold text-slate-800">Chargement</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Importez votre document original (DOCX, PDF, HTML). Assurez-vous que le texte intégral s'affiche correctement dans la zone de saisie pour une analyse exhaustive.
+                        </p>
+                    </div>
+                    <div class="space-y-3 border-l border-slate-100 lg:pl-8">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">2</span>
+                            <h3 class="font-bold text-slate-800">Paramétrage</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Cochez les profils d'apprentissage ciblés. Les instructions d'adaptation varieront automatiquement selon le trouble et l'intensité d'accompagnement choisis.
+                        </p>
+                    </div>
+                    <div class="space-y-3 border-l border-slate-100 lg:pl-8">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">3</span>
+                            <h3 class="font-bold text-slate-800">Finalisation</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Copiez le prompt généré et <strong>collez-le directement dans votre interface d'IA générative habituelle</strong>. L'IA appliquera alors les transformations nécessaires pour produire votre support adapté.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-4">
+                    <i data-lucide="lightbulb" class="text-amber-500 w-8 h-8 shrink-0"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-amber-800 mb-1">Conseil d'Expert :</h4>
+                        <p class="text-[11px] text-amber-700 leading-relaxed italic">
+                            "Le prompt généré intègre des directives de <strong>parallélisme strict</strong> pour éviter les résumés. Privilégiez l'utilisation d'un modèle d'IA performant en traitement de texte pour garantir que la structure et les nuances de votre cours soient parfaitement respectées."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3 : APPLICATION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Configuration (Gauche) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-up" class="text-blue-500 w-5 h-5"></i>
+                            <h2 class="font-bold text-slate-800">1. Source du cours complet</h2>
+                        </div>
+                        <span id="charCount" class="text-[10px] font-mono text-slate-400">0 caractères</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <label class="group flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl py-6 px-4 hover:border-blue-400 hover:bg-blue-50/30 cursor-pointer transition-all">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-300 group-hover:text-blue-500 mb-2 transition-colors"></i>
+                            <span class="text-sm font-medium text-slate-600">Importer le document original</span>
+                            <span class="text-[10px] text-slate-400 mt-1">DOCX, PDF, HTML, TXT</span>
+                            <input type="file" id="fileInput" class="hidden" accept=".docx,.pdf,.html,.txt">
+                        </label>
+                        
+                        <textarea id="courseContent" 
+                            class="w-full h-64 p-4 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow" 
+                            placeholder="Le contenu intégral apparaîtra ici..."></textarea>
+                        
+                        <div id="statusMessage" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+                    </div>
+                </section>
+
+                <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-6">
+                        <i data-lucide="settings-2" class="text-blue-500 w-5 h-5"></i>
+                        <h2 class="font-bold text-slate-800">2. Profils d'apprentissage à cibler</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="troubleSelectors">
+                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="dyslexie">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-slate-700 text-sm">Dyslexie / Ortho</span>
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            </div>
+                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
+                                <option value="leger">Léger</option>
+                                <option value="modere" selected>Standard (PAP)</option>
+                                <option value="fort">Renforcé (AESH)</option>
+                            </select>
+                        </div>
+
+                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="dyspraxie">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-slate-700 text-sm">Dyspraxie (Visuo-spatial)</span>
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            </div>
+                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
+                                <option value="leger">Léger</option>
+                                <option value="modere" selected>Standard (PAP)</option>
+                                <option value="fort">Zéro tracé manuel</option>
+                            </select>
+                        </div>
+
+                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="tdah">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-slate-700 text-sm">TDAH (Attention)</span>
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            </div>
+                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
+                                <option value="leger">Guide lecture</option>
+                                <option value="modere" selected>Séquençage fort</option>
+                                <option value="fort">Check-lists extrêmes</option>
+                            </select>
+                        </div>
+
+                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="dyscalculie">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-slate-700 text-sm">Dyscalculie / Logique</span>
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            </div>
+                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
+                                <option value="leger">Aide visuelle</option>
+                                <option value="modere" selected>Standard</option>
+                                <option value="fort">Simplification logique</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Resultat (Droite) -->
+            <div class="lg:col-span-5">
+                <div class="sticky top-24 space-y-4">
+                    <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-200 ring-4 ring-white">
+                        <i data-lucide="wand-2" class="w-5 h-5"></i>
+                        <span>Générer le Prompt Expert</span>
+                    </button>
+
+                    <div id="outputContainer" class="bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 transition-all">
+                        <div class="bg-slate-800 px-4 py-2 flex justify-between items-center border-b border-slate-700">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Prompt prêt à copier</span>
+                            <button id="copyBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded flex items-center gap-1 transition-colors">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                                <span class="text-[10px] font-bold">COPIER</span>
+                            </button>
+                        </div>
+                        <div class="p-4 relative">
+                            <div id="copyTooltip" class="absolute top-2 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[11px] font-bold px-4 py-2 rounded-full shadow-lg hidden z-30">Copié !</div>
+                            <textarea id="outputPrompt" readonly 
+                                class="w-full h-[450px] bg-transparent text-blue-100 text-[11px] font-mono leading-relaxed focus:outline-none resize-none scrollbar-thin scrollbar-thumb-slate-700"
+                                placeholder="Le prompt s'affichera ici après génération..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.addEventListener('load', function() {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            const fileInput = document.getElementById('fileInput');
+            const courseContent = document.getElementById('courseContent');
+            const statusMessage = document.getElementById('statusMessage');
+            const generateBtn = document.getElementById('generateBtn');
+            const outputPrompt = document.getElementById('outputPrompt');
+            const outputContainer = document.getElementById('outputContainer');
+            const copyBtn = document.getElementById('copyBtn');
+            const copyTooltip = document.getElementById('copyTooltip');
+            const charCount = document.getElementById('charCount');
+            const troubleCards = document.querySelectorAll('.trouble-card');
+
+            courseContent.addEventListener('input', () => {
+                charCount.textContent = `${courseContent.value.length} caractères`;
+            });
+
+            if (typeof pdfjsLib !== 'undefined') {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            }
+
+            troubleCards.forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                card.addEventListener('click', (e) => {
+                    if(e.target.tagName !== 'SELECT' && e.target.tagName !== 'INPUT') {
+                        checkbox.checked = !checkbox.checked;
+                        updateCardState(card, checkbox.checked);
+                    }
+                });
+                checkbox.addEventListener('change', () => updateCardState(card, checkbox.checked));
+            });
+
+            function updateCardState(card, isActive) {
+                if (isActive) card.classList.add('active');
+                else card.classList.remove('active');
+            }
+
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                showStatus("Analyse du document...", "blue");
+                try {
+                    if (file.name.endsWith('.docx')) {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const result = await mammoth.extractRawText({ arrayBuffer });
+                        courseContent.value = result.value;
+                        showStatus("Document DOCX importé.", "green");
+                    } else if (file.name.endsWith('.pdf')) {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        let text = "";
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(" ") + "\n";
+                        }
+                        courseContent.value = text;
+                        showStatus("Document PDF importé.", "green");
+                    } else {
+                        const text = await file.text();
+                        courseContent.value = text;
+                        showStatus("Document chargé.", "green");
+                    }
+                    charCount.textContent = `${courseContent.value.length} caractères`;
+                } catch (err) {
+                    showStatus("Erreur d'importation.", "red");
+                }
+            });
+
+            function showStatus(msg, color) {
+                statusMessage.textContent = msg;
+                statusMessage.className = `p-3 rounded-xl text-xs font-semibold bg-${color}-50 text-${color}-700 border border-${color}-200`;
+                statusMessage.classList.remove('hidden');
+            }
+
+            generateBtn.addEventListener('click', () => {
+                const content = courseContent.value.trim();
+                if (!content) return showStatus("Veuillez d'abord importer un cours.", "red");
+                const activeProfiles = [];
+                troubleCards.forEach(card => {
+                    if (card.querySelector('input[type="checkbox"]').checked) {
+                        activeProfiles.push({
+                            type: card.dataset.id,
+                            level: card.querySelector('select').value,
+                            label: card.querySelector('.font-bold').textContent
+                        });
+                    }
+                });
+                if (activeProfiles.length === 0) return showStatus("Sélectionnez au moins un profil d'élève.", "red");
+                
+                outputContainer.classList.add('pulse-success');
+                setTimeout(() => outputContainer.classList.remove('pulse-success'), 500);
+                
+                outputPrompt.value = constructPrompt(content, activeProfiles);
+                showStatus("Prompt expert généré avec succès !", "green");
+            });
+
+            function constructPrompt(content, profiles) {
+                return `Tu es un expert senior en ingénierie de la transformation et en inclusion pédagogique au collège.
+
+TA MISSION : Réécrire et adapter le document de cours intégral ci-dessous pour des élèves présentant les troubles suivants : ${profiles.map(p => p.label + ' (Niveau: ' + p.level + ')').join(', ')}.
+
+### RÈGLES DE CONSERVATION (ZÉRO RÉSUMÉ) :
+1. INTERDICTION DE RÉSUMER : Tu ne dois absolument pas réduire la longueur du cours. Si le texte original fait 2000 mots, la version adaptée doit faire environ 2000 mots. Chaque paragraphe doit être traité.
+2. PARALLÉLISME STRICT : Aucun savoir, aucune anecdote, aucune définition ne doit être omise. Tu adaptes la FORME, pas le FOND.
+3. INTÉGRITÉ DES NOTIONS : Toutes les explications techniques doivent être conservées.
+
+### RÈGLES D'ADAPTATION (MÉTHODE INCLUSIVE) :
+- Typographie : Structure aérée, suggère l'usage de polices sans empattement.
+- Langage : Phrases courtes, une seule idée par phrase. Explicite les termes techniques au moment où ils apparaissent.
+- Visuel : Pas d'italique. Utilise le GRAS uniquement pour les mots-clés essentiels. 
+- Aération : Saute une ligne entre chaque paragraphe. Utilise des listes à puces pour chaque énumération.
+- Design : Si l'original contient du HTML ou des tableaux, reproduis la structure exacte.
+
+### ADAPTATION DES ÉVALUATIONS :
+- Transforme les QCM complexes en QCM à 3 options maximum.
+- Souligne ou mets en gras les mots pivots des consignes (ex: "**Vrai** ou **Faux**").
+- Conserve l'intégralité des questions de l'original, mais rends-les plus lisibles visuellement.
+
+### SPÉCIFICITÉS PAR PROFIL SÉLECTIONNÉ :
+${profiles.map(p => {
+    if (p.type === 'dyslexie') return "- DYS : Segmentation des termes complexes, lexique préalable complet, mise en relief des mots-clés en gras.";
+    if (p.type === 'dyspraxie') return "- DYSPRAXIE : Allègement de la charge visuo-spatiale. Pas de tracés manuels requis. Utilisation de cadres pour délimiter les sections.";
+    if (p.type === 'tdah') return "- TDAH : Séquençage par micro-étapes. Ajout d'icônes visuelles de rappel (📌). Check-list de fin de section.";
+    if (p.type === 'dyscalculie') return "- DYSCALCULIE : Utilise des analogies visuelles et décompose chaque raisonnement logique pas à pas.";
+    return "";
+}).join('\n')}
+
+### COURS ORIGINAL À TRANSFORMER (NE PAS RÉSUMER) :
+---
+${content}
+---
+
+LIVRABLE : Produis la version adaptée intégrale, sans aucune perte d'information par rapport à l'original.`;
+            }
+
+            copyBtn.addEventListener('click', () => {
+                outputPrompt.select();
+                outputPrompt.setSelectionRange(0, 99999);
+                try {
+                    document.execCommand('copy');
+                    copyTooltip.classList.remove('hidden');
+                    setTimeout(() => copyTooltip.classList.add('hidden'), 2500);
+                } catch (err) { alert("Copie échouée."); }
+            });
+        });
+    </script>
+</body>
+</html>
