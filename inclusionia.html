@@ -3,268 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Prompt d'Inclusion Pédagogique</title>
+    <title>Inclusion IA - Plateforme de Remédiation Cognitive Collège</title>
+    <!-- Bibliothèques de support -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        
         .trouble-card.active { border-color: #2563eb; background-color: #f0f7ff; box-shadow: 0 0 0 2px #3b82f6; }
-        .pulse-success { animation: pulse 0.5s ease-in-out; }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        
+        /* --- MOTEUR DE RENDU D'ACCESSIBILITÉ (NORMES 11-15 ANS) --- */
+        #preview-area {
+            line-height: 2.0 !important;
+            font-family: Arial, Verdana, sans-serif !important;
+            font-size: 1.2rem;
+            color: #1a1a1a;
+            text-align: left !important; /* Alignement gauche strict */
         }
-        #outputPrompt::selection {
-            background: #3b82f6;
-            color: white;
+        #preview-area h1 { color: #1e40af; font-size: 2rem; border-bottom: 4px solid #3b82f6; padding-bottom: 10px; margin-bottom: 1.5rem; font-weight: 800; }
+        #preview-area h2 { color: #1e40af; font-size: 1.6rem; margin-top: 2.5rem; margin-bottom: 1rem; font-weight: 700; border-left: 8px solid #3b82f6; padding-left: 15px; }
+        #preview-area p { margin-bottom: 1.8rem; font-style: normal !important; } /* Proscrit l'italique */
+        #preview-area strong { background-color: #fff9c4; padding: 0 4px; color: #000; font-weight: 700; }
+        #preview-area section { border: 2px solid #3b82f6; border-radius: 15px; padding: 25px; margin-bottom: 40px; background: white; }
+        #preview-area img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; display: block; }
+        #preview-area ul { list-style-type: disc; margin-left: 2rem; margin-bottom: 1.5rem; }
+        #preview-area li { margin-bottom: 0.5rem; }
+
+        @media print {
+            .no-print { display: none !important; }
+            #preview-container { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; }
+            @page { margin: 1.5cm; }
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-xl shadow-blue-200 shadow-lg">
+                <div class="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-200">
                     <i data-lucide="brain-circuit" class="text-white w-6 h-6"></i>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold text-slate-800 leading-none">Inclusion IA</h1>
-                    <p class="text-[10px] text-slate-500 uppercase tracking-tighter font-bold mt-1">Expert Numérique & Pédagogie</p>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold mt-1 tracking-wider">Expert Numérique & Pédagogie</p>
                 </div>
             </div>
-            <div class="hidden sm:block text-right">
-                <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Stratégie IA & Inclusion</span>
-            </div>
+            <nav class="flex bg-slate-100 p-1 rounded-xl">
+                <button onclick="switchTab('config')" id="tab-config" class="px-5 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-blue-600 transition-all">1. Configuration</button>
+                <button onclick="switchTab('preview')" id="tab-preview" class="px-5 py-2 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700 transition-all">2. Prévisualisation & PDF</button>
+            </nav>
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 mt-8">
         
-        <!-- SECTION 1 : VISION MÉTHODOLOGIQUE DÉVELOPPÉE -->
-        <section class="mb-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-1 shadow-xl">
-            <div class="bg-white rounded-[1.4rem] p-6 sm:p-8">
-                <div class="flex flex-col md:flex-row gap-8 items-start">
-                    <div class="flex-1">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <i data-lucide="microscope" class="text-blue-600 w-6 h-6"></i>
-                            Pourquoi utiliser cet outil ?
-                        </h2>
-                        <div class="text-slate-600 leading-relaxed space-y-4 text-sm sm:text-base">
-                            <p>
-                                Le collège marque une explosion de la <strong>charge cognitive</strong> : les élèves doivent simultanément décoder des textes complexes, organiser leurs idées et maîtriser de nouveaux outils. Pour un élève neuroatypique (Dys, TDAH), l'obstacle n'est souvent pas le concept lui-même, mais la <strong>forme</strong> sous laquelle il est présenté.
-                            </p>
-                            <p>
-                                Cette plateforme pratique la <strong>remédiation cognitive</strong> : par l'usage du Meta-Prompting, nous automatisons l'application de protocoles ergonomiques et linguistiques éprouvés. L'objectif n'est jamais de simplifier le niveau d'exigence, mais de lever les barrières d'accès pour garantir que chaque élève accède à la <strong>totalité du savoir</strong>, conformément aux attendus du socle commun.
-                            </p>
-                        </div>
-                        <div class="mt-6 flex flex-wrap gap-4">
-                            <div class="bg-green-50 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full border border-green-100 flex items-center gap-1">
-                                <i data-lucide="shield-check" class="w-3 h-3"></i> ÉQUITÉ COGNITIVE
+        <!-- SECTION 1 : FONCTIONNEMENT -->
+        <div id="section-config" class="space-y-8">
+            <section class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-3xl p-1 shadow-xl">
+                <div class="bg-white rounded-[1.4rem] p-6 sm:p-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="help-circle" class="text-blue-600 w-6 h-6"></i>
+                        Comment fonctionne Inclusion IA ?
+                    </h2>
+                    <div class="text-slate-600 text-sm leading-relaxed space-y-4">
+                        <p>
+                            Cette plateforme est un assistant pour adapter vos cours aux élèves de <strong>11 à 15 ans (Collège)</strong>. À cet âge, l'objectif est de libérer la charge cognitive par un design épuré, sans jamais réduire la qualité du savoir original.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                            <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                                <h4 class="font-bold text-blue-800 text-xs uppercase mb-2">Miroir de Format</h4>
+                                <p class="text-xs">Le texte collé ou les fichiers Word/PDF génèrent un support pour <strong>Word (.docx)</strong>. L'import HTML génère un <strong>HTML autonome</strong> avec images.</p>
                             </div>
-                            <div class="bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-100 flex items-center gap-1">
-                                <i data-lucide="book-open" class="w-3 h-3"></i> INTÉGRITÉ DU PROGRAMME
+                            <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
+                                <h4 class="font-bold text-green-800 text-xs uppercase mb-2">Normes Collège</h4>
+                                <p class="text-xs">Alignement gauche strict. <strong>Aucun tiret syllabique</strong> n'est utilisé. Focus sur les listes à puces et le gras pour les mots-clés.</p>
                             </div>
-                            <div class="bg-purple-50 text-purple-700 text-[10px] font-bold px-3 py-1 rounded-full border border-purple-100 flex items-center gap-1">
-                                <i data-lucide="users" class="w-3 h-3"></i> ACCESSIBILITÉ UNIVERSELLE
+                            <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                <h4 class="font-bold text-amber-800 text-xs uppercase mb-2">Zéro Résumé</h4>
+                                <p class="text-xs">100% du document original est conservé (définitions, exemples, anecdotes). Seule la forme est remédiée.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- SECTION 2 : PROTOCOLE D'UTILISATION MIS À JOUR -->
-        <section class="mb-10 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-800 p-4 flex items-center gap-3">
-                <i data-lucide="help-circle" class="text-blue-400 w-5 h-5"></i>
-                <h2 class="text-white font-bold text-sm uppercase tracking-wider">Fonctionnement de l'outil : Mode d'emploi</h2>
-            </div>
-            <div class="p-6 sm:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-3">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">1</span>
-                            <h3 class="font-bold text-slate-800">Chargement</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Zone Gauche -->
+                <div class="lg:col-span-7 space-y-6">
+                    <section class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wider">1. Source du cours</h2>
+                            <span id="formatBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700 uppercase">TEXTE COLLÉ</span>
                         </div>
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Importez votre document original (DOCX, PDF, HTML). Assurez-vous que le texte intégral s'affiche correctement dans la zone de saisie pour une analyse exhaustive.
-                        </p>
-                    </div>
-                    <div class="space-y-3 border-l border-slate-100 lg:pl-8">
-                        <div class="flex items-center gap-3">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">2</span>
-                            <h3 class="font-bold text-slate-800">Paramétrage</h3>
-                        </div>
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Cochez les profils d'apprentissage ciblés. Les instructions d'adaptation varieront automatiquement selon le trouble et l'intensité d'accompagnement choisis.
-                        </p>
-                    </div>
-                    <div class="space-y-3 border-l border-slate-100 lg:pl-8">
-                        <div class="flex items-center gap-3">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">3</span>
-                            <h3 class="font-bold text-slate-800">Finalisation</h3>
-                        </div>
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Copiez le prompt généré et <strong>collez-le directement dans votre interface d'IA générative habituelle</strong>. L'IA appliquera alors les transformations nécessaires pour produire votre support adapté.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="mt-8 p-4 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-4">
-                    <i data-lucide="lightbulb" class="text-amber-500 w-8 h-8 shrink-0"></i>
-                    <div>
-                        <h4 class="text-sm font-bold text-amber-800 mb-1">Conseil d'Expert :</h4>
-                        <p class="text-[11px] text-amber-700 leading-relaxed italic">
-                            "Le prompt généré intègre des directives de <strong>parallélisme strict</strong> pour éviter les résumés. Privilégiez l'utilisation d'un modèle d'IA performant en traitement de texte pour garantir que la structure et les nuances de votre cours soient parfaitement respectées."
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3 : APPLICATION -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Configuration (Gauche) -->
-            <div class="lg:col-span-7 space-y-6">
-                
-                <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="file-up" class="text-blue-500 w-5 h-5"></i>
-                            <h2 class="font-bold text-slate-800">1. Source du cours complet</h2>
-                        </div>
-                        <span id="charCount" class="text-[10px] font-mono text-slate-400">0 caractères</span>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <label class="group flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl py-6 px-4 hover:border-blue-400 hover:bg-blue-50/30 cursor-pointer transition-all">
-                            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-300 group-hover:text-blue-500 mb-2 transition-colors"></i>
-                            <span class="text-sm font-medium text-slate-600">Importer le document original</span>
-                            <span class="text-[10px] text-slate-400 mt-1">DOCX, PDF, HTML, TXT</span>
+                        <label class="group flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl py-10 px-4 hover:border-blue-400 hover:bg-blue-50/30 cursor-pointer transition-all mb-4">
+                            <i data-lucide="upload-cloud" class="w-12 h-12 text-slate-300 group-hover:text-blue-500 mb-3 transition-colors"></i>
+                            <span class="text-sm font-semibold text-slate-600 text-center">Charger un document ou coller du texte</span>
                             <input type="file" id="fileInput" class="hidden" accept=".docx,.pdf,.html,.txt">
                         </label>
-                        
-                        <textarea id="courseContent" 
-                            class="w-full h-64 p-4 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow" 
-                            placeholder="Le contenu intégral apparaîtra ici..."></textarea>
-                        
-                        <div id="statusMessage" class="hidden p-3 rounded-xl text-xs font-medium"></div>
-                    </div>
-                </section>
+                        <textarea id="courseContent" class="w-full h-64 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Collez votre texte ici..."></textarea>
+                    </section>
 
-                <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-2 mb-6">
-                        <i data-lucide="settings-2" class="text-blue-500 w-5 h-5"></i>
-                        <h2 class="font-bold text-slate-800">2. Profils d'apprentissage à cibler</h2>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="troubleSelectors">
-                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="dyslexie">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-slate-700 text-sm">Dyslexie / Ortho</span>
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                    <section class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                        <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-6 text-blue-600">2. Profils d'élèves</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="troubleSelectors">
+                            <div class="trouble-card border border-slate-200 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all" data-id="dyslexie">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-slate-700 text-sm">Dyslexie / Ortho</span>
+                                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                                </div>
+                                <select class="w-full text-[10px] p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <option value="leger">Léger</option>
+                                    <option value="standard" selected>Standard (PAP)</option>
+                                    <option value="renforce">Renforcé (AESH)</option>
+                                </select>
                             </div>
-                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="leger">Léger</option>
-                                <option value="modere" selected>Standard (PAP)</option>
-                                <option value="fort">Renforcé (AESH)</option>
-                            </select>
-                        </div>
-
-                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="dyspraxie">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-slate-700 text-sm">Dyspraxie (Visuo-spatial)</span>
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            <div class="trouble-card border border-slate-200 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all" data-id="dyspraxie">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-slate-700 text-sm">Dyspraxie (Organisation)</span>
+                                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                                </div>
+                                <select class="w-full text-[10px] p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <option value="leger">Léger</option>
+                                    <option value="standard" selected>Standard (PAP)</option>
+                                    <option value="zero">Zéro tracé manuel</option>
+                                </select>
                             </div>
-                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="leger">Léger</option>
-                                <option value="modere" selected>Standard (PAP)</option>
-                                <option value="fort">Zéro tracé manuel</option>
-                            </select>
-                        </div>
-
-                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="tdah">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-slate-700 text-sm">TDAH (Attention)</span>
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            <div class="trouble-card border border-slate-200 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all" data-id="tdah">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-slate-700 text-sm">TDAH (Attention)</span>
+                                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                                </div>
+                                <select class="w-full text-[10px] p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <option value="guide">Guide lecture</option>
+                                    <option value="sequencage" selected>Séquençage fort</option>
+                                    <option value="checklists">Check-lists extrêmes</option>
+                                </select>
                             </div>
-                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="leger">Guide lecture</option>
-                                <option value="modere" selected>Séquençage fort</option>
-                                <option value="fort">Check-lists extrêmes</option>
-                            </select>
-                        </div>
-
-                        <div class="trouble-card border border-slate-200 p-4 rounded-xl cursor-pointer transition-all hover:shadow-md" data-id="dyscalculie">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-slate-700 text-sm">Dyscalculie / Logique</span>
-                                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                            <div class="trouble-card border border-slate-200 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all" data-id="dyscalculie">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-slate-700 text-sm">Dyscalculie / Logique</span>
+                                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                                </div>
+                                <select class="w-full text-[10px] p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <option value="visuel" selected>Aide visuelle</option>
+                                    <option value="standard">Standard</option>
+                                </select>
                             </div>
-                            <select class="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="leger">Aide visuelle</option>
-                                <option value="modere" selected>Standard</option>
-                                <option value="fort">Simplification logique</option>
-                            </select>
+                            <div class="trouble-card border border-slate-200 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all" data-id="tsa">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-slate-700 text-sm">Spectre Autistique</span>
+                                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                                </div>
+                                <p class="text-[9px] text-blue-600 font-bold uppercase tracking-tighter mb-1">[En test]</p>
+                                <select class="w-full text-[10px] p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <option value="literalite" selected>Littéralité / Explicite</option>
+                                </select>
+                            </div>
+                            <div class="trouble-card border border-slate-200 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all" data-id="hpi">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-slate-700 text-sm">Haut Potentiel (HPI)</span>
+                                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                                </div>
+                                <p class="text-[9px] text-blue-600 font-bold uppercase tracking-tighter mb-1">[En test]</p>
+                                <select class="w-full text-[10px] p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <option value="complexite" selected>Besoin de complexité</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                </section>
-            </div>
+                    </section>
+                </div>
 
-            <!-- Resultat (Droite) -->
-            <div class="lg:col-span-5">
-                <div class="sticky top-24 space-y-4">
-                    <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-200 ring-4 ring-white">
-                        <i data-lucide="wand-2" class="w-5 h-5"></i>
-                        <span>Générer le Prompt Expert</span>
-                    </button>
-
-                    <div id="outputContainer" class="bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 transition-all">
-                        <div class="bg-slate-800 px-4 py-2 flex justify-between items-center border-b border-slate-700">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Prompt prêt à copier</span>
-                            <button id="copyBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded flex items-center gap-1 transition-colors">
-                                <i data-lucide="copy" class="w-3 h-3"></i>
-                                <span class="text-[10px] font-bold">COPIER</span>
-                            </button>
-                        </div>
-                        <div class="p-4 relative">
-                            <div id="copyTooltip" class="absolute top-2 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[11px] font-bold px-4 py-2 rounded-full shadow-lg hidden z-30">Copié !</div>
-                            <textarea id="outputPrompt" readonly 
-                                class="w-full h-[450px] bg-transparent text-blue-100 text-[11px] font-mono leading-relaxed focus:outline-none resize-none scrollbar-thin scrollbar-thumb-slate-700"
-                                placeholder="Le prompt s'affichera ici après génération..."></textarea>
+                <!-- Zone Droite : Prompt -->
+                <div class="lg:col-span-5">
+                    <div class="sticky top-24 space-y-4">
+                        <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-3xl shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95">
+                            <i data-lucide="wand-2" class="w-5 h-5"></i> Générer le Prompt Expert
+                        </button>
+                        <div class="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800">
+                            <div class="bg-slate-800 px-5 py-3 flex justify-between items-center border-b border-slate-700">
+                                <span id="targetLabel" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest tracking-tight">Format cible : DOCX</span>
+                                <button id="copyBtn" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-blue-500">COPIER</button>
+                            </div>
+                            <div class="p-5 relative">
+                                <div id="copyTooltip" class="absolute top-2 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] px-3 py-1 rounded-full hidden z-50">Copié !</div>
+                                <textarea id="outputPrompt" readonly class="w-full h-[450px] bg-transparent text-blue-100 text-[11px] font-mono leading-relaxed focus:outline-none resize-none scrollbar-thin scrollbar-thumb-slate-700" placeholder="Le prompt apparaîtra ici..."></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- ONGLET 2 : PRÉVISUALISATION -->
+        <div id="section-preview" class="hidden space-y-8">
+            <section class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 no-print">
+                <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i data-lucide="eye" class="text-blue-600 w-5 h-5"></i>
+                    Aperçu Haute Accessibilité (11-15 ans)
+                </h2>
+                <textarea id="aiInput" class="w-full h-40 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm mb-6 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Collez ici la réponse de l'IA (Markdown ou HTML complet)..."></textarea>
+                <div class="flex flex-wrap gap-4">
+                    <button id="renderBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-2xl text-sm shadow-lg">Mettre en page</button>
+                    <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-8 py-3 rounded-2xl text-sm flex items-center gap-2 transition-all"><i data-lucide="printer" class="w-4 h-4"></i> Imprimer / PDF Inclusif</button>
+                </div>
+            </section>
+
+            <div id="preview-container" class="bg-white p-12 rounded-3xl shadow-sm border border-slate-200 min-h-[800px]">
+                <div id="preview-area">
+                    <div class="flex flex-col items-center justify-center py-20 text-slate-300">
+                        <i data-lucide="file-text" class="w-16 h-16 mb-4 opacity-20"></i>
+                        <p class="italic">Collez la réponse de l'IA pour prévisualiser le document.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
+        function safeLucide() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
         window.addEventListener('load', function() {
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            safeLucide();
+            let detectedFormat = "TEXTE";
 
             const fileInput = document.getElementById('fileInput');
             const courseContent = document.getElementById('courseContent');
-            const statusMessage = document.getElementById('statusMessage');
-            const generateBtn = document.getElementById('generateBtn');
             const outputPrompt = document.getElementById('outputPrompt');
-            const outputContainer = document.getElementById('outputContainer');
-            const copyBtn = document.getElementById('copyBtn');
-            const copyTooltip = document.getElementById('copyTooltip');
-            const charCount = document.getElementById('charCount');
+            const aiInput = document.getElementById('aiInput');
+            const previewArea = document.getElementById('preview-area');
             const troubleCards = document.querySelectorAll('.trouble-card');
+            const targetLabel = document.getElementById('targetLabel');
+            const formatBadge = document.getElementById('formatBadge');
 
-            courseContent.addEventListener('input', () => {
-                charCount.textContent = `${courseContent.value.length} caractères`;
-            });
-
-            if (typeof pdfjsLib !== 'undefined') {
+            if (typeof pdfjsLib !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
                 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            }
+
+            window.switchTab = function(tab) {
+                const config = document.getElementById('section-config');
+                const preview = document.getElementById('section-preview');
+                const btnConfig = document.getElementById('tab-config');
+                const btnPreview = document.getElementById('tab-preview');
+
+                if(tab === 'config') {
+                    config.classList.remove('hidden'); preview.classList.add('hidden');
+                    btnConfig.className = "px-5 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-blue-600 transition-all";
+                    btnPreview.className = "px-5 py-2 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700 transition-all";
+                } else {
+                    config.classList.add('hidden'); preview.classList.remove('hidden');
+                    btnPreview.className = "px-5 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-blue-600 transition-all";
+                    btnConfig.className = "px-5 py-2 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700 transition-all";
+                }
+                safeLucide();
             }
 
             troubleCards.forEach(card => {
@@ -272,124 +273,124 @@
                 card.addEventListener('click', (e) => {
                     if(e.target.tagName !== 'SELECT' && e.target.tagName !== 'INPUT') {
                         checkbox.checked = !checkbox.checked;
-                        updateCardState(card, checkbox.checked);
+                        card.classList.toggle('active', checkbox.checked);
                     }
                 });
-                checkbox.addEventListener('change', () => updateCardState(card, checkbox.checked));
             });
 
-            function updateCardState(card, isActive) {
-                if (isActive) card.classList.add('active');
-                else card.classList.remove('active');
-            }
-
-            fileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                showStatus("Analyse du document...", "blue");
-                try {
-                    if (file.name.endsWith('.docx')) {
-                        const arrayBuffer = await file.arrayBuffer();
-                        const result = await mammoth.extractRawText({ arrayBuffer });
-                        courseContent.value = result.value;
-                        showStatus("Document DOCX importé.", "green");
-                    } else if (file.name.endsWith('.pdf')) {
-                        const arrayBuffer = await file.arrayBuffer();
-                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                        let text = "";
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const content = await page.getTextContent();
-                            text += content.items.map(item => item.str).join(" ") + "\n";
-                        }
-                        courseContent.value = text;
-                        showStatus("Document PDF importé.", "green");
-                    } else {
-                        const text = await file.text();
-                        courseContent.value = text;
-                        showStatus("Document chargé.", "green");
-                    }
-                    charCount.textContent = `${courseContent.value.length} caractères`;
-                } catch (err) {
-                    showStatus("Erreur d'importation.", "red");
+            courseContent.addEventListener('input', () => {
+                if (courseContent.value.length > 0 && detectedFormat !== "HTML") {
+                    detectedFormat = "TEXTE";
+                    formatBadge.textContent = "TEXTE COLLÉ";
+                    targetLabel.textContent = "FORMAT CIBLE : DOCX";
                 }
             });
 
-            function showStatus(msg, color) {
-                statusMessage.textContent = msg;
-                statusMessage.className = `p-3 rounded-xl text-xs font-semibold bg-${color}-50 text-${color}-700 border border-${color}-200`;
-                statusMessage.classList.remove('hidden');
-            }
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0]; if (!file) return;
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                detectedFormat = (ext === 'html' || ext === 'htm') ? "HTML" : "DOCX";
+                formatBadge.textContent = (detectedFormat === "HTML") ? "SOURCE HTML" : "SOURCE DOCUMENT";
+                targetLabel.textContent = (detectedFormat === "HTML") ? "FORMAT CIBLE : HTML" : "FORMAT CIBLE : DOCX";
+                
+                try {
+                    if (file.name.endsWith('.docx')) {
+                        const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() }); courseContent.value = res.value;
+                    } else if (file.name.endsWith('.pdf')) {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        let t = ""; for (let i = 1; i <= pdf.numPages; i++) { const p = await pdf.getPage(i); const c = await p.getTextContent(); t += c.items.map(it => it.str).join(" ") + "\n"; }
+                        courseContent.value = t;
+                    } else { courseContent.value = await file.text(); }
+                } catch (err) { console.error(err); }
+            });
 
-            generateBtn.addEventListener('click', () => {
-                const content = courseContent.value.trim();
-                if (!content) return showStatus("Veuillez d'abord importer un cours.", "red");
-                const activeProfiles = [];
-                troubleCards.forEach(card => {
-                    if (card.querySelector('input[type="checkbox"]').checked) {
-                        activeProfiles.push({
-                            type: card.dataset.id,
-                            level: card.querySelector('select').value,
-                            label: card.querySelector('.font-bold').textContent
+            document.getElementById('generateBtn').addEventListener('click', () => {
+                const content = courseContent.value.trim(); if (!content) return;
+                const profiles = []; 
+                troubleCards.forEach(c => {
+                    if (c.querySelector('input[type="checkbox"]').checked) {
+                        profiles.push({ 
+                            label: c.querySelector('.font-bold').textContent, 
+                            type: c.dataset.id, 
+                            level: c.querySelector('select').options[c.querySelector('select').selectedIndex].text 
                         });
                     }
                 });
-                if (activeProfiles.length === 0) return showStatus("Sélectionnez au moins un profil d'élève.", "red");
-                
-                outputContainer.classList.add('pulse-success');
-                setTimeout(() => outputContainer.classList.remove('pulse-success'), 500);
-                
-                outputPrompt.value = constructPrompt(content, activeProfiles);
-                showStatus("Prompt expert généré avec succès !", "green");
+
+                if (profiles.length === 0) { alert("Sélectionnez au moins un trouble."); return; }
+
+                let deliverableInstruction = "";
+                if (detectedFormat === "HTML") {
+                    deliverableInstruction = "LIVRABLE : Tu dois générer un FICHIER HTML5 AUTONOME ET COMPLET (<!DOCTYPE html>... </html>). IMPORTANT : Tu dois impérativement CONSERVER et REPRODUIRE toutes les balises <img> présentes dans la source originale avec leurs attributs exacts.";
+                } else {
+                    deliverableInstruction = "LIVRABLE : Tu dois générer un texte structuré prêt pour un document Word (.docx). IMPORTANT : Utilise exclusivement le format MARKDOWN (symboles #, -, **). N'utilise AUCUNE balise HTML.";
+                }
+
+                outputPrompt.value = `### RÔLE : EXPERT EN INCLUSION SCOLAIRE (CIBLE COLLÈGE 11-15 ANS)
+MISSION : Transformer intégralement le cours ci-dessous en un support adapté haute-accessibilité.
+
+### RÈGLES DE PRODUCTION (ZÉRO RÉSUMÉ) :
+1. ${deliverableInstruction}
+2. INTERDICTION DE TIRETS SYLLABIQUES : Ne segmente pas les mots (ex: ne pas écrire é-ner-gie). Pour les 11-15 ans, cela ralentit la lecture.
+3. CONSERVATION INTÉGRALE : Ne résume RIEN. Garde 100% des définitions, exemples, anecdotes, exercices et quiz.
+4. TYPOGRAPHIE COLLÈGE : Proscris l'italique et les majuscules superflues. Utilise Arial, taille 12-14.
+5. MISE EN PAGE : Texte TOUJOURS aligné à gauche (pas de justification). Une seule idée par paragraphe.
+
+### PROFILS CIBLES :
+${profiles.map(p => `- ${p.label} (Intensité : ${p.level})`).join('\n')}
+
+### MÉTHODE :
+- Phrases courtes. Structure sémantique claire par listes à puces.
+- Repères visuels : Icônes fixes (📌, 💡, 🆘, ✅) pour chaque bloc de savoir.
+- Mots-clés : Uniquement les termes essentiels en **GRAS**.
+
+### DOCUMENT SOURCE :
+=========================================
+${content}
+=========================================
+
+LIVRABLE : Le contenu adapté complet sans aucun commentaire introductif ou conclusif.`;
             });
 
-            function constructPrompt(content, profiles) {
-                return `Tu es un expert senior en ingénierie de la transformation et en inclusion pédagogique au collège.
+            document.getElementById('renderBtn').addEventListener('click', () => {
+                let raw = aiInput.value;
+                if(!raw) return;
 
-TA MISSION : Réécrire et adapter le document de cours intégral ci-dessous pour des élèves présentant les troubles suivants : ${profiles.map(p => p.label + ' (Niveau: ' + p.level + ')').join(', ')}.
+                // Nettoyage sécurisé pour extraire le contenu des blocs de code markdown
+                // Utilisation de méthodes de chaînes plutôt que de regex littérales fragiles
+                if (raw.includes("```")) {
+                    const parts = raw.split("```");
+                    if (parts.length >= 3) {
+                        // On prend le contenu à l'intérieur du premier bloc de code trouvé
+                        const contentWithLanguage = parts[1];
+                        raw = contentWithLanguage.replace(/^(html|markdown|text|docx)\s*/i, "").trim();
+                    } else if (parts.length === 2) {
+                        raw = parts[1].trim();
+                    }
+                }
 
-### RÈGLES DE CONSERVATION (ZÉRO RÉSUMÉ) :
-1. INTERDICTION DE RÉSUMER : Tu ne dois absolument pas réduire la longueur du cours. Si le texte original fait 2000 mots, la version adaptée doit faire environ 2000 mots. Chaque paragraphe doit être traité.
-2. PARALLÉLISME STRICT : Aucun savoir, aucune anecdote, aucune définition ne doit être omise. Tu adaptes la FORME, pas le FOND.
-3. INTÉGRITÉ DES NOTIONS : Toutes les explications techniques doivent être conservées.
+                const bodyStart = raw.toLowerCase().indexOf("<body");
+                const bodyEnd = raw.toLowerCase().indexOf("</body>");
+                
+                if (bodyStart !== -1 && bodyEnd !== -1) {
+                    const content = raw.substring(raw.indexOf(">", bodyStart) + 1, bodyEnd);
+                    previewArea.innerHTML = content;
+                } else if (typeof marked !== 'undefined') {
+                    previewArea.innerHTML = marked.parse(raw);
+                } else {
+                    previewArea.innerHTML = raw;
+                }
+                
+                safeLucide();
+                if(window.innerWidth < 1024) previewArea.scrollIntoView({ behavior: 'smooth' });
+            });
 
-### RÈGLES D'ADAPTATION (MÉTHODE INCLUSIVE) :
-- Typographie : Structure aérée, suggère l'usage de polices sans empattement.
-- Langage : Phrases courtes, une seule idée par phrase. Explicite les termes techniques au moment où ils apparaissent.
-- Visuel : Pas d'italique. Utilise le GRAS uniquement pour les mots-clés essentiels. 
-- Aération : Saute une ligne entre chaque paragraphe. Utilise des listes à puces pour chaque énumération.
-- Design : Si l'original contient du HTML ou des tableaux, reproduis la structure exacte.
-
-### ADAPTATION DES ÉVALUATIONS :
-- Transforme les QCM complexes en QCM à 3 options maximum.
-- Souligne ou mets en gras les mots pivots des consignes (ex: "**Vrai** ou **Faux**").
-- Conserve l'intégralité des questions de l'original, mais rends-les plus lisibles visuellement.
-
-### SPÉCIFICITÉS PAR PROFIL SÉLECTIONNÉ :
-${profiles.map(p => {
-    if (p.type === 'dyslexie') return "- DYS : Segmentation des termes complexes, lexique préalable complet, mise en relief des mots-clés en gras.";
-    if (p.type === 'dyspraxie') return "- DYSPRAXIE : Allègement de la charge visuo-spatiale. Pas de tracés manuels requis. Utilisation de cadres pour délimiter les sections.";
-    if (p.type === 'tdah') return "- TDAH : Séquençage par micro-étapes. Ajout d'icônes visuelles de rappel (📌). Check-list de fin de section.";
-    if (p.type === 'dyscalculie') return "- DYSCALCULIE : Utilise des analogies visuelles et décompose chaque raisonnement logique pas à pas.";
-    return "";
-}).join('\n')}
-
-### COURS ORIGINAL À TRANSFORMER (NE PAS RÉSUMER) :
----
-${content}
----
-
-LIVRABLE : Produis la version adaptée intégrale, sans aucune perte d'information par rapport à l'original.`;
-            }
-
-            copyBtn.addEventListener('click', () => {
-                outputPrompt.select();
-                outputPrompt.setSelectionRange(0, 99999);
-                try {
-                    document.execCommand('copy');
-                    copyTooltip.classList.remove('hidden');
-                    setTimeout(() => copyTooltip.classList.add('hidden'), 2500);
-                } catch (err) { alert("Copie échouée."); }
+            document.getElementById('copyBtn').addEventListener('click', () => {
+                outputPrompt.select(); document.execCommand('copy');
+                const t = document.getElementById('copyTooltip'); t.classList.remove('hidden');
+                setTimeout(() => t.classList.add('hidden'), 2000);
             });
         });
     </script>
