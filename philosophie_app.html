@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophie de l'Assistant Pédagogique Moderne</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.5;
+            color: #1e293b;
+            background: white;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 15mm;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        h1 {
+            font-size: 22pt;
+            margin-bottom: 8pt;
+            text-align: center;
+            color: #0284c7;
+            border-bottom: 3px solid #0284c7;
+            padding-bottom: 8pt;
+        }
+
+        h2 {
+            font-size: 14pt;
+            margin-top: 14pt;
+            margin-bottom: 8pt;
+            color: #334155;
+            border-left: 4px solid #0284c7;
+            padding-left: 10pt;
+        }
+
+        h3 {
+            font-size: 11pt;
+            margin-top: 10pt;
+            margin-bottom: 6pt;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 8pt;
+            text-align: justify;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 12pt;
+            color: #64748b;
+            font-style: italic;
+            margin-bottom: 16pt;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #0284c7;
+            padding: 10pt;
+            margin: 10pt 0;
+            border-radius: 4pt;
+        }
+
+        .core-value {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 8pt;
+            margin: 6pt 0;
+            border-radius: 4pt;
+        }
+
+        .core-value strong {
+            color: #0284c7;
+            font-size: 11pt;
+        }
+
+        ul {
+            margin: 8pt 0 8pt 20pt;
+        }
+
+        li {
+            margin-bottom: 4pt;
+        }
+
+        .two-column {
+            column-count: 2;
+            column-gap: 15pt;
+            margin: 10pt 0;
+        }
+
+        .footer {
+            margin-top: 16pt;
+            padding-top: 10pt;
+            border-top: 1px solid #cbd5e1;
+            text-align: center;
+            font-size: 9pt;
+            color: #64748b;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10pt;
+            margin: 10pt 0;
+        }
+
+        .pillar {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 8pt;
+            border-radius: 4pt;
+        }
+
+        .pillar-title {
+            font-weight: 600;
+            color: #0284c7;
+            margin-bottom: 4pt;
+            font-size: 10pt;
+        }
+
+        strong {
+            color: #334155;
+        }
+
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .print-button:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+        }
+
+        .print-button:active {
+            transform: translateY(0);
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .highlight-box,
+            .core-value,
+            .pillar {
+                break-inside: avoid;
+            }
+
+            h2 {
+                page-break-after: avoid;
+            }
+
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="print-button" onclick="window.print()">🖨️ Imprimer / PDF</button>
+
+    <h1>L'Assistant Pédagogique Moderne</h1>
+    <p class="subtitle">Philosophie & Vision d'une Suite d'Outils au Service de l'Enseignant</p>
+
+    <div class="highlight-box">
+        <p><strong>Vision centrale :</strong> Démocratiser l'accès à des ressources pédagogiques de qualité
+            professionnelle en mettant l'intelligence artificielle au service de l'enseignant, sans jamais le remplacer.
+            L'IA n'est pas le pédagogue : <em>elle est l'assistant qui prépare le terrain, l'enseignant reste
+                l'architecte</em>.</p>
+    </div>
+
+    <h2>1. Genèse & Contexte</h2>
+    <p>L'Assistant Pédagogique Moderne est né d'une observation terrain : les enseignants manquent de temps pour créer
+        des supports pédagogiques variés, adaptés et esthétiquement engageants. Face à l'émergence des IA génératives,
+        il devenait urgent de concevoir une <strong>interface de médiation</strong> entre ces outils puissants mais
+        complexes et les besoins concrets de l'enseignant.</p>
+
+    <p>Plutôt que de se perdre dans des prompts mal structurés ou de produire du contenu générique, cette suite d'outils
+        propose une <strong>ingénierie pédagogique encapsulée</strong> : chaque générateur intègre les bonnes pratiques
+        didactiques, les référentiels officiels (programmes de l'Éducation Nationale) et une exigence de qualité alignée
+        sur celle d'un éditeur scolaire.</p>
+
+    <h2>2. Les Cinq Piliers Philosophiques</h2>
+
+    <div class="pillars-grid">
+        <div class="pillar">
+            <div class="pillar-title">🎯 L'enseignant au centre</div>
+            <p style="font-size: 9.5pt;">L'outil ne génère jamais de contenu "clé en main" sans validation humaine. Il
+                produit des <em>prompts structurés</em> ou des <em>bases de travail</em> que l'enseignant enrichit,
+                adapte et valide.</p>
+        </div>
+        <div class="pillar">
+            <div class="pillar-title">⚡ Gain de temps, pas de qualité perdue</div>
+            <p style="font-size: 9.5pt;">L'automatisation vise les tâches chronophages (structuration, mise en page,
+                diversité de formats), libérant du temps pour la personnalisation et l'innovation pédagogique.</p>
+        </div>
+        <div class="pillar">
+            <div class="pillar-title">🔄 Flexibilité & Diversité</div>
+            <p style="font-size: 9.5pt;">Un même contenu peut être décliné en cours DOCX, page HTML interactive,
+                exercice Moodle XML, infographie visuelle ou jeu pédagogique, selon le besoin et le public.</p>
+        </div>
+        <div class="pillar">
+            <div class="pillar-title">🌐 Compatibilité ENT</div>
+            <p style="font-size: 9.5pt;">Intégration facilitée avec les <strong>Environnements Numériques de
+                    Travail</strong> : exports prêts à l'emploi pour outils de création assistée (PNG), Tests Moodle
+                (XML), ou pages HTML interactives.</p>
+        </div>
+    </div>
+
+    <div class="pillars-grid">
+        <div class="pillar">
+            <div class="pillar-title">🎨 Esthétique & Engagement</div>
+            <p style="font-size: 9.5pt;">Refus des interfaces austères. Chaque générateur embarque des principes de
+                design moderne (palettes de couleurs, typographie soignée, animations CSS) pour produire des supports
+                qui <em>donnent envie</em>.</p>
+        </div>
+        <div class="pillar">
+            <div class="pillar-title">📚 Rigueur Pédagogique</div>
+            <p style="font-size: 9.5pt;">Alignement strict sur les programmes officiels, intégration du Socle Commun,
+                structuration par compétences. L'IA est <em>guidée</em> pour produire des contenus conformes aux
+                exigences institutionnelles.</p>
+        </div>
+    </div>
+
+    <h2>3. Architecture de l'Écosystème</h2>
+
+    <p>L'application se décompose en <strong>quatre familles fonctionnelles complémentaires</strong> :</p>
+
+    <div class="two-column">
+        <div>
+            <h3>A. Générateurs de Cours Disciplinaires</h3>
+            <ul style="font-size: 9.5pt;">
+                <li><strong>Sciences</strong> : Technologie, SVT, Physique-Chimie, Mathématiques</li>
+                <li><strong>Sciences Humaines</strong> : Histoire, Géographie, EMC</li>
+                <li><strong>Langues & Arts</strong> : Français, Anglais, Espagnol, Italien, LCC, Arts Plastiques,
+                    Éducation Musicale</li>
+                <li><strong>Lycée</strong> : SNT, SES</li>
+            </ul>
+            <p style="font-size: 9.5pt;"><em>Chaque générateur s'appuie sur une base de données de séquences
+                    pédagogiques pré-structurées par niveau et thème, permettant une génération contextuelle et
+                    cohérente.</em></p>
+        </div>
+        <div>
+            <h3>B. Boîte à Outils (Édition & Conversion)</h3>
+            <ul style="font-size: 9.5pt;">
+                <li>Éditeur visuel HTML (WYSIWYG)</li>
+                <li>Amélioration de design HTML via prompt</li>
+                <li>Amélioration de textes DOCX via IA</li>
+                <li>Convertisseur HTML → PDF</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="two-column">
+        <div>
+            <h3>C. Activités Interactives & Ludiques</h3>
+            <ul style="font-size: 9.5pt;">
+                <li>Générateurs de parcours d'activités multi-onglets</li>
+                <li>Escape Games / Scénarios à choix</li>
+                <li>Ateliers cognitifs (Memory, Mots Croisés, Mots Mêlés, Association)</li>
+            </ul>
+        </div>
+        <div>
+            <h3>D. Exercices & Évaluations</h3>
+            <ul style="font-size: 9.5pt;">
+                <li>Exercices visuels (PNG pour Création Assistée Léia)</li>
+                <li>Exercices auto-corrigés (XML Moodle)</li>
+                <li>Infographies pédagogiques (Accroche, Résumé, Synthèse)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>4. Principes de Conception Technique</h2>
+
+    <div class="core-value">
+        <strong>Autonomie & Légèreté :</strong> Tous les outils fonctionnent côté client (HTML/CSS/JavaScript), sans
+        serveur backend. L'enseignant garde la main sur ses données, rien n'est envoyé à un serveur tiers (hors appel IA
+        si mode API activé).
+    </div>
+
+    <div class="core-value">
+        <strong>Transparence & Modifiabilité des Prompts :</strong> L'application ne "cache" jamais ce qu'elle envoie à
+        l'IA. Le prompt généré est toujours visible, modifiable et pédagogique : il explicite les exigences (structure,
+        format, compétences visées). <em>Toutes les informations et prompts sont facilement modifiables et
+            améliorables</em> selon les besoins spécifiques de chaque enseignant.
+    </div>
+
+    <div class="core-value">
+        <strong>Modularité :</strong> Chaque outil est une page HTML autonome et réutilisable. Un enseignant peut
+        adapter ou dupliquer un générateur pour ses besoins spécifiques sans dépendances complexes.
+    </div>
+
+    <h2>5. Posture Éthique & Pédagogique</h2>
+
+    <p><strong>L'IA comme co-pilote, jamais comme pilote</strong> : Les outils n'encouragent pas la délégation aveugle à
+        l'IA, mais une collaboration consciente. L'enseignant doit :</p>
+    <ul style="font-size: 9.5pt;">
+        <li>Paramétrer ses besoins (niveau, thème, objets d'étude, plan imposé)</li>
+        <li>Vérifier systématiquement les contenus générés (mention explicite dans le footer de chaque page)</li>
+        <li>Adapter le contenu à sa classe, son contexte, ses élèves</li>
+    </ul>
+
+    <p><strong>Accompagnement à la maîtrise des outils numériques</strong> : En affichant les prompts et en expliquant
+        les mécanismes (structure d'un cours, critères d'un bon exercice), l'application forme implicitement
+        l'enseignant à l'ingénierie pédagogique et à l'usage raisonné de l'IA.</p>
+
+    <h2>6. Modèle Économique & Accessibilité</h2>
+
+    <p>L'application est diffusée sous <strong>licence Creative Commons BY-NC 4.0</strong> : gratuite pour un usage non
+        commercial, libre de partage et d'adaptation. Ce choix affirme une volonté de <strong>démocratisation</strong> :
+        tout enseignant, quelle que soit son académie ou son établissement, peut bénéficier de ces outils.</p>
+
+    <p>Le mode <strong>API optionnel</strong> (connexion Gemini ou OpenRouter) permet une automatisation complète, mais
+        l'application reste pleinement fonctionnelle en mode "générateur de prompts" : l'enseignant copie le prompt
+        produit et l'utilise dans l'IA de son choix (gratuite ou payante).</p>
+
+    <h2>Conclusion : Vers une Pédagogie Augmentée</h2>
+
+    <p>L'Assistant Pédagogique Moderne ne cherche pas à "remplacer" le travail de l'enseignant, mais à le
+        <strong>réorienter</strong> : moins de temps sur la mise en forme, plus de temps sur la personnalisation,
+        l'accompagnement et l'innovation. En structurant l'usage de l'IA par des cadres pédagogiques rigoureux, il
+        transforme un outil généraliste en un <strong>partenaire d'expertise disciplinaire</strong>.</p>
+
+    <p>La philosophie sous-jacente est celle d'une <strong>pédagogie augmentée</strong> : l'humain (enseignant et élève)
+        reste au cœur, la machine sert d'amplificateur de créativité et de productivité, jamais de substitut à la
+        réflexion et au lien humain.</p>
+
+    <div class="footer">
+        <p><strong>© 2026 Gilles Cormi</strong> | Licence CC BY-NC 4.0</p>
+        <p style="font-size: 8pt; margin-top: 4pt;">Document généré à partir de l'analyse de l'application « Assistant
+            Pédagogique Moderne » — Version 2026</p>
+    </div>
+</body>
+
+</html>
