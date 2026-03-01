@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Expert - Assistant Pédagogique IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0369a1;
+            --accent: #8b5cf6;
+            --bg-slate: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        .premium-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 25px -10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-fill-color: transparent;
+            color: transparent;
+        }
+
+        .page {
+            max-width: 210mm;
+            min-height: 297mm;
+            padding: 10mm 15mm;
+            margin: 1rem auto;
+            background: white;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .page-header {
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section {
+            page-break-inside: avoid;
+            margin-bottom: 1.25rem;
+        }
+
+        .tool-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .step-number {
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 50%;
+            background: #1e293b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.75rem;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            @page {
+                margin: 0;
+                size: A4;
+            }
+
+            body {
+                background: white !important;
+                margin: 0;
+                padding: 0;
+            }
+
+            .page {
+                margin: 0 !important;
+                padding: 8mm 12mm !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                page-break-after: always;
+                display: block !important;
+                background: white !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+            }
+
+            /* Désactiver les effets qui cassent le rendu PDF */
+            .premium-card {
+                background: #f8fafc !important;
+                backdrop-filter: none !important;
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+                height: auto !important;
+                break-inside: avoid;
+            }
+
+            section {
+                break-inside: avoid;
+            }
+
+            /* Cacher les cercles de fond absolus qui peuvent masquer le texte */
+            div[class*="absolute"][class*="bg-"] {
+                display: none !important;
+            }
+
+            .gradient-text {
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+                color: #1e293b !important;
+                -webkit-background-clip: initial !important;
+                background-clip: initial !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="fixed top-6 right-6 no-print flex gap-4">
+        <button onclick="window.print()"
+            class="bg-indigo-600 text-white px-6 py-3 rounded-full font-bold shadow-xl hover:bg-indigo-700 transition-all flex items-center gap-2">
+            <i class="fas fa-file-pdf"></i> Exporter en PDF (2 pages)
+        </button>
+    </div>
+
+    <!-- PAGE 1: VISION ET HUB -->
+    <div class="page">
+        <!-- Background Accent -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-sky-50 rounded-full -mr-32 -mt-32 opacity-50"></div>
+
+        <header class="page-header relative z-10">
+            <div class="flex justify-between items-start mb-6">
+                <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-lg">
+                    <i class="fas fa-brain text-2xl"></i>
+                </div>
+                <div class="text-right">
+                    <span class="badge bg-sky-100 text-sky-700">Documentation Technique - 2026</span>
+                    <p class="text-xs text-slate-400 mt-1">Gilles Cormi - Expert Pédagogique</p>
+                </div>
+            </div>
+            <h1 class="text-5xl font-extrabold text-slate-900 leading-tight">Assistant <br><span
+                    class="gradient-text">Pédagogique Intelligent</span></h1>
+            <p class="mt-4 text-slate-500 text-lg max-w-2xl">
+                Une infrastructure modulaire dédiée à l'enseignant moderne pour automatiser la conception de séquences,
+                individualiser les parcours et enrichir les supports de cours.
+            </p>
+        </header>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-extrabold text-slate-800 mb-6 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-8 h-1 bg-sky-500 rounded-full"></span>
+                Philosophie & Architecture
+            </h2>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="premium-card bg-sky-50 border-sky-100">
+                    <h3 class="font-bold text-sky-900 mb-2">Ingénierie de "Prompting"</h3>
+                    <p class="text-sm text-sky-800 opacity-80">
+                        L'outil ne se substitue pas à l'enseignant mais devient son "metteur en scène". Il génère des
+                        commandes IA ultra-complexes qui incluent les <strong>Bulletins Officiels (BO)</strong>, les
+                        compétences CRCN et les contraintes de mise en page.
+                    </p>
+                </div>
+                <div class="premium-card bg-purple-50 border-purple-100">
+                    <h3 class="font-bold text-purple-900 mb-2">Évolution Continue</h3>
+                    <p class="text-sm text-purple-800 opacity-80">
+                        Conçu comme un laboratoire vivant, l'assistant s'enrichit chaque mois. Sa force réside dans sa
+                        structure <strong>Zero-Backend</strong> : vos données (points de cours, plans) ne transitent par
+                        aucun serveur privé.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-extrabold text-slate-800 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-8 h-1 bg-indigo-500 rounded-full"></span>
+                Le Hub Central : Séquençage & BO
+            </h2>
+            <p class="text-slate-600 mb-6 italic">Fichier master : <code
+                    class="text-indigo-600 font-bold">index.html</code></p>
+
+            <div class="space-y-4">
+                <div
+                    class="flex gap-4 items-start p-4 rounded-2xl border border-slate-100 bg-slate-50 transition-all hover:border-indigo-200">
+                    <div class="tool-icon bg-indigo-600 text-white"><i class="fas fa-layer-group"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">Alignement Programmatique</h4>
+                        <p class="text-sm text-slate-500">
+                            Chaque matière (Technologie, SVT, Français) est pré-configurée. En un clic, l'IA reçoit
+                            l'instruction de respecter les attendus précis du cycle 4, les connaissances requises et les
+                            terminologies académiques.
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="flex gap-4 items-start p-4 rounded-2xl border border-slate-100 bg-slate-50 transition-all hover:border-indigo-200">
+                    <div class="tool-icon bg-indigo-600 text-white"><i class="fas fa-sliders-h"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">Personnalisation du "Cœur de Cours"</h4>
+                        <p class="text-sm text-slate-500">
+                            L'enseignant peut "former" l'IA en injectant des ressources externes : vidéos YouTube,
+                            articles de presse, ou manuels scolaires scannés. Le prompt oblige l'IA à extraire les
+                            données de ces sources pour construire le cours.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer
+            class="mt-6 pt-4 border-t border-slate-100 text-center text-slate-300 text-[10px] uppercase tracking-widest">
+            Page 1 - Vision Stratégique & Hub Pédagogique
+        </footer>
+    </div>
+
+    <!-- PAGE 2: OUTILS EXPERTS ET WORKFLOW -->
+    <div class="page">
+        <!-- Background Accent -->
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-50 rounded-full -ml-32 -mb-32 opacity-50"></div>
+
+        <header class="page-header">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-1">L'Atelier de Transformation</h2>
+            <p class="text-sm text-slate-500">Suite d'outils spécialisés accessibles via <code
+                    class="text-purple-600">boite.html</code></p>
+        </header>
+
+        <section class="mb-6">
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Inclusion IA -->
+                <div class="premium-card border-l-4 border-l-blue-500 group hover:shadow-2xl transition-all p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
+                            <i class="fas fa-universal-access"></i></div>
+                        <span class="badge bg-blue-50 text-blue-600">Accessibilité</span>
+                    </div>
+                    <h3 class="font-bold text-slate-800 mb-1 text-sm">Inclusion IA</h3>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Remédiation cognitive instantanée. Adapte les polices, l'interlignage et la structure pour les
+                        élèves Dys/TDAH.
+                    </p>
+                </div>
+
+                <!-- Intégrateur Visuel -->
+                <div class="premium-card border-l-4 border-l-purple-500 group hover:shadow-2xl transition-all p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                            <i class="fas fa-eye"></i></div>
+                        <span class="badge bg-purple-50 text-purple-600">Édition</span>
+                    </div>
+                    <h3 class="font-bold text-slate-800 mb-1 text-sm">Intégrateur Visuel</h3>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Éditeur WYSIWYG de haut niveau. Permet de "nettoyer" le code, coller des images et exporter le
+                        pack complet.
+                    </p>
+                </div>
+
+                <!-- Générateur d'Activités -->
+                <div class="premium-card border-l-4 border-l-amber-500 group hover:shadow-2xl transition-all p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <span class="badge bg-amber-50 text-amber-600">Interactivité</span>
+                    </div>
+                    <h3 class="font-bold text-slate-800 mb-1 text-sm">Générateur d'Activités</h3>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Construit des exercices d'identification ou de logique inversée avec système de "Magic Word".
+                    </p>
+                </div>
+
+                <!-- Amélioration DOCX -->
+                <div class="premium-card border-l-4 border-l-green-500 group hover:shadow-2xl transition-all p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm">
+                            <i class="fas fa-file-word"></i>
+                        </div>
+                        <span class="badge bg-green-50 text-green-600">Révision</span>
+                    </div>
+                    <h3 class="font-bold text-slate-800 mb-1 text-sm">Amélioration DOCX</h3>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Prend vos cours DOCX et suggère des enrichissements : schémas, paragraphes ou évaluations.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-4">
+            <h2 class="text-lg font-extrabold text-slate-800 mb-3 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-6 h-1 bg-slate-900 rounded-full"></span>
+                Mode Opératoire
+            </h2>
+            <div class="flex flex-col gap-2">
+                <div
+                    class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-sm relative">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h4 class="font-bold text-xs">Configuration Master</h4>
+                        <p class="text-[10px] text-slate-500">Saisie du thème, niveau et ressources.</p>
+                    </div>
+                </div>
+                <div
+                    class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-sm relative">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h4 class="font-bold text-xs">Dialogue IA</h4>
+                        <p class="text-[10px] text-slate-500">Copie du prompt et récupération du contenu.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h4 class="font-bold text-xs">Export Multi-Format</h4>
+                        <p class="text-[10px] text-slate-500">Sortie finale en <strong>DOCX</strong> ou
+                            <strong>HTML</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="premium-card bg-slate-100 text-slate-800 border-slate-200 flex items-center justify-between p-4">
+            <div>
+                <h3 class="text-lg font-bold mb-1">Support en Évolution & Tests continus</h3>
+                <p class="text-slate-500 text-[10px] italic">Un assistant en amélioration constante, optimisé pour le
+                    terrain.</p>
+            </div>
+            <div class="opacity-10 text-4xl">
+                <i class="fas fa-microscope text-slate-900"></i>
+            </div>
+        </section>
+
+        <footer
+            class="mt-6 pt-4 border-t border-slate-100 text-center text-slate-300 text-[10px] uppercase tracking-widest">
+            © 2026 Gilles Cormi - Un outil en constante mutation pour le futur de la pédagogie.
+            <br>
+            Page 2 - Outils Avancés & Flux de Travail
+        </footer>
+    </div>
+
+</body>
+
+</html>
