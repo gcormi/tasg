@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horloge Examen DNB - Académie de Corse</title>
-    <!-- AMÉLIORATION : Chargement réel de la police Nunito -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* === VARIABLES === */
@@ -67,20 +66,8 @@
             opacity: 0;
         }
 
-        .admin-group-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            flex: 1;
-        }
-
-        .admin-group-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .admin-group-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 1; }
+        .admin-group-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
         .admin-title {
             font-weight: bold;
@@ -146,338 +133,89 @@
         }
         .btn-action:hover { background-color: #f1f5f9; border-color: #94a3b8; color: #1e293b; }
 
-        /* AMÉLIORATION : Bouton flottant pour ré-afficher le panneau */
         .show-panel-btn {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 100;
-            background: var(--blue-main);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.5em;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+            position: fixed; top: 15px; right: 15px; z-index: 100;
+            background: var(--blue-main); color: white; border: none; border-radius: 50%;
+            width: 50px; height: 50px; font-size: 1.5em; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4); display: none;
+            align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.2s;
         }
         .show-panel-btn:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(59,130,246,0.5); }
         .show-panel-btn.visible { display: flex; }
 
         /* === TABLEAU DE BORD === */
-        .dashboard {
-            display: flex;
-            gap: 2vw;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
+        .dashboard { display: flex; gap: 2vw; margin-bottom: 15px; flex-wrap: wrap; }
 
         .clock-card {
-            flex: 1;
-            min-width: 280px;
-            background-color: var(--gray-light);
-            border-radius: 20px;
-            padding: 2vw;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border: 1px solid #e2e8f0;
+            flex: 1; min-width: 280px; background-color: var(--gray-light);
+            border-radius: 20px; padding: 2vw; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; border: 1px solid #e2e8f0;
         }
 
-        .date-display {
-            font-size: clamp(0.9em, 1.5vw, 1.2em);
-            font-weight: 800;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .time-display {
-            font-size: clamp(3.5em, 6vw, 5.5em);
-            font-weight: 900;
-            color: var(--blue-dark);
-            line-height: 1;
-            margin: 0;
-            font-variant-numeric: tabular-nums;
-        }
+        .date-display { font-size: clamp(0.9em, 1.5vw, 1.2em); font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+        .time-display { font-size: clamp(3.5em, 6vw, 5.5em); font-weight: 900; color: var(--blue-dark); line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
 
         .remaining-card {
-            flex: 1.2;
-            min-width: 300px;
+            flex: 1.2; min-width: 300px;
             background: linear-gradient(135deg, var(--blue-main), var(--blue-dark));
-            border-radius: 20px;
-            padding: 2vw;
-            text-align: center;
-            color: white;
+            border-radius: 20px; padding: 2vw; text-align: center; color: white;
             box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: flex; flex-direction: column; justify-content: center;
             transition: background 0.8s ease, box-shadow 0.8s ease;
         }
 
-        /* AMÉLIORATION : États d'urgence */
-        .remaining-card.pre-exam {
-            background: linear-gradient(135deg, #64748b, #334155);
-            box-shadow: 0 10px 15px -3px rgba(100,116,139,0.3);
-        }
-        .remaining-card.warning {
-            background: linear-gradient(135deg, var(--orange-warning), var(--orange-dark));
-            box-shadow: 0 10px 15px -3px rgba(245,158,11,0.3);
-        }
+        .remaining-card.pre-exam { background: linear-gradient(135deg, #64748b, #334155); box-shadow: 0 10px 15px -3px rgba(100,116,139,0.3); }
+        .remaining-card.warning { background: linear-gradient(135deg, var(--orange-warning), var(--orange-dark)); box-shadow: 0 10px 15px -3px rgba(245,158,11,0.3); }
         .remaining-card.critical {
             background: linear-gradient(135deg, var(--red-alert), var(--red-dark));
             box-shadow: 0 10px 15px -3px rgba(239,68,68,0.4);
             animation: pulse-critical 1s infinite;
         }
-        .remaining-card.finished {
-            background: linear-gradient(135deg, #7f1d1d, #450a0a);
-            box-shadow: 0 10px 15px -3px rgba(127,29,29,0.4);
-            animation: none;
-        }
+        .remaining-card.finished { background: linear-gradient(135deg, #7f1d1d, #450a0a); box-shadow: 0 10px 15px -3px rgba(127,29,29,0.4); animation: none; }
 
         @keyframes pulse-critical {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.02); box-shadow: 0 14px 20px -3px rgba(239,68,68,0.5); }
         }
 
-        .remaining-label {
-            font-size: clamp(0.9em, 1.3vw, 1.1em);
-            font-weight: bold;
-            letter-spacing: 2px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
+        .remaining-label { font-size: clamp(0.9em, 1.3vw, 1.1em); font-weight: bold; letter-spacing: 2px; opacity: 0.9; margin-bottom: 5px; }
+        .remaining-time { font-size: clamp(4em, 7.5vw, 7em); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .remaining-status { font-size: clamp(0.8em, 1.2vw, 1em); opacity: 0.85; margin-top: 8px; font-weight: 700; letter-spacing: 1px; min-height: 1.2em; }
 
-        .remaining-time {
-            font-size: clamp(4em, 7.5vw, 7em);
-            font-weight: 900;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* AMÉLIORATION : Texte de statut sous le décompte */
-        .remaining-status {
-            font-size: clamp(0.8em, 1.2vw, 1em);
-            opacity: 0.85;
-            margin-top: 8px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            min-height: 1.2em;
-        }
-
-        /* === AMÉLIORATION : BARRE DE PROGRESSION === */
-        .progress-section {
-            margin-bottom: 20px;
-            padding: 0 5px;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 14px;
-            background-color: #e2e8f0;
-            border-radius: 7px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--blue-main), var(--blue-dark));
-            border-radius: 7px;
-            transition: width 1s linear, background 0.8s ease;
-        }
-
+        /* === BARRE DE PROGRESSION === */
+        .progress-section { margin-bottom: 20px; padding: 0 5px; }
+        .progress-bar-container { width: 100%; height: 14px; background-color: #e2e8f0; border-radius: 7px; overflow: hidden; position: relative; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--blue-main), var(--blue-dark)); border-radius: 7px; transition: width 1s linear, background 0.8s ease; }
         .progress-bar-fill.warning { background: linear-gradient(90deg, var(--orange-warning), #d97706); }
         .progress-bar-fill.critical { background: linear-gradient(90deg, var(--red-alert), var(--red-dark)); }
         .progress-bar-fill.finished { background: linear-gradient(90deg, #7f1d1d, #450a0a); width: 100% !important; }
-
-        /* Marqueur mi-épreuve */
-        .progress-mid-marker {
-            position: absolute;
-            left: 50%;
-            top: -3px;
-            bottom: -3px;
-            width: 3px;
-            background-color: #94a3b8;
-            border-radius: 2px;
-            z-index: 1;
-        }
-
-        .progress-labels {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 6px;
-            font-size: 0.8em;
-            font-weight: 700;
-            color: #64748b;
-        }
-
-        .progress-mid-label {
-            color: #94a3b8;
-            font-size: 0.9em;
-        }
+        .progress-mid-marker { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 3px; background-color: #94a3b8; border-radius: 2px; z-index: 1; }
+        .progress-labels { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.8em; font-weight: 700; color: #64748b; }
+        .progress-mid-label { color: #94a3b8; font-size: 0.9em; }
 
         /* === GESTION DU TEMPS ET RÈGLES === */
-        .controls-and-rules {
-            display: flex;
-            gap: 2vw;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .time-management {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background-color: var(--gray-light);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .time-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .time-box {
-            flex: 1;
-            min-width: 80px;
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px 5px;
-            font-weight: bold;
-            transition: border-color 0.2s;
-        }
-
+        .controls-and-rules { display: flex; gap: 2vw; margin-bottom: 30px; flex-wrap: wrap; }
+        .time-management { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 12px; background-color: var(--gray-light); padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; }
+        .time-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .time-box { flex: 1; min-width: 80px; background: white; border: 1px solid #cbd5e1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; font-weight: bold; transition: border-color 0.2s; }
         .time-box.active { border-color: var(--blue-main); box-shadow: 0 2px 4px rgba(59,130,246,0.1); }
-
-        .time-label {
-            font-size: 0.7em;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-
-        .time-input {
-            border: none;
-            font-size: clamp(1.2em, 2vw, 1.6em);
-            font-weight: 900;
-            color: var(--blue-dark);
-            outline: none;
-            width: 100%;
-            text-align: center;
-            background: transparent;
-        }
-
+        .time-label { font-size: 0.7em; text-transform: uppercase; color: #64748b; margin-bottom: 5px; text-align: center; }
+        .time-input { border: none; font-size: clamp(1.2em, 2vw, 1.6em); font-weight: 900; color: var(--blue-dark); outline: none; width: 100%; text-align: center; background: transparent; }
         .time-box.readonly { background-color: #f1f5f9; }
-
-        /* AMÉLIORATION : Ligne avec bouton Maintenant + Tiers-temps */
-        .time-buttons-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tt-button, .now-button {
-            flex: 1;
-            background-color: white;
-            color: var(--blue-main);
-            border: 2px solid var(--blue-main);
-            padding: 12px;
-            font-size: 1em;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
+        .time-buttons-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .tt-button, .now-button { flex: 1; background-color: white; color: var(--blue-main); border: 2px solid var(--blue-main); padding: 12px; font-size: 1em; font-weight: bold; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
         .tt-button:hover, .now-button:hover { background-color: var(--blue-light); }
-
-        .now-button {
-            color: var(--green-ok);
-            border-color: var(--green-ok);
-            flex: 0 1 auto;
-        }
+        .now-button { color: var(--green-ok); border-color: var(--green-ok); flex: 0 1 auto; }
         .now-button:hover { background-color: #f0fdf4; }
 
-        .rules-container {
-            flex: 1.5;
-            min-width: 300px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            background-color: var(--red-light);
-            padding: 15px;
-            border-radius: 16px;
-            border: 1px solid #fecaca;
-        }
-
-        .rule-box {
-            flex: 1;
-            min-width: 85px;
-            max-width: 160px;
-            background: white;
-            border-radius: 10px;
-            padding: 10px 5px;
-            text-align: center;
-            color: var(--red-alert);
-            font-weight: bold;
-            font-size: clamp(0.65em, 1vw, 0.75em);
-            text-transform: uppercase;
-            box-shadow: 0 2px 4px rgba(239,68,68,0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
+        .rules-container { flex: 1.5; min-width: 300px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; background-color: var(--red-light); padding: 15px; border-radius: 16px; border: 1px solid #fecaca; }
+        .rule-box { flex: 1; min-width: 85px; max-width: 160px; background: white; border-radius: 10px; padding: 10px 5px; text-align: center; color: var(--red-alert); font-weight: bold; font-size: clamp(0.65em, 1vw, 0.75em); text-transform: uppercase; box-shadow: 0 2px 4px rgba(239,68,68,0.05); display: flex; flex-direction: column; justify-content: center; transition: all 0.3s ease; }
         .rule-icon { font-size: clamp(1.8em, 2.5vw, 2.2em); margin-bottom: 8px; position: relative; }
-        .rule-icon::after {
-            content: ""; position: absolute; top: 50%; left: 20%; width: 60%; height: 3px;
-            background-color: var(--red-alert); transform: rotate(-45deg); border-radius: 2px;
-        }
+        .rule-icon::after { content: ""; position: absolute; top: 50%; left: 20%; width: 60%; height: 3px; background-color: var(--red-alert); transform: rotate(-45deg); border-radius: 2px; }
 
-        .tt-bar {
-            background-color: var(--blue-light);
-            color: var(--blue-dark);
-            text-align: center;
-            padding: 15px;
-            font-weight: bold;
-            font-size: clamp(1em, 1.5vw, 1.2em);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            border-radius: 12px;
-            border: 2px dashed var(--blue-main);
-            flex-wrap: wrap;
-        }
+        .tt-bar { background-color: var(--blue-light); color: var(--blue-dark); text-align: center; padding: 15px; font-weight: bold; font-size: clamp(1em, 1.5vw, 1.2em); margin-bottom: 20px; display: flex; justify-content: center; gap: 40px; border-radius: 12px; border: 2px dashed var(--blue-main); flex-wrap: wrap; }
 
-        /* === COPIE D'EXAMEN === */
+        /* === COPIE D'EXAMEN (Mise à jour d'après images) === */
         .exam-copy-wrapper {
             border: 2px solid var(--border-color);
             background-color: white;
@@ -485,6 +223,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            font-family: Arial, sans-serif; /* Plus proche d'un document administratif */
         }
 
         .copy-section { display: flex; min-height: 250px; }
@@ -510,10 +249,10 @@
 
         .copy-main {
             flex: 1;
-            padding: 3vw;
+            padding: 2vw 3vw;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             position: relative;
             min-width: 0;
         }
@@ -532,28 +271,34 @@
 
         .form-label {
             font-weight: bold;
-            font-size: clamp(0.75em, 1.2vw, 0.9em);
+            font-size: clamp(0.85em, 1.2vw, 1em);
             white-space: nowrap;
-            margin-right: 10px;
+            margin-right: 8px;
             padding-bottom: 2px;
             color: #111;
         }
 
+        .form-subtext {
+            font-size: 0.7em;
+            font-style: italic;
+            color: #475569;
+            margin-top: 3px;
+        }
+
         .form-line {
             flex: 1;
-            border-bottom: 2px solid var(--blue-main);
-            font-size: clamp(1.1em, 1.8vw, 1.5em);
-            font-weight: 900;
+            border-bottom: 1px solid #111; /* Ligne plus fine comme sur les copies */
+            font-size: clamp(1.1em, 1.8vw, 1.3em);
+            font-weight: 800;
             color: var(--blue-main);
             padding-bottom: 2px;
-            min-height: 28px;
+            min-height: 24px;
             text-transform: uppercase;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Champs auto-synchronisés (partie basse) */
         .form-line.synced {
             background-color: #fafafa;
             cursor: default;
@@ -568,22 +313,8 @@
             text-align: center;
         }
 
-        .instructions-box {
-            position: absolute;
-            right: 3vw;
-            top: 2vw;
-            width: clamp(150px, 20vw, 200px);
-            font-size: 0.7em;
-            font-style: italic;
-            border: 1px solid #333;
-            padding: 8px;
-            text-align: justify;
-            background-color: #fff;
-            z-index: 2;
-        }
-
         .num-candidat-box {
-            border: 2px solid var(--blue-main);
+            border: 1px solid #111;
             height: 35px;
             flex: 1;
             min-width: 150px;
@@ -604,91 +335,54 @@
             border-color: var(--red-alert);
         }
 
-        /* === MODALES === */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15,23,42,0.6);
-            backdrop-filter: blur(3px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-overlay.active { display: flex; }
-
-        .modal-content {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 16px;
-            max-width: 600px;
-            width: 90%;
-            position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            color: #1e293b;
-            max-height: 90vh;
-            overflow-y: auto;
+        /* Organisation partie basse */
+        .bottom-section-flex { display: flex; gap: 2vw; width: 100%; }
+        .bottom-fields { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .bottom-instructions-container { width: clamp(160px, 20vw, 220px); flex-shrink: 0; }
+        
+        .instructions-box-new {
+            font-size: 0.75em;
+            border: 1px solid #111;
+            padding: 12px;
+            text-align: justify;
+            background-color: #fff;
+            color: #111;
+            line-height: 1.4;
         }
 
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--blue-dark);
-            text-transform: uppercase;
-            font-size: 1.4em;
-            border-bottom: 2px solid var(--blue-light);
-            padding-bottom: 10px;
-        }
-        .modal-content p { line-height: 1.6; margin-bottom: 15px; }
-        .modal-content ul { line-height: 1.6; margin-bottom: 15px; padding-left: 20px; }
-        .modal-content li { margin-bottom: 10px; }
-        .modal-content a { color: var(--blue-main); text-decoration: none; font-weight: bold; }
-        .modal-content a:hover { text-decoration: underline; }
-
-        .close-modal {
-            position: absolute;
-            top: 20px; right: 25px;
-            font-size: 1.8em;
-            font-weight: bold;
-            cursor: pointer;
-            color: #64748b;
-            transition: color 0.2s;
-            line-height: 1;
-        }
-        .close-modal:hover { color: var(--red-alert); }
-
-        .privacy-note {
-            background-color: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--blue-main);
-            font-size: 0.9em;
-            margin-top: 20px;
-        }
-
-        .help-highlight { font-weight: bold; color: var(--blue-main); }
-
-        .rules-toggles { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-
-        .rules-toggles label {
+        .grading-area {
             display: flex;
             align-items: center;
             gap: 15px;
-            font-size: 1.1em;
-            cursor: pointer;
-            padding: 12px 15px;
-            background-color: var(--gray-light);
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            transition: background-color 0.2s;
+            margin-top: 25px;
+            padding-top: 15px;
         }
-        .rules-toggles label:hover { background-color: #e2e8f0; }
 
-        .rules-toggles input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            cursor: pointer;
-            accent-color: var(--blue-main);
+        .note-box {
+            border: 1px solid #111;
+            width: 90px;
+            height: 55px;
+            position: relative;
+            background-color: #fff;
         }
+
+        /* === MODALES === */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15,23,42,0.6); backdrop-filter: blur(3px); z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; padding: 30px 40px; border-radius: 16px; max-width: 600px; width: 90%; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); color: #1e293b; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { margin-top: 0; color: var(--blue-dark); text-transform: uppercase; font-size: 1.4em; border-bottom: 2px solid var(--blue-light); padding-bottom: 10px; }
+        .modal-content p, .modal-content ul { line-height: 1.6; margin-bottom: 15px; }
+        .modal-content li { margin-bottom: 10px; margin-left: 20px; }
+        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 1.8em; font-weight: bold; cursor: pointer; color: #64748b; transition: color 0.2s; line-height: 1; }
+        .close-modal:hover { color: var(--red-alert); }
+        .privacy-note { background-color: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid var(--blue-main); font-size: 0.9em; margin-top: 20px; }
+        .rules-toggles { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .rules-toggles label { display: flex; align-items: center; gap: 15px; font-size: 1.1em; cursor: pointer; padding: 12px 15px; background-color: var(--gray-light); border-radius: 8px; border: 1px solid #cbd5e1; }
+        .rules-toggles input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--blue-main); }
 
         /* === IMPRESSION === */
         @media print {
@@ -703,7 +397,8 @@
             .copy-section { flex-direction: column; }
             .sidebar-left { width: 100%; height: 30px; border-right: none; border-bottom: 2px solid var(--border-color); }
             .vertical-text { transform: none; letter-spacing: 5px; }
-            .instructions-box { position: relative; width: 100%; right: 0; top: 0; margin-bottom: 15px; }
+            .bottom-section-flex { flex-direction: column-reverse; }
+            .bottom-instructions-container { width: 100%; margin-bottom: 15px; }
             .form-group[style*="margin-right"] { margin-right: 0 !important; }
         }
     </style>
@@ -723,7 +418,7 @@
                 <option value="fr_grammaire">DNB - Français : Grammaire & Compréhension (1h10)</option>
                 <option value="fr_dictee">DNB - Français : Dictée (0h20)</option>
                 <option value="fr_redaction">DNB - Français : Rédaction (1h30)</option>
-                <option value="sciences">DNB - Sciences (Physique-Chimie / SVT / Techno) (1h00)</option>
+                <option value="sciences">DNB - Sciences (1h00 Officiel / 1h30 Blanc)</option>
                 <option value="lv">DNB - Langues Vivantes Étrangères (1h30)</option>
                 <option value="custom">Autre (Saisie manuelle)</option>
             </select>
@@ -743,7 +438,6 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-                <!-- AMÉLIORATION : Toggle alertes sonores -->
                 <div class="switch-container">
                     <span>🔊 Sons</span>
                     <label class="switch">
@@ -758,13 +452,11 @@
             <button class="btn-action" onclick="openRulesModal()" title="Cocher/décocher les consignes affichées">📋 Règles</button>
             <button class="btn-action" onclick="openHelpModal()" title="Mode d'emploi">❓ Aide</button>
             <button class="btn-action" onclick="openInfoModal()" title="Informations et Licence">ℹ️ Infos</button>
-            <!-- AMÉLIORATION : Masquer le panneau -->
             <button class="btn-action" onclick="hideAdminPanel()" title="Masquer ce panneau pour la projection">👁️‍🗨️ Masquer</button>
             <button class="btn-action" onclick="toggleFullScreen()" id="btn-fullscreen">🔲 Plein Écran</button>
         </div>
     </div>
 
-    <!-- AMÉLIORATION : Bouton flottant pour ré-afficher le panneau -->
     <button class="show-panel-btn" id="show-panel-btn" onclick="showAdminPanel()" title="Ré-afficher le panneau surveillant">⚙️</button>
 
     <!-- TABLEAU DE BORD -->
@@ -777,12 +469,11 @@
         <div class="remaining-card" id="remaining-card">
             <div class="remaining-label" id="remaining-label">TEMPS RESTANT</div>
             <div class="remaining-time" id="time-remaining">--h--</div>
-            <!-- AMÉLIORATION : Statut contextuel -->
             <div class="remaining-status" id="remaining-status"></div>
         </div>
     </div>
 
-    <!-- AMÉLIORATION : BARRE DE PROGRESSION -->
+    <!-- BARRE DE PROGRESSION -->
     <div class="progress-section" id="progress-section">
         <div class="progress-bar-container">
             <div class="progress-mid-marker"></div>
@@ -812,14 +503,9 @@
                     <input type="time" class="time-input" id="end-time" readonly>
                 </div>
             </div>
-            <!-- AMÉLIORATION : Bouton Maintenant + Tiers-temps sur la même ligne -->
             <div class="time-buttons-row">
-                <button class="now-button" onclick="setStartNow()" title="Utiliser l'heure actuelle comme heure de début">
-                    ▶️ Maintenant
-                </button>
-                <button class="tt-button" onclick="toggleTiersTemps()">
-                    ⏱️ AFFICHER 1/3 TIERS-TEMPS
-                </button>
+                <button class="now-button" onclick="setStartNow()" title="Utiliser l'heure actuelle comme heure de début">▶️ Maintenant</button>
+                <button class="tt-button" onclick="toggleTiersTemps()">⏱️ AFFICHER 1/3 TIERS-TEMPS</button>
             </div>
         </div>
 
@@ -841,118 +527,162 @@
         <span>FIN : <span id="tt-end-time">--:--</span></span>
     </div>
 
-    <!-- === COPIE D'EXAMEN === -->
+    <!-- === COPIE D'EXAMEN (MISE À JOUR) === -->
     <div class="exam-copy-wrapper">
+        <!-- PARTIE HAUTE -->
         <div class="copy-section">
-            <div class="sidebar-left"><span class="vertical-text">DANS CE CADRE</span></div>
+            <div class="sidebar-left"><span class="vertical-text">NE RIEN ÉCRIRE</span></div>
             <div class="copy-main">
+                
                 <div class="form-row">
                     <div class="form-group">
-                        <span class="form-label">ACADÉMIE :</span>
+                        <span class="form-label">Académie :</span>
                         <div class="form-line locked-corsica">CORSE</div>
                     </div>
-                    <div class="form-group">
-                        <span class="form-label">SESSION :</span>
-                        <div class="form-line" id="field-session" contenteditable="true"></div>
+                    <div class="form-group" style="justify-content: center;">
+                        <span class="form-label">Session :</span>
+                        <div class="form-line" id="field-session" contenteditable="true" style="text-align: center;"></div>
+                    </div>
+                    <div class="form-group" style="flex: 0.3; justify-content: flex-end; align-items: flex-end; border-bottom: none;">
+                        <span style="font-size: 0.8em; font-weight: bold; padding-bottom: 5px;">Modèle EN.</span>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <span class="form-label">EXAMEN OU CONCOURS :</span>
+                        <span class="form-label">Examen ou Concours</span>
                         <div class="form-line" id="field-examen" contenteditable="true">DIPLÔME NATIONAL DU BREVET</div>
                     </div>
-                    <div class="form-group">
-                        <span class="form-label">SÉRIE* :</span>
+                    <div class="form-group" style="flex: 0.6;">
+                        <span class="form-label">Série* :</span>
                         <div class="form-line" id="field-serie" contenteditable="true">GÉNÉRALE</div>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <span class="form-label">SPÉCIALITÉ/OPTION :</span>
+                        <span class="form-label">Spécialité/option :</span>
                         <div class="form-line" id="field-specialite" contenteditable="true">NÉANT</div>
                     </div>
-                    <div class="form-group">
-                        <span class="form-label">REPÈRE DE L'ÉPREUVE :</span>
-                        <div class="form-line" contenteditable="true"></div>
+                    <div class="form-group" style="flex: 0.8;">
+                        <span class="form-label">Repère de l'épreuve :</span>
+                        <div class="form-line" id="field-repere" contenteditable="true"></div>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group" style="width: 100%;">
-                        <span class="form-label">ÉPREUVE/SOUS-ÉPREUVE :</span>
+                        <span class="form-label">Épreuve/sous-épreuve :</span>
                         <div class="form-line" id="field-epreuve" contenteditable="true">MATHÉMATIQUES</div>
                     </div>
                 </div>
 
                 <div class="form-row" style="margin-top: 10px;">
-                    <div class="form-group" style="width: 100%;">
-                        <span class="form-label">NOM :</span>
+                    <div class="form-group" style="width: 100%; flex-direction: column; align-items: flex-start;">
+                        <div style="display: flex; width: 100%; align-items: flex-end;">
+                            <span class="form-label">NOM :</span>
+                            <div class="form-line"></div>
+                        </div>
+                        <span class="form-subtext">(en majuscules, suivi s'il y a lieu, du nom d'épouse)</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <span class="form-label">Prénoms :</span>
                         <div class="form-line"></div>
+                    </div>
+                    <div class="form-group" style="flex: 0.8; flex-direction: column; align-items: flex-end; justify-content: flex-end;">
+                        <div style="display: flex; width: 100%; align-items: center; justify-content: flex-end;">
+                            <span class="form-label" style="margin-right: 15px;">N° du candidat</span>
+                            <div class="num-candidat-box" id="num-candidat-box" onclick="toggleNumCandidat()" title="Cliquez pour indiquer aux élèves de ne pas remplir"></div>
+                        </div>
+                        <span class="form-subtext" style="width: 100%; text-align: right; margin-top: 5px;">(le numéro est celui qui figure sur la convocation ou la liste d'appel)</span>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <span class="form-label">PRÉNOMS :</span>
+                        <span class="form-label">Né(e) le :</span>
                         <div class="form-line"></div>
-                    </div>
-                    <div class="form-group" style="flex: 0.8;">
-                        <span class="form-label">N° DU CANDIDAT :</span>
-                        <div class="num-candidat-box" id="num-candidat-box" onclick="toggleNumCandidat()" title="Cliquez pour indiquer aux élèves de ne pas remplir"></div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <span class="form-label">NÉ(E) LE :</span>
-                        <div class="form-line"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div class="dashed-divider"></div>
 
+        <!-- PARTIE BASSE -->
         <div class="copy-section">
-            <div class="sidebar-left"><span class="vertical-text">NE RIEN ÉCRIRE</span></div>
+            <div class="sidebar-left"><span class="vertical-text">DANS CE CADRE</span></div>
             <div class="copy-main">
-                <div class="instructions-box">
-                    Numérotez chaque page (dans le cadre en bas de la page) et placez les feuilles intercalaires dans le bon sens.
+                
+                <div class="bottom-section-flex">
+                    <div class="bottom-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <span class="form-label">Examen ou Concours</span>
+                                <div class="form-line synced" id="field-examen-bottom">DIPLÔME NATIONAL DU BREVET</div>
+                            </div>
+                            <div class="form-group" style="flex: 0.5;">
+                                <span class="form-label">Série* :</span>
+                                <div class="form-line synced" id="field-serie-bottom">GÉNÉRALE</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <span class="form-label">Spécialité/option :</span>
+                                <div class="form-line synced" id="field-specialite-bottom">NÉANT</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <span class="form-label">Repère de l'épreuve :</span>
+                                <div class="form-line synced" id="field-repere-bottom"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="width: 100%; flex-direction: column; align-items: flex-start;">
+                                <div style="display: flex; width: 100%; align-items: flex-end;">
+                                    <span class="form-label">Épreuve/sous-épreuve :</span>
+                                    <div class="form-line synced" id="field-epreuve-bottom">MATHÉMATIQUES</div>
+                                </div>
+                                <span class="form-subtext">(Préciser, s'il y a lieu, le sujet choisi)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-instructions-container">
+                        <div class="instructions-box-new">
+                            Numérotez chaque page (dans le cadre en bas de la page) et placez les feuilles intercalaires dans le bon sens.
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-row" style="margin-top: 10px; margin-bottom: 20px;">
-                    <div class="form-group">
-                        <span class="form-label">EXAMEN OU CONCOURS :</span>
-                        <!-- AMÉLIORATION : classe synced, non éditable -->
-                        <div class="form-line synced" id="field-examen-bottom">DIPLÔME NATIONAL DU BREVET</div>
+                <!-- ENCART NOTE -->
+                <div class="grading-area">
+                    <div class="note-box">
+                        <span style="position: absolute; top: 3px; left: 5px; font-size: 0.85em; font-weight: bold;">Note :</span>
+                        <svg width="100%" height="100%" style="position: absolute; top: 0; left: 0; pointer-events: none;">
+                            <line x1="35" y1="55" x2="90" y2="15" stroke="#111" stroke-width="1.5"/>
+                        </svg>
+                        <span style="position: absolute; bottom: 3px; right: 5px; font-size: 1.1em; font-weight: bold;">20</span>
                     </div>
-                    <div class="form-group" style="margin-right: 220px;">
-                        <span class="form-label">SÉRIE* :</span>
-                        <div class="form-line synced" id="field-serie-bottom">GÉNÉRALE</div>
-                    </div>
+                    <span style="font-size: 0.9em; font-style: italic; color: #111;">
+                        Appréciation du correcteur (uniquement s'il s'agit d'un examen) :
+                    </span>
                 </div>
 
-                <div class="form-row" style="margin-bottom: 20px;">
-                    <div class="form-group">
-                        <span class="form-label">SPÉCIALITÉ/OPTION :</span>
-                        <div class="form-line synced" id="field-specialite-bottom">NÉANT</div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group" style="width: 100%;">
-                        <span class="form-label">ÉPREUVE/SOUS-ÉPREUVE :</span>
-                        <div class="form-line synced" id="field-epreuve-bottom">MATHÉMATIQUES</div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MODALE RÈGLES -->
+<!-- MODALES RESTANTES (inchangées) -->
 <div id="rules-modal" class="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('rules-modal')">&times;</span>
@@ -968,7 +698,6 @@
     </div>
 </div>
 
-<!-- MODALE AIDE -->
 <div id="help-modal" class="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('help-modal')">&times;</span>
@@ -977,17 +706,16 @@
         <ul>
             <li><span class="help-highlight">1. Préparez l'épreuve :</span> Utilisez le menu déroulant pour sélectionner l'épreuve du jour. Toutes les informations s'ajusteront automatiquement.</li>
             <li><span class="help-highlight">2. Ajustez les règles :</span> Le bouton <strong>« 📋 Règles »</strong> permet d'afficher ou masquer certaines consignes selon l'épreuve.</li>
-            <li><span class="help-highlight">3. Donnez le Top Départ :</span> Cliquez sur <strong>« ▶️ Maintenant »</strong> pour saisir l'heure exacte en un clic, ou tapez-la manuellement dans la case « Début ».</li>
+            <li><span class="help-highlight">3. Donnez le Top Départ :</span> Cliquez sur <strong>« ▶️ Maintenant »</strong> pour saisir l'heure exacte en un clic.</li>
             <li><span class="help-highlight">4. Tiers-Temps :</span> Cliquez sur <strong>« ⏱️ Afficher 1/3 Tiers-Temps »</strong> pour les horaires aménagés.</li>
-            <li><span class="help-highlight">5. N° du Candidat :</span> <strong style="color: var(--red-alert);">Cliquez directement sur la case</strong> sur la copie virtuelle pour afficher « NE PAS REMPLIR » (ex : DNB Blanc).</li>
+            <li><span class="help-highlight">5. N° du Candidat :</span> <strong style="color: var(--red-alert);">Cliquez directement sur la case</strong> sur la copie virtuelle pour afficher « NE PAS REMPLIR ».</li>
             <li><span class="help-highlight">6. Alertes sonores :</span> Activez le toggle <strong>« 🔊 Sons »</strong> pour recevoir un bip à 30 min, 5 min et à la fin de l'épreuve.</li>
-            <li><span class="help-highlight">7. Masquer / Plein Écran :</span> Cliquez sur <strong>« 👁️‍🗨️ Masquer »</strong> pour cacher le panneau surveillant, ou sur <strong>« 🔲 Plein Écran »</strong>. Un bouton ⚙️ flottant permet de réafficher le panneau.</li>
+            <li><span class="help-highlight">7. Masquer / Plein Écran :</span> Cliquez sur <strong>« 👁️‍🗨️ Masquer »</strong> pour cacher le panneau surveillant, ou sur <strong>« 🔲 Plein Écran »</strong>.</li>
             <li><span class="help-highlight">8. Raccourcis clavier :</span> <kbd>Échap</kbd> pour fermer les fenêtres modales.</li>
         </ul>
     </div>
 </div>
 
-<!-- MODALE INFOS -->
 <div id="info-modal" class="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('info-modal')">&times;</span>
@@ -1021,28 +749,23 @@
     };
 
     let tiersTempsActive = false;
-
-    // AMÉLIORATION : Suivi des alertes sonores déjà émises
     const alertsFired = { min30: false, min15: false, min5: false, end: false };
 
     // ============================================================
-    // MODALES (générique)
+    // MODALES
     // ============================================================
     function openModal(id)  { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
     function openRulesModal() { openModal('rules-modal'); }
     function openHelpModal()  { openModal('help-modal'); }
     function openInfoModal()  { openModal('info-modal'); }
 
-    // Fermer en cliquant en dehors
     window.addEventListener('click', function(e) {
         ['rules-modal', 'help-modal', 'info-modal'].forEach(id => {
             if (e.target === document.getElementById(id)) closeModal(id);
         });
     });
 
-    // AMÉLIORATION : Fermer avec Échap
     window.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             ['rules-modal', 'help-modal', 'info-modal'].forEach(id => closeModal(id));
@@ -1050,15 +773,12 @@
     });
 
     // ============================================================
-    // RÈGLES
+    // RÈGLES & PANNEAU
     // ============================================================
     function toggleRuleVisibility(ruleId, isVisible) {
         document.getElementById(ruleId).style.display = isVisible ? 'flex' : 'none';
     }
 
-    // ============================================================
-    // MASQUER / AFFICHER PANNEAU SURVEILLANT
-    // ============================================================
     function hideAdminPanel() {
         document.getElementById('admin-panel').classList.add('hidden');
         document.getElementById('show-panel-btn').classList.add('visible');
@@ -1069,14 +789,9 @@
         document.getElementById('show-panel-btn').classList.remove('visible');
     }
 
-    // ============================================================
-    // PLEIN ÉCRAN
-    // ============================================================
     function toggleFullScreen() {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                alert(`Erreur plein écran : ${err.message}`);
-            });
+            document.documentElement.requestFullscreen().catch(err => alert(`Erreur plein écran : ${err.message}`));
             document.getElementById('btn-fullscreen').innerHTML = "🗗 Quitter Plein Écran";
         } else {
             document.exitFullscreen();
@@ -1091,7 +806,7 @@
     });
 
     // ============================================================
-    // COPIE : N° CANDIDAT
+    // COPIE
     // ============================================================
     function toggleNumCandidat() {
         const box = document.getElementById('num-candidat-box');
@@ -1099,12 +814,15 @@
         box.textContent = box.classList.contains('not-required') ? "NE PAS REMPLIR" : "";
     }
 
-    // ============================================================
-    // COPIE : TOGGLES BLANC / PRO
-    // ============================================================
     function toggleBlanc() {
-        const text = document.getElementById('mode-blanc').checked ? "D.N.B. BLANC" : "DIPLÔME NATIONAL DU BREVET";
+        const isBlanc = document.getElementById('mode-blanc').checked;
+        const text = isBlanc ? "D.N.B. BLANC" : "DIPLÔME NATIONAL DU BREVET";
         setFieldWithSync('field-examen', text);
+        
+        // Si l'épreuve de sciences est sélectionnée, on réapplique pour changer la durée (1h vs 1h30)
+        if (document.getElementById('preset-selector').value === 'sciences') {
+            applyPreset();
+        }
     }
 
     function toggleSerie() {
@@ -1112,25 +830,21 @@
         setFieldWithSync('field-serie', text);
     }
 
-    // ============================================================
-    // AMÉLIORATION : SYNCHRONISATION DES CHAMPS HAUT / BAS
-    // ============================================================
     const syncPairs = [
         ['field-examen',     'field-examen-bottom'],
         ['field-serie',      'field-serie-bottom'],
         ['field-specialite', 'field-specialite-bottom'],
+        ['field-repere',     'field-repere-bottom'],
         ['field-epreuve',    'field-epreuve-bottom']
     ];
 
     function setFieldWithSync(topId, text) {
         const el = document.getElementById(topId);
         el.textContent = text;
-        // Synchroniser le champ bas correspondant
         const pair = syncPairs.find(p => p[0] === topId);
         if (pair) document.getElementById(pair[1]).textContent = text;
     }
 
-    // Synchroniser automatiquement quand l'utilisateur édite les champs du haut
     syncPairs.forEach(([topId, bottomId]) => {
         const topEl = document.getElementById(topId);
         topEl.addEventListener('input', () => {
@@ -1138,18 +852,28 @@
         });
     });
 
-    // ============================================================
-    // PRÉRÉGLAGES
-    // ============================================================
     function applyPreset() {
         const choice = document.getElementById('preset-selector').value;
         if (!choice || !presetsDNB[choice]) return;
 
-        const data = presetsDNB[choice];
+        const isBlanc = document.getElementById('mode-blanc').checked;
+        // On clone les données du preset pour pouvoir les modifier dynamiquement
+        const data = { ...presetsDNB[choice] };
+
+        // --- Logique spécifique pour les Sciences ---
+        if (choice === "sciences") {
+            if (isBlanc) {
+                data.duree = "01:30";
+                data.epreuve = "SCIENCES (PHYSIQUE-CHIMIE, SVT ET TECHNOLOGIE)";
+            } else {
+                data.duree = "01:00";
+                data.epreuve = "SCIENCES (2 MATIÈRES PARMI PC, SVT, TECHNO)";
+            }
+        }
 
         setFieldWithSync('field-epreuve', data.epreuve);
 
-        const examText = document.getElementById('mode-blanc').checked ? "D.N.B. BLANC" : "DIPLÔME NATIONAL DU BREVET";
+        const examText = isBlanc ? "D.N.B. BLANC" : "DIPLÔME NATIONAL DU BREVET";
         setFieldWithSync('field-examen', examText);
 
         const serieText = document.getElementById('mode-pro').checked ? "PROFESSIONNELLE" : "GÉNÉRALE";
@@ -1163,9 +887,6 @@
         calculateTimes();
     }
 
-    // ============================================================
-    // AMÉLIORATION : BOUTON « MAINTENANT »
-    // ============================================================
     function setStartNow() {
         const now = new Date();
         const h = String(now.getHours()).padStart(2, '0');
@@ -1176,7 +897,7 @@
     }
 
     // ============================================================
-    // CALCULS DE TEMPS
+    // GESTION DU TEMPS
     // ============================================================
     function parseTimeToMinutes(str) {
         if (!str) return NaN;
@@ -1195,18 +916,15 @@
         const durMin   = parseTimeToMinutes(document.getElementById('duration').value);
         if (isNaN(startMin) || isNaN(durMin) || durMin === 0) return;
 
-        // Fin
         const endMin = startMin + durMin;
         document.getElementById('end-time').value = formatMinutesToHHMM(endMin);
 
-        // Sortie (pas de sortie avant 1h, ou avant la fin si épreuve ≤ 1h)
         const exitMin = durMin <= 60 ? startMin + durMin : startMin + 60;
         const exitH = String(Math.floor(exitMin / 60) % 24).padStart(2, '0');
         const exitM = String(exitMin % 60).padStart(2, '0');
         document.getElementById('exit-time-display').innerHTML =
             `SORTIE AVANT<br/><span style="font-size: 1.2em; color: var(--red-alert);">${exitH}h${exitM}</span>`;
 
-        // Tiers-temps
         const ttDurMin = Math.round(durMin + (durMin / 3));
         const ttEndMin = startMin + ttDurMin;
         const ttDurH = Math.floor(ttDurMin / 60);
@@ -1214,7 +932,6 @@
         document.getElementById('tt-duration').textContent = `${ttDurH}h${ttDurM}`;
         document.getElementById('tt-end-time').textContent = formatMinutesToHHMM(ttEndMin);
 
-        // AMÉLIORATION : Barre de progression labels
         const startH = String(Math.floor(startMin / 60) % 24).padStart(2, '0');
         const startM2 = String(startMin % 60).padStart(2, '0');
         document.getElementById('progress-label-start').textContent = `Début : ${startH}:${startM2}`;
@@ -1237,14 +954,11 @@
     }
 
     // ============================================================
-    // AMÉLIORATION : ALERTES SONORES (Web Audio API)
+    // SONS
     // ============================================================
     let audioCtx = null;
-
     function getAudioContext() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         return audioCtx;
     }
 
@@ -1273,7 +987,7 @@
     }
 
     // ============================================================
-    // BOUCLE PRINCIPALE : HORLOGE & DÉCOMPTE
+    // HORLOGE & DÉCOMPTE
     // ============================================================
     function updateClock() {
         const now = new Date();
@@ -1286,7 +1000,6 @@
         const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
         document.getElementById('date-display').textContent = now.toLocaleDateString('fr-FR', options);
 
-        // --- Calcul du temps restant ---
         const startStr = document.getElementById('start-time').value;
         const endStr   = document.getElementById('end-time').value;
         const durStr   = document.getElementById('duration').value;
@@ -1313,7 +1026,6 @@
         const diffSec = Math.floor(diffMs / 1000);
         const diffMin = diffMs / 60000;
 
-        // AMÉLIORATION : État pré-examen
         if (now < startDate) {
             const beforeMs = startDate - now;
             const bMin = Math.floor(beforeMs / 60000);
@@ -1327,7 +1039,6 @@
             return;
         }
 
-        // Épreuve terminée
         if (diffMs <= 0) {
             label.textContent = "TEMPS ÉCOULÉ";
             display.textContent = "TERMINÉ";
@@ -1345,7 +1056,6 @@
 
         label.textContent = "TEMPS RESTANT";
 
-        // AMÉLIORATION : Affichage avec secondes quand < 1h
         const rH = Math.floor(diffSec / 3600);
         const rM = Math.floor((diffSec % 3600) / 60);
         const rS = diffSec % 60;
@@ -1356,13 +1066,11 @@
             display.textContent = `${rM}:${String(rS).padStart(2, '0')}`;
         }
 
-        // AMÉLIORATION : Barre de progression
         const totalMs = endDate - startDate;
         const elapsedMs = now - startDate;
         const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
         bar.style.width = progress + '%';
 
-        // AMÉLIORATION : Couleurs d'urgence
         if (diffMin <= 5) {
             card.className = 'remaining-card critical';
             bar.className = 'progress-bar-fill critical';
@@ -1376,7 +1084,6 @@
         } else {
             card.className = 'remaining-card';
             bar.className = 'progress-bar-fill';
-            // Mi-épreuve
             const halfMs = totalMs / 2;
             if (elapsedMs >= halfMs) {
                 status.textContent = "📝 Mi-épreuve dépassée";
