@@ -1,0 +1,1413 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EdTech Prompt Studio - Générateur Expert</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- PDF.js pour la lecture locale des PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- JSZip & FileSaver pour l'export SCORM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <!-- React & ReactDOM (UMD) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+    <!-- Babel pour JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+        // Configuration de PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo, useRef } = React;
+
+        // --- UTILS & LOGIC ---
+
+        const STOP_WORDS = new Set(['a', 'afin', 'ai', 'aie', 'aient', 'aies', 'ait', 'alors', 'apres', 'as', 'au', 'aucun', 'aucune', 'aujourd', 'aura', 'aurai', 'auraient', 'aurais', 'aurait', 'auras', 'aurez', 'auriez', 'aurions', 'aurons', 'auront', 'aussi', 'autre', 'autres', 'aux', 'avaient', 'avais', 'avait', 'avant', 'avec', 'avez', 'aviez', 'avions', 'avoir', 'avons', 'ayant', 'ayez', 'ayons', 'bon', 'car', 'ce', 'ceci', 'cela', 'celle', 'celles', 'celui', 'cependant', 'certain', 'certaine', 'certaines', 'certains', 'ces', 'cet', 'cette', 'ceux', 'chaque', 'ci', 'comme', 'comment', 'd', 'dans', 'de', 'deja', 'depuis', 'des', 'deux', 'devant', 'devrait', 'doit', 'donc', 'dont', 'du', 'elle', 'elles', 'en', 'encore', 'entre', 'est', 'et', 'etaient', 'etais', 'etait', 'etant', 'ete', 'etes', 'etiez', 'etions', 'etre', 'eu', 'eue', 'eues', 'eurent', 'eus', 'eusse', 'eussent', 'eusses', 'eussiez', 'eussions', 'eut', 'eux', 'faire', 'fais', 'faisaient', 'faisant', 'fait', 'faites', 'fois', 'font', 'furent', 'fus', 'fusse', 'fussent', 'fusses', 'fussiez', 'fussions', 'fut', 'haut', 'hors', 'hui', 'il', 'ils', 'j', 'je', 'l', 'la', 'le', 'les', 'leur', 'leurs', 'lui', 'm', 'ma', 'mais', 'me', 'meme', 'memes', 'mes', 'mien', 'mienne', 'miennes', 'miens', 'moi', 'moins', 'mon', 'mot', 'n', 'ne', 'ni', 'nom', 'non', 'nos', 'notre', 'notres', 'nous', 'on', 'ont', 'ou', 'par', 'parce', 'pas', 'pendant', 'personne', 'peu', 'peut', 'plus', 'plutot', 'pour', 'pourquoi', 'puis', 'qu', 'quand', 'que', 'quel', 'quelle', 'quelles', 'quels', 'qui', 's', 'sa', 'sans', 'se', 'sera', 'serai', 'seraient', 'serais', 'serait', 'seras', 'serez', 'seriez', 'serions', 'serons', 'seront', 'ses', 'si', 'sien', 'sienne', 'siennes', 'siens', 'soi', 'soient', 'sois', 'soit', 'sommes', 'son', 'sont', 'soyez', 'soyons', 'suis', 'sur', 't', 'ta', 'tandis', 'te', 'tel', 'telle', 'telles', 'tels', 'tes', 'toi', 'ton', 'tous', 'tout', 'toute', 'toutes', 'tres', 'tu', 'un', 'une', 'va', 'vais', 'vas', 'vers', 'voici', 'voila', 'vont', 'vos', 'votre', 'votres', 'vous', 'y']);
+
+        const normalizeWord = (word) => word.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, '');
+
+        function extractKeywords(text, count, forcedWordsStr = '') {
+            const forcedWords = new Set((forcedWordsStr || '').split(',').map(w => normalizeWord(w.trim())).filter(w => w.length > 0));
+            const words = text.toLowerCase().replace(/['’]/g, ' ').split(/[^a-zA-ZàâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ0-9]+/).filter(word => word.length > 3 && !STOP_WORDS.has(word));
+
+            const wordCount = {};
+            words.forEach(word => {
+                const normalized = normalizeWord(word);
+                if (normalized.length > 0) { wordCount[normalized] = (wordCount[normalized] || 0) + 1; }
+            });
+
+            const sortedWords = Object.entries(wordCount).sort((a, b) => b[1] - a[1]).map(([word]) => word);
+            const result = [];
+
+            forcedWords.forEach(word => { if (word.length > 0 && !result.includes(word)) result.push(word); });
+            for (const word of sortedWords) {
+                if (!result.includes(word) && result.length < count) result.push(word);
+            }
+            return result.slice(0, count);
+        }
+
+        // Crossword Logic
+        const GRID_SIZE = 50;
+        const createGrid = (size) => Array(size).fill(null).map(() => Array(size).fill(null));
+        function canPlaceWord(grid, word, row, col, direction) {
+            if (row < 0 || col < 0) return false;
+            if (direction === 'horizontal') {
+                if (col + word.length > GRID_SIZE) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[row][col + i] && grid[row][col + i] !== word[i]) return false;
+                    if (!grid[row][col + i] && (grid[row - 1]?.[col + i] || grid[row + 1]?.[col + i])) return false;
+                }
+                if (grid[row]?.[col - 1] || grid[row]?.[col + word.length]) return false;
+            } else {
+                if (row + word.length > GRID_SIZE) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[row + i]?.[col] && grid[row + i][col] !== word[i]) return false;
+                    if (!grid[row + i]?.[col] && (grid[row + i]?.[col - 1] || grid[row + i]?.[col + 1])) return false;
+                }
+                if (grid[row - 1]?.[col] || grid[row + word.length]?.[col]) return false;
+            }
+            return true;
+        }
+        function finalizeGrid(grid, words) {
+            let minRow = GRID_SIZE, minCol = GRID_SIZE, maxRow = 0, maxCol = 0;
+            words.forEach(w => {
+                if (w.direction === 'horizontal') {
+                    minRow = Math.min(minRow, w.row); maxRow = Math.max(maxRow, w.row);
+                    minCol = Math.min(minCol, w.col); maxCol = Math.max(maxCol, w.col + w.mot.length - 1);
+                } else {
+                    minRow = Math.min(minRow, w.row); maxRow = Math.max(maxRow, w.row + w.mot.length - 1);
+                    minCol = Math.min(minCol, w.col); maxCol = Math.max(maxCol, w.col);
+                }
+            });
+            const height = maxRow - minRow + 1;
+            const width = maxCol - minCol + 1;
+            if (height <= 1 && width <= 1) return null;
+            const finalPlacedWords = words.map(w => ({ ...w, row: w.row - minRow, col: w.col - minCol, number: 0 }));
+            let clueNumber = 1;
+            const numberCoordinates = new Map();
+            finalPlacedWords.sort((a, b) => a.row - b.row || a.col - b.col);
+            for (const word of finalPlacedWords) {
+                const key = `${word.row},${word.col}`;
+                if (!numberCoordinates.has(key)) { numberCoordinates.set(key, clueNumber++); }
+                word.number = numberCoordinates.get(key);
+            }
+            return { placedWords: finalPlacedWords, rows: height, cols: width };
+        }
+        function generateCrossword(wordsArray) {
+            const sortedWords = [...wordsArray].map(w => ({ mot: w })).sort((a, b) => b.mot.length - a.mot.length);
+            let grid = createGrid(GRID_SIZE);
+            const placedWords = [];
+            if (sortedWords.length === 0) return null;
+            const firstWord = sortedWords.shift();
+            const startCol = Math.floor((GRID_SIZE - firstWord.mot.length) / 2);
+            const startRow = Math.floor(GRID_SIZE / 2);
+            for (let i = 0; i < firstWord.mot.length; i++) grid[startRow][startCol + i] = firstWord.mot[i];
+            placedWords.push({ ...firstWord, row: startRow, col: startCol, direction: 'horizontal', number: 0 });
+
+            for (const word of sortedWords) {
+                let bestFit = null;
+                let maxScore = -1;
+                for (const placed of placedWords) {
+                    for (let i = 0; i < placed.mot.length; i++) {
+                        for (let j = 0; j < word.mot.length; j++) {
+                            if (placed.mot[i] === word.mot[j]) {
+                                const newDirection = placed.direction === 'horizontal' ? 'vertical' : 'horizontal';
+                                let newRow, newCol;
+                                if (newDirection === 'vertical') { newRow = placed.row - j; newCol = placed.col + i; }
+                                else { newRow = placed.row + i; newCol = placed.col - j; }
+                                if (canPlaceWord(grid, word.mot, newRow, newCol, newDirection)) {
+                                    let score = 1; if (score > maxScore) { maxScore = score; bestFit = { word, row: newRow, col: newCol, direction: newDirection }; }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (bestFit) {
+                    const { word: wordToPlace, row, col, direction } = bestFit;
+                    for (let i = 0; i < wordToPlace.mot.length; i++) {
+                        if (direction === 'horizontal') grid[row][col + i] = wordToPlace.mot[i];
+                        else grid[row + i][col] = wordToPlace.mot[i];
+                    }
+                    placedWords.push({ ...wordToPlace, row, col, direction, number: 0 });
+                }
+            }
+            return finalizeGrid(grid, placedWords);
+        }
+
+        /* ========== HUB ÉLÈVE ========== */
+        function generateHubHtml(title, activities, weights, displayMax, courseFilename, hasCover, notebookLabels) {
+            const coverPart = hasCover
+                ? `<div style="width:100%;max-width:380px;height:240px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:18px;box-shadow:0 20px 40px -10px rgba(0,0,0,.12);border:1.5px solid #e2e8f0;flex-shrink:0;"><img src="course_cover.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Couverture"></div>`
+                : `<div style="margin-bottom:20px;text-align:center;font-size:4.5rem;">📄</div>`;
+
+            const noteHtml = notebookLabels.map((l, idx) => `
+                <div style="margin-bottom:16px;width:100%;">
+                    <label style="display:block;font-weight:900;margin-bottom:6px;color:#1e293b;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;">${l}</label>
+                    <textarea id="note-${idx}" class="note-area" style="width:100%;height:85px;border:1.5px solid #e2e8f0;background:#fff;border-radius:10px;padding:11px;resize:none;font-size:.9rem;color:#475569;line-height:1.6;box-sizing:border-box;" oninput="saveNotes()"></textarea>
+                </div>`).join('');
+
+            const cardsHtml = activities.map(a => {
+                const iconMap = { 'xml': '📊', 'holes': '✍️', 'motsmeles': '🧩', 'motscroises': '🔡', 'memory': '🎴', 'pendu': '⚖️', 'intrus': '🔍', 'lesson': '📄', 'html': '🎮' };
+                const icon = iconMap[a.type] || '🎮';
+                return `<div id="card-${a.idx}" class="card locked" onclick="launch('activity_${a.idx}.html',${a.idx})">${icon}<h3>${a.title}</h3><span id="b-${a.idx}" class="badge">À faire</span></div>`;
+            }).join('');
+
+            const W = JSON.stringify(weights);
+            const JS = `
+                var weights=${W}, maxD=${displayMax}, file="${courseFilename}";
+                var session={scores:{},notes:{},pdfRead:false,submitted:false};
+                window.onload=function(){
+                    try{SCORM.initHub();}catch(e){}
+                    try{var d=SCORM.getData();if(d&&d.scores)session=d;}catch(e){}
+                    if(session.notes){for(var k in session.notes){var el=document.getElementById("note-"+k);if(el)el.value=session.notes[k];}}
+                    if(session.pdfRead){var bv=document.getElementById("btn-val-pdf");if(bv)bv.style.display="none";unlockFirst();}
+                    updateUI();
+                    if(session.submitted){lockAll();}
+                    makeDraggable(document.getElementById("postit"),document.getElementById("postit-head"));
+                };
+                function saveNotes(){
+                    var n={}; document.querySelectorAll(".note-area").forEach(function(el,idx){n[idx]=el.value;});
+                    session.notes=n; try{SCORM.setNote(JSON.stringify(session));}catch(e){}
+                }
+                function openPDF(){ window.open(file,"_blank"); }
+                function validatePDF(){
+                    session.pdfRead=true; document.getElementById("btn-val-pdf").style.display="none";
+                    try{SCORM.setNote(JSON.stringify(session));}catch(e){}
+                    unlockFirst(); updateUI();
+                }
+                function unlockFirst(){
+                    var c0=document.getElementById("card-0"); if(c0){c0.classList.remove("locked");c0.style.pointerEvents="auto";}
+                }
+                function switchTab(t){
+                    document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});
+                    document.getElementById("page-"+t).classList.add("active");
+                    document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+                    document.getElementById("t-"+t).classList.add("active");
+                }
+                function launch(url,idx){
+                    var f=document.getElementById("act-frame"); f.src=url; f.style.display="block";
+                    document.getElementById("menu").style.display="none";
+                    document.getElementById("btn-back").style.display="block";
+                }
+                function stop(){
+                    document.getElementById("act-frame").src="about:blank";
+                    document.getElementById("act-frame").style.display="none";
+                    document.getElementById("menu").style.display="grid";
+                    document.getElementById("btn-back").style.display="none";
+                    updateUI();
+                }
+                window.addEventListener("message",function(e){
+                    if(e.data&&e.data.type==="scorm_score"){
+                        var idx=e.data.idx;var score=e.data.score;
+                        session.scores[idx]=score;
+                        updateUI(); saveNotes();
+                    }
+                });
+                function updateUI(){
+                    var tW=0,cW=0;
+                    var c0=document.getElementById("card-0");if(c0){c0.classList.remove("locked");c0.style.pointerEvents="auto";}
+                    for(var id in weights){
+                        var sc=session.scores&&session.scores[id]!==undefined?session.scores[id]:undefined;
+                        tW+=weights[id];
+                        var b=document.getElementById("b-"+id); var card=document.getElementById("card-"+id);
+                        if(sc!==undefined){
+                            cW+=(sc/100)*weights[id];
+                            if(b){b.innerText=sc>=50?"\u2705 Terminé":sc>0?"\u23f3 En cours":"\uD83D\uDC40 Visité";b.className=sc>=50?"badge done":"badge";}
+                            if(card){card.classList.remove("locked");card.style.pointerEvents="auto";}
+                            var nId=parseInt(id)+1; var cN=document.getElementById("card-"+nId);
+                            if(cN){cN.classList.remove("locked");cN.style.pointerEvents="auto";}
+                        }
+                    }
+                    var pct=tW>0?Math.round((cW/tW)*100):0;
+                    var ds=tW>0?Math.round((cW/tW)*maxD*10)/10:0;
+                    document.getElementById("score").innerText="Score : "+ds+"/"+maxD;
+                    try{SCORM.setGlobalScore(pct);}catch(e){}
+                }
+                function submitWork(){
+                    if(session.submitted){alert("Travail déjà envoyé. Vous ne pouvez plus modifier.");return;}
+                    var rows=""; var meta=${JSON.stringify(activities.map(a => ({ idx: a.idx, title: a.title })))};
+                    var tW=0,cW=0; meta.forEach(function(a){
+                        var sc=session.scores&&session.scores[a.idx]!==undefined?session.scores[a.idx]:null;
+                        var w=weights[a.idx]||0; tW+=w;
+                        var pts=sc!==null?Math.round((sc/100)*w*10)/10:0; if(sc!==null)cW+=pts;
+                        var badge=sc===null?"\uD83D\uDD12 Non fait":(sc>=50?"\u2705 Terminé":(sc>0?"\u23f3 En cours":"\uD83D\uDC40 Visité"));
+                        var col=sc===null?"#94a3b8":(sc>=50?"#15803d":(sc>0?"#d97706":"#94a3b8"));
+                        rows += "<tr><td style='padding:10px 8px;border-bottom:1px solid #f1f5f9;'>" + a.title + "</td><td style='text-align:center;color:" + col + ";font-weight:700;padding:10px 8px;border-bottom:1px solid #f1f5f9;'>" + badge + "</td><td style='text-align:right;font-weight:800;padding:10px 8px;border-bottom:1px solid #f1f5f9;'>" + pts.toFixed(1) + "/" + w + "</td></tr>";
+                    });
+                    var ds=tW>0?Math.round((cW/tW)*maxD*10)/10:0;
+                    var pct=tW>0?Math.round((cW/tW)*100):0;
+                    document.getElementById("recap-rows").innerHTML=rows;
+                    document.getElementById("recap-final").innerText="\uD83C\uDFC6 Score final : "+ds+"/"+maxD+" ("+pct+"%)";
+                    document.getElementById("recap-modal").style.display="flex";
+                }
+                function confirmSubmit(){
+                    session.submitted=true; try{SCORM.finish();}catch(e){} try{SCORM.setNote(JSON.stringify(session));}catch(e){}
+                    document.getElementById("recap-modal").style.display="none"; lockAll();
+                }
+                function lockAll(){
+                    document.querySelectorAll(".card").forEach(function(c){c.classList.add("locked");c.style.pointerEvents="none";});
+                    var btn=document.getElementById("submit-btn"); if(btn){btn.innerText="\u2705 Travail envoyé — Merci !";btn.style.background="#15803d";btn.disabled=true;}
+                }
+                function makeDraggable(el,h){
+                    var x=0,y=0,x1=0,y1=0; if(!h) return; h.onmousedown=dragStart;
+                    function dragStart(e){ e.preventDefault(); x1=e.clientX; y1=e.clientY; document.onmouseup=dragEnd; document.onmousemove=drag; }
+                    function drag(e){ e.preventDefault(); x=x1-e.clientX; y=y1-e.clientY; x1=e.clientX; y1=e.clientY; el.style.top=(el.offsetTop-y)+"px"; el.style.left=(el.offsetLeft-x)+"px"; }
+                    function dragEnd(){ document.onmouseup=null; document.onmousemove=null; }
+                }
+                function togglePostit(){ var p=document.getElementById("postit"); p.style.display=p.style.display==="block"?"none":"block"; }
+            `;
+
+            const css = `
+                *{box-sizing:border-box} body,html{margin:0;padding:0;height:100%;font-family:Inter,sans-serif;background:#f1f5f9;color:#1e293b;user-select:none;}
+                .header{height:70px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;box-shadow:0 1px 0 rgba(0,0,0,.06);position:sticky;top:0;z-index:50;}
+                .tabs{display:flex;height:100%;} .tab-btn{padding:0 24px;display:flex;align-items:center;cursor:pointer;font-weight:800;border-bottom:4px solid transparent;transition:.2s;opacity:.5;font-size:.85rem;gap:8px;}
+                .tab-btn:hover,.tab-btn.active{opacity:1;color:#6366f1;border-bottom-color:#6366f1;} .main{height:calc(100vh - 70px);overflow:hidden;position:relative;}
+                .page{position:absolute;inset:0;display:none;overflow-y:auto;background:#f1f5f9;} .page.active{display:block;}
+                .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;padding:36px;max-width:1200px;margin:0 auto;}
+                .card{background:#fff;padding:28px;border-radius:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:.3s;border:1px solid #e2e8f0;text-align:center;display:flex;flex-direction:column;align-items:center;font-size:2.2rem;gap:8px;}
+                .card h3{font-weight:900;margin:0;font-size:1rem;color:#1e293b;} .card:hover{transform:translateY(-6px);box-shadow:0 16px 32px -8px rgba(99,102,241,.16);border-color:#6366f1;}
+                .card.locked{opacity:.35;filter:grayscale(1);cursor:not-allowed;pointer-events:none;} .badge{background:#f1f5f9;color:#64748b;padding:6px 16px;border-radius:50px;font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;}
+                .badge.done{background:#dcfce7;color:#15803d;} #recap-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+                #recap-box{background:#fff;border-radius:22px;padding:36px;max-width:520px;width:90%;box-shadow:0 30px 60px rgba(0,0,0,.2);animation:popIn .35s ease;} @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+                #recap-box h3{margin:0 0 4px;font-size:1.25rem;font-weight:900;color:#1e1b4b;} #recap-box p{margin:0 0 20px;color:#64748b;font-size:.88rem;} #recap-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-bottom:20px;}
+                #recap-table th{text-align:left;padding:8px;background:#f8fafc;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;border-radius:6px;} #recap-final{font-size:1.15rem;font-weight:900;color:#6366f1;text-align:center;padding:14px;background:#eef2ff;border-radius:12px;margin-bottom:24px;}
+                .recap-actions{display:flex;gap:12px;} .btn-cancel{flex:1;padding:13px;border:2px solid #e2e8f0;background:#fff;border-radius:12px;font-weight:800;cursor:pointer;color:#64748b;font-size:.9rem;}
+                .btn-confirm{flex:2;padding:13px;background:#dc2626;color:#fff;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:.95rem;box-shadow:0 6px 16px rgba(220,38,38,.3);}
+                #act-frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;background:#fff;} #btn-back{position:fixed;bottom:28px;left:28px;background:#1e1b4b;color:#fff;border:none;padding:13px 26px;border-radius:13px;font-weight:800;display:none;z-index:100;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2);}
+                .fab{position:fixed;bottom:28px;right:28px;background:#6366f1;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 8px 20px rgba(99,102,241,.4);border:none;font-size:1.4rem;transition:.2s;z-index:100;}
+                #postit{display:none;position:fixed;bottom:96px;right:28px;width:320px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 16px 36px -8px rgba(0,0,0,.2);border-radius:20px;overflow:hidden;z-index:9999;}
+                .postit-head{background:#1e293b;color:#fff;padding:14px 18px;font-weight:900;font-size:.78rem;letter-spacing:1.5px;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;cursor:grab;}
+                .score-chip{background:#6366f1;color:#fff;padding:7px 20px;border-radius:50px;font-weight:900;font-size:.85rem;} .cours-wrap{display:flex;flex-direction:column;align-items:center;padding:44px 24px;max-width:620px;margin:0 auto;}
+            `;
+
+            return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${title}</title>
+                <script src="scorm_api.js">\x3c/script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>${css}</style>
+    </head>
+
+    <body>
+        <div class="header">
+            <div style="font-weight:900;font-size:1.1rem;color:#1e1b4b;">Mission d'Apprentissage</div>
+            <div class="tabs">
+                <div class="tab-btn active" id="t-cours" onclick="switchTab('cours')">🔍 DÉCOUVERTE</div>
+                <div class="tab-btn" id="t-activites" onclick="switchTab('activites')">🚀 MISSION</div>
+            </div>
+            <div class="score-chip" id="score">Score : 0/${displayMax}</div>
+        </div>
+        <div class="main">
+            <div id="page-cours" class="page active">
+                <div class="cours-wrap">${coverPart}<h2 style="font-size:1.9rem;font-weight:900;text-align:center;">
+                        Phase 1 : Observation</h2>
+                    <p style="color:#64748b;text-align:center;">Consultez le document ci-dessous, puis validez votre
+                        lecture pour débloquer les activités.</p>
+                    <div style="display:flex;gap:14px;justify-content:center;"><button
+                            style="background:#6366f1;color:#fff;padding:16px 36px;border-radius:14px;cursor:pointer;font-weight:900;border:none;"
+                            onclick="openPDF()">📖 Document</button><button id="btn-val-pdf"
+                            style="background:#10b981;color:#fff;padding:16px 30px;border-radius:14px;cursor:pointer;font-weight:900;border:none;"
+                            onclick="validatePDF()">✅ Terminé</button></div>
+                </div>
+            </div>
+            <div id="page-activites" class="page">
+                <div id="menu" class="grid">${cardsHtml}<div
+                        style="grid-column:1/-1;display:flex;justify-content:center;padding:16px 0;"><button
+                            id="submit-btn" onclick="submitWork()"
+                            style="background:#dc2626;color:#fff;padding:18px 48px;border-radius:50px;font-weight:900;cursor:pointer;border:none;">🚀
+                            Envoyer mon travail</button></div>
+                </div><iframe id="act-frame" style="width:100%;height:100%;border:none;display:none;"></iframe><button
+                    id="btn-back" onclick="stop()"
+                    style="position:fixed;bottom:28px;left:28px;background:#1e1b4b;color:#fff;padding:13px 26px;border-radius:13px;font-weight:800;display:none;z-index:100;cursor:pointer;border:none;">←
+                    Menu</button>
+            </div>
+            <div id="recap-modal">
+                <div id="recap-box">
+                    <h3>📊 Récapitulatif</h3>
+                    <p>Vérifiez vos résultats avant l'envoi définitif.</p>
+                    <table id="recap-table" style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left">Activité</th>
+                                <th>État</th>
+                                <th style="text-align:right">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recap-rows"></tbody>
+                    </table>
+                    <div id="recap-final"
+                        style="margin:20px 0;font-weight:900;text-align:center;padding:14px;background:#eef2ff;"></div>
+                    <div style="display:flex;gap:12px;"><button class="btn-cancel"
+                            onclick="document.getElementById('recap-modal').style.display='none'">Annuler</button><button
+                            class="btn-confirm" onclick="confirmSubmit()">✅ Confirmer</button></div>
+                </div>
+            </div>
+        </div>
+        <button class="fab" onclick="togglePostit()">✏️</button>
+        <div id="postit">
+            <div id="postit-head"><span>📓 Carnet</span><span onclick="togglePostit()" style="cursor:pointer">✕</span>
+            </div>
+            <div style="padding:20px;max-height:65vh;overflow-y:auto;">${noteHtml}</div>
+        </div>
+        <script>${JS}\x3c/script>
+    </body>
+
+</html>`;
+        }
+
+        function generateManifest(t, a, c, h) {
+            const files = a.map(x => `
+<file href="activity_${x.idx}.html" />`).join('\n');
+            return `<?xml version="1.0" encoding="UTF-8" ?>
+<manifest identifier="elea_expert_pkg" version="1.0" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+    xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsproject.org/xsd/imsmd_rootv1p2 imsmd_rootv1p2.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+    <metadata>
+        <schema>ADL SCORM</schema>
+        <schemaversion>1.2</schemaversion>
+    </metadata>
+    <organizations default="org_1">
+        <organization identifier="org_1">
+            <title>${t}</title>
+            <item identifier="item_1" identifierref="res_hub">
+                <title>Tableau de Bord</title>
+            </item>
+        </organization>
+    </organizations>
+    <resources>
+        <resource identifier="res_hub" type="webcontent" adlcp:scormtype="sco" href="hub.html">
+            <file href="hub.html" />
+            <file href="${c}" />${h ? '<file href="course_cover.jpg" />' : ''}
+            <file href="scorm_api.js" />${files}
+        </resource>
+    </resources>
+</manifest>`;
+        }
+
+        /* ========== TEMPLATES ACTIVITÉS ========== */
+        const SCORM_API_CODE = `var SCORM={
+initHub:function(){ try{ API=window.parent.API; if(!API) API=window.top.API; if(API) API.LMSInitialize(""); }catch(e){}
+},
+setGlobalScore:function(s){ try{ if(API){ API.LMSSetValue("cmi.core.score.raw",s); API.LMSCommit(""); } }catch(e){} },
+setNote:function(n){ try{ if(API){ API.LMSSetValue("cmi.suspend_data",n); API.LMSCommit(""); } }catch(e){} },
+getData:function(){ try{ if(API) return JSON.parse(API.LMSGetValue("cmi.suspend_data")); }catch(e){ return null; } },
+finish:function(){ try{ if(API){ API.LMSSetValue("cmi.core.lesson_status","completed"); API.LMSCommit("");
+API.LMSFinish(""); } }catch(e){} },
+initAct:function(){ try{ API=window.parent.API; if(!API) API=window.top.API; }catch(e){} },
+sendScore:function(s,idx){ window.parent.postMessage({type:"scorm_score",score:s,idx:idx},"*"); }
+};`;
+
+        function generateMemoryHtml(idx, pairs, maxPoints) {
+            return `
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="scorm_api.js">\x3c/script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background: #6366f1;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .card.flipped {
+            background: #fff;
+            border: 2px solid #6366f1;
+            color: #6366f1;
+        }
+
+        .card.done {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Memory</h2>
+    <p>Trouvez les ${pairs} paires.</p>
+    <div id="grid" class="grid"></div>
+    <script>
+                        SCORM.initAct(); var p=${pairs}, mP=${maxPoints}, idx=${idx}, flipped=[], count=0;
+                        var items=[]; for(var i=0;i<p;i++){items.push(i, i);} items.sort(function(){return .5-Math.random();});
+                        var g=document.getElementById("grid");
+                        items.forEach(function(val,i){
+            var c=document.createElement("div"); c.className="card"; c.innerText="?"; c.onclick=function(){
+                if(flipped.length<2 && !c.classList.contains("flipped")){
+                            c.classList.add("flipped"); c.innerText=val; flipped.push({el:c,val:val});
+                        if(flipped.length==2){
+                            setTimeout(function () {
+                                if (flipped[0].val == flipped[1].val) { flipped[0].el.classList.add("done"); flipped[1].el.classList.add("done"); count++; if (count == p) SCORM.sendScore(100, idx); }
+                                else { flipped[0].el.classList.remove("flipped"); flipped[0].el.innerText = "?"; flipped[1].el.classList.remove("flipped"); flipped[1].el.innerText = "?"; }
+                                flipped = [];
+                            }, 700);
+                    }
+                }
+            }; g.appendChild(c);
+        });
+    \x3c/script>
+</body>
+
+</html>`;
+        }
+
+        function generatePenduHtml(idx, words, maxPoints) {
+            return `
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="scorm_api.js">\x3c/script>
+</head>
+
+<body>
+    <h2>Pendu</h2>
+    <p>Devinez les mots du cours.</p>
+    <div id="game"></div>
+    <script>
+                        SCORM.initAct(); var idx=${idx}, words=${JSON.stringify(words)}, maxP=${maxPoints};
+                        document.getElementById("game").innerText="Jeu du Pendu Prototype - Terminez pour 100%";
+                        setTimeout(function(){SCORM.sendScore(100, idx); }, 3000);
+    \x3c/script>
+</body>
+
+</html>`;
+        }
+
+        function generateIntrusHtml(idx, sets, maxPoints) {
+            return `
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="scorm_api.js">\x3c/script>
+</head>
+
+<body>
+    <h2>L'Intrus</h2>
+    <p>Trouvez l'élément qui n'appartient pas à la série.</p>
+    <script>
+                        SCORM.initAct(); var idx=${idx}; setTimeout(function(){SCORM.sendScore(100, idx); }, 3000);
+    \x3c/script>
+</body>
+
+</html>`;
+        }
+
+        function generateMelesHtml(idx, words, maxPoints) {
+            return `
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="scorm_api.js">\x3c/script>
+</head>
+
+<body>
+    <h2>Mots Mêlés</h2>
+    <div id="grid"></div>
+    <script>SCORM.initAct(); var idx=${idx}; setTimeout(function(){SCORM.sendScore(100, idx); }, 3000);\x3c/script>
+</body>
+
+</html>`;
+        }
+
+        function generateCroisesHtml(idx, gridJson, maxPoints) {
+            return `
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="scorm_api.js">\x3c/script>
+</head>
+
+<body>
+    <h2>Mots Croisés</h2>
+    <div id="grid"></div>
+    <script>SCORM.initAct(); var idx=${idx}, data=${gridJson}; setTimeout(function(){SCORM.sendScore(100, idx); }, 3000);\x3c/script>
+</body>
+
+</html>`;
+        }
+
+
+
+        // --- ICONS ---
+        const Icons = {
+            Upload: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>,
+            FileText: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>,
+            Wand: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>,
+            Copy: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>,
+            Check: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>,
+            Settings: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>,
+            Gamepad: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>,
+            Brain: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>,
+            Grid: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>,
+            Layers: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+        };
+
+        // --- COMPONENTS ---
+
+        const Toggle = ({ checked, onChange, label }) => (
+            <label className="flex items-center cursor-pointer">
+                <div className="relative">
+                    <input type="checkbox" className="sr-only" checked={checked} onChange={e => onChange(e.target.checked)} />
+                    <div className={`block w-10 h-6 rounded-full transition-colors ${checked ? 'bg-brand-500' : 'bg-slate-300'}`}>
+                    </div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${checked
+                        ? 'transform translate-x-4' : ''}`}></div>
+                </div>
+                {label && <span className="ml-3 text-sm font-medium text-slate-700">{label}</span>}
+            </label>
+        );
+
+        const InputGroup = ({ label, type = "text", value, onChange, min, max, placeholder }) => (
+            <div className="mb-4 flex flex-col justify-end">
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{label}</label>
+                <input type={type} value={value} onChange={e => onChange(e.target.value)} min={min} max={max}
+                    placeholder={placeholder}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500
+    focus:border-brand-500 text-sm transition-shadow"
+                />
+            </div>
+        );
+
+        // --- MAIN APP ---
+
+        const App = () => {
+            // Global State
+            const [sourceText, setSourceText] = useState("");
+            const [fileName, setFileName] = useState(null);
+            const [generatedPrompt, setGeneratedPrompt] = useState("");
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [copySuccess, setCopySuccess] = useState(false);
+
+            // SCORM Deployment State
+            const [aiResponseText, setAiResponseText] = useState("");
+            const [activities, setActivities] = useState([]);
+            const [scormTitle, setScormTitle] = useState("Ma Mission Éléa");
+            const [scormAuthor, setScormAuthor] = useState("Expert EdTech");
+            const [scormPoints, setScormPoints] = useState(20);
+            const [scormStatus, setScormStatus] = useState("");
+            const [courseCover, setCourseCover] = useState(null);
+            const [courseFile, setCourseFile] = useState(null);
+            const [courseFileName, setCourseFileName] = useState("");
+            const [notebookLabels, setNotebookLabels] = useState(["Mes découvertes :", "Mots Magiques obtenus :", "À retenir :"]);
+            const [activeScreen, setActiveScreen] = useState("generator");
+
+
+            // Multi-Module Selection State
+            const [selectedModules, setSelectedModules] = useState({
+                seriousgame: true,
+                activites: false,
+                parcours: false,
+                motscroises: false
+            });
+
+            // Global EdTech Settings
+            const [bloomLevel, setBloomLevel] = useState("Compréhension & Application");
+            const [iaTone, setIaTone] = useState("Encourageant et Ludique");
+
+            // Specific States: Serious Game
+            const [sgQuestions, setSgQuestions] = useState(15);
+            const [sgTimerActive, setSgTimerActive] = useState(false);
+            const [sgTime, setSgTime] = useState(10);
+            const [sgScoreToWin, setSgScoreToWin] = useState(12);
+            const [sgMagicWord, setSgMagicWord] = useState("EXCELLENCE");
+            const [sgMaxPoints, setSgMaxPoints] = useState(20);
+
+            // Specific States: Activités Formatives
+            const [actId, setActId] = useState(1);
+            const [actSeq, setActSeq] = useState(1);
+            const [actSynth, setActSynth] = useState(1);
+            const [actLogic, setActLogic] = useState(1);
+            const [actValidation, setActValidation] = useState(true);
+            const [actSeuil, setActSeuil] = useState(80);
+            const [actTimerActive, setActTimerActive] = useState(false);
+            const [actTime, setActTime] = useState(5);
+            const [actMagicWord, setActMagicWord] = useState("VALIDE");
+            const [actMaxPoints, setActMaxPoints] = useState(20);
+
+            // Specific States: Parcours Multi-Jeux
+            const [pmGames, setPmGames] = useState({
+                memory: { active: true, pairs: 6, timerActive: false, time: 5, magicWord: 'MEMO', maxPoints: 10 },
+                pendu: { active: true, words: 5, timerActive: false, time: 5, magicWord: 'MOT', maxPoints: 10 },
+                intrus: { active: true, sets: 4, timerActive: false, time: 5, magicWord: 'INTRUS', maxPoints: 10 },
+                association: { active: false, zones: 3, items: 4, timerActive: false, time: 5, magicWord: 'ASSOC', maxPoints: 10 },
+                motsmeles: { active: false, words: 10, timerActive: false, time: 5, magicWord: 'MELES', maxPoints: 10 },
+                motscroises: { active: false, words: 8, timerActive: false, time: 10, magicWord: 'CROISES', maxPoints: 10 }
+            });
+
+            // Specific States: Mots Croisés
+            const [mcWordCount, setMcWordCount] = useState(10);
+            const [mcForcedWords, setMcForcedWords] = useState("");
+            const [mcTimerActive, setMcTimerActive] = useState(false);
+            const [mcTime, setMcTime] = useState(10);
+            const [mcMagicWord, setMcMagicWord] = useState("BRAVO");
+            const [mcMaxPoints, setMcMaxPoints] = useState(20);
+
+            // Auto-génération intelligente des mots magiques à partir du cours
+            useEffect(() => {
+                if (sourceText.trim().length > 30) {
+                    const keywords = extractKeywords(sourceText, 20);
+                    if (keywords.length > 0) {
+                        setSgMagicWord(keywords[0] || "EXCELLENCE");
+                        setActMagicWord(keywords[1] || "VALIDE");
+                        setMcMagicWord(keywords[2] || "BRAVO");
+
+                        setPmGames(prev => ({
+                            memory: { ...prev.memory, magicWord: keywords[3] || 'MEMO' },
+                            pendu: { ...prev.pendu, magicWord: keywords[4] || 'MOT' },
+                            intrus: { ...prev.intrus, magicWord: keywords[5] || 'INTRUS' },
+                            association: { ...prev.association, magicWord: keywords[6] || 'ASSOC' },
+                            motsmeles: { ...prev.motsmeles, magicWord: keywords[7] || 'MELES' },
+                            motscroises: { ...prev.motscroises, magicWord: keywords[8] || 'CROISES' }
+                        }));
+                    }
+                }
+            }, [sourceText]);
+
+            const updatePmGame = (gameId, key, value) => {
+                setPmGames(prev => ({
+                    ...prev,
+                    [gameId]: { ...prev[gameId], [key]: value }
+                }));
+            };
+
+            // Handlers
+            const handleFileUpload = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setFileName(file.name);
+
+                if (file.name.endsWith('.txt') || file.name.endsWith('.html')) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => setSourceText(evt.target.result);
+                    reader.readAsText(file);
+                } else if (file.name.endsWith('.pdf')) {
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        let text = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i); const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(' ') + '\n';
+                        }
+                        setSourceText(text);
+                    } catch (error) {
+                        alert("Erreur lors de la lecture du PDF. Assurez-vous qu'il contient du texte.");
+                    }
+                } else {
+                    alert("Format non supporté. Utilisez TXT, HTML ou PDF.");
+                }
+            };
+
+            const copyToClipboard = () => {
+                navigator.clipboard.writeText(generatedPrompt).then(() => {
+                    setCopySuccess(true);
+                    setTimeout(() => setCopySuccess(false), 2000);
+                });
+            };
+
+            const getExpertContext = () => `
+    **Contexte Pédagogique Global (Expertise EdTech) :**
+    - Niveau taxonomique cible (Bloom) : ${bloomLevel}. Adaptez la complexité des questions en conséquence.
+    - Ton de l'interface et du feedback : ${iaTone}.
+    - Consigne de code (QUALITÉ PRODUCTION STRICTE) : Produisez STRICTEMENT un fichier HTML unique contenant le HTML, le
+    CSS (Tailwind autorisé via CDN) et le JS interactif. AUCUN LOG DE DEBUG (\`console.log\` strictement interdit),
+    aucun artefact de test. Le code doit fonctionner parfaitement du premier coup de façon silencieuse et
+    professionnelle.
+    - Design et UX (EXPERT) : Le design doit être irréprochable, digne d'une application professionnelle moderne.
+  - DESIGN PREMIUM avec Tailwind CSS CDN : Cartes Glassmorphism, ombres prononcées, icônes FontAwesome, typographie Inter.
+- **CONTRAINTE CRUCIALE : NE PAS générer de header, de titre global ou de menu de navigation.** Le contenu doit commencer directement par le corps du cours. Pas de logo, pas de barre de progression globale.
+    `;
+
+            const injectAiResult = () => {
+                if (!aiResponseText.trim()) { alert("Veuillez coller le résultat de l'IA."); return; }
+                const acts = []; let idx = 0;
+                const leconIdx = aiResponseText.indexOf("[[LECON]]");
+                const syntheseIdx = aiResponseText.indexOf("[[SYNTHESE]]");
+                if (leconIdx > -1) {
+                    let end = syntheseIdx > leconIdx ? syntheseIdx : aiResponseText.length;
+                    acts.push({
+                        idx: idx++, type: 'lesson', title: 'Cours interactif', content: aiResponseText.substring(leconIdx + 9,
+                            end).trim(), weight: 0
+                    });
+                }
+                if (syntheseIdx > -1) {
+                    acts.push({
+                        idx: idx++, type: 'holes', title: 'Synthèse à trous', content: aiResponseText.substring(syntheseIdx +
+                            12).split("[[CORRECTION]]")[0].trim(), weight: 10
+                    });
+                }
+                // Auto-add games based on config
+                if (selectedModules.parcours) {
+                    if (pmGames.memory.active) acts.push({
+                        idx: idx++, type: 'memory', title: 'Jeu de Memory', weight:
+                            pmGames.memory.maxPoints
+                    });
+                    if (pmGames.pendu.active) acts.push({
+                        idx: idx++, type: 'pendu', title: 'Jeu du Pendu', weight:
+                            pmGames.pendu.maxPoints
+                    });
+                    if (pmGames.intrus.active) acts.push({
+                        idx: idx++, type: 'intrus', title: 'L\'Intrus', weight:
+                            pmGames.intrus.maxPoints
+                    });
+                    if (pmGames.motsmeles.active) acts.push({
+                        idx: idx++, type: 'motsmeles', title: 'Mots Mêlés', weight:
+                            pmGames.motsmeles.maxPoints
+                    });
+                    if (pmGames.motscroises.active) acts.push({
+                        idx: idx++, type: 'motscroises', title: 'Mots Croisés', weight:
+                            pmGames.motscroises.maxPoints
+                    });
+                } else if (selectedModules.motscroises) {
+                    acts.push({ idx: idx++, type: 'motscroises', title: 'Mots Croisés', weight: mcMaxPoints });
+                }
+                setActivities(acts);
+                setScormStatus("🪄 " + acts.length + " activités injectées avec succès !");
+            };
+
+            const generateScormPackage = async () => {
+                if (activities.length === 0) { alert("Aucune activité à exporter. Injectez d'abord le résultat de l'IA."); return; }
+                setScormStatus("⚙️ Génération du package...");
+                try {
+                    const zip = new JSZip();
+                    const weights = {}; activities.forEach(a => weights[a.idx] = a.weight);
+
+                    const hub = generateHubHtml(scormTitle, activities, weights, scormPoints, courseFileName || "cours.pdf",
+                        !!courseCover, notebookLabels);
+                    zip.file("hub.html", hub);
+                    zip.file("scorm_api.js", SCORM_API_CODE);
+
+                    for (let a of activities) {
+                        let html = "";
+                        if (a.type === 'lesson') html = a.content;
+                        else if (a.type === 'holes') html = `
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+        <meta charset="UTF-8">
+        <script src="scorm_api.js">\x3c/script>
+    </head>
+
+    <body>
+        <h2>${a.title}</h2>
+        <div style="padding:20px; line-height:1.6;">${a.content}</div>
+        <script>SCORM.initAct(); setTimeout(()=>SCORM.sendScore(100,${a.idx}),2000);\x3c/script>
+    </body>
+
+    </html>`;
+                        else if (a.type === 'memory') html = generateMemoryHtml(a.idx, pmGames.memory.pairs, a.weight);
+                        else if (a.type === 'pendu') html = generatePenduHtml(a.idx, extractKeywords(sourceText, pmGames.pendu.words),
+                            a.weight);
+                        else if (a.type === 'intrus') html = generateIntrusHtml(a.idx, pmGames.intrus.sets, a.weight);
+                        else if (a.type === 'motsmeles') html = generateMelesHtml(a.idx, extractKeywords(sourceText,
+                            pmGames.motsmeles.words), a.weight);
+                        else if (a.type === 'motscroises') {
+                            const words = extractKeywords(sourceText, (selectedModules.parcours ? pmGames.motscroises.words : mcWordCount) * 2);
+                            const grid = generateCrossword(words.slice(0, (selectedModules.parcours ? pmGames.motscroises.words :
+                                mcWordCount)));
+                            html = generateCroisesHtml(a.idx, JSON.stringify(grid), a.weight);
+                        }
+                        zip.file(`activity_${a.idx}.html`, html);
+                    }
+
+                    if (courseFile) zip.file(courseFileName || "cours.pdf", courseFile);
+                    if (courseCover) zip.file("course_cover.jpg", courseCover);
+
+                    const manifest = generateManifest(scormTitle, activities, courseFileName || "cours.pdf", !!courseCover);
+                    zip.file("imsmanifest.xml", manifest);
+
+                    const blob = await zip.generateAsync({ type: "blob" });
+                    saveAs(blob, `SCORM_${scormTitle.replace(/\s+/g, '_')}.zip`);
+                    setScormStatus("✅ Package SCORM généré !");
+                } catch (err) {
+                    console.error(err);
+                    setScormStatus("❌ Erreur : " + err.message);
+                }
+            };
+
+
+            const generatePrompt = () => {
+                if (!sourceText.trim()) {
+                    alert("Veuillez fournir un texte source.");
+                    return;
+                }
+
+                const activeMods = Object.keys(selectedModules).filter(k => selectedModules[k]);
+                if (activeMods.length === 0) {
+                    alert("Veuillez sélectionner (cocher) au moins un module dans le menu de gauche pour générer le prompt.");
+                    return;
+                }
+
+                setIsGenerating(true);
+                setGeneratedPrompt("");
+
+                setTimeout(() => {
+                    try {
+                        let prompt = `**RÔLE**\nTu es un Ingénieur Pédagogique et Développeur Front-End Senior. Ta mission est de générer
+    une application interactive d'apprentissage basée EXCLUSIVEMENT sur le contenu suivant
+    :\n\n\`\`\`text\n${sourceText}\n\`\`\`\n\n${getExpertContext()}\n\n`;
+
+                        if (activeMods.length > 1) {
+                            prompt += `**ARCHITECTURE INTERNE (MODULES MULTIPLES) :**\nIMPORTANT : NE PAS générer de header global, ni de menu de navigation principal (type onglets ou barre latérale). L'application hôte gère déjà la navigation. Affiche les modules les uns après les autres ou utilise une pagination très discrète sans menu redondant.\n\n`;
+                        }
+
+                        let moduleIndex = 1;
+
+                        if (selectedModules.seriousgame) {
+                            prompt += `### MODULE ${moduleIndex++} : Serious Game / Escape Game d'Évaluation\n`;
+                            prompt += `- **Nombre de questions :** Exactement ${sgQuestions} questions variées (QCM, Vrai/Faux, Texte à trous,
+    Glisser-déposer, Association).\n`;
+                            prompt += `- **Chronomètre :** ${sgTimerActive ? `${sgTime} minutes au total. Fin du jeu et échec si le temps est
+    écoulé.` : `Aucun chronomètre imposé.`}\n`;
+                            prompt += `- **Score et Victoire :** Le feedback est donné à la fin. Si l'apprenant obtient
+    ${sgScoreToWin}/${sgQuestions} ou plus, affichez une modale de félicitations contenant le mot magique :
+    **${sgMagicWord}**. Sinon, proposez de rejouer.\n`;
+                            prompt += `- **Barème :** L'évaluation doit calculer un score final ramené sur **${sgMaxPoints} points**.\n`;
+                            prompt += `- **Contrainte :** Pas d'images externes, utilisez des emojis ou du CSS pour l'immersion.\n\n`;
+                        }
+
+                        if (selectedModules.activites) {
+                            prompt += `### MODULE ${moduleIndex++} : Série d'Activités Formatives Ciblées\n`;
+                            prompt += `Générez les activités suivantes à la suite (les unes en dessous des autres ou via une pagination interne
+    au module) :\n`;
+                            if (actId > 0) prompt += `- ${actId} exercice(s) d'Identification (QCM ou sélection de texte).\n`;
+                            if (actSeq > 0) prompt += `- ${actSeq} exercice(s) de Séquençage (remettre dans l'ordre logique).\n`;
+                            if (actSynth > 0) prompt += `- ${actSynth} exercice(s) de Synthèse (texte à trous).\n`;
+                            if (actLogic > 0) prompt += `- ${actLogic} exercice(s) de Logique Inversée (trouver l'intrus ou l'erreur).\n`;
+                            prompt += `- **Validation :** ${actValidation ? `Calcul du score global avec un seuil de ${actSeuil}%. Si le seuil
+    est atteint, révéler le mot magique : "**${actMagicWord}**". Verrouiller les champs après validation.` : `Validation simple par exercice sans score global bloquant.`}\n`;
+                            prompt += `- **Chronomètre :** ${actTimerActive ? `Afficher un chronomètre global pour ces activités de ${actTime}
+    minutes. Fin si le temps est écoulé.` : `Aucun chronomètre imposé.`}\n`;
+                            prompt += `- **Barème :** Le score total cumulé de ces activités doit être calculé et ramené sur un barème de
+    **${actMaxPoints} points**.\n`;
+                            prompt += `- **Feedback :** Immédiat après validation (vert/rouge).\n\n`;
+                        }
+
+                        if (selectedModules.parcours) {
+                            let keywords = extractKeywords(sourceText, 30).join(', ');
+                            prompt += `### MODULE ${moduleIndex++} : Parcours Multi-Jeux (Sous-Navigation)\n`;
+                            prompt += `Au sein de ce module spécifique, créez une sous-navigation interne (ex: menu horizontal sous le menu
+    principal) pour naviguer entre plusieurs mini-jeux indépendants.\n`;
+                            prompt += `**Mots-clés extraits pour inspiration des jeux :** ${keywords}\n`;
+                            prompt += `**Mini-jeux à inclure dans ce sous-parcours :**\n`;
+                            if (pmGames.memory.active) prompt += `- **Memory :** ${pmGames.memory.pairs} paires (concept/définition).
+    ${pmGames.memory.timerActive ? `Chrono: ${pmGames.memory.time} min.` : 'Pas de chrono.'} Mot magique de récompense:
+    **${pmGames.memory.magicWord}**. Barème : **${pmGames.memory.maxPoints} points**.\n`;
+                            if (pmGames.pendu.active) prompt += `- **Pendu :** ${pmGames.pendu.words} mots avec indices conceptuels. **Crucial :
+    Inclure une représentation visuelle de la potence (en SVG, Canvas ou CSS) qui se dessine à chaque erreur.**
+    ${pmGames.pendu.timerActive ? `Chrono: ${pmGames.pendu.time} min.` : 'Pas de chrono.'} Mot magique de récompense:
+    **${pmGames.pendu.magicWord}**. Barème : **${pmGames.pendu.maxPoints} points**.\n`;
+                            if (pmGames.intrus.active) prompt += `- **L'Intrus :** ${pmGames.intrus.sets} séries d'éléments.
+    ${pmGames.intrus.timerActive ? `Chrono: ${pmGames.intrus.time} min.` : 'Pas de chrono.'} Mot magique de récompense:
+    **${pmGames.intrus.magicWord}**. Barème : **${pmGames.intrus.maxPoints} points**.\n`;
+                            if (pmGames.association.active) prompt += `- **Association :** ${pmGames.association.zones} catégories de
+    ${pmGames.association.items} éléments. ${pmGames.association.timerActive ? `Chrono: ${pmGames.association.time}
+    min.` : 'Pas de chrono.'} Mot magique de récompense: **${pmGames.association.magicWord}**. Barème :
+    **${pmGames.association.maxPoints} points**.\n`;
+                            if (pmGames.motsmeles.active) {
+                                let mmWords = extractKeywords(sourceText, pmGames.motsmeles.words).join(', ');
+                                prompt += `- **Mots Mêlés :** Grille JS avec ${pmGames.motsmeles.words} mots cachés. \n**Règles Strictes de la
+    grille :** 1) Mots du cours à cacher obligatoirement : ${mmWords}. \n2) Orientations permises : Horizontal (gauche
+    vers droite ET droite vers gauche), Vertical (haut vers bas ET bas vers haut). \n3) DIAGONALES STRICTEMENT
+    INTERDITES. \n**Règles Strictes d'interaction (Sélection) :** L'élève DOIT pouvoir sélectionner un mot entier dans
+    la grille de façon fluide avec sa souris (par exemple via un 'cliqué-glissé' combinant mousedown/mouseenter/mouseup,
+    ou en cliquant sur la 1ère puis la dernière lettre). INTERDICTION de faire une sélection où l'on clique sur chaque
+    lettre une par une. \n**Design Expert :** Utilisez CSS Grid pour des lettres parfaitement alignées dans des cases
+    carrées. Le retour visuel de la sélection doit être élégant (ex: ligne de surlignage colorée et semi-transparente
+    reliant les lettres, avec bords arrondis). \n${pmGames.motsmeles.timerActive ? `Chrono: ${pmGames.motsmeles.time}
+    min.` : 'Pas de chrono.'} Mot magique de récompense: **${pmGames.motsmeles.magicWord}**. Barème :
+    **${pmGames.motsmeles.maxPoints} points**.\n`;
+                            }
+                            if (pmGames.motscroises.active) {
+                                let mcWords = extractKeywords(sourceText, pmGames.motscroises.words * 2);
+                                const gridData = generateCrossword(mcWords.slice(0, pmGames.motscroises.words));
+                                if (!gridData) {
+                                    prompt += `- **Mots Croisés :** ${pmGames.motscroises.words} mots. ${pmGames.motscroises.timerActive ? `Chrono:
+    ${pmGames.motscroises.time} min.` : 'Pas de chrono.'} Mot magique de récompense:
+    **${pmGames.motscroises.magicWord}**. Barème : **${pmGames.motscroises.maxPoints} points**.\n`;
+                                } else {
+                                    const dataString = JSON.stringify({
+                                        rows: gridData.rows, cols: gridData.cols, placedWords:
+                                            gridData.placedWords.map(w => ({ mot: w.mot, row: w.row, col: w.col, direction: w.direction, number: w.number }))
+                                    });
+                                    prompt += `- **Mots Croisés :** Utilisez STRICTEMENT ce JSON pour générer la grille JS : ${dataString}. Inventez les
+    définitions. \n**Design Expert & Précision Grille :** 1) Utilisez CSS Grid pour garantir que la grille est
+    mathématiquement parfaite. 2) Pour identifier les mots, affichez **UNIQUEMENT LE CHIFFRE** (fourni par la clé
+    "number" du JSON) en tout petit dans le coin en haut à gauche de la case de départ. N'ajoutez JAMAIS de texte
+    parasite comme "M1" ou "Mot 1". 3) Les cases vides doivent être invisibles (ou noires), et les cases à remplir
+    doivent être blanches avec des bordures claires. L'input de l'utilisateur doit être centré.
+    \n${pmGames.motscroises.timerActive ? `Chrono: ${pmGames.motscroises.time} min.` : 'Pas de chrono.'} Mot magique de
+    récompense: **${pmGames.motscroises.magicWord}**. Barème : **${pmGames.motscroises.maxPoints} points**.\n`;
+                                }
+                            }
+                            prompt += `- Chaque jeu réussi doit révéler son propre mot magique individuel par une modale de succès.\n`;
+                            prompt += `- Ajoutez un bouton "Bilan du parcours" pour voir les jeux terminés de ce sous-module et cumuler leurs
+    points.\n\n`;
+                        }
+
+                        if (selectedModules.motscroises && (!selectedModules.parcours || !pmGames.motscroises.active)) {
+                            prompt += `### MODULE ${moduleIndex++} : Mots Croisés Interactifs\n`;
+                            let words = extractKeywords(sourceText, mcWordCount * 2, mcForcedWords);
+                            const gridData = generateCrossword(words.slice(0, mcWordCount));
+
+                            if (!gridData || gridData.placedWords.length < 3) { throw new Error("Mots Croisés (Module Principal) : Impossible de générer une grille avec ces paramètres."); } const dataString = JSON.stringify({ rows: gridData.rows, cols: gridData.cols, placedWords: gridData.placedWords.map(w => ({ mot: w.mot, row: w.row, col: w.col, direction: w.direction, number: w.number })) }, null, 2);
+
+                            prompt += `1. **Définitions :** Pour chaque mot important du cours figurant dans la grille JSON ci-dessous,
+        créez une définition précise en utilisant le texte source.\n`;
+                            prompt += `2. **Interface & Précision Grille (EXPERT) :** Générez la grille HTML/JS interactive basée sur ce
+        JSON :\n`;
+                            prompt += `\`\`\`json\n${dataString}\n\`\`\`\n`;
+                            prompt += `- **Design Irréprochable :** Utilisez CSS Grid pour un alignement absolument parfait. Les cases
+        doivent être carrées. Les cases non utilisées sont transparentes ou noires.\n`;
+                            prompt += `- **Numérotation STRICTE :** Affichez **UNIQUEMENT LE CHIFFRE** (correspondant au "number" du JSON)
+        en tout petit dans le coin en haut à gauche de la case de départ. NE JAMAIS écrire de texte parasite comme "M1",
+        "M2" ou "Mot 1".\n`;
+                            prompt += `- **Interactivité :** Saisie propre et centrée de l'utilisateur, et focus automatique à la case
+        suivante.\n`;
+                            prompt += `- **Chronomètre :** ${mcTimerActive ? `${mcTime} minutes maximum. Fin du jeu si le temps est écoulé.`
+                                : `Aucun chronomètre imposé.`}\n`;
+                            prompt += `- **Barème :** Attribuez un score final ramené sur **${mcMaxPoints} points** une fois la grille
+        terminée.\n`;
+                            prompt += `- Si la grille est entièrement correcte, révélez le mot magique : **${mcMagicWord}**.\n\n`;
+                        }
+
+                        prompt += `### BILAN ET RÉCAPITULATIF DES MOTS MAGIQUES\n`;
+                        prompt += `Prévoyez une section globale "Récapitulatif" (ou "Coffre aux trésors") accessible facilement. Cet
+        écran doit lister dynamiquement et mémoriser tous les Mots Magiques que l'élève a débloqués à travers l'ensemble
+        des jeux et activités de l'application, **ainsi que son score total cumulé basé sur la somme des différents
+        barèmes de l'application.**\n\n`;
+
+                        setGeneratedPrompt(prompt.trim());
+                    } catch (err) {
+                        alert(err.message);
+                    } finally {
+                        setIsGenerating(false);
+                    }
+                }, 500); // simulation delay
+            };
+
+            const tabs = [
+                {
+                    id: 'seriousgame', name: 'Serious Game', icon:
+                        <Icons.Gamepad />
+                },
+                {
+                    id: 'activites', name: 'Activités Formatives', icon:
+                        <Icons.Layers />
+                },
+                {
+                    id: 'parcours', name: 'Parcours Multi-Jeux', icon:
+                        <Icons.Grid />
+                },
+                {
+                    id: 'motscroises', name: 'Mots Croisés', icon:
+                        <Icons.Brain />
+                },
+            ];
+
+            const activeModsCount = Object.keys(selectedModules).filter(k => selectedModules[k]).length;
+
+            return (
+                <div className="min-h-screen flex flex-col md:flex-row">
+                    {/* SIDEBAR */}
+                    <aside
+                        className="w-full md:w-80 bg-slate-900 text-white flex flex-col h-auto md:h-screen sticky top-0 z-10 shadow-xl">
+                        <div className="p-6 border-b border-slate-800">
+                            <h1
+                                className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-300">
+                                EdTech Studio</h1>
+                            <p className="text-slate-400 text-sm mt-1">Générateur Prompt Expert</p>
+                        </div>
+
+                        <nav className="flex-1 overflow-y-auto py-4">
+                            <div className="px-4 mb-2 flex items-center justify-between">
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sélection des
+                                    modules</span>
+                                <span className="text-xs bg-slate-800 text-brand-400 px-2 py-1 rounded-md">{activeModsCount}/4
+                                    actifs</span>
+                            </div>
+                            <ul className="space-y-1">
+                                {tabs.map(tab => (
+                                    <li key={tab.id} className={`flex items-center border-l-4 transition-colors
+                            ${selectedModules[tab.id] ? 'border-brand-500 bg-slate-800'
+                                            : 'border-transparent hover:bg-slate-800/50'}`}>
+                                        <label className={`flex-1 flex items-center px-4 py-3 cursor-pointer text-sm font-medium
+                                transition-colors ${selectedModules[tab.id] ? 'text-white' : 'text-slate-400'}`}>
+                                            <input type="checkbox" checked={selectedModules[tab.id]} onChange={() =>
+                                                setSelectedModules(prev => ({ ...prev, [tab.id]: !prev[tab.id] }))}
+                                                className="w-5 h-5 mr-3 rounded border-slate-600 bg-slate-700 text-brand-500
+                                focus:ring-brand-500 focus:ring-offset-slate-900 cursor-pointer"
+                                            />
+                                            <span className={`mr-3 ${selectedModules[tab.id] ? 'text-brand-400' : 'text-slate-500'
+                                                }`}>{tab.icon}</span>
+                                            {tab.name}
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <div className="px-4 mb-2 mt-8 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                Navigation</div>
+                            <ul className="space-y-1">
+                                <li className={`flex items-center border-l-4 transition-colors ${activeScreen === 'generator'
+                                    ? 'border-brand-500 bg-slate-800' : 'border-transparent hover:bg-slate-800/50'}`}>
+                                    <button onClick={() => setActiveScreen('generator')} className={`flex-1 flex items-center
+                                px-4 py-3 text-sm font-medium transition-colors ${activeScreen === 'generator' ?
+                                            'text-white' : 'text-slate-400'}`}>
+                                        <Icons.Settings className="mr-3" /> Configurer le Prompt
+                                    </button>
+                                </li>
+                                <li className={`flex items-center border-l-4 transition-colors ${activeScreen === 'deployment'
+                                    ? 'border-brand-500 bg-slate-800' : 'border-transparent hover:bg-slate-800/50'}`}>
+                                    <button onClick={() => setActiveScreen('deployment')} className={`flex-1 flex items-center
+                                px-4 py-3 text-sm font-medium transition-colors ${activeScreen === 'deployment' ?
+                                            'text-white' : 'text-slate-400'}`}>
+                                        <Icons.Wand className="mr-3" /> Déploiement & SCORM
+                                    </button>
+                                </li>
+                            </ul>
+
+
+                            <div className="px-4 mb-2 mt-8 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                Paramètres Pédagogiques</div>
+                            <div className="px-6 mt-3 space-y-4">
+                                <div>
+                                    <label className="text-xs text-slate-400 block mb-1">Cible Cognitive (Bloom)</label>
+                                    <select value={bloomLevel} onChange={e => setBloomLevel(e.target.value)} className="w-full
+                                bg-slate-800 border border-slate-700 rounded p-2 text-sm text-slate-200 outline-none
+                                focus:border-brand-500">
+                                        <option>Mémorisation pure</option>
+                                        <option>Compréhension & Application</option>
+                                        <option>Analyse & Évaluation (Complexe)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-slate-400 block mb-1">Ton de l'interface</label>
+                                    <select value={iaTone} onChange={e => setIaTone(e.target.value)} className="w-full
+                                bg-slate-800 border border-slate-700 rounded p-2 text-sm text-slate-200 outline-none
+                                focus:border-brand-500">
+                                        <option>Sérieux et Académique</option>
+                                        <option>Encourageant et Ludique</option>
+                                        <option>Défi / Compétition</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </nav>
+                    </aside>
+
+                    {/* MAIN CONTENT */}
+                    <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                        <div className="max-w-4xl mx-auto space-y-6">
+                            {activeScreen === 'generator' ? (
+                                <>
+                                    {/* SOURCE SECTION */}
+                                    <section className="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200">
+                                        <div className="flex items-center mb-4 text-brand-600">
+                                            <Icons.FileText />
+                                            <h2 className="text-lg font-bold ml-2">Source de Connaissances</h2>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-2">Import Fichier
+                                                    (PDF, TXT, HTML)</label>
+                                                <div
+                                                    className="relative border-2 border-dashed border-slate-300 rounded-xl p-4 hover:border-brand-500 transition-colors bg-slate-50 flex items-center justify-center cursor-pointer group">
+                                                    <input type="file"
+                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                        accept=".txt,.html,.pdf" onChange={handleFileUpload} />
+                                                    <div className="text-center pointer-events-none">
+                                                        <Icons.Upload
+                                                            className="mx-auto h-6 w-6 text-slate-400 group-hover:text-brand-500 mb-1" />
+                                                        <span
+                                                            className="text-sm text-slate-500 group-hover:text-brand-600 font-medium">
+                                                            {fileName ? fileName : "Glisser ou cliquer ici"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-2">Ou copier-coller
+                                                    le texte brut</label>
+                                                <textarea
+                                                    className="w-full h-24 p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm custom-scrollbar resize-none"
+                                                    placeholder="Le contenu du cours commence ici..." value={sourceText}
+                                                    onChange={e => { setSourceText(e.target.value); setFileName(null); }} />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* CONFIGURATION SECTIONS */}
+                                    {activeModsCount === 0 && (
+                                        <div className="glass-panel p-10 rounded-2xl shadow-sm border border-slate-200 text-center animate-fade-in">
+                                            <div className="flex justify-center mb-4 text-slate-300 transform scale-150"><Icons.Settings /></div>
+                                            <h3 className="text-lg font-bold text-slate-600">Aucun module sélectionné</h3>
+                                            <p className="text-sm text-slate-500 mt-1">Cochez une ou plusieurs activités dans le menu de gauche.</p>
+                                        </div>
+                                    )}
+
+                                    {selectedModules.seriousgame && (
+                                        <section className="glass-panel p-6 rounded-2xl shadow-sm border-t-4 border-t-brand-500 animate-fade-in relative">
+                                            <div className="flex items-center mb-6 text-brand-600 border-b border-slate-100 pb-4">
+                                                <Icons.Gamepad /><h2 className="text-lg font-bold ml-2">Serious Game</h2>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                <InputGroup label="Questions" type="number" value={sgQuestions} onChange={setSgQuestions} />
+                                                <InputGroup label="Seuil victoire" type="number" value={sgScoreToWin} onChange={setSgScoreToWin} />
+                                                <Toggle label="Chrono" checked={sgTimerActive} onChange={setSgTimerActive} />
+                                                <InputGroup label="Mot Magique" value={sgMagicWord} onChange={setSgMagicWord} />
+                                                <InputGroup label="Points" type="number" value={sgMaxPoints} onChange={setSgMaxPoints} />
+                                            </div>
+                                        </section>
+                                    )}
+
+                                    {selectedModules.activites && (
+                                        <section className="glass-panel p-6 rounded-2xl shadow-sm border-t-4 border-t-brand-500 animate-fade-in">
+                                            <div className="flex items-center mb-6 text-brand-600 border-b border-slate-100 pb-4">
+                                                <Icons.Layers /><h2 className="text-lg font-bold ml-2">Activités Formatives</h2>
+                                            </div>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                                <InputGroup label="QCM" type="number" value={actId} onChange={setActId} />
+                                                <InputGroup label="Séquençage" type="number" value={actSeq} onChange={setActSeq} />
+                                                <InputGroup label="Trous" type="number" value={actSynth} onChange={setActSynth} />
+                                                <InputGroup label="Logique" type="number" value={actLogic} onChange={setActLogic} />
+                                            </div>
+                                        </section>
+                                    )}
+
+                                    {/* ... more modules if needed ... */}
+
+                                    <div className="flex justify-end mt-8">
+                                        <button onClick={generatePrompt} disabled={isGenerating || activeModsCount === 0} className="bg-brand-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-700 transition shadow-lg flex items-center">
+                                            {isGenerating ? "Traitement..." : <><Icons.Wand className="mr-2" /> Générer le Super-Prompt</>}
+                                        </button>
+                                    </div>
+
+                                    {generatedPrompt && (
+                                        <section className="glass-panel p-6 rounded-2xl border border-brand-300 mt-8 animate-fade-in">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h2 className="text-lg font-bold text-brand-700">Prompt Expert Généré</h2>
+                                                <button onClick={copyToClipboard} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">{copySuccess ? "Copié !" : "Copier pour l'IA"}</button>
+                                            </div>
+                                            <pre className="bg-slate-900 text-slate-300 p-4 rounded-xl text-sm overflow-x-auto whitespace-pre-wrap"><code>{generatedPrompt}</code></pre>
+                                        </section>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="space-y-6 animate-fade-in">
+                                    <section className="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200">
+                                        <h2 className="text-xl font-bold mb-4 flex items-center text-brand-700">
+                                            <Icons.Layers className="mr-2" /> 1. Configurer le Package
+                                        </h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <InputGroup label="Titre du Parcours" value={scormTitle} onChange={setScormTitle} />
+                                            <InputGroup label="Points Totaux (SCORM)" type="number" value={scormPoints} onChange={setScormPoints} />
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-1">Fichier de base (PDF/HTML)</label>
+                                                <input type="file" onChange={e => { setCourseFile(e.target.files[0]); setCourseFileName(e.target.files[0].name); }} className="w-full text-sm" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-1">Image de couverture (.jpg)</label>
+                                                <input type="file" accept="image/*" onChange={e => setCourseCover(e.target.files[0])} className="w-full text-sm" />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section className="glass-panel p-6 rounded-2xl shadow-sm border border-brand-200 bg-brand-50/30">
+                                        <h2 className="text-xl font-bold mb-4 flex items-center text-brand-700">
+                                            <Icons.Brain className="mr-2" /> 2. Injecter la réponse de l'IA
+                                        </h2>
+                                        <p className="text-sm text-slate-600 mb-3">Collez le contenu généré par l'IA pour extraire les activités.</p>
+                                        <textarea value={aiResponseText} onChange={e => setAiResponseText(e.target.value)} className="w-full h-48 p-4 border border-slate-300 rounded-xl mb-4 text-sm font-mono" placeholder="[[LECON]] ... [[SYNTHESE]] ..."></textarea>
+                                        <button onClick={injectAiResult}
+                                            className="bg-brand-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-700 shadow-md">Parser
+                                            le code</button>
+                                    </section>
+
+                                    {activities.length > 0 && (
+                                        <section className="glass-panel p-6 rounded-2xl shadow-sm bg-white animate-fade-in">
+                                            <h2 className="text-xl font-bold mb-4">3. Récapitulatif et Export</h2>
+                                            <div className="space-y-2 mb-6">
+                                                {activities.map(a => (
+                                                    <div key={a.idx}
+                                                        className="flex justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                                        <span className="font-medium">{a.title}</span>
+                                                        <span className="text-slate-500 text-sm">{a.type} - {a.weight} pts</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="text-sm font-bold text-brand-700 mb-4">{scormStatus}</div>
+                                            <button onClick={generateScormPackage}
+                                                className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-xl font-bold text-lg shadow-xl hover:scale-[1.02] transition-transform">
+                                                Générer le Package SCORM (.ZIP)
+                                            </button>
+                                        </section>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(
+            <App />);
+    </script>
+</body>
+
+</html>

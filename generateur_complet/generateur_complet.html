@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Générateur Pédagogique Tout-en-Un</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f1f5f9;
+            color: #334155;
+            min-height: 100vh
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+            border: 1px solid #e2e8f0
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px
+        }
+
+        .step-badge {
+            width: 28px;
+            height: 28px;
+            background: #2563eb;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        /* Upload */
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: .2s
+        }
+
+        .upload-zone:hover {
+            border-color: #3b82f6;
+            background: #eff6ff
+        }
+
+        .upload-zone input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%
+        }
+
+        .upload-zone i {
+            font-size: 2rem;
+            color: #94a3b8;
+            margin-bottom: 8px
+        }
+
+        .upload-zone p {
+            font-weight: 600;
+            color: #475569;
+            font-size: .9rem
+        }
+
+        .upload-zone small {
+            color: #94a3b8
+        }
+
+        .or-divider {
+            text-align: center;
+            color: #94a3b8;
+            font-size: .85rem;
+            margin: 12px 0
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: .85rem;
+            resize: vertical;
+            outline: none;
+            transition: .2s
+        }
+
+        textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px #dbeafe
+        }
+
+        .keywords-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px
+        }
+
+        .kw-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: .75rem;
+            font-weight: 600
+        }
+
+        /* Grid selection */
+        .section-label {
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #64748b;
+            margin-bottom: 10px
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px
+        }
+
+        .items-grid.games {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px
+        }
+
+        @media(max-width:600px) {
+
+            .items-grid,
+            .items-grid.games {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        .item-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: .2s;
+            user-select: none
+        }
+
+        .item-card:hover {
+            border-color: #93c5fd;
+            background: #f8fafc
+        }
+
+        .item-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+            transform: scale(1.03)
+        }
+
+        .item-card .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 6px;
+            font-size: 1.2rem
+        }
+
+        .item-card .name {
+            font-size: .75rem;
+            font-weight: 700;
+            color: #334155;
+            line-height: 1.2
+        }
+
+        .item-card .magic {
+            font-size: .65rem;
+            color: #2563eb;
+            font-weight: 600;
+            margin-top: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        /* Config */
+        .configs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px
+        }
+
+        @media(max-width:600px) {
+            .configs-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .config-box {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px
+        }
+
+        .config-box .cfg-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: .85rem;
+            color: #1e293b;
+            margin-bottom: 14px
+        }
+
+        .cfg-row {
+            margin-bottom: 12px
+        }
+
+        .cfg-row label {
+            display: flex;
+            justify-content: space-between;
+            font-size: .78rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px
+        }
+
+        .cfg-row label span.val {
+            color: #2563eb;
+            font-weight: 700
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(37, 99, 235, .4)
+        }
+
+        .cfg-text {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: .8rem;
+            outline: none
+        }
+
+        .cfg-text:focus {
+            border-color: #3b82f6
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px
+        }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+            cursor: pointer
+        }
+
+        .toggle-wrap input {
+            display: none
+        }
+
+        .toggle-slider {
+            width: 40px;
+            height: 22px;
+            background: #e2e8f0;
+            border-radius: 11px;
+            position: relative;
+            transition: .2s
+        }
+
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: .2s
+        }
+
+        .toggle-wrap input:checked+.toggle-slider {
+            background: #2563eb
+        }
+
+        .toggle-wrap input:checked+.toggle-slider::after {
+            left: 21px
+        }
+
+        /* Button */
+        .btn-generate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(37, 99, 235, .35);
+            transition: .2s
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, .45)
+        }
+
+        .btn-generate:active {
+            transform: translateY(0)
+        }
+
+        .btn-generate:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        /* Output */
+        .output-card {
+            border-color: #bbf7d0;
+            background: #f0fdf4
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px
+        }
+
+        .output-header h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #15803d;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn-copy {
+            padding: 8px 16px;
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: .2s
+        }
+
+        .btn-copy:hover {
+            background: #15803d
+        }
+
+        .btn-copy.copied {
+            background: #0f766e
+        }
+
+        .prompt-pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 12px;
+            overflow: auto;
+            max-height: 420px;
+            font-size: .75rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace
+        }
+
+        .prompt-pre::-webkit-scrollbar {
+            width: 6px
+        }
+
+        .prompt-pre::-webkit-scrollbar-track {
+            background: #1e293b
+        }
+
+        .prompt-pre::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px
+        }
+
+        .hidden {
+            display: none !important
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- ÉTAPE 1 : COURS -->
+        <div class="card">
+            <div class="step-title">
+                <div class="step-badge">1</div> Contenu du cours
+            </div>
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept=".html,.htm,.txt" />
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <p>Importer un fichier (.html ou .txt)</p>
+                <small>ou glissez-le ici</small>
+            </div>
+            <div class="or-divider">— ou —</div>
+            <textarea id="courseText" placeholder="Collez votre texte de cours ici..."></textarea>
+            <div class="keywords-bar" id="kwBar"></div>
+        </div>
+
+        <!-- ÉTAPE 2 : SÉLECTION -->
+        <div class="card">
+            <div class="step-title">
+                <div class="step-badge">2</div> Activités &amp; Jeux
+            </div>
+            <p class="section-label">Activités d'apprentissage</p>
+            <div class="items-grid" id="activitiesGrid"></div>
+            <p class="section-label">Jeux ludiques</p>
+            <div class="items-grid games" id="gamesGrid"></div>
+        </div>
+
+        <!-- ÉTAPE 3 : CONFIGURATION -->
+        <div class="card hidden" id="configCard">
+            <div class="step-title">
+                <div class="step-badge">3</div> Configuration
+            </div>
+            <div class="configs-grid" id="configsGrid"></div>
+        </div>
+
+        <!-- BOUTON -->
+        <button class="btn-generate" id="btnGenerate">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Générer le Prompt
+        </button>
+
+        <!-- RÉSULTAT -->
+        <div class="card output-card hidden" id="outputCard">
+            <div class="output-header">
+                <h2><i class="fa-solid fa-circle-check"></i> Prompt prêt</h2>
+                <button class="btn-copy" id="btnCopy"><i class="fa-solid fa-copy"></i> Copier</button>
+            </div>
+            <pre class="prompt-pre" id="promptOutput"></pre>
+        </div>
+
+    </div>
+
+    <script>
+        // =====================================================
+        // DONNÉES ITEMS
+        // =====================================================
+        const ITEMS = {
+            qcm: { id: 'qcm', type: 'activity', label: 'QCM / Identification', icon: 'fa-list-check', color: '#0ea5e9', bg: '#e0f2fe', config: { quantity: 3, timerEnabled: false, timerMinutes: 5, magicWord: '' } },
+            sequencing: { id: 'sequencing', type: 'activity', label: 'Séquençage', icon: 'fa-arrow-down-1-9', color: '#0ea5e9', bg: '#e0f2fe', config: { quantity: 1, timerEnabled: false, timerMinutes: 5, magicWord: '' } },
+            synthesis: { id: 'synthesis', type: 'activity', label: 'Synthèse à trous', icon: 'fa-pen-to-square', color: '#0ea5e9', bg: '#e0f2fe', config: { quantity: 1, timerEnabled: false, timerMinutes: 10, magicWord: '' } },
+            logic: { id: 'logic', type: 'activity', label: 'Logique / Intrus', icon: 'fa-lightbulb', color: '#0ea5e9', bg: '#e0f2fe', config: { quantity: 2, timerEnabled: false, timerMinutes: 5, magicWord: '' } },
+            memory: { id: 'memory', type: 'game', label: 'Memory', icon: 'fa-table-cells', color: '#ec4899', bg: '#fce7f3', config: { quantity: 8, timerEnabled: false, timerMinutes: 5, magicWord: '' } },
+            pendu: { id: 'pendu', type: 'game', label: 'Pendu', icon: 'fa-person', color: '#f59e0b', bg: '#fef3c7', config: { quantity: 5, timerEnabled: false, timerMinutes: 10, magicWord: '' } },
+            intrus: { id: 'intrus', type: 'game', label: "Chasse à l'Intrus", icon: 'fa-star', color: '#10b981', bg: '#d1fae5', config: { quantity: 5, timerEnabled: false, timerMinutes: 8, magicWord: '' } },
+            association: { id: 'association', type: 'game', label: 'Association', icon: 'fa-arrows-left-right', color: '#3b82f6', bg: '#dbeafe', config: { quantity: 4, timerEnabled: false, timerMinutes: 10, magicWord: '' } },
+            motsmeles: { id: 'motsmeles', type: 'game', label: 'Mots Mêlés', icon: 'fa-magnifying-glass', color: '#8b5cf6', bg: '#ede9fe', config: { quantity: 10, timerEnabled: false, timerMinutes: 15, magicWord: '' } },
+            motscroises: { id: 'motscroises', type: 'game', label: 'Mots Croisés', icon: 'fa-hashtag', color: '#ef4444', bg: '#fee2e2', config: { quantity: 8, timerEnabled: false, timerMinutes: 20, magicWord: '' } },
+            escapegame: { id: 'escapegame', type: 'game', label: 'Escape Game', icon: 'fa-lock', color: '#f97316', bg: '#ffedd5', config: { numQuestions: 20, scoreToWin: 17, magicWord: '' } },
+        };
+
+        const selected = new Set();
+        let courseText = '';
+
+        // =====================================================
+        // MOTS-CLÉS
+        // =====================================================
+        const STOP = new Set(['alors', 'apres', 'aussi', 'autre', 'autres', 'avec', 'bien', 'cant', 'car', 'ceci', 'cela', 'celle', 'celles', 'celui', 'cest', 'chaque', 'comme', 'comment', 'dans', 'depuis', 'depuis', 'dont', 'donc', 'elle', 'elles', 'encore', 'entre', 'faire', 'fais', 'fait', 'fois', 'html', 'head', 'body', 'vers', 'style', 'font', 'sans', 'tres', 'vous', 'pour', 'plus', 'mais', 'nous', 'tout', 'tous', 'toutes', 'cette', 'leurs', 'leur', 'dans', 'avec', 'sont', 'avez', 'avoir', 'etait', 'sera', 'etre', 'quel', 'quels', 'quel', 'quelle', 'leur']);
+        const HSTOP = new Set(['html', 'head', 'body', 'div', 'span', 'class', 'style', 'script', 'link', 'meta', 'href', 'src', 'width', 'height', 'border', 'color', 'background', 'margin', 'padding', 'display', 'flex', 'none', 'true', 'false', 'var', 'const', 'let', 'function', 'return', 'console', 'window', 'charset', 'content', 'rem', 'auto', 'text', 'align', 'left', 'right', 'center', 'opacity', 'import', 'export', 'white', 'black', 'blue', 'red', 'green', 'yellow', 'orange', 'purple', 'gray', 'slate', 'score', 'cours', 'chapitre']);
+
+        function normalize(w) { return w.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z]/g, ''); }
+
+        function extractKeywords(text, count) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = text;
+            const clean = tmp.textContent || text;
+            const words = clean.toLowerCase().replace(/['']/g, ' ').split(/[^a-zA-ZàâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ]+/).filter(w => {
+                if (w.length <= 3) return false;
+                if (STOP.has(w) || HSTOP.has(w)) return false;
+                if (/^\d/.test(w)) return false;
+                return true;
+            });
+            const freq = {};
+            words.forEach(w => { const n = normalize(w); if (n) freq[n] = (freq[n] || 0) + 1; });
+            return Object.entries(freq).sort((a, b) => b[1] - a[1]).map(([w]) => w).slice(0, count);
+        }
+
+        // =====================================================
+        // GRILLE MOTS CROISÉS
+        // =====================================================
+        const GS = 40;
+        function canPlace(grid, word, r, c, d) {
+            if (r < 0 || c < 0) return false;
+            if (d === 'h') {
+                if (c + word.length > GS) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[r][c + i] && grid[r][c + i] !== word[i]) return false;
+                    if (!grid[r][c + i] && (grid[r - 1]?.[c + i] || grid[r + 1]?.[c + i])) return false;
+                }
+                if (grid[r]?.[c - 1] || grid[r]?.[c + word.length]) return false;
+            } else {
+                if (r + word.length > GS) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (grid[r + i]?.[c] && grid[r + i][c] !== word[i]) return false;
+                    if (!grid[r + i]?.[c] && (grid[r + i]?.[c - 1] || grid[r + i]?.[c + 1])) return false;
+                }
+                if (grid[r - 1]?.[c] || grid[r + word.length]?.[c]) return false;
+            }
+            return true;
+        }
+        function buildCrossword(wordList) {
+            const words = [...wordList].sort((a, b) => b.length - a.length);
+            const grid = Array(GS).fill(null).map(() => Array(GS).fill(null));
+            const placed = [];
+            if (!words.length) return null;
+            const first = words.shift();
+            const sc = Math.floor((GS - first.length) / 2), sr = Math.floor(GS / 2);
+            for (let i = 0; i < first.length; i++) grid[sr][sc + i] = first[i];
+            placed.push({ mot: first, row: sr, col: sc, dir: 'h' });
+            for (const word of words) {
+                let best = null;
+                for (const p of placed) {
+                    for (let i = 0; i < p.mot.length && !best; i++)for (let j = 0; j < word.length && !best; j++) {
+                        if (p.mot[i] === word[j]) {
+                            const nd = p.dir === 'h' ? 'v' : 'h';
+                            const [nr, nc] = nd === 'v' ? [p.row - j, p.col + i] : [p.row + i, p.col - j];
+                            if (canPlace(grid, word, nr, nc, nd)) best = { word, row: nr, col: nc, dir: nd };
+                        }
+                    }
+                    if (best) break;
+                }
+                if (best) {
+                    const { word: w, row, col, dir } = best;
+                    for (let i = 0; i < w.length; i++) { if (dir === 'h') grid[row][col + i] = w[i]; else grid[row + i][col] = w[i]; }
+                    placed.push({ mot: w, row, col, dir });
+                }
+            }
+            if (!placed.length) return null;
+            let minR = GS, minC = GS, maxR = 0, maxC = 0;
+            placed.forEach(p => {
+                if (p.dir === 'h') { minR = Math.min(minR, p.row); maxR = Math.max(maxR, p.row); minC = Math.min(minC, p.col); maxC = Math.max(maxC, p.col + p.mot.length - 1); }
+                else { minR = Math.min(minR, p.row); maxR = Math.max(maxR, p.row + p.mot.length - 1); minC = Math.min(minC, p.col); maxC = Math.max(maxC, p.col); }
+            });
+            const final = placed.map(p => ({ ...p, row: p.row - minR, col: p.col - minC, number: 0 }));
+            let n = 1; const coords = new Map();
+            final.sort((a, b) => a.row - b.row || a.col - b.col);
+            for (const w of final) { const k = `${w.row},${w.col}`; if (!coords.has(k)) coords.set(k, n++); w.number = coords.get(k); }
+            return { placedWords: final, rows: maxR - minR + 1, cols: maxC - minC + 1 };
+        }
+
+        // =====================================================
+        // PROMPT CONSTRUCTORS
+        // =====================================================
+        const PC = {
+            memory: (c, w) => `**JEU : Memory**\n**Mot magique :** ${c.magicWord}\n- ${c.quantity} paires Concept+Définition basées sur : ${w.join(', ')}.\n- ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'} Bouton "Passer" obligatoire. Si gagné : révéler le mot magique.\n`,
+            pendu: (c, w) => `**JEU : Pendu**\n**Mot magique :** ${c.magicWord}\n- ${c.quantity} mots : ${w.join(', ')}. Clavier virtuel A-Z. Potence SVG étape par étape.\n- ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'} Bouton "Passer" obligatoire.\n`,
+            intrus: (c, w) => `**JEU : L'Intrus**\n**Mot magique :** ${c.magicWord}\n- ${c.quantity} séries de 5 mots dont un intrus, basées sur : ${w.join(', ')}.\n- ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'} Bouton "Passer" obligatoire.\n`,
+            association: (c, w) => `**JEU : Association**\n**Mot magique :** ${c.magicWord}\n- ${c.quantity} catégories, 5 éléments chacune, basées sur : ${w.join(', ')}.\n- ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'} Bouton "Passer" obligatoire.\n`,
+            motsmeles: (c, w) => `**JEU : Mots Mêlés (design premium)**\n**Mot magique :** ${c.magicWord}\n- Mots : ${w.join(', ')}. Grille générée en JS (horizontal + vertical, pas de diagonales). Cases vides = lettres aléatoires.\n**DESIGN :** Cases carrées, bordure fine, lettre centrée, police monospace bold. Liste des mots à côté.\n**INTERACTION :** Sélection clic sur 1ère lettre puis clic sur dernière (clic-clic, pas glisser). Surbrillance jaune pendant sélection. Si correct → cases vertes + mot barré dans liste. Si incorrect → reset. Quand tout trouvé → révéler : **"${c.magicWord}"**\n- ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'} Bouton "Passer" obligatoire.\n`,
+            motscroises: (c, w, extra) => {
+                if (extra) {
+                    const json = JSON.stringify({ rows: extra.rows, cols: extra.cols, placedWords: extra.placedWords.map(({ mot, row, col, dir, number }) => ({ mot, row, col, direction: dir === 'h' ? 'horizontal' : 'vertical', number })) }, null, 2);
+                    return `**JEU : Mots Croisés (grille pré-calculée)**\n**Mot magique :** ${c.magicWord}\nLa grille est construite. Intègre ce JSON et rédige une définition pour chaque mot.\n\`\`\`json\n${json}\n\`\`\`\n- Cases interactives (saisie lettre par lettre). Mot correct → cases vertes. Grille complète → révéler : **"${c.magicWord}"**\n- ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'} Bouton "Passer" obligatoire.\n`;
+                }
+                return `**JEU : Mots Croisés**\n**Mot magique :** ${c.magicWord}\n- Mots : ${w.join(', ')}. Grille interactive. ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'}\n`;
+            },
+            escapegame: (c) => `**JEU : Escape Game Pédagogique**\n**Mot magique :** ${c.magicWord}\n- ${c.numQuestions} questions/énigmes (QCM, Vrai/Faux, texte à trous, mise en ordre, association).\n- **PAS DE CHRONOMÈTRE.**\n- Score affiché uniquement à la fin. Si ≥ ${c.scoreToWin}/${c.numQuestions} → révéler : **"${c.magicWord}"**\n- Si échec : encouragement + bouton "Rejouer". Ne PAS donner les réponses.\n- Un seul fichier HTML, aucune image.\n`,
+            qcm: (c) => `**ACTIVITÉ : QCM**\n- ${c.quantity} questions à choix multiples. Feedback immédiat (sans donner la réponse si faux). ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'}\n${c.magicWord ? `- Score > 80% → révéler : "${c.magicWord}"\n` : ''}`,
+            sequencing: (c) => `**ACTIVITÉ : Séquençage**\n- ${c.quantity} exercices de remise en ordre. Si erreur : "Incorrect", sans donner la solution. ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'}\n${c.magicWord ? `- Score > 80% → révéler : "${c.magicWord}"\n` : ''}`,
+            synthesis: (c) => `**ACTIVITÉ : Synthèse (texte à trous)**\n- ${c.quantity} textes à trous. Ne pas donner la réponse si faux. ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'}\n${c.magicWord ? `- Score > 80% → révéler : "${c.magicWord}"\n` : ''}`,
+            logic: (c) => `**ACTIVITÉ : Logique**\n- ${c.quantity} exercices de logique. Ne pas donner la réponse si faux. ${c.timerEnabled ? `Chrono : ${c.timerMinutes} min.` : '**PAS DE CHRONOMÈTRE**.'}\n${c.magicWord ? `- Score > 80% → révéler : "${c.magicWord}"\n` : ''}`,
+        };
+
+        // =====================================================
+        // RENDU DES CARTES
+        // =====================================================
+        function renderGrid(containerId, type) {
+            const grid = document.getElementById(containerId);
+            grid.innerHTML = '';
+            Object.values(ITEMS).filter(i => i.type === type).forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card' + (selected.has(item.id) ? ' selected' : '');
+                card.dataset.id = item.id;
+                const mw = item.config.magicWord ? `<div class="magic">🔑 ${item.config.magicWord}</div>` : '';
+                card.innerHTML = `<div class="icon" style="background:${item.bg};color:${item.color}"><i class="fa-solid ${item.icon}"></i></div><div class="name">${item.label}</div>${mw}`;
+                card.addEventListener('click', () => toggleItem(item.id));
+                grid.appendChild(card);
+            });
+        }
+
+        function renderAll() {
+            renderGrid('activitiesGrid', 'activity');
+            renderGrid('gamesGrid', 'game');
+            renderConfigs();
+            updateKeywords();
+        }
+
+        // =====================================================
+        // CONFIGURATION
+        // =====================================================
+        function renderConfigs() {
+            const configCard = document.getElementById('configCard');
+            const grid = document.getElementById('configsGrid');
+            if (selected.size === 0) { configCard.classList.add('hidden'); return; }
+            configCard.classList.remove('hidden');
+            grid.innerHTML = '';
+            selected.forEach(id => {
+                const item = ITEMS[id];
+                const box = document.createElement('div');
+                box.className = 'config-box';
+                box.innerHTML = `<div class="cfg-title"><div class="icon" style="background:${item.bg};color:${item.color};width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0"><i class="fa-solid ${item.icon}"></i></div>${item.label}</div>`;
+
+                if (id === 'escapegame') {
+                    box.innerHTML += buildRange('numQuestions', 'Nombre de questions', 5, 40, item.config.numQuestions, id, 'orange');
+                    box.innerHTML += buildRange('scoreToWin', 'Score pour gagner', 1, item.config.numQuestions, item.config.scoreToWin, id, 'orange', item.config.numQuestions);
+                    box.innerHTML += buildText('magicWord', 'Mot magique', item.config.magicWord, id);
+                } else {
+                    const isGame = item.type === 'game';
+                    box.innerHTML += buildRange('quantity', isGame ? 'Quantité' : 'Nb de questions', isGame ? 3 : 1, isGame ? 20 : 10, item.config.quantity, id);
+                    box.innerHTML += buildToggle('timerEnabled', 'Chronomètre', item.config.timerEnabled, id);
+                    if (item.config.timerEnabled) box.innerHTML += buildRange('timerMinutes', 'Durée (min)', 1, 60, item.config.timerMinutes, id);
+                    box.innerHTML += buildText('magicWord', 'Mot magique', item.config.magicWord, id);
+                }
+                grid.appendChild(box);
+                box.querySelectorAll('input[type=range]').forEach(inp => inp.addEventListener('input', e => onConfigChange(id, e.target.dataset.key, +e.target.value, box)));
+                box.querySelectorAll('input[type=checkbox]').forEach(inp => inp.addEventListener('change', e => onConfigChange(id, e.target.dataset.key, e.target.checked, box)));
+                box.querySelectorAll('input[type=text]').forEach(inp => inp.addEventListener('input', e => onConfigChange(id, e.target.dataset.key, e.target.value, box)));
+            });
+        }
+
+        function buildRange(key, label, min, max, val, id, color = 'blue', suffix = null) {
+            const display = suffix ? `${val}/${suffix}` : val;
+            return `<div class="cfg-row"><label>${label} <span class="val" id="val-${id}-${key}">${display}</span></label><input type="range" min="${min}" max="${max}" value="${val}" data-key="${key}" data-id="${id}"></div>`;
+        }
+        function buildToggle(key, label, val, id) {
+            return `<div class="toggle-row"><span style="font-size:.78rem;font-weight:600;color:#475569">${label}</span><label class="toggle-wrap"><input type="checkbox" data-key="${key}" data-id="${id}" ${val ? 'checked' : ''}><div class="toggle-slider"></div></label></div>`;
+        }
+        function buildText(key, label, val, id) {
+            return `<div class="cfg-row"><label>${label}</label><input type="text" class="cfg-text" data-key="${key}" data-id="${id}" value="${val}" placeholder="Ex: BRAVO"></div>`;
+        }
+
+        function onConfigChange(id, key, val, box) {
+            ITEMS[id].config[key] = val;
+            // Contrainte scoreToWin <= numQuestions
+            if (id === 'escapegame' && key === 'numQuestions') {
+                ITEMS[id].config.scoreToWin = Math.min(ITEMS[id].config.scoreToWin, val);
+            }
+            // Mettre à jour l'affichage de la valeur du range
+            const valEl = box.querySelector(`#val-${id}-${key}`);
+            if (valEl) {
+                if (key === 'scoreToWin') valEl.textContent = `${ITEMS[id].config.scoreToWin}/${ITEMS[id].config.numQuestions}`;
+                else valEl.textContent = val;
+            }
+            // Re-render si toggle changé (pour afficher/masquer durée)
+            if (key === 'timerEnabled') renderConfigs();
+            // Màj badge mot magique sur la carte
+            renderGrid(ITEMS[id].type === 'activity' ? 'activitiesGrid' : 'gamesGrid', ITEMS[id].type);
+        }
+
+        // =====================================================
+        // MOTS-CLÉS AUTO
+        // =====================================================
+        let kwTimeout = null;
+        function updateKeywords() {
+            const bar = document.getElementById('kwBar');
+            const txt = document.getElementById('courseText').value;
+            courseText = txt;
+            if (txt.length < 50) { bar.innerHTML = ''; return; }
+            const kw = extractKeywords(txt, 12);
+            bar.innerHTML = '<span style="font-size:.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-right:6px">Mots détectés :</span>' + kw.map(w => `<span class="kw-badge">${w}</span>`).join('');
+            // Suggérer mots magiques vides
+            Object.keys(ITEMS).forEach((id, i) => {
+                if (!ITEMS[id].config.magicWord) ITEMS[id].config.magicWord = kw[i % kw.length] || 'BRAVO';
+            });
+        }
+
+        // =====================================================
+        // TOGGLE SELECTION
+        // =====================================================
+        function toggleItem(id) {
+            if (selected.has(id)) selected.delete(id); else selected.add(id);
+            renderAll();
+        }
+
+        // =====================================================
+        // GÉNÉRATION DU PROMPT
+        // =====================================================
+        document.getElementById('btnGenerate').addEventListener('click', () => {
+            courseText = document.getElementById('courseText').value;
+            if (!courseText.trim()) { alert('⚠️ Ajoutez votre cours en étape 1 !'); return; }
+            if (selected.size === 0) { alert('⚠️ Sélectionnez au moins une activité ou un jeu !'); return; }
+
+            let p = `**RÔLE :** Expert en Ingénierie Pédagogique et Développement Web.\n`;
+            p += `**OBJECTIF :** Créer un fichier HTML unique, autonome et moderne avec des activités pédagogiques et des jeux basés sur le cours ci-dessous.\n\n`;
+            p += `**CONTENU DU COURS :**\n\`\`\`\n${courseText}\n\`\`\`\n\n`;
+            p += `**STRUCTURE :**\n- Navigation par onglets : "Activités d'Apprentissage" et "Jeux Ludiques".\n- Design moderne et responsive (Tailwind CSS via CDN).\n- **RÈGLE CRITIQUE :** Si un chronomètre n'est pas activé pour un module, IL NE FAUT RIEN AFFICHER NI COMPTER.\n- **RÈGLE PÉDAGOGIQUE :** Toutes les questions et jeux portent sur le SENS du cours, pas sur le code informatique.\n\n`;
+            p += `**MODULES À GÉNÉRER :**\n`;
+
+            selected.forEach(id => {
+                const item = ITEMS[id];
+                const c = item.config;
+                let words = [];
+                let extra = null;
+                if (['memory', 'pendu', 'intrus', 'association', 'motsmeles', 'motscroises'].includes(id)) {
+                    let n = c.quantity * 2;
+                    if (id === 'memory') n = c.quantity * 3;
+                    else if (id === 'intrus') n = c.quantity * 5;
+                    else if (id === 'association') n = c.quantity * 10;
+                    words = extractKeywords(courseText, n);
+                    if (id === 'motscroises') extra = buildCrossword(extractKeywords(courseText, c.quantity));
+                }
+                if (PC[id]) p += PC[id](c, words, extra) + '\n---\n';
+            });
+
+            p += `\n**TECHNIQUE :**\n1. Un seul fichier HTML complet (tout le CSS + JS à l'intérieur).\n2. FontAwesome via CDN pour les icônes.\n3. Code complet et fonctionnel sans erreur.`;
+
+            document.getElementById('promptOutput').textContent = p;
+            document.getElementById('outputCard').classList.remove('hidden');
+            document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // =====================================================
+        // COPIER
+        // =====================================================
+        document.getElementById('btnCopy').addEventListener('click', () => {
+            const txt = document.getElementById('promptOutput').textContent;
+            const ta = document.createElement('textarea');
+            ta.value = txt;
+            ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            try {
+                document.execCommand('copy');
+                const btn = document.getElementById('btnCopy');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copié !';
+                btn.style.background = '#0f766e';
+                setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copier'; btn.style.background = ''; }, 2500);
+            } catch (e) { alert('Erreur de copie. Sélectionnez le texte manuellement (Ctrl+A puis Ctrl+C).'); }
+            document.body.removeChild(ta);
+        });
+
+        // =====================================================
+        // UPLOAD FICHIER
+        // =====================================================
+        document.getElementById('fileInput').addEventListener('change', e => {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const content = ev.target.result;
+                let text = content;
+                if (file.name.match(/\.html?$/i) || content.trimStart().startsWith('<')) {
+                    const tmp = document.createElement('div'); tmp.innerHTML = content; text = tmp.textContent || '';
+                }
+                document.getElementById('courseText').value = text;
+                updateKeywords();
+                renderAll();
+            };
+            reader.readAsText(file);
+        });
+
+        // Textarea change
+        document.getElementById('courseText').addEventListener('input', () => {
+            clearTimeout(kwTimeout);
+            kwTimeout = setTimeout(() => { updateKeywords(); renderAll(); }, 400);
+        });
+
+        // Init
+        renderAll();
+    </script>
+</body>
+
+</html>
