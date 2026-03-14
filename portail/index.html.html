@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail de l'Ingénierie Pédagogique | Ressources & Innovation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.03) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Abstract Background Decor */
+        .bg-decor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .decor-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .card-soft {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+        }
+
+        .card-soft::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+
+        .card-soft:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px -15px rgba(79, 70, 229, 0.15);
+            border-color: rgba(79, 70, 229, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .category-pill {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }
+
+        .keyword-tag {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #475569;
+            background: rgba(241, 245, 249, 0.5);
+            padding: 3px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.3);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .card-soft:hover .keyword-tag {
+            background: white;
+            border-color: var(--primary-light);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body class="text-slate-700 antialiased flex flex-col min-h-screen">
+
+    <!-- Background Decor -->
+    <div class="bg-decor">
+        <div class="decor-circle bg-indigo-200 w-[600px] h-[600px] -top-96 -left-48"></div>
+        <div class="decor-circle bg-blue-100 w-[500px] h-[500px] bottom-0 -right-48"></div>
+    </div>
+
+    <!-- Header Institutionnel -->
+    <header class="sticky top-0 glass-header border-b border-slate-100/50">
+        <div class="container mx-auto max-w-7xl px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-5">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-100 ring-4 ring-white">
+                    <i class="fas fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <span class="block font-bold text-xl leading-none text-slate-900 uppercase tracking-tight">Portail
+                        de l'Ingénierie Pédagogique</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Innovation & Biens
+                        Communs Numériques</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex gap-10">
+                <a href="#"
+                    class="nav-link text-xs font-bold text-indigo-600 uppercase border-b-2 border-indigo-600 pb-1">Hub
+                    de Solutions</a>
+                <a href="https://gcormi.forge.apps.education.fr/frojet/philosophie_app.html" target="_blank"
+                    class="nav-link text-xs font-bold text-slate-500 uppercase tracking-wide">Philosophie du Projet</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto max-w-7xl px-6 py-16 flex-grow">
+
+        <!-- En-tête Principal -->
+        <div class="mb-20 fade-in-up">
+            <div class="flex items-center gap-3 text-indigo-500 font-bold text-xs uppercase tracking-[0.2em] mb-4">
+                <span class="w-12 h-[2px] bg-indigo-200"></span>
+                Espace Ressources
+            </div>
+            <h1 class="text-5xl font-black text-slate-900 mb-8 tracking-tight leading-tight">
+                Architecturer l'Apprentissage <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">avec
+                    l'Intelligence Artificielle</span>
+            </h1>
+            <p class="text-xl text-slate-500 max-w-3xl leading-relaxed font-medium">
+                Un écosystème d'outils ouverts pour optimiser la préparation, favoriser l'inclusion et engager vos
+                élèves par le design et le jeu.
+            </p>
+            <div class="mt-10 flex gap-6">
+                <a href="https://gcormi.forge.apps.education.fr/frojet/philosophie_app.html" target="_blank"
+                    class="inline-flex items-center gap-3 px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold text-sm shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <i class="fas fa-book-open"></i>
+                    Lire le Manifeste
+                </a>
+            </div>
+        </div>
+
+        <!-- Section 1 : Outils Majeurs -->
+        <section class="mb-24 fade-in-up" style="animation-delay: 0.2s;">
+            <div class="flex items-center gap-3 mb-10">
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Solutions Structurantes</h2>
+                <div class="h-px flex-grow bg-slate-100"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Assistant Pédagogique -->
+                <article class="card-soft rounded-3xl p-10 flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16"></div>
+                    <div class="flex justify-between items-start mb-8 relative">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-xl shadow-indigo-100">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100">IA Génératrice
+                            & Didactique</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Assistant de Conception Pédagogique</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        Optimisez votre temps de préparation. Notre assistant intelligent analyse vos objectifs pour
+                        générer des séquences pédagogiques cohérentes, des activités différenciées et des supports de
+                        cours structurés. Parfaitement intégré à l'ENT pour une diffusion immédiate.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-8 mt-auto">
+                        <span class="keyword-tag">IA Générative</span>
+                        <span class="keyword-tag">Séquences</span>
+                        <span class="keyword-tag">Didactique</span>
+                        <span class="keyword-tag">ENT</span>
+                        <span class="keyword-tag">Gain de temps</span>
+                    </div>
+                    <div class="pt-8 border-t border-slate-50">
+                        <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank"
+                            class="group flex items-center justify-between bg-slate-900 hover:bg-indigo-600 text-white px-6 py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02]">
+                            Lancer l'application
+                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Technologie Master -->
+                <article
+                    class="card-soft rounded-3xl p-10 flex flex-col h-full relative overflow-hidden text-slate-900">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16"></div>
+                    <div class="flex justify-between items-start mb-8 relative">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-blue-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-blue-100">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <span class="category-pill bg-blue-50 text-blue-600 border border-blue-100">Expertise
+                            Disciplinaire</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Générateur Master Technologie</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        L'outil ultime pour les enseignants de technologie. Intègre les référentiels Pix/CRCN, permet le
+                        clonage de design visuel et propose des exports multi-formats (Word, PDF, HTML, Markdown) pour
+                        une flexibilité pédagogique totale.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-8 mt-auto">
+                        <span class="keyword-tag">Techno</span>
+                        <span class="keyword-tag">Pix/CRCN</span>
+                        <span class="keyword-tag">Clonage Design</span>
+                        <span class="keyword-tag">Multi-formats</span>
+                        <span class="keyword-tag">Rigueur</span>
+                    </div>
+                    <div class="pt-8 border-t border-slate-50">
+                        <a href="https://gcormi.forge.apps.education.fr/frojet/technologie_master.html" target="_blank"
+                            class="group flex items-center justify-between bg-slate-900 hover:bg-blue-500 text-white px-6 py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02]">
+                            Lancer le Master Tech
+                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Section 2 : Workshop et Spécialités -->
+        <section class="fade-in-up" style="animation-delay: 0.4s;">
+            <div class="flex items-center gap-3 mb-10">
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Atelier de Création & Spécialités</h2>
+                <div class="h-px flex-grow bg-slate-100"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Inclusion IA -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
+                    <div class="category-pill bg-emerald-50 text-emerald-600 mb-4 w-fit">Accessibilité & DYS</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Adaptation Inclusive (Complet)</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">L'accessibilité au cœur du cours. Propose des
+                        remediations visuelles avancées, polices spécifiques et modes de concentration haute-fidélité
+                        pour les besoins particuliers.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">DYS/TDAH</span>
+                        <span class="keyword-tag">Accessibilité</span>
+                        <span class="keyword-tag">Remédiation</span>
+                        <span class="keyword-tag">Dyslexie</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 rounded-xl font-bold text-xs transition-colors">
+                        Ouvrir le Studio
+                    </a>
+                </article>
+
+                <!-- EduSlide -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
+                    <div class="category-pill bg-pink-50 text-pink-600 mb-4 w-fit">Diaporamas & Visuels</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">EduSlide Studio</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Articulez vos sources vers NotebookLM.
+                        Transformez documents et liens web en diaporamas visuels impactants avec 13 styles artistiques
+                        au choix.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Diaporamas</span>
+                        <span class="keyword-tag">NotebookLM</span>
+                        <span class="keyword-tag">IA Visuelle</span>
+                        <span class="keyword-tag">Slides</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/eduslide/eduslide.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-pink-600 rounded-xl font-bold text-xs transition-colors">
+                        Accéder
+                    </a>
+                </article>
+
+                <!-- Atelier d'Amélioration DOCX -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
+                    <div class="category-pill bg-blue-50 text-blue-600 mb-4 w-fit">Enrichissement</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Améliorateur de Cours DOCX</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Améliorez vos cours existants. Collez votre
+                        texte brut pour y injecter dynamiquement des vidéos, images, audios et sections d'évaluations
+                        auto-générées.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Enrichissement</span>
+                        <span class="keyword-tag">Médias</span>
+                        <span class="keyword-tag">Quiz Auto</span>
+                        <span class="keyword-tag">DOCX</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/ameliorer_docx.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl font-bold text-xs transition-colors">
+                        Enrichir un document
+                    </a>
+                </article>
+
+                <!-- Boîte à Outils -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-indigo-100">
+                    <div class="category-pill bg-slate-50 text-slate-600 mb-4 w-fit">Multi-usages</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Boîte à Outils Enseignant</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Espace polyvalent de conversion et de
+                        traitement : PDF/DOCX vers HTML, édition de texte et utilitaires rapides pour le quotidien.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Conversion</span>
+                        <span class="keyword-tag">PDF/HTML</span>
+                        <span class="keyword-tag">Prompts</span>
+                        <span class="keyword-tag">Outils</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/boite.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition-colors">
+                        Ouvrir
+                    </a>
+                </article>
+
+                <!-- Mon Atelier Web : Visual Studio -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
+                    <div class="category-pill bg-teal-50 text-teal-600 mb-4 w-fit">Édition Visuelle</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Atelier Web : Visual Studio</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Éditeur HTML WYSIWYG avancé. Modifiez vos
+                        ressources comme dans un traitement de texte, gérez vos images par lot et téléchargez votre site
+                        complet en un clic.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">WYSIWYG</span>
+                        <span class="keyword-tag">Éditeur Visuel</span>
+                        <span class="keyword-tag">Images Batch</span>
+                        <span class="keyword-tag">Export ZIP</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/integrateur-visuel.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-teal-50 text-slate-600 hover:text-teal-600 rounded-xl font-bold text-xs transition-colors">
+                        Modifier vos pages
+                    </a>
+                </article>
+
+                <!-- LudoTech -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
+                    <div class="category-pill bg-amber-50 text-amber-600 mb-4 w-fit">Ludification</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">LudoTech Engine</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">La pédagogie par le jeu. Transformez vos
+                        contenus en parcours ludiques interactifs. Génère des mécaniques de jeux de l'oie numériques
+                        personnalisées.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Ludification</span>
+                        <span class="keyword-tag">Jeux</span>
+                        <span class="keyword-tag">Interactif</span>
+                        <span class="keyword-tag">Engagement</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded-xl font-bold text-xs transition-colors">
+                        Créer un jeu
+                    </a>
+                </article>
+
+                <!-- Lecture Facile -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
+                    <div class="category-pill bg-sky-50 text-sky-600 mb-4 w-fit">Accessibilité Rapide</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Lecteur Adaptatif (Léger)</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Accompagnement à la lecture fluide. Propose
+                        une interface épurée avec lecture bionique, synthèse vocale et aides visuelles à la
+                        concentration.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Lecture Bionique</span>
+                        <span class="keyword-tag">Audio</span>
+                        <span class="keyword-tag">Focus</span>
+                        <span class="keyword-tag">Inclusion</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/lecturefacile/lecturefacile.html"
+                        target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 rounded-xl font-bold text-xs transition-colors">
+                        Lancer le lecteur
+                    </a>
+                </article>
+
+                <!-- Illustrateur IA -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-purple-100">
+                    <div class="category-pill bg-purple-50 text-purple-600 mb-4 w-fit">Visuels IA</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Studio d'Illustration Pro</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Planifiez et générez l'intégralité des
+                        visuels de votre cours en un lot. Assure une cohérence stylistique professionnelle pour vos
+                        documents.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Images IA</span>
+                        <span class="keyword-tag">Cohérence Style</span>
+                        <span class="keyword-tag">Batch Prompts</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/illustrateur_ia.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-purple-50 text-slate-600 hover:text-purple-600 rounded-xl font-bold text-xs transition-colors">
+                        Créer des visuels
+                    </a>
+                </article>
+
+                <!-- Escape Game -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-orange-100">
+                    <div class="category-pill bg-orange-50 text-orange-600 mb-4 w-fit">Évaluation Ludique</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Générateur Serious Games</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Transformez vos cours en escape games
+                        interactifs. Générateur de prompts complexes pour créer des activités HTML autonomes et
+                        captivantes.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">Escape Game</span>
+                        <span class="keyword-tag">Scénario IA</span>
+                        <span class="keyword-tag">HTML Autonome</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/escapegame.html" target="_blank"
+                        class="mt-auto inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl font-bold text-xs transition-colors">
+                        Générer un jeu
+                    </a>
+                </article>
+
+                <!-- SCORM Lab -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-dashed">
+                    <div class="category-pill bg-slate-100 text-slate-600 mb-4 w-fit">Lab / LMS</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">SCORM Lab & Activités</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Exportation de contenus au format standard
+                        SCORM pour Moodle ou Éléa. Création d'activités interactives structurées pour votre LMS.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">SCORM</span>
+                        <span class="keyword-tag">Moodle/Éléa</span>
+                        <span class="keyword-tag">LMS</span>
+                        <span class="keyword-tag">Standard</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateuractivite/generateuract.html"
+                        target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-200 transition-colors">
+                        Zone de Test
+                    </a>
+                </article>
+
+                <!-- LinkedIn Assistant -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-dashed">
+                    <div class="category-pill bg-slate-100 text-slate-600 mb-4 w-fit">Diffusion</div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Assistant de Diffusion</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Valorisez vos travaux. Rédigez des
+                        publications impactantes pour les réseaux professionnels basées sur vos réalisations
+                        pédagogiques.</p>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="keyword-tag">LinkedIn</span>
+                        <span class="keyword-tag">Valorisation</span>
+                        <span class="keyword-tag">Réseaux Pro</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/linkedIn/Linkedin.html" target="_blank"
+                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-200 transition-colors">
+                        Lancer
+                    </a>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- FooterInstitutionnel -->
+    <footer class="bg-white border-t border-slate-100 py-12 mt-20">
+        <div class="container mx-auto max-w-7xl px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 text-slate-400">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-slate-100 rounded flex items-center justify-center text-slate-400">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <span class="text-sm font-bold tracking-tight">Gilles Cormi <span
+                            class="text-slate-200 mx-2">|</span> Ingénierie Pédagogique</span>
+                </div>
+
+                <div class="flex gap-8 text-sm font-bold uppercase tracking-widest">
+                    <a href="https://gcormi.forge.apps.education.fr/" target="_blank"
+                        class="hover:text-indigo-600 transition-colors">Portfolio Professionnel</a>
+                    <a href="#" class="hover:text-indigo-600 transition-colors">Contact</a>
+                </div>
+
+                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-300">
+                    Sous licence <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank"
+                        class="hover:underline">CC BY-NC 4.0</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
