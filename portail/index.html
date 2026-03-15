@@ -4,15 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portail d'Ingénierie Pédagogique - Suite d'outils IA au service de l'enseignant. Accessible et inclusif.">
     <title>Portail de l'Ingénierie Pédagogique | Ressources & Innovation</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -20,513 +19,2148 @@
             --primary-light: #eef2ff;
             --secondary: #0ea5e9;
             --accent: #f59e0b;
+            --text-scale: 1;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            background-image:
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.03) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.03) 0px, transparent 50%);
-            background-attachment: fixed;
+        /* ===================== DARK MODE VARIABLES ===================== */
+        html.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
         }
 
-        /* Abstract Background Decor */
-        .bg-decor {
+        html:not(.dark-mode) {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        /* ===================== DYSLEXIA MODE ===================== */
+        html.dyslexia-mode {
+            font-family: 'OpenDyslexic', sans-serif !important;
+            letter-spacing: 0.05em;
+            line-height: 1.8;
+        }
+
+        html.dyslexia-mode h1, 
+        html.dyslexia-mode h2, 
+        html.dyslexia-mode h3, 
+        html.dyslexia-mode h4 {
+            font-family: 'OpenDyslexic', sans-serif !important;
+        }
+
+        html.dyslexia-mode body {
+            background-color: #fef3e2 !important;
+        }
+
+        html.dyslexia-mode.dark-mode body {
+            background-color: #1a1410 !important;
+        }
+
+        /* ===================== SCROLL PROGRESS BAR ===================== */
+        #scroll-progress {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #4f46e5, #0ea5e9, #f59e0b);
+            z-index: 9999;
+            transition: width 0.1s linear;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* ===================== BODY & BACKGROUND ===================== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        html.dark-mode body {
+            background-image: none;
+        }
+
+        .bg-decor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             z-index: -1;
             overflow: hidden;
         }
-
         .decor-circle {
             position: absolute;
             border-radius: 50%;
             filter: blur(100px);
-            opacity: 0.3;
+            opacity: 0.25;
         }
 
-        h1,
-        h2,
-        h3,
-        h4 {
-            font-family: 'Outfit', sans-serif;
+        html.dark-mode .decor-circle {
+            opacity: 0.1;
         }
 
-        .card-soft {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
-            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
+
+        /* ===================== GLASS HEADER ===================== */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            z-index: 100;
+            transition: background-color 0.3s ease;
+        }
+
+        html.dark-mode .glass-header {
+            background: rgba(15, 23, 42, 0.82);
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
             position: relative;
+            color: var(--text-secondary);
         }
-
-        .card-soft::after {
+        .nav-link::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: inherit;
-            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
-            transition: all 0.5s ease;
-            z-index: -1;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
         }
+        .nav-link:hover::after { width: 100%; }
+        .nav-link:hover { color: var(--primary); }
+        .nav-link.active { color: var(--primary); }
+        .nav-link.active::after { width: 100%; }
 
-        .card-soft:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px -15px rgba(79, 70, 229, 0.15);
-            border-color: rgba(79, 70, 229, 0.2);
-            background: rgba(255, 255, 255, 0.9);
+        /* ===================== MOBILE MENU ===================== */
+        #mobile-menu {
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
         }
+        #mobile-menu.open { max-height: 500px; }
 
-        .category-pill {
-            font-size: 0.65rem;
+        /* ===================== SKIP TO CONTENT (Accessibilité) ===================== */
+        .skip-link {
+            position: absolute;
+            top: -40px; left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            z-index: 9999;
+            border-radius: 0 0 8px 0;
+            transition: top 0.2s;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 5px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            backdrop-filter: blur(4px);
+        }
+        .skip-link:focus { top: 0; }
+
+        /* ===================== ACCESSIBILITY TOOLBAR ===================== */
+        .accessibility-toolbar {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
         }
 
-        .keyword-tag {
-            font-size: 0.6rem;
-            font-weight: 600;
-            color: #475569;
-            background: rgba(241, 245, 249, 0.5);
-            padding: 3px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(226, 232, 240, 0.3);
-            white-space: nowrap;
+        .accessibility-toggle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
             transition: all 0.3s ease;
         }
 
-        .card-soft:hover .keyword-tag {
+        .accessibility-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+        }
+
+        .accessibility-toggle:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        .accessibility-menu {
             background: white;
-            border-color: var(--primary-light);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 280px;
+            animation: slideUp 0.3s ease;
         }
 
-        .fade-in-up {
-            animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        html.dark-mode .accessibility-menu {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
         }
 
-        @keyframes fadeInUp {
+        .accessibility-menu.active {
+            display: flex;
+        }
+
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(40px);
+                transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .glass-header {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            z-index: 100;
+        .accessibility-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
         }
 
-        .nav-link {
+        html.dark-mode .accessibility-control {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+
+        .accessibility-control:hover {
+            background: var(--primary-light);
+        }
+
+        .accessibility-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .accessibility-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .accessibility-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        html.dark-mode .accessibility-btn {
+            background: var(--bg-secondary);
+        }
+
+        .accessibility-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .accessibility-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .accessibility-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .accessibility-toggle-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .accessibility-toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ===================== CARDS ===================== */
+        .card-soft {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            color: var(--text-primary);
+        }
+
+        html.dark-mode .card-soft {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-soft:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px -12px rgba(79, 70, 229, 0.15);
+            border-color: rgba(79, 70, 229, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        html.dark-mode .card-soft:hover {
+            box-shadow: 0 24px 48px -12px rgba(79, 70, 229, 0.3);
+        }
+
+        .card-soft:focus-within {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Card hidden for filter */
+        .card-wrapper.hidden-filter {
+            display: none !important;
+        }
+
+        /* ===================== CATEGORY PILL ===================== */
+        .category-pill {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===================== KEYWORD TAGS ===================== */
+        .keyword-tag {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #475569;
+            background: rgba(241, 245, 249, 0.6);
+            padding: 3px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.4);
+            white-space: nowrap;
             transition: all 0.3s ease;
+        }
+
+        html.dark-mode .keyword-tag {
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+
+        .card-soft:hover .keyword-tag {
+            background: white;
+            border-color: rgba(79, 70, 229, 0.15);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        /* ===================== BADGE NOUVEAU ===================== */
+        .badge-new {
+            position: absolute;
+            top: 14px; right: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 3px 9px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); }
+            50% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6); }
+        }
+
+        /* ===================== ANIMATIONS ===================== */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-1 { transition-delay: 0.05s; }
+        .stagger-2 { transition-delay: 0.10s; }
+        .stagger-3 { transition-delay: 0.15s; }
+        .stagger-4 { transition-delay: 0.20s; }
+        .stagger-5 { transition-delay: 0.25s; }
+        .stagger-6 { transition-delay: 0.30s; }
+        .stagger-7 { transition-delay: 0.35s; }
+        .stagger-8 { transition-delay: 0.40s; }
+        .stagger-9 { transition-delay: 0.45s; }
+        .stagger-10 { transition-delay: 0.50s; }
+        .stagger-11 { transition-delay: 0.55s; }
+
+        /* ===================== HERO FLOATING BADGES ===================== */
+        .float-badge {
+            animation: float 4s ease-in-out infinite;
+            backdrop-filter: blur(12px);
+        }
+        .float-badge:nth-child(2) { animation-delay: 0.8s; }
+        .float-badge:nth-child(3) { animation-delay: 1.6s; }
+        .float-badge:nth-child(4) { animation-delay: 2.4s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===================== STATS ===================== */
+        .stat-card {
+            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        html.dark-mode .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px -8px rgba(79,70,229,0.12);
+        }
+
+        /* ===================== SEARCH BAR ===================== */
+        .search-container {
             position: relative;
         }
+        .search-container input {
+            width: 100%;
+            padding: 12px 20px 12px 48px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255,255,255,0.9);
+            font-size: calc(0.875rem * var(--text-scale));
+            font-weight: 500;
+            color: #334155;
+            transition: all 0.3s ease;
+            outline: none;
+        }
 
-        .nav-link:hover {
+        html.dark-mode .search-container input {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .search-container input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: white;
+        }
+
+        html.dark-mode .search-container input:focus {
+            background: var(--bg-secondary);
+        }
+
+        .search-container .search-icon {
+            position: absolute;
+            left: 16px; top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .search-container .clear-btn {
+            position: absolute;
+            right: 12px; top: 50%;
+            transform: translateY(-50%);
+            background: #e2e8f0;
+            border: none;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.65rem;
+            color: #64748b;
+            transition: background 0.2s;
+        }
+
+        html.dark-mode .search-container .clear-btn {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .search-container .clear-btn:hover { background: #cbd5e1; }
+        .search-container input:not(:placeholder-shown) ~ .clear-btn { display: flex; }
+
+        /* ===================== FILTER PILLS ===================== */
+        .filter-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+            color: #64748b;
+            border-color: rgba(226,232,240,0.8);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        html.dark-mode .filter-pill {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+        }
+
+        .filter-pill:hover {
+            border-color: var(--primary);
             color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        html.dark-mode .filter-pill:hover {
+            background: rgba(79, 70, 229, 0.2);
+        }
+
+        .filter-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+
+        .filter-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+        .filter-pill.active .filter-count { background: rgba(255,255,255,0.25); }
+
+        /* No results */
+        #no-results {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        /* ===================== BACK TO TOP ===================== */
+        #back-to-top {
+            position: fixed;
+            bottom: 32px; right: 32px;
+            width: 48px; height: 48px;
+            background: white;
+            border: 1.5px solid rgba(226,232,240,0.8);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            z-index: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            color: #4f46e5;
+        }
+
+        html.dark-mode #back-to-top {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--primary);
+        }
+
+        #back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #back-to-top:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 12px 32px rgba(79,70,229,0.3);
+            transform: translateY(-4px);
+        }
+
+        /* ===================== SECTION HEADER ===================== */
+        .section-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            border-radius: 20px;
+            padding: 2px 10px;
+            margin-left: 10px;
+        }
+
+        /* ===================== HERO CTA BUTTON ===================== */
+        .cta-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: calc(0.875rem * var(--text-scale));
+            box-shadow: 0 8px 24px rgba(79,70,229,0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(79,70,229,0.4);
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+        }
+        .cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: white;
+            color: #4f46e5;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: calc(0.875rem * var(--text-scale));
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1.5px solid rgba(79,70,229,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        html.dark-mode .cta-secondary {
+            background: var(--bg-secondary);
+            color: var(--primary);
+            border-color: var(--border-color);
+        }
+
+        .cta-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79,70,229,0.12);
+            border-color: rgba(79,70,229,0.3);
+        }
+
+        /* ===================== CARD CTA BUTTONS ===================== */
+        .card-cta-small {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: calc(0.75rem * var(--text-scale));
+            transition: all 0.3s ease;
+            border: 1.5px solid transparent;
+        }
+        .card-cta-small i { transition: transform 0.3s ease; }
+        .card-cta-small:hover i { transform: translateX(4px); }
+
+        /* ===================== FOCUS STYLES (Accessibilité) ===================== */
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        /* ===================== MODAL STYLES ===================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 1001;
+            color: var(--text-primary);
+        }
+
+        html.dark-mode .modal-content {
+            background: var(--bg-secondary);
+        }
+
+        .modal-overlay.active .modal-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            padding: 32px 32px 24px;
+            border-radius: 24px 24px 0 0;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .modal-header-content {
+            flex: 1;
+        }
+
+        .modal-header h2 {
+            font-size: calc(1.875rem * var(--text-scale));
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-header p {
+            font-size: 0.875rem;
+            opacity: 0.95;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 32px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: calc(0.95rem * var(--text-scale));
+        }
+
+        .modal-body h3 {
+            font-size: calc(1.25rem * var(--text-scale));
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 24px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body h3 i {
+            color: #4f46e5;
+            font-size: 1.1rem;
+        }
+
+        .modal-body p {
+            margin: 12px 0;
+            font-size: calc(0.95rem * var(--text-scale));
+            color: var(--text-secondary);
+        }
+
+        .modal-body ul {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .modal-body li {
+            margin: 8px 0;
+            color: var(--text-secondary);
+            font-size: calc(0.95rem * var(--text-scale));
+        }
+
+        .modal-body strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .modal-vision-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border-left: 4px solid #4f46e5;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        html.dark-mode .modal-vision-box {
+            background: rgba(79, 70, 229, 0.15);
+        }
+
+        .modal-pillar {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-pillar-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-pillar-content {
+            flex: 1;
+        }
+
+        .modal-pillar-content strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: calc(0.95rem * var(--text-scale));
+        }
+
+        .modal-pillar-content p {
+            margin: 0;
+            font-size: calc(0.875rem * var(--text-scale));
+            color: var(--text-secondary);
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            background: var(--bg-tertiary);
+            padding: 20px 32px;
+            border-radius: 0 0 24px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .modal-footer-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .modal-footer-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .modal-footer-link:hover {
+            color: #4338ca;
+            text-decoration: underline;
+        }
+
+        /* Scrollbar styling for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Philosophy button styling */
+        .philosophy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: calc(0.875rem * var(--text-scale));
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .philosophy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+        }
+
+        .philosophy-btn i {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-header {
+                padding: 24px 20px 16px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-footer {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .accessibility-toolbar {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            #back-to-top {
+                bottom: 16px;
+                right: 16px;
+            }
         }
     </style>
 </head>
 
 <body class="text-slate-700 antialiased flex flex-col min-h-screen">
 
+    <!-- Skip to content (Accessibilité) -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress" style="width: 0%"></div>
+
     <!-- Background Decor -->
-    <div class="bg-decor">
-        <div class="decor-circle bg-indigo-200 w-[600px] h-[600px] -top-96 -left-48"></div>
-        <div class="decor-circle bg-blue-100 w-[500px] h-[500px] bottom-0 -right-48"></div>
+    <div class="bg-decor" aria-hidden="true">
+        <div class="decor-circle bg-indigo-200 w-[700px] h-[700px] -top-96 -left-64"></div>
+        <div class="decor-circle bg-sky-100 w-[600px] h-[600px] bottom-0 -right-64"></div>
+        <div class="decor-circle bg-violet-100 w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
     </div>
 
-    <!-- Header Institutionnel -->
-    <header class="sticky top-0 glass-header border-b border-slate-100/50">
-        <div class="container mx-auto max-w-7xl px-6 py-5 flex justify-between items-center">
-            <div class="flex items-center gap-5">
-                <div
-                    class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-100 ring-4 ring-white">
-                    <i class="fas fa-graduation-cap text-xl"></i>
-                </div>
-                <div>
-                    <span class="block font-bold text-xl leading-none text-slate-900 uppercase tracking-tight">Portail
-                        de l'Ingénierie Pédagogique</span>
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Innovation & Biens
-                        Communs Numériques</span>
-                </div>
+    <!-- ============================== HEADER ============================== -->
+    <header class="sticky top-0 glass-header border-b border-slate-100/60 shadow-sm" role="banner">
+        <div class="container mx-auto max-w-7xl px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-4 group" aria-label="Portail de l'Ingénierie Pédagogique - Accueil">
+                    <div class="w-11 h-11 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100 ring-4 ring-white group-hover:scale-105 transition-transform">
+                        <i class="fas fa-graduation-cap text-lg" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <span class="block font-extrabold text-base leading-none text-slate-900 tracking-tight">Portail de l'Ingénierie Pédagogique</span>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 block">Innovation & Biens Communs Numériques</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center gap-8" aria-label="Navigation principale">
+                    <a href="#" class="nav-link active text-xs font-bold text-indigo-600 uppercase tracking-wide" aria-current="page">Hub de Solutions</a>
+                    <button id="philosophy-nav-btn" class="philosophy-btn text-xs">
+                        <i class="fas fa-book-open" aria-hidden="true"></i>
+                        Philosophie
+                    </button>
+                </nav>
+
+                <!-- Mobile Hamburger -->
+                <button id="hamburger" class="md:hidden flex flex-col gap-[5px] p-2 rounded-xl hover:bg-slate-100 transition-colors" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
             </div>
-            <nav class="hidden md:flex gap-10">
-                <a href="#"
-                    class="nav-link text-xs font-bold text-indigo-600 uppercase border-b-2 border-indigo-600 pb-1">Hub
-                    de Solutions</a>
-                <a href="https://gcormi.forge.apps.education.fr/frojet/philosophie_app.html" target="_blank"
-                    class="nav-link text-xs font-bold text-slate-500 uppercase tracking-wide">Philosophie du Projet</a>
-            </nav>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" role="navigation" aria-label="Menu mobile">
+                <nav class="pt-4 pb-2 flex flex-col gap-1 border-t border-slate-100/80 mt-3">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wide text-indigo-600 bg-indigo-50">
+                        <i class="fas fa-home w-4 text-center" aria-hidden="true"></i> Hub de Solutions
+                    </a>
+                    <button id="philosophy-mobile-btn" class="philosophy-btn w-full justify-center text-xs">
+                        <i class="fas fa-book-open" aria-hidden="true"></i> Philosophie du Projet
+                    </button>
+                    <a href="mailto:gilles@gcormi.fr" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wide text-slate-600 hover:bg-slate-50 transition-colors">
+                        <i class="fas fa-envelope w-4 text-center" aria-hidden="true"></i> Contact
+                    </a>
+                </nav>
+            </div>
         </div>
     </header>
 
-    <main class="container mx-auto max-w-7xl px-6 py-16 flex-grow">
-
-        <!-- En-tête Principal -->
-        <div class="mb-20 fade-in-up">
-            <div class="flex items-center gap-3 text-indigo-500 font-bold text-xs uppercase tracking-[0.2em] mb-4">
-                <span class="w-12 h-[2px] bg-indigo-200"></span>
-                Espace Ressources
+    <!-- ============================== ACCESSIBILITY TOOLBAR ============================== -->
+    <div class="accessibility-toolbar" role="region" aria-label="Barre d'accessibilité">
+        <button id="accessibility-toggle" class="accessibility-toggle" aria-label="Ouvrir les options d'accessibilité" aria-expanded="false" aria-controls="accessibility-menu" title="Options d'accessibilité (Alt + A)">
+            <i class="fas fa-universal-access" aria-hidden="true"></i>
+        </button>
+        <div id="accessibility-menu" class="accessibility-menu" role="menu">
+            <div class="accessibility-control">
+                <span class="accessibility-label">Thème sombre</span>
+                <button id="dark-mode-toggle" class="accessibility-toggle-btn" aria-label="Basculer le thème sombre" aria-pressed="false">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span id="dark-mode-status">Désactivé</span>
+                </button>
             </div>
-            <h1 class="text-5xl font-black text-slate-900 mb-8 tracking-tight leading-tight">
-                Architecturer l'Apprentissage <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">avec
-                    l'Intelligence Artificielle</span>
-            </h1>
-            <p class="text-xl text-slate-500 max-w-3xl leading-relaxed font-medium">
-                Un écosystème d'outils ouverts pour optimiser la préparation, favoriser l'inclusion et engager vos
-                élèves par le design et le jeu.
-            </p>
-            <div class="mt-10 flex gap-6">
-                <a href="https://gcormi.forge.apps.education.fr/frojet/philosophie_app.html" target="_blank"
-                    class="inline-flex items-center gap-3 px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold text-sm shadow-sm border border-slate-100 hover:shadow-md transition-all">
-                    <i class="fas fa-book-open"></i>
-                    Lire le Manifeste
-                </a>
+
+            <div class="accessibility-control">
+                <span class="accessibility-label">Mode dyslexie</span>
+                <button id="dyslexia-toggle" class="accessibility-toggle-btn" aria-label="Basculer le mode dyslexie" aria-pressed="false">
+                    <i class="fas fa-font" aria-hidden="true"></i>
+                    <span id="dyslexia-status">Désactivé</span>
+                </button>
+            </div>
+
+            <div class="accessibility-control">
+                <span class="accessibility-label">Taille du texte</span>
+                <div class="accessibility-buttons">
+                    <button id="text-size-decrease" class="accessibility-btn" aria-label="Diminuer la taille du texte">−</button>
+                    <span id="text-size-display" class="accessibility-btn" style="cursor: default; border: none; background: none;">100%</span>
+                    <button id="text-size-increase" class="accessibility-btn" aria-label="Augmenter la taille du texte">+</button>
+                    <button id="text-size-reset" class="accessibility-btn" aria-label="Réinitialiser la taille du texte" title="Réinitialiser">↻</button>
+                </div>
+            </div>
+
+            <button id="accessibility-reset" class="accessibility-toggle-btn" aria-label="Réinitialiser tous les paramètres d'accessibilité">
+                <i class="fas fa-redo" aria-hidden="true"></i>
+                <span>Réinitialiser tout</span>
+            </button>
+
+            <a href="#accessibility-help" class="accessibility-toggle-btn" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+                <span>Aide</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ============================== MAIN ============================== -->
+    <main id="main-content" class="container mx-auto max-w-7xl px-6 py-14 flex-grow">
+
+        <!-- ===== HERO ===== -->
+        <div class="mb-16 fade-in-up relative">
+
+            <!-- Floating badges (décoratif) -->
+            <div class="hidden lg:flex absolute right-0 top-0 flex-col gap-4 items-end pointer-events-none" aria-hidden="true">
+                <div class="float-badge bg-white/80 border border-indigo-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
+                    <div class="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-microchip text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">IA Générative</div>
+                        <div class="text-xs font-bold text-slate-800">Conception pédagogique</div>
+                    </div>
+                </div>
+                <div class="float-badge bg-white/80 border border-emerald-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
+                    <div class="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+                        <i class="fas fa-universal-access text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Accessibilité</div>
+                        <div class="text-xs font-bold text-slate-800">DYS / TDAH / Inclusion</div>
+                    </div>
+                </div>
+                <div class="float-badge bg-white/80 border border-amber-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
+                    <div class="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
+                        <i class="fas fa-gamepad text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Gamification</div>
+                        <div class="text-xs font-bold text-slate-800">Jeux & Escape games</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 rounded-full px-4 py-2 mb-6">
+                    <span class="w-2 h-2 bg-indigo-600 rounded-full"></span>
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Bienvenue sur le portail</span>
+                </div>
+
+                <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-tight tracking-tight">
+                    Ingénierie Pédagogique <span class="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">Augmentée</span>
+                </h1>
+
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    Découvrez une suite complète d'outils IA au service de la conception pédagogique. Créez des ressources engageantes, accessibles et professionnelles en quelques clics.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="cta-primary">
+                        <i class="fas fa-sparkles" aria-hidden="true"></i>
+                        <span>Explorer les outils</span>
+                    </button>
+                    <button id="hero-philosophy-btn" class="cta-secondary">
+                        <i class="fas fa-book-open" aria-hidden="true"></i>
+                        <span>Découvrir la philosophie</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Section 1 : Outils Majeurs -->
-        <section class="mb-24 fade-in-up" style="animation-delay: 0.2s;">
-            <div class="flex items-center gap-3 mb-10">
-                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Solutions Structurantes</h2>
-                <div class="h-px flex-grow bg-slate-100"></div>
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 fade-in-up">
+            <div class="stat-card rounded-2xl p-8 text-center">
+                <div class="text-3xl font-extrabold text-indigo-600 mb-2"><span class="counter">13</span></div>
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Outils Disponibles</div>
+            </div>
+            <div class="stat-card rounded-2xl p-8 text-center">
+                <div class="text-3xl font-extrabold text-emerald-600 mb-2"><span class="counter">100</span>%</div>
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Gratuit & Libre</div>
+            </div>
+            <div class="stat-card rounded-2xl p-8 text-center">
+                <div class="text-3xl font-extrabold text-amber-600 mb-2"><span class="counter">5</span></div>
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Piliers Philosophiques</div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Section -->
+        <section class="mb-12 fade-in-up">
+            <div class="mb-8">
+                <div class="search-container mb-6">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text" id="search-input" placeholder="Rechercher un outil..." aria-label="Rechercher un outil">
+                    <button class="clear-btn" id="clear-search" aria-label="Effacer la recherche"></button>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-pill active" data-filter="all">
+                        <i class="fas fa-th-large text-xs" aria-hidden="true"></i>
+                        Tous les outils
+                    </button>
+                    <button class="filter-pill" data-filter="ia">
+                        <i class="fas fa-microchip text-xs" aria-hidden="true"></i>
+                        IA & Génération
+                    </button>
+                    <button class="filter-pill" data-filter="creation">
+                        <i class="fas fa-palette text-xs" aria-hidden="true"></i>
+                        Création
+                    </button>
+                    <button class="filter-pill" data-filter="inclusion">
+                        <i class="fas fa-universal-access text-xs" aria-hidden="true"></i>
+                        Accessibilité
+                    </button>
+                    <button class="filter-pill" data-filter="jeu">
+                        <i class="fas fa-gamepad text-xs" aria-hidden="true"></i>
+                        Jeux & Ludification
+                    </button>
+                    <button class="filter-pill" data-filter="export">
+                        <i class="fas fa-download text-xs" aria-hidden="true"></i>
+                        Export & LMS
+                    </button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Assistant Pédagogique -->
-                <article class="card-soft rounded-3xl p-10 flex flex-col h-full relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16"></div>
-                    <div class="flex justify-between items-start mb-8 relative">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-xl shadow-indigo-100">
-                            <i class="fas fa-microchip"></i>
+            <!-- Cards Grid -->
+            <div class="cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- 1. Assistant de Conception -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper"
+                         data-category="ia"
+                         data-name="Assistant Conception Pédagogique IA Cours Séquences"
+                         aria-label="Assistant de Conception">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                            <i class="fas fa-microchip" aria-hidden="true"></i>
                         </div>
-                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100">IA Génératrice
-                            & Didactique</span>
+                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100/60">
+                            <i class="fas fa-wand-magic-sparkles text-[9px]" aria-hidden="true"></i> IA Générative
+                        </span>
                     </div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Assistant de Conception Pédagogique</h3>
-                    <p class="text-slate-500 mb-6 leading-relaxed">
-                        Optimisez votre temps de préparation. Notre assistant intelligent analyse vos objectifs pour
-                        générer des séquences pédagogiques cohérentes, des activités différenciées et des supports de
-                        cours structurés. Parfaitement intégré à l'ENT pour une diffusion immédiate.
-                    </p>
-                    <div class="flex flex-wrap gap-2 mb-8 mt-auto">
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Assistant de Conception</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Concevez des cours complets avec l'IA. Structuration pédagogique, génération de séquences et activités adaptées à votre niveau et discipline.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">IA Générative</span>
-                        <span class="keyword-tag">Séquences</span>
-                        <span class="keyword-tag">Didactique</span>
-                        <span class="keyword-tag">ENT</span>
-                        <span class="keyword-tag">Gain de temps</span>
+                        <span class="keyword-tag">Conception</span>
+                        <span class="keyword-tag">Pédagogie</span>
                     </div>
-                    <div class="pt-8 border-t border-slate-50">
-                        <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank"
-                            class="group flex items-center justify-between bg-slate-900 hover:bg-indigo-600 text-white px-6 py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02]">
-                            Lancer l'application
-                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </a>
-                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank" rel="noopener"
+                       class="card-cta-small bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-500 hover:text-white hover:border-indigo-500">
+                        <span>Lancer l'assistant</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
                 </article>
 
-                <!-- Technologie Master -->
-                <article
-                    class="card-soft rounded-3xl p-10 flex flex-col h-full relative overflow-hidden text-slate-900">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16"></div>
-                    <div class="flex justify-between items-start mb-8 relative">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-blue-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-blue-100">
-                            <i class="fas fa-laptop-code"></i>
+                <!-- 2. Master Technologie -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-2 card-wrapper"
+                         data-category="ia,creation"
+                         data-name="Master Technologie Cours Complet Ressources Pédagogiques"
+                         aria-label="Master Technologie">
+                    <span class="badge-new">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-lg">
+                            <i class="fas fa-laptop-code" aria-hidden="true"></i>
                         </div>
-                        <span class="category-pill bg-blue-50 text-blue-600 border border-blue-100">Expertise
-                            Disciplinaire</span>
+                        <span class="category-pill bg-blue-50 text-blue-600 border border-blue-100/60">
+                            <i class="fas fa-graduation-cap text-[9px]" aria-hidden="true"></i> Disciplinaire
+                        </span>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Générateur Master Technologie</h3>
-                    <p class="text-slate-500 mb-6 leading-relaxed">
-                        L'outil ultime pour les enseignants de technologie. Intègre les référentiels Pix/CRCN, permet le
-                        clonage de design visuel et propose des exports multi-formats (Word, PDF, HTML, Markdown) pour
-                        une flexibilité pédagogique totale.
-                    </p>
-                    <div class="flex flex-wrap gap-2 mb-8 mt-auto">
-                        <span class="keyword-tag">Techno</span>
-                        <span class="keyword-tag">Pix/CRCN</span>
-                        <span class="keyword-tag">Clonage Design</span>
-                        <span class="keyword-tag">Multi-formats</span>
-                        <span class="keyword-tag">Rigueur</span>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Master Technologie</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Cours complets de technologie du collège au lycée. Ressources structurées, activités prêtes à l'emploi et évaluations alignées aux programmes.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Technologie</span>
+                        <span class="keyword-tag">Collège/Lycée</span>
+                        <span class="keyword-tag">Complet</span>
                     </div>
-                    <div class="pt-8 border-t border-slate-50">
-                        <a href="https://gcormi.forge.apps.education.fr/frojet/technologie_master.html" target="_blank"
-                            class="group flex items-center justify-between bg-slate-900 hover:bg-blue-500 text-white px-6 py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02]">
-                            Lancer le Master Tech
-                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </a>
-                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/technologie_master.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-500 hover:text-white hover:border-blue-500">
+                        <span>Accéder au cours</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
                 </article>
-            </div>
-        </section>
 
-        <!-- Section 2 : Workshop et Spécialités -->
-        <section class="fade-in-up" style="animation-delay: 0.4s;">
-            <div class="flex items-center gap-3 mb-10">
-                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Atelier de Création & Spécialités</h2>
-                <div class="h-px flex-grow bg-slate-100"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Inclusion IA -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
-                    <div class="category-pill bg-emerald-50 text-emerald-600 mb-4 w-fit">Accessibilité & DYS</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Adaptation Inclusive (Complet)</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">L'accessibilité au cœur du cours. Propose des
-                        remediations visuelles avancées, polices spécifiques et modes de concentration haute-fidélité
-                        pour les besoins particuliers.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
-                        <span class="keyword-tag">DYS/TDAH</span>
+                <!-- 3. Adaptation Inclusive -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-3 card-wrapper"
+                         data-category="inclusion"
+                         data-name="Adaptation Inclusive DYS TDAH Accessibilité Ressources"
+                         aria-label="Adaptation Inclusive">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">
+                            <i class="fas fa-universal-access" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-emerald-50 text-emerald-600 border border-emerald-100/60">
+                            <i class="fas fa-heart text-[9px]" aria-hidden="true"></i> Inclusion
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Adaptation Inclusive</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Adaptez vos ressources pour les élèves DYS, TDAH et en situation de handicap. Mise en page accessible, polices adaptées, formats inclusifs.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">DYS</span>
+                        <span class="keyword-tag">TDAH</span>
                         <span class="keyword-tag">Accessibilité</span>
-                        <span class="keyword-tag">Remédiation</span>
-                        <span class="keyword-tag">Dyslexie</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 rounded-xl font-bold text-xs transition-colors">
-                        Ouvrir le Studio
+                    <a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank" rel="noopener"
+                       class="card-cta-small bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-500 hover:text-white hover:border-emerald-500">
+                        <span>Adapter vos ressources</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- EduSlide -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
-                    <div class="category-pill bg-pink-50 text-pink-600 mb-4 w-fit">Diaporamas & Visuels</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">EduSlide Studio</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Articulez vos sources vers NotebookLM.
-                        Transformez documents et liens web en diaporamas visuels impactants avec 13 styles artistiques
-                        au choix.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
-                        <span class="keyword-tag">Diaporamas</span>
-                        <span class="keyword-tag">NotebookLM</span>
-                        <span class="keyword-tag">IA Visuelle</span>
-                        <span class="keyword-tag">Slides</span>
+                <!-- 4. Éditeur HTML Visuel -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-4 card-wrapper"
+                         data-category="creation"
+                         data-name="Éditeur HTML Visuel WYSIWYG Mise en Page Design"
+                         aria-label="Éditeur HTML Visuel">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-pink-600 text-lg">
+                            <i class="fas fa-code" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-pink-50 text-pink-600 border border-pink-100/60">
+                            <i class="fas fa-pen-fancy text-[9px]" aria-hidden="true"></i> Édition
+                        </span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/eduslide/eduslide.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-pink-600 rounded-xl font-bold text-xs transition-colors">
-                        Accéder
-                    </a>
-                </article>
-
-                <!-- Atelier d'Amélioration DOCX -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
-                    <div class="category-pill bg-blue-50 text-blue-600 mb-4 w-fit">Enrichissement</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Améliorateur de Cours DOCX</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Améliorez vos cours existants. Collez votre
-                        texte brut pour y injecter dynamiquement des vidéos, images, audios et sections d'évaluations
-                        auto-générées.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
-                        <span class="keyword-tag">Enrichissement</span>
-                        <span class="keyword-tag">Médias</span>
-                        <span class="keyword-tag">Quiz Auto</span>
-                        <span class="keyword-tag">DOCX</span>
-                    </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/ameliorer_docx.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl font-bold text-xs transition-colors">
-                        Enrichir un document
-                    </a>
-                </article>
-
-                <!-- Boîte à Outils -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-indigo-100">
-                    <div class="category-pill bg-slate-50 text-slate-600 mb-4 w-fit">Multi-usages</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Boîte à Outils Enseignant</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Espace polyvalent de conversion et de
-                        traitement : PDF/DOCX vers HTML, édition de texte et utilitaires rapides pour le quotidien.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
-                        <span class="keyword-tag">Conversion</span>
-                        <span class="keyword-tag">PDF/HTML</span>
-                        <span class="keyword-tag">Prompts</span>
-                        <span class="keyword-tag">Outils</span>
-                    </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/boite.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition-colors">
-                        Ouvrir
-                    </a>
-                </article>
-
-                <!-- Mon Atelier Web : Visual Studio -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
-                    <div class="category-pill bg-teal-50 text-teal-600 mb-4 w-fit">Édition Visuelle</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Atelier Web : Visual Studio</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Éditeur HTML WYSIWYG avancé. Modifiez vos
-                        ressources comme dans un traitement de texte, gérez vos images par lot et téléchargez votre site
-                        complet en un clic.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Éditeur HTML Visuel</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Créez des pages HTML sans coder. Interface WYSIWYG intuitive avec templates professionnels et composants réutilisables.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">HTML</span>
                         <span class="keyword-tag">WYSIWYG</span>
-                        <span class="keyword-tag">Éditeur Visuel</span>
-                        <span class="keyword-tag">Images Batch</span>
-                        <span class="keyword-tag">Export ZIP</span>
+                        <span class="keyword-tag">Design</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/integrateur-visuel.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-teal-50 text-slate-600 hover:text-teal-600 rounded-xl font-bold text-xs transition-colors">
-                        Modifier vos pages
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/editeur_html.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-pink-50 text-pink-700 border-pink-100 hover:bg-pink-500 hover:text-white hover:border-pink-500">
+                        <span>Ouvrir l'éditeur</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- LudoTech -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
-                    <div class="category-pill bg-amber-50 text-amber-600 mb-4 w-fit">Ludification</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">LudoTech Engine</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">La pédagogie par le jeu. Transformez vos
-                        contenus en parcours ludiques interactifs. Génère des mécaniques de jeux de l'oie numériques
-                        personnalisées.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                <!-- 5. Générateur d'Exercices Visuels -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-5 card-wrapper"
+                         data-category="creation,ia"
+                         data-name="Générateur Exercices Visuels PNG Images Évaluation"
+                         aria-label="Générateur d'Exercices Visuels">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-lg">
+                            <i class="fas fa-image" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-red-50 text-red-600 border border-red-100/60">
+                            <i class="fas fa-star text-[9px]" aria-hidden="true"></i> Exercices
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Générateur d'Exercices Visuels</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Créez des exercices visuels au format PNG. Idéal pour Création Assistée Léia, impression ou intégration dans vos supports.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Exercices</span>
+                        <span class="keyword-tag">PNG</span>
+                        <span class="keyword-tag">Visuels</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateurexercice.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-red-50 text-red-700 border-red-100 hover:bg-red-500 hover:text-white hover:border-red-500">
+                        <span>Générer des exercices</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 6. LudoTech Engine -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-6 card-wrapper"
+                         data-category="jeu,ia"
+                         data-name="LudoTech Engine Pédagogie Jeu Ludification Interactif"
+                         aria-label="LudoTech Engine">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-lg">
+                            <i class="fas fa-dice" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-amber-50 text-amber-600 border border-amber-100/60">
+                            <i class="fas fa-gamepad text-[9px]" aria-hidden="true"></i> Ludification
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">LudoTech Engine</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">La pédagogie par le jeu. Transformez vos contenus en parcours ludiques interactifs. Génère des mécaniques de jeux de l'oie numériques personnalisées.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">Ludification</span>
                         <span class="keyword-tag">Jeux</span>
                         <span class="keyword-tag">Interactif</span>
                         <span class="keyword-tag">Engagement</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded-xl font-bold text-xs transition-colors">
-                        Créer un jeu
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-500 hover:text-white hover:border-amber-500">
+                        <span>Créer un jeu</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- Lecture Facile -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full">
-                    <div class="category-pill bg-sky-50 text-sky-600 mb-4 w-fit">Accessibilité Rapide</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Lecteur Adaptatif (Léger)</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Accompagnement à la lecture fluide. Propose
-                        une interface épurée avec lecture bionique, synthèse vocale et aides visuelles à la
-                        concentration.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                <!-- 7. Lecteur Adaptatif -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-7 card-wrapper"
+                         data-category="inclusion"
+                         data-name="Lecteur Adaptatif Léger Lecture Bionique Audio Focus Inclusion"
+                         aria-label="Lecteur Adaptatif">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-lg">
+                            <i class="fas fa-book-reader" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-sky-50 text-sky-600 border border-sky-100/60">
+                            <i class="fas fa-eye text-[9px]" aria-hidden="true"></i> Accessibilité Rapide
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Lecteur Adaptatif <span class="text-sky-500 text-xs font-bold">(Léger)</span></h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Accompagnement à la lecture fluide. Propose une interface épurée avec lecture bionique, synthèse vocale et aides visuelles à la concentration.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">Lecture Bionique</span>
                         <span class="keyword-tag">Audio</span>
                         <span class="keyword-tag">Focus</span>
                         <span class="keyword-tag">Inclusion</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/lecturefacile/lecturefacile.html"
-                        target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 rounded-xl font-bold text-xs transition-colors">
-                        Lancer le lecteur
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/lecturefacile/lecturefacile.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-sky-50 text-sky-700 border-sky-100 hover:bg-sky-500 hover:text-white hover:border-sky-500">
+                        <span>Lancer le lecteur</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- Illustrateur IA -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-purple-100">
-                    <div class="category-pill bg-purple-50 text-purple-600 mb-4 w-fit">Visuels IA</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Studio d'Illustration Pro</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Planifiez et générez l'intégralité des
-                        visuels de votre cours en un lot. Assure une cohérence stylistique professionnelle pour vos
-                        documents.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                <!-- 8. Studio d'Illustration IA -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-8 card-wrapper"
+                         data-category="ia,creation"
+                         data-name="Studio Illustration Pro Images IA Cohérence Style Batch Prompts"
+                         aria-label="Studio d'Illustration Pro">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-lg">
+                            <i class="fas fa-paint-brush" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-purple-50 text-purple-600 border border-purple-100/60">
+                            <i class="fas fa-image text-[9px]" aria-hidden="true"></i> Visuels IA
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Studio d'Illustration Pro</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Planifiez et générez l'intégralité des visuels de votre cours en un lot. Assure une cohérence stylistique professionnelle pour vos documents.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">Images IA</span>
                         <span class="keyword-tag">Cohérence Style</span>
                         <span class="keyword-tag">Batch Prompts</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/illustrateur_ia.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-purple-50 text-slate-600 hover:text-purple-600 rounded-xl font-bold text-xs transition-colors">
-                        Créer des visuels
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/illustrateur_ia.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-500 hover:text-white hover:border-purple-500">
+                        <span>Créer des visuels</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- Escape Game -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-orange-100">
-                    <div class="category-pill bg-orange-50 text-orange-600 mb-4 w-fit">Évaluation Ludique</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Générateur Serious Games</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Transformez vos cours en escape games
-                        interactifs. Générateur de prompts complexes pour créer des activités HTML autonomes et
-                        captivantes.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                <!-- 9. Générateur Serious Games -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-9 card-wrapper"
+                         data-category="jeu,ia"
+                         data-name="Générateur Serious Games Escape Game Scénario IA HTML Autonome"
+                         aria-label="Générateur Serious Games">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-lg">
+                            <i class="fas fa-puzzle-piece" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-orange-50 text-orange-600 border border-orange-100/60">
+                            <i class="fas fa-star text-[9px]" aria-hidden="true"></i> Évaluation Ludique
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Générateur Serious Games</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Transformez vos cours en escape games interactifs. Générateur de prompts complexes pour créer des activités HTML autonomes et captivantes.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">Escape Game</span>
                         <span class="keyword-tag">Scénario IA</span>
                         <span class="keyword-tag">HTML Autonome</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/escapegame.html" target="_blank"
-                        class="mt-auto inline-flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl font-bold text-xs transition-colors">
-                        Générer un jeu
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/escapegame.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-orange-50 text-orange-700 border-orange-100 hover:bg-orange-500 hover:text-white hover:border-orange-500">
+                        <span>Générer un jeu</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- SCORM Lab -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-dashed">
-                    <div class="category-pill bg-slate-100 text-slate-600 mb-4 w-fit">Lab / LMS</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">SCORM Lab & Activités</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Exportation de contenus au format standard
-                        SCORM pour Moodle ou Éléa. Création d'activités interactives structurées pour votre LMS.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                <!-- 10. SCORM Lab -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-10 card-wrapper"
+                         data-category="export"
+                         data-name="SCORM Lab Activités Moodle Éléa LMS Standard"
+                         aria-label="SCORM Lab & Activités">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 text-lg">
+                            <i class="fas fa-layer-group" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-slate-100 text-slate-500 border border-slate-200/60">
+                            <i class="fas fa-flask text-[9px]" aria-hidden="true"></i> Lab / LMS
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">SCORM Lab & Activités</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Exportation de contenus au format standard SCORM pour Moodle ou Éléa. Création d'activités interactives structurées pour votre LMS.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">SCORM</span>
                         <span class="keyword-tag">Moodle/Éléa</span>
                         <span class="keyword-tag">LMS</span>
                         <span class="keyword-tag">Standard</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateuractivite/generateuract.html"
-                        target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-200 transition-colors">
-                        Zone de Test
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateuractivite/generateuract.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-600 hover:text-white hover:border-slate-600">
+                        <span>Zone de Test</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- LinkedIn Assistant -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full border-dashed">
-                    <div class="category-pill bg-slate-100 text-slate-600 mb-4 w-fit">Diffusion</div>
-                    <h4 class="text-lg font-bold text-slate-900 mb-3">Assistant de Diffusion</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Valorisez vos travaux. Rédigez des
-                        publications impactantes pour les réseaux professionnels basées sur vos réalisations
-                        pédagogiques.</p>
-                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                <!-- 11. Assistant de Diffusion -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-11 card-wrapper"
+                         data-category="diffusion"
+                         data-name="Assistant Diffusion LinkedIn Valorisation Réseaux Pro"
+                         aria-label="Assistant de Diffusion">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 text-lg">
+                            <i class="fab fa-linkedin" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-slate-100 text-slate-500 border border-slate-200/60">
+                            <i class="fas fa-bullhorn text-[9px]" aria-hidden="true"></i> Diffusion
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Assistant de Diffusion</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Valorisez vos travaux. Rédigez des publications impactantes pour les réseaux professionnels basées sur vos réalisations pédagogiques.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">LinkedIn</span>
                         <span class="keyword-tag">Valorisation</span>
                         <span class="keyword-tag">Réseaux Pro</span>
                     </div>
-                    <a href="https://gcormi.forge.apps.education.fr/frojet/linkedIn/Linkedin.html" target="_blank"
-                        class="inline-flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-200 transition-colors">
-                        Lancer
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/linkedIn/Linkedin.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-slate-100 text-slate-600 border-slate-200 hover:bg-[#0077b5] hover:text-white hover:border-[#0077b5]">
+                        <span>Lancer</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
+
+            </div><!-- end cards-grid -->
+
+            <!-- No results message -->
+            <div id="no-results" class="text-center py-20">
+                <i class="fas fa-search text-5xl text-slate-300 mb-4 block" aria-hidden="true"></i>
+                <p class="text-slate-500 font-medium">Aucun outil ne correspond à votre recherche.</p>
             </div>
+
         </section>
+
     </main>
 
-    <!-- FooterInstitutionnel -->
-    <footer class="bg-white border-t border-slate-100 py-12 mt-20">
-        <div class="container mx-auto max-w-7xl px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 text-slate-400">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-slate-100 rounded flex items-center justify-center text-slate-400">
-                        <i class="fas fa-cubes"></i>
+    <!-- ============================== FOOTER ============================== -->
+    <footer class="footer-gradient border-t border-slate-100 mt-20">
+        <div class="container mx-auto max-w-7xl px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center text-white">
+                            <i class="fas fa-graduation-cap text-sm" aria-hidden="true"></i>
+                        </div>
+                        <span class="font-extrabold text-slate-900">Portail IA</span>
                     </div>
-                    <span class="text-sm font-bold tracking-tight">Gilles Cormi <span
-                            class="text-slate-200 mx-2">|</span> Ingénierie Pédagogique</span>
+                    <p class="text-sm text-slate-500 leading-relaxed">Ingénierie pédagogique augmentée pour les enseignants. Suite d'outils libres et gratuits.</p>
                 </div>
 
-                <div class="flex gap-8 text-sm font-bold uppercase tracking-widest">
-                    <a href="https://gcormi.forge.apps.education.fr/" target="_blank"
-                        class="hover:text-indigo-600 transition-colors">Portfolio Professionnel</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors">Contact</a>
+                <!-- Ressources -->
+                <div>
+                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-5">Ressources</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <button id="footer-philosophy-btn" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-book-open text-xs text-slate-300" aria-hidden="true"></i> Philosophie du Projet
+                            </button>
+                        </li>
+                        <li>
+                            <a href="mailto:gilles@gcormi.fr" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-envelope text-xs text-slate-300" aria-hidden="true"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                    Sous licence <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank"
-                        class="hover:underline">CC BY-NC 4.0</a>
+                <!-- Outils vedettes -->
+                <div>
+                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-5">Outils phares</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-microchip text-xs text-indigo-300" aria-hidden="true"></i> Assistant de Conception
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/frojet/technologie_master.html" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-laptop-code text-xs text-blue-300" aria-hidden="true"></i> Master Technologie
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-universal-access text-xs text-emerald-300" aria-hidden="true"></i> Adaptation Inclusive
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-dice text-xs text-amber-300" aria-hidden="true"></i> LudoTech Engine
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Bottom footer -->
+            <div class="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400">
+                <div class="text-xs font-bold tracking-tight">
+                    © 2026 Gilles Cormi · Ingénierie Pédagogique
+                </div>
+                <div class="text-[10px] font-bold uppercase tracking-widest">
+                    Sous licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="hover:text-indigo-500 transition-colors underline decoration-dotted">CC BY-NC-ND 4.0</a>
                 </div>
             </div>
         </div>
     </footer>
 
-</body>
+    <!-- Back to Top Button -->
+    <button id="back-to-top" aria-label="Retour en haut de page" title="Retour en haut">
+        <i class="fas fa-arrow-up text-sm" aria-hidden="true"></i>
+    </button>
 
+    <!-- Toast -->
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ============================== MODAL: PHILOSOPHIE DU PROJET ============================== -->
+    <div id="philosophy-modal" class="modal-overlay">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <h2>Philosophie du Projet</h2>
+                    <p>Vision d'une suite d'outils au service de l'enseignant</p>
+                </div>
+                <button class="modal-close-btn" aria-label="Fermer la modale" id="modal-close">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="modal-vision-box">
+                    <strong>Vision centrale :</strong> Démocratiser l'accès à des ressources pédagogiques de qualité professionnelle en mettant l'intelligence artificielle au service de l'enseignant, sans jamais le remplacer. L'IA n'est pas le pédagogue : <em>elle est l'assistant qui prépare le terrain, l'enseignant reste l'architecte</em>.
+                </div>
+
+                <h3><i class="fas fa-lightbulb"></i> Genèse & Contexte</h3>
+                <p>L'Assistant Pédagogique Moderne est né d'une observation terrain : les enseignants manquent de temps pour créer des supports pédagogiques variés, adaptés et esthétiquement engageants. Face à l'émergence des IA génératives, il devenait urgent de concevoir une <strong>interface de médiation</strong> entre ces outils puissants mais complexes et les besoins concrets de l'enseignant.</p>
+                <p>Plutôt que de se perdre dans des prompts mal structurés ou de produire du contenu générique, cette suite d'outils propose une <strong>ingénierie pédagogique encapsulée</strong> : chaque générateur intègre les bonnes pratiques didactiques, les référentiels officiels (programmes de l'Éducation Nationale) et une exigence de qualité alignée sur celle d'un éditeur scolaire.</p>
+
+                <h3><i class="fas fa-columns"></i> Les Cinq Piliers Philosophiques</h3>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🎯</div>
+                    <div class="modal-pillar-content">
+                        <strong>L'enseignant au centre</strong>
+                        <p>L'outil ne génère jamais de contenu "clé en main" sans validation humaine. Il produit des prompts structurés ou des bases de travail que l'enseignant enrichit, adapte et valide.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">⚡</div>
+                    <div class="modal-pillar-content">
+                        <strong>Gain de temps, pas de qualité perdue</strong>
+                        <p>L'automatisation vise les tâches chronophages (structuration, mise en page, diversité de formats), libérant du temps pour la personnalisation et l'innovation pédagogique.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🔄</div>
+                    <div class="modal-pillar-content">
+                        <strong>Flexibilité & Diversité</strong>
+                        <p>Un même contenu peut être décliné en cours DOCX, page HTML interactive, exercice Moodle XML, infographie visuelle ou jeu pédagogique, selon le besoin et le public.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🌐</div>
+                    <div class="modal-pillar-content">
+                        <strong>Compatibilité ENT</strong>
+                        <p>Intégration facilitée avec les Environnements Numériques de Travail : exports prêts à l'emploi pour outils de création assistée (PNG), Tests Moodle (XML), ou pages HTML interactives.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🎨</div>
+                    <div class="modal-pillar-content">
+                        <strong>Esthétique & Engagement</strong>
+                        <p>Refus des interfaces austères. Chaque générateur embarque des principes de design moderne (palettes de couleurs, typographie soignée, animations CSS) pour produire des supports qui donnent envie.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">📚</div>
+                    <div class="modal-pillar-content">
+                        <strong>Rigueur Pédagogique</strong>
+                        <p>Alignement strict sur les programmes officiels, intégration du Socle Commun, structuration par compétences. L'IA est guidée pour produire des contenus conformes aux exigences institutionnelles.</p>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-sitemap"></i> Architecture de l'Écosystème</h3>
+                <p>L'application se décompose en <strong>quatre familles fonctionnelles complémentaires</strong> :</p>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">📖</div>
+                    <div class="modal-pillar-content">
+                        <strong>A. Générateurs de Cours Disciplinaires</strong>
+                        <p>Sciences (Technologie, SVT, Physique-Chimie, Mathématiques), Sciences Humaines (Histoire, Géographie, EMC), Langues & Arts (Français, Anglais, Espagnol, Italien, LCC, Arts Plastiques, Éducation Musicale), Lycée (SNT, SES)</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🛠️</div>
+                    <div class="modal-pillar-content">
+                        <strong>B. Boîte à Outils (Édition & Conversion)</strong>
+                        <p>Éditeur visuel HTML (WYSIWYG), Amélioration de design HTML via prompt, Amélioration de textes DOCX via IA, Convertisseur HTML → PDF</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🎮</div>
+                    <div class="modal-pillar-content">
+                        <strong>C. Activités Interactives & Ludiques</strong>
+                        <p>Générateurs de parcours d'activités multi-onglets, Escape Games / Scénarios à choix, Ateliers cognitifs (Memory, Mots Croisés, Mots Mêlés, Association)</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">✏️</div>
+                    <div class="modal-pillar-content">
+                        <strong>D. Exercices & Évaluations</strong>
+                        <p>Exercices visuels (PNG pour Création Assistée Léia), Exercices auto-corrigés (XML Moodle), Infographies pédagogiques (Accroche, Résumé, Synthèse)</p>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-cogs"></i> Principes de Conception Technique</h3>
+                <p><strong>Autonomie & Légèreté :</strong> Tous les outils fonctionnent côté client (HTML/CSS/JavaScript), sans serveur backend. L'enseignant garde la main sur ses données, rien n'est envoyé à un serveur tiers (hors appel IA si mode API activé).</p>
+                <p><strong>Transparence & Modifiabilité des Prompts :</strong> L'application ne "cache" jamais ce qu'elle envoie à l'IA. Le prompt généré est toujours visible, modifiable et pédagogique : il explicite les exigences (structure, format, compétences visées). <em>Toutes les informations et prompts sont facilement modifiables et améliorables</em> selon les besoins spécifiques de chaque enseignant.</p>
+                <p><strong>Modularité :</strong> Chaque outil est une page HTML autonome et réutilisable. Un enseignant peut adapter ou dupliquer un générateur pour ses besoins spécifiques sans dépendances complexes.</p>
+
+                <h3><i class="fas fa-heart"></i> Posture Éthique & Pédagogique</h3>
+                <p><strong>L'IA comme co-pilote, jamais comme pilote :</strong> Les outils n'encouragent pas la délégation aveugle à l'IA, mais une collaboration consciente. L'enseignant doit :</p>
+                <ul>
+                    <li>Paramétrer ses besoins (niveau, thème, objets d'étude, plan imposé)</li>
+                    <li>Vérifier systématiquement les contenus générés (mention explicite dans le footer de chaque page)</li>
+                    <li>Adapter le contenu à sa classe, son contexte, ses élèves</li>
+                </ul>
+                <p><strong>Accompagnement à la maîtrise des outils numériques :</strong> En affichant les prompts et en expliquant les mécanismes (structure d'un cours, critères d'un bon exercice), l'application forme implicitement l'enseignant à l'ingénierie pédagogique et à l'usage raisonné de l'IA.</p>
+
+                <h3><i class="fas fa-globe"></i> Modèle Économique & Accessibilité</h3>
+                <p>L'application est diffusée sous <strong>licence Creative Commons BY-NC-ND 4.0</strong> : gratuite pour un usage non commercial, l'auteur doit être crédité, et aucune modification n'est autorisée. Ce choix affirme une volonté de <strong>démocratisation</strong> : tout enseignant, quelle que soit son académie ou son établissement, peut bénéficier de ces outils.</p>
+                <p>Le mode <strong>API optionnel</strong> (connexion Gemini ou OpenRouter) permet une automatisation complète, mais l'application reste pleinement fonctionnelle en mode "générateur de prompts" : l'enseignant copie le prompt produit et l'utilise dans l'IA de son choix (gratuite ou payante).</p>
+
+                <h3><i class="fas fa-rocket"></i> Conclusion : Vers une Pédagogie Augmentée</h3>
+                <p>L'Assistant Pédagogique Moderne ne cherche pas à "remplacer" le travail de l'enseignant, mais à le <strong>réorienter</strong> : moins de temps sur la mise en forme, plus de temps sur la personnalisation, l'accompagnement et l'innovation. En structurant l'usage de l'IA par des cadres pédagogiques rigoureux, il transforme un outil généraliste en un <strong>partenaire d'expertise disciplinaire</strong>.</p>
+                <p>La philosophie sous-jacente est celle d'une <strong>pédagogie augmentée</strong> : l'humain (enseignant et élève) reste au cœur, la machine sert d'amplificateur de créativité et de productivité, jamais de substitut à la réflexion et au lien humain.</p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <div class="modal-footer-text">
+                    © 2026 Gilles Cormi · Licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="modal-footer-link">CC BY-NC-ND 4.0</a>
+                </div>
+                <button id="modal-close-footer" class="philosophy-btn text-xs">
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================== SCRIPTS ============================== -->
+    <script>
+        // ====== ACCESSIBILITY SETTINGS MANAGEMENT ======
+        const STORAGE_KEY_DARK_MODE = 'accessibility-dark-mode';
+        const STORAGE_KEY_DYSLEXIA = 'accessibility-dyslexia';
+        const STORAGE_KEY_TEXT_SIZE = 'accessibility-text-size';
+
+        // Initialize accessibility settings from localStorage
+        function initializeAccessibility() {
+            const darkMode = localStorage.getItem(STORAGE_KEY_DARK_MODE) === 'true';
+            const dyslexia = localStorage.getItem(STORAGE_KEY_DYSLEXIA) === 'true';
+            const textSize = parseInt(localStorage.getItem(STORAGE_KEY_TEXT_SIZE)) || 100;
+
+            if (darkMode) toggleDarkMode(true);
+            if (dyslexia) toggleDyslexia(true);
+            setTextSize(textSize);
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode(enable) {
+            const html = document.documentElement;
+            const toggle = document.getElementById('dark-mode-toggle');
+            const status = document.getElementById('dark-mode-status');
+
+            if (enable) {
+                html.classList.add('dark-mode');
+                localStorage.setItem(STORAGE_KEY_DARK_MODE, 'true');
+                toggle.classList.add('active');
+                toggle.setAttribute('aria-pressed', 'true');
+                status.textContent = 'Activé';
+            } else {
+                html.classList.remove('dark-mode');
+                localStorage.setItem(STORAGE_KEY_DARK_MODE, 'false');
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-pressed', 'false');
+                status.textContent = 'Désactivé';
+            }
+        }
+
+        // Dyslexia Mode Toggle
+        function toggleDyslexia(enable) {
+            const html = document.documentElement;
+            const toggle = document.getElementById('dyslexia-toggle');
+            const status = document.getElementById('dyslexia-status');
+
+            if (enable) {
+                html.classList.add('dyslexia-mode');
+                localStorage.setItem(STORAGE_KEY_DYSLEXIA, 'true');
+                toggle.classList.add('active');
+                toggle.setAttribute('aria-pressed', 'true');
+                status.textContent = 'Activé';
+            } else {
+                html.classList.remove('dyslexia-mode');
+                localStorage.setItem(STORAGE_KEY_DYSLEXIA, 'false');
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-pressed', 'false');
+                status.textContent = 'Désactivé';
+            }
+        }
+
+        // Text Size Control
+        function setTextSize(percentage) {
+            const html = document.documentElement;
+            const display = document.getElementById('text-size-display');
+            const scale = percentage / 100;
+
+            html.style.setProperty('--text-scale', scale);
+            display.textContent = percentage + '%';
+            localStorage.setItem(STORAGE_KEY_TEXT_SIZE, percentage);
+        }
+
+        // Event Listeners for Accessibility Controls
+        document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            toggleDarkMode(!isDarkMode);
+        });
+
+        document.getElementById('dyslexia-toggle').addEventListener('click', function() {
+            const isDyslexia = document.documentElement.classList.contains('dyslexia-mode');
+            toggleDyslexia(!isDyslexia);
+        });
+
+        document.getElementById('text-size-decrease').addEventListener('click', function() {
+            const current = parseInt(localStorage.getItem(STORAGE_KEY_TEXT_SIZE)) || 100;
+            if (current > 80) setTextSize(current - 10);
+        });
+
+        document.getElementById('text-size-increase').addEventListener('click', function() {
+            const current = parseInt(localStorage.getItem(STORAGE_KEY_TEXT_SIZE)) || 100;
+            if (current < 200) setTextSize(current + 10);
+        });
+
+        document.getElementById('text-size-reset').addEventListener('click', function() {
+            setTextSize(100);
+        });
+
+        document.getElementById('accessibility-reset').addEventListener('click', function() {
+            localStorage.removeItem(STORAGE_KEY_DARK_MODE);
+            localStorage.removeItem(STORAGE_KEY_DYSLEXIA);
+            localStorage.removeItem(STORAGE_KEY_TEXT_SIZE);
+            location.reload();
+        });
+
+        // Accessibility Toolbar Toggle
+        const accessibilityToggle = document.getElementById('accessibility-toggle');
+        const accessibilityMenu = document.getElementById('accessibility-menu');
+
+        accessibilityToggle.addEventListener('click', function() {
+            const isOpen = accessibilityMenu.classList.toggle('active');
+            accessibilityToggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Close accessibility menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.accessibility-toolbar')) {
+                accessibilityMenu.classList.remove('active');
+                accessibilityToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Keyboard shortcut: Alt + A to open accessibility menu
+        document.addEventListener('keydown', function(e) {
+            if (e.altKey && e.key === 'a') {
+                e.preventDefault();
+                accessibilityToggle.click();
+            }
+        });
+
+        // Initialize accessibility on page load
+        initializeAccessibility();
+
+        // ====== SCROLL PROGRESS BAR ======
+        const progressBar = document.getElementById('scroll-progress');
+        function updateProgress() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            progressBar.style.width = pct + '%';
+        }
+
+        // ====== BACK TO TOP ======
+        const backToTop = document.getElementById('back-to-top');
+        function updateBackToTop() {
+            if (window.scrollY > 400) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        }
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ====== SCROLL LISTENER ======
+        window.addEventListener('scroll', () => {
+            updateProgress();
+            updateBackToTop();
+        }, { passive: true });
+
+        // ====== HAMBURGER MENU ======
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        hamburger.addEventListener('click', () => {
+            const isOpen = hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open', isOpen);
+            hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Close mobile menu on resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // ====== SCROLL-TRIGGERED ANIMATIONS (IntersectionObserver) ======
+        const fadeEls = document.querySelectorAll('.fade-in-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+        fadeEls.forEach(el => observer.observe(el));
+
+        // ====== FILTER PILLS ======
+        const filterPills = document.querySelectorAll('.filter-pill');
+        const cardWrappers = document.querySelectorAll('.card-wrapper');
+        const noResults = document.getElementById('no-results');
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        function applyFiltersAndSearch() {
+            let visible = 0;
+            cardWrappers.forEach(card => {
+                const categories = card.getAttribute('data-category') || '';
+                const name = (card.getAttribute('data-name') || '') + ' ' + (card.querySelector('h3, h4')?.textContent || '') + ' ' + (card.querySelector('p')?.textContent || '');
+                
+                const matchesFilter = currentFilter === 'all' || categories.includes(currentFilter);
+                const matchesSearch = currentSearch === '' || name.toLowerCase().includes(currentSearch.toLowerCase());
+
+                if (matchesFilter && matchesSearch) {
+                    card.classList.remove('hidden-filter');
+                    visible++;
+                } else {
+                    card.classList.add('hidden-filter');
+                }
+            });
+
+            noResults.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                filterPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentFilter = pill.getAttribute('data-filter');
+                applyFiltersAndSearch();
+            });
+        });
+
+        // ====== SEARCH BAR ======
+        const searchInput = document.getElementById('search-input');
+        const clearSearch = document.getElementById('clear-search');
+
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            applyFiltersAndSearch();
+        });
+
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            currentSearch = '';
+            applyFiltersAndSearch();
+            searchInput.focus();
+        });
+
+        // ====== TOAST HELPER ======
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // ====== COUNTER ANIMATION ======
+        function animateCounter(el, target, suffix = '') {
+            let start = 0;
+            const duration = 1200;
+            const step = (timestamp) => {
+                if (!start) start = timestamp;
+                const progress = Math.min((timestamp - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(eased * target);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = target + suffix;
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Animate stat counters when visible
+        const statCards = document.querySelectorAll('.stat-card');
+        let countersAnimated = false;
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !countersAnimated) {
+                    countersAnimated = true;
+                    const counters = entry.target.parentElement.querySelectorAll('.counter');
+                    counters.forEach(c => {
+                        const text = c.textContent.trim();
+                        if (text === '13') animateCounter(c, 13, '');
+                        else if (text === '100%') { c.textContent = '0%'; animateCounter(c, 100, '%'); }
+                        else if (text === '5') animateCounter(c, 5, '');
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        if (statCards[0]) statObserver.observe(statCards[0]);
+
+        // ====== KEYBOARD SUPPORT FOR FILTER PILLS ======
+        filterPills.forEach(pill => {
+            pill.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    pill.click();
+                }
+            });
+        });
+
+        // ====== MODAL: PHILOSOPHIE DU PROJET ======
+        const philosophyModal = document.getElementById('philosophy-modal');
+        const philosophyNavBtn = document.getElementById('philosophy-nav-btn');
+        const philosophyMobileBtn = document.getElementById('philosophy-mobile-btn');
+        const heroPhilosophyBtn = document.getElementById('hero-philosophy-btn');
+        const footerPhilosophyBtn = document.getElementById('footer-philosophy-btn');
+        const modalCloseBtn = document.getElementById('modal-close');
+        const modalCloseFooterBtn = document.getElementById('modal-close-footer');
+
+        function openPhilosophyModal() {
+            philosophyModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhilosophyModal() {
+            philosophyModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Open modal from various buttons
+        philosophyNavBtn?.addEventListener('click', openPhilosophyModal);
+        philosophyMobileBtn?.addEventListener('click', openPhilosophyModal);
+        heroPhilosophyBtn?.addEventListener('click', openPhilosophyModal);
+        footerPhilosophyBtn?.addEventListener('click', openPhilosophyModal);
+
+        // Close modal
+        modalCloseBtn?.addEventListener('click', closePhilosophyModal);
+        modalCloseFooterBtn?.addEventListener('click', closePhilosophyModal);
+
+        // Close modal when clicking on overlay
+        philosophyModal?.addEventListener('click', (e) => {
+            if (e.target === philosophyModal) {
+                closePhilosophyModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && philosophyModal.classList.contains('active')) {
+                closePhilosophyModal();
+            }
+        });
+
+    </script>
+
+</body>
 </html>
