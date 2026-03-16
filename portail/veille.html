@@ -149,7 +149,7 @@
         <div id="status-banner" class="mb-8 bg-indigo-50 border border-indigo-100 text-indigo-700 p-4 rounded-2xl text-[10px] flex items-center justify-between transition-all">
             <div class="flex items-center gap-2">
                 <i class="fas fa-cloud"></i>
-                <span id="status-text">Vérification de la connexion Cloud...</span>
+                <span id="status-text">Initialisation du système...</span>
             </div>
             <button onclick="this.parentElement.remove()" class="opacity-50"><i class="fas fa-times"></i></button>
         </div>
@@ -264,13 +264,12 @@
 
         async function hashPassword(pwd) {
             const encoder = new TextEncoder();
-            const data = encoder.encode(pwd + "gilles_salt_vfinal_6463");
+            const data = encoder.encode(pwd + "gilles_salt_vfinal_6463_fixed");
             const hash = await crypto.subtle.digest('SHA-256', data);
             return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function setupFirebase() {
-            // Détection de l'environnement : Preview ou Forge
             let configToUse = null;
             let autoToken = null;
 
@@ -295,7 +294,6 @@
                 db = getFirestore(app);
                 isCloudEnabled = true;
 
-                // Authentification (Règle 3)
                 if (autoToken) {
                     await signInWithCustomToken(auth, autoToken);
                 } else {
@@ -310,7 +308,7 @@
                         
                         currentUser = { uid: effectiveUid };
                         document.getElementById('current-session-id').textContent = effectiveUid.substring(0, 12);
-                        document.getElementById('status-text').textContent = "Connecté au Cloud.";
+                        document.getElementById('status-text').textContent = "Cloud Connecté.";
                         listenToCloud(effectiveUid);
                     }
                 });
@@ -327,7 +325,6 @@
             if(unsubscribeFolders) unsubscribeFolders();
             if(unsubscribeSources) unsubscribeSources();
             
-            // Chemins Firestore (Règle 1)
             const foldersRef = collection(db, 'artifacts', appId, 'users', uid, 'folders');
             const sourcesRef = collection(db, 'artifacts', appId, 'users', uid, 'sources');
 
@@ -462,7 +459,7 @@
         };
 
         window.deleteLink = async (id) => {
-            if(!confirm("Supprimer ce favori ?")) return;
+            if(!confirm("Supprimer ?")) return;
             if (isCloudEnabled && currentUser) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'sources', id));
             } else {
@@ -505,6 +502,10 @@
         setupFirebase();
         document.getElementById('acc-btn').addEventListener('click', () => document.documentElement.classList.toggle('dark-mode'));
         document.getElementById('btn-refresh').addEventListener('click', fetchAllFeeds);
+        
+        // --- LA LIGNE MANQUANTE ICI ---
+        document.getElementById('btn-session-ui').addEventListener('click', toggleSessionModal);
+        // ------------------------------
     </script>
 </body>
 </html>
