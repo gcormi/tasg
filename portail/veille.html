@@ -147,7 +147,7 @@
         
         <div id="local-status-msg" class="mb-8 bg-blue-50 border border-blue-100 text-blue-700 p-4 rounded-2xl text-xs flex items-center gap-3">
             <i class="fas fa-info-circle"></i>
-            <span id="status-text">Chargement du système...</span>
+            <span id="status-text">Initialisation du Cloud...</span>
         </div>
 
         <section class="mb-12 bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl shadow-indigo-500/5">
@@ -326,30 +326,24 @@
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     try {
-                        // Tente d'utiliser le jeton injecté par l'environnement
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } catch (tokenError) {
-                        // Le jeton échoue car il ne correspond pas à votre propre configuration Firebase (maveillecg)
                         await signInAnonymously(auth);
                     }
                 } else { 
                     await signInAnonymously(auth); 
                 }
             } catch (error) {
-                // Remplacement de console.error par console.warn pour empêcher l'alerte bloquante de l'IDE
                 console.warn("Avertissement Firebase :", error.code);
                 
-                // Message d'erreur personnalisé orienté vers la solution
                 let errorMessage = "Erreur de connexion Cloud. Mode local activé.";
                 if (error.code === 'auth/configuration-not-found' || error.code === 'auth/unauthorized-domain' || (error.message && error.message.includes('configuration-not-found'))) {
-                    errorMessage = "⚠️ Domaines Autorisés Firebase : Allez dans la console Firebase > Authentication > onglet 'Paramètres' (Settings) > 'Domaines autorisés', et ajoutez le domaine 'scf.usercontent.goog'.";
+                    errorMessage = "⏳ Déploiement Firebase en cours. Si vous venez d'activer le mode 'Anonyme', veuillez patienter 5 minutes. Mode local activé.";
                 }
 
-                // Affichage dans le bandeau
                 document.getElementById('status-text').textContent = errorMessage;
                 document.getElementById('local-status-msg').className = "mb-8 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-xs flex items-center gap-3";
                 
-                // Graceful fallback : On bascule en mode local
                 isCloudEnabled = false;
                 loadLocalData();
                 fetchAllFeeds();
@@ -496,7 +490,6 @@
             });
         }
 
-        // --- ACTIONS (Supporte Local + Cloud) ---
         document.getElementById('btn-add-source').addEventListener('click', async () => {
             const urlInput = document.getElementById('new-url');
             const folderId = document.getElementById('folder-select').value;
