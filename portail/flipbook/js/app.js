@@ -141,6 +141,17 @@ function forcerMode2D() {
     if(sourceActuelle) initialiserFlipbook(sourceActuelle);
 }
 
+// Outil Importer depuis URL Distante
+function chargerDepuisURL() {
+    const url = $('#url-input').val().trim();
+    if(url) {
+        logDiagnostic("Vérification du lien distant : " + url);
+        // Ajout du paramètre fictif pour forcer le même comportement stable
+        const baseUrl = window.location.href.split('?')[0];
+        window.location.href = `${baseUrl}?pdf=${encodeURIComponent(url)}`;
+    }
+}
+
 // Outil Générateur de Lien (Studio)
 function creerLienEleve() {
     let nom = $('#eleve-pdf-name').val().trim();
@@ -226,7 +237,8 @@ $(document).ready(() => {
                 const blob = new Blob([octets], { type: 'application/pdf' });
                 const blobUrl = URL.createObjectURL(blob);
                 
-                logDiagnostic("Document téléchargé. Initialisation du lecteur " + (isEleve ? "Élève..." : "Studio..."), "success");
+                const modeCrt = new URLSearchParams(window.location.search).get('mode') === 'eleve';
+                logDiagnostic("Document téléchargé. Initialisation du lecteur " + (modeCrt ? "Élève..." : "Studio..."), "success");
                 
                 // On donne le BLOB à DearFlip
                 initialiserFlipbook(blobUrl, pdfUrl);
