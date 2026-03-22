@@ -16,86 +16,33 @@
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
             --clock-hands: #ffffff;
-            --weather-text: #ffffff;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             color: #f1f5f9;
             overflow: hidden;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            gap: 2rem;
         }
 
         /* THEMES */
-        body.theme-night {
-            background-color: #020617;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.4) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.4) 0px, transparent 50%);
-            --card-glass: rgba(15, 23, 42, 0.7);
-        }
-
-        body.theme-day {
-            background-color: #f8fafc;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.5) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(224, 242, 254, 0.4) 0px, transparent 50%);
-            color: #1e293b;
-            --card-glass: rgba(255, 255, 255, 0.85);
-        }
-        body.theme-day .glass-card { border-color: rgba(0,0,0,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        body.theme-night { background-color: #020617; background-image: radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.4) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.4) 0px, transparent 50%); --card-glass: rgba(15, 23, 42, 0.7); }
+        body.theme-day { background-color: #f8fafc; color: #1e293b; --card-glass: rgba(255, 255, 255, 0.85); }
         body.theme-day #current-date { color: #0f172a; }
-        body.theme-day #digital-clock, body.theme-day blockquote { color: #334155; }
-        body.theme-day .info-area { color: #334155; }
-        body.theme-day [contenteditable]:empty:before { color: rgba(0,0,0,0.2); }
-        body.theme-day .clock-container { background: #fff; border-color: #f1f5f9; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+        body.theme-day #digital-clock, body.theme-day blockquote, body.theme-day .info-area { color: #334155; }
+        body.theme-day .clock-container { background: #fff; border-color: #f1f5f9; }
         body.theme-day .hour-hand { background: #1e293b; }
         body.theme-day .min-hand { background: #94a3b8; }
-        body.theme-day .number { color: #cbd5e1; }
 
-        body.theme-cyber {
-            background-color: #050505;
-            background-image: 
-                linear-gradient(rgba(31, 41, 55, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(31, 41, 55, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            --card-glass: rgba(0, 0, 0, 0.8);
-        }
-        body.theme-cyber .glass-card { border-color: #6366f1; box-shadow: 0 0 30px rgba(99, 102, 241, 0.1); }
-
-        body.theme-sky {
-            background-color: #f0f9ff;
-            background-image: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            color: #000;
-            --card-glass: rgba(255, 255, 255, 0.9);
-            --clock-hands: #000000;
-            --weather-text: #000000;
-        }
-        body.theme-sky .glass-card { border-color: #7dd3fc; box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1); }
-        body.theme-sky #current-date, body.theme-sky #digital-clock, body.theme-sky #meteo-temp { color: #000; }
-        body.theme-sky .info-area { color: #000; font-weight: 500; }
-        body.theme-sky .clock-container { background: #fff; border-color: #bae6fd; }
-        body.theme-sky blockquote, body.theme-sky cite, body.theme-sky [contenteditable]:empty:before { color: #1e293b; }
-        body.theme-sky .editor-btn { border-color: #94a3b8; color: #1e293b; }
-
-        body.theme-mint {
-            background-color: #f0fdf4;
-            background-image: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-            color: #000;
-            --card-glass: rgba(255, 255, 255, 0.92);
-            --clock-hands: #000000;
-            --weather-text: #000000;
-        }
-        body.theme-mint .glass-card { border-color: #86efac; box-shadow: 0 10px 30px rgba(34, 197, 94, 0.1); }
-        body.theme-mint #current-date, body.theme-mint #digital-clock, body.theme-mint #meteo-temp { color: #000; }
-        body.theme-mint .info-area { color: #000; font-weight: 500; }
-        body.theme-mint .clock-container { background: #fff; border-color: #bbf7d0; }
-        body.theme-mint blockquote, body.theme-mint cite, body.theme-mint [contenteditable]:empty:before { color: #064e3b; }
-        body.theme-mint .editor-btn { border-color: #86efac; color: #064e3b; }
+        body.theme-sky { background-color: #f0f9ff; background-image: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #000; --card-glass: rgba(255, 255, 255, 0.9); }
+        body.theme-mint { background-color: #f0fdf4; background-image: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #000; --card-glass: rgba(255, 255, 255, 0.92); }
+        body.theme-cyber { background-color: #050505; --card-glass: rgba(0, 0, 0, 0.8); }
 
         .font-display { font-family: 'Outfit', sans-serif; }
-
         .glass-card {
             background: var(--card-glass);
             backdrop-filter: blur(12px);
@@ -105,108 +52,43 @@
             transition: all 0.3s ease;
         }
 
-        /* HORLOGE ANALOGIQUE MODERNE */
+        /* CLOCK & TIMER SIZE ADJUSTMENTS FOR FOOTER VISIBILITY */
         .clock-container {
-            width: 280px;
-            height: 280px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             background: rgba(15, 23, 42, 0.8);
-            border: 8px solid rgba(255, 255, 255, 0.05);
+            border: 6px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 60px rgba(99, 102, 241, 0.2);
         }
+        .clock-face::after { content: ''; position: absolute; width: 10px; height: 10px; background: #fff; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; }
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 10px; transform: translateX(-50%); }
+        .hour-hand { width: 5px; height: 50px; background: var(--clock-hands); z-index: 3; }
+        .min-hand { width: 3px; height: 75px; background: var(--clock-hands); opacity: 0.8; z-index: 2; }
+        .second-hand { width: 1px; height: 85px; background: var(--accent-rose); z-index: 1; }
 
-        .clock-face::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            border-radius: 50%;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
-
-        .hand {
-            position: absolute;
-            bottom: 50%; left: 50%;
-            transform-origin: bottom;
-            border-radius: 10px;
-            transform: translateX(-50%);
-        }
-
-        .hour-hand { width: 6px; height: 70px; background: var(--clock-hands); z-index: 3; }
-        .min-hand { width: 4px; height: 100px; background: var(--clock-hands); opacity: 0.8; z-index: 2; }
-        .second-hand { width: 2px; height: 110px; background: var(--accent-rose); z-index: 1; }
-
-        .number {
-            position: absolute;
-            width: 100%; height: 100%;
-            text-align: center;
-            font-weight: 800;
-            font-family: 'Outfit';
-            font-size: 1.2rem;
-            color: rgba(255,255,255,0.3);
-            padding: 10px;
-        }
-
-        /* TIMER PROGRESS RING */
-        .timer-svg { transform: rotate(-90deg); }
-        .timer-circle {
-            transition: stroke-dashoffset 1s linear;
-            stroke-linecap: round;
-        }
-
-        /* EDITABLE AREA */
         .info-area {
             background: transparent;
             border: none;
             width: 100%;
             height: 100%;
-            min-height: 400px;
-            color: #cbd5e1;
-            font-size: 1.6rem;
+            overflow-y: auto;
+            color: inherit;
             line-height: 1.4;
             outline: none;
             cursor: text;
         }
 
-        /* Forcing user styles to apply */
-        .info-area font[color], .info-area span[style*="color"] {
+        /* Force color/bg-color because Tailwind/Theme might conflict */
+        .info-area * {
+            color: inherit;
+        }
+        .info-area span[style*="color"], .info-area font[color] {
             color: revert !important;
         }
-        .info-area font[size], .info-area span[style*="font-size"] {
-            font-size: revert !important;
-        }
-        .info-area mark, .info-area span[style*="background-color"] {
+        .info-area span[style*="background-color"], .info-area mark {
             background-color: revert !important;
             color: #000 !important;
-        }
-
-        .glow-text {
-            text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-        }
-
-        .pulse-emerald { animation: pulseE 2s infinite; }
-        @keyframes pulseE {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-
-        .pulse-rose { animation: pulseR 2s infinite; }
-        @keyframes pulseR {
-            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-        }
-
-        .pulse-amber { animation: pulseA 2s infinite; }
-        @keyframes pulseA {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
         }
 
         .editor-btn {
@@ -221,213 +103,139 @@
             transition: all 0.2s;
         }
         .editor-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .editor-btn.active { background: var(--accent-indigo); color: #fff; }
 
-        .theme-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        .theme-btn:hover { transform: translateY(-2px); }
-        .theme-btn.active { border-color: var(--accent-indigo); box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+        .theme-btn { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; border: 2px solid transparent; }
+        .theme-btn.active { border-color: var(--accent-indigo); }
 
-        [contenteditable]:empty:before {
-            content: attr(placeholder);
-            color: rgba(255,255,255,0.2);
-            font-style: italic;
-        }
-
-        /* RESPONSIVE FIXES */
-        @media (max-height: 800px) {
-            .clock-container { width: 220px; height: 220px; }
-            .hour-hand { height: 50px; }
-            .min-hand { height: 80px; }
-            .second-hand { height: 90px; }
-            .timer-svg { width: 100px; height: 100px; }
-        }
+        .pulse-emerald { animation: pulseE 2s infinite; }
+        @keyframes pulseE { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        .pulse-rose { animation: pulseR 2s infinite; }
+        @keyframes pulseR { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
     </style>
 </head>
-<body class="h-full bg-slate-950 p-8 flex flex-col gap-8 theme-night">
+<body class="theme-night">
 
-    <!-- HEADER: DATE & METEO -->
-    <header class="flex items-center justify-between px-4">
+    <!-- HEADER -->
+    <header class="flex items-center justify-between shrink-0">
         <div class="flex items-center gap-6">
-            <h1 id="current-date" class="text-3xl font-display font-extrabold tracking-tight text-white glow-text uppercase">---</h1>
-            <div class="h-8 w-px bg-white/10"></div>
+            <h1 id="current-date" class="text-3xl font-display font-extrabold text-white uppercase">---</h1>
             <div id="digital-clock" class="text-3xl font-mono font-bold text-slate-400">00:00:00</div>
         </div>
 
-        <!-- THEME CONTROLS -->
         <div class="glass-card px-4 py-2 flex items-center gap-2">
-            <button onclick="setTheme('night')" id="btn-night" class="theme-btn bg-slate-900 text-indigo-400 active" title="Nuit Profonde">
-                <i class="fas fa-moon"></i>
-            </button>
-            <button onclick="setTheme('day')" id="btn-day" class="theme-btn bg-white text-amber-500" title="Journée Claire">
-                <i class="fas fa-sun"></i>
-            </button>
-            <button onclick="setTheme('sky')" id="btn-sky" class="theme-btn bg-sky-100 text-sky-600" title="Ciel Bleu">
-                <i class="fas fa-cloud-sun"></i>
-            </button>
-            <button onclick="setTheme('mint')" id="btn-mint" class="theme-btn bg-emerald-50 text-emerald-600" title="Menthe Fraîche">
-                <i class="fas fa-leaf"></i>
-            </button>
-            <button onclick="setTheme('cyber')" id="btn-cyber" class="theme-btn bg-black text-indigo-500" title="Cyberpunk">
-                <i class="fas fa-microchip"></i>
-            </button>
+            <button onclick="setTheme('night')" id="btn-night" class="theme-btn bg-slate-900 text-indigo-400 active"><i class="fas fa-moon"></i></button>
+            <button onclick="setTheme('day')" id="btn-day" class="theme-btn bg-white text-amber-500"><i class="fas fa-sun"></i></button>
+            <button onclick="setTheme('sky')" id="btn-sky" class="theme-btn bg-sky-100 text-sky-600"><i class="fas fa-cloud-sun"></i></button>
+            <button onclick="setTheme('mint')" id="btn-mint" class="theme-btn bg-emerald-50 text-emerald-600"><i class="fas fa-leaf"></i></button>
+            <button onclick="setTheme('cyber')" id="btn-cyber" class="theme-btn bg-black text-indigo-500"><i class="fas fa-microchip"></i></button>
         </div>
 
-        <div class="glass-card px-6 py-3 flex items-center gap-4 border-emerald-500/20">
-            <div id="meteo-icon" class="text-2xl text-amber-400">
-                <i class="fas fa-sun"></i>
-            </div>
-            <span id="meteo-temp" class="text-2xl font-display font-extrabold text-white">22°C</span>
-            <span id="meteo-desc" class="text-sm font-bold uppercase tracking-widest text-emerald-500">Bastia</span>
+        <div class="glass-card px-6 py-3 flex items-center gap-4">
+            <span id="meteo-temp" class="text-2xl font-display font-extrabold">22°C</span>
+            <span class="text-sm font-bold uppercase text-emerald-500">Bastia</span>
         </div>
     </header>
 
-    <main class="flex-grow grid grid-cols-12 gap-8">
-        <div class="col-span-4 flex flex-col gap-8">
-            <div class="glass-card p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
-                <div class="clock-container shadow-2xl">
+    <main class="flex-grow grid grid-cols-12 gap-8 min-h-0">
+        <!-- LEFT -->
+        <div class="col-span-4 flex flex-col gap-8 min-h-0">
+            <div class="glass-card p-6 flex flex-col items-center justify-center gap-4 shrink-0">
+                <div class="clock-container">
                     <div class="clock-face h-full w-full">
                         <div id="hour" class="hand hour-hand"></div>
                         <div id="min" class="hand min-hand"></div>
                         <div id="sec" class="hand second-hand"></div>
-                        <div class="number" style="transform: rotate(30deg)"><span style="transform: rotate(-30deg); display: block">1</span></div>
-                        <div class="number" style="transform: rotate(60deg)"><span style="transform: rotate(-60deg); display: block">2</span></div>
-                        <div class="number" style="transform: rotate(90deg)"><span style="transform: rotate(-90deg); display: block">3</span></div>
-                        <div class="number" style="transform: rotate(120deg)"><span style="transform: rotate(-120deg); display: block">4</span></div>
-                        <div class="number" style="transform: rotate(150deg)"><span style="transform: rotate(-150deg); display: block">5</span></div>
-                        <div class="number" style="transform: rotate(180deg)"><span style="transform: rotate(-180deg); display: block">6</span></div>
-                        <div class="number" style="transform: rotate(210deg)"><span style="transform: rotate(-210deg); display: block">7</span></div>
-                        <div class="number" style="transform: rotate(240deg)"><span style="transform: rotate(-240deg); display: block">8</span></div>
-                        <div class="number" style="transform: rotate(270deg)"><span style="transform: rotate(-270deg); display: block">9</span></div>
-                        <div class="number" style="transform: rotate(300deg)"><span style="transform: rotate(-300deg); display: block">10</span></div>
-                        <div class="number" style="transform: rotate(330deg)"><span style="transform: rotate(-330deg); display: block">11</span></div>
-                        <div class="number" style="transform: rotate(360deg)"><span style="transform: rotate(-360deg); display: block">12</span></div>
                     </div>
                 </div>
-                <div id="analog-digital-link" class="text-sm font-bold text-slate-500 uppercase tracking-widest">Temps réel scolaire</div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">Temps réel scolaire</div>
             </div>
 
-            <div class="glass-card p-8 flex flex-col gap-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Consigne Niveau Sonore</span>
-                </div>
-                <div class="flex gap-4">
-                    <button onclick="setNoise('chut')" id="noise-chut" class="flex-grow py-3 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-400 text-xs font-bold pulse-rose">SILENCE</button>
-                    <button onclick="setNoise('murmure')" id="noise-murmure" class="flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold hover:bg-emerald-500/20 hover:text-emerald-400 transition-all">MURMURE</button>
-                    <button onclick="setNoise('libre')" id="noise-libre" class="flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold hover:bg-amber-500/20 hover:text-amber-400 transition-all">GROUPE</button>
+            <div class="glass-card p-6 flex flex-col gap-4 shrink-0">
+                <span class="text-xs font-bold uppercase text-slate-400">Niveau Sonore</span>
+                <div class="flex gap-2">
+                    <button onclick="setNoise('chut')" id="noise-chut" class="flex-grow py-3 rounded-xl bg-white/5 text-xs font-bold transition-all">SILENCE</button>
+                    <button onclick="setNoise('murmure')" id="noise-murmure" class="flex-grow py-3 rounded-xl bg-white/5 text-xs font-bold">MURMURE</button>
+                    <button onclick="setNoise('libre')" id="noise-libre" class="flex-grow py-3 rounded-xl bg-white/5 text-xs font-bold">GROUPE</button>
                 </div>
             </div>
         </div>
 
-        <div class="col-span-8 flex flex-col gap-8">
-            <div class="glass-card p-10 flex-grow relative overflow-hidden group">
-                <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
-                    <i class="fas fa-pen-nib text-8xl text-white"></i>
-                </div>
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-slate-900 text-xs shadow-lg shadow-amber-500/40">
-                            <i class="fas fa-sticky-note"></i>
-                        </div>
-                        <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Informations & Travail à faire</span>
-                    </div>
-                    <!-- EDITOR TOOLS -->
-                    <div class="flex items-center gap-2 bg-black/20 p-1.5 rounded-xl border border-white/5 shadow-inner">
-                        <button onmousedown="event.preventDefault(); execCmd('bold')" class="editor-btn font-black text-sm" title="Gras">B</button>
-                        <button onmousedown="event.preventDefault(); execCmd('underline')" class="editor-btn underline text-sm" title="Souligner">U</button>
-                        <button onmousedown="event.preventDefault(); execCmd('italic')" class="editor-btn italic text-sm" title="Italique">I</button>
+        <!-- RIGHT (EDITOR) -->
+        <div class="col-span-8 flex flex-col gap-8 min-h-0">
+            <div class="glass-card p-8 flex flex-col flex-grow min-h-0">
+                <div class="flex items-center justify-between mb-4 shrink-0">
+                    <span class="text-xs font-bold uppercase text-amber-500"><i class="fas fa-sticky-note mr-2"></i>Informations</span>
+                    <div class="flex items-center gap-2 bg-black/20 p-1.5 rounded-xl border border-white/5">
+                        <button onmousedown="event.preventDefault(); execCmd('bold')" class="editor-btn font-black text-sm">B</button>
+                        <button onmousedown="event.preventDefault(); execCmd('underline')" class="editor-btn underline text-sm">U</button>
+                        <button onmousedown="event.preventDefault(); execCmd('italic')" class="editor-btn italic text-sm">I</button>
                         <div class="w-px h-5 bg-white/10 mx-1"></div>
-                        <button onmousedown="event.preventDefault(); changeFontSize('large')" class="editor-btn text-xs" title="Normal">A</button>
-                        <button onmousedown="event.preventDefault(); changeFontSize('extra')" class="editor-btn text-sm font-bold" title="Grand">A</button>
-                        <button onmousedown="event.preventDefault(); changeFontSize('xxl')" class="editor-btn text-lg font-black" title="TRÈS GRAND">A</button>
-                        <button onmousedown="event.preventDefault(); changeFontSize('giga')" class="editor-btn text-2xl font-black text-rose-500" title="GIGA">A</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('large')" class="editor-btn text-xs">Normal</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('extra')" class="editor-btn text-sm font-bold">Grand</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('xxl')" class="editor-btn text-lg font-black">XXL</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('giga')" class="editor-btn text-2xl font-black text-rose-500">GIGA</button>
                         <div class="w-px h-5 bg-white/10 mx-1"></div>
                         <div class="flex gap-1 bg-black/40 p-1 rounded-lg">
-                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#ffffff')" class="w-4 h-4 rounded-full bg-white border border-white/20" title="Blanc/Défaut"></button>
-                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#ef4444')" class="w-4 h-4 rounded-full bg-red-500" title="Rouge"></button>
-                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#3b82f6')" class="w-4 h-4 rounded-full bg-blue-500" title="Bleu"></button>
-                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#22c55e')" class="w-4 h-4 rounded-full bg-green-500" title="Vert"></button>
+                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#ffffff')" class="w-4 h-4 rounded-full bg-white border border-white/20"></button>
+                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#ef4444')" class="w-4 h-4 rounded-full bg-red-500"></button>
+                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#3b82f6')" class="w-4 h-4 rounded-full bg-blue-500"></button>
+                            <button onmousedown="event.preventDefault(); execCmd('foreColor', '#22c55e')" class="w-4 h-4 rounded-full bg-green-500"></button>
                         </div>
-                        <div class="w-px h-5 bg-white/10 mx-1"></div>
-                        <button onmousedown="event.preventDefault(); execCmd('insertUnorderedList')" class="editor-btn" title="Liste"><i class="fas fa-list-ul"></i></button>
-                        <button onmousedown="event.preventDefault(); execCmd('backColor', '#fbbf24')" class="editor-btn text-amber-400" title="Surligner Jaune"><i class="fas fa-highlighter"></i></button>
+                        <button onmousedown="event.preventDefault(); execCmd('backColor', '#fbbf24')" class="editor-btn text-amber-400 ml-2" title="Surligner"><i class="fas fa-highlighter"></i></button>
                     </div>
                 </div>
-                <div id="info-board" contenteditable="true" class="info-area overflow-y-auto" placeholder="Tapez ici les consignes, devoirs ou objectifs de la séance..."></div>
+                <!-- THE EDITOR BOARD -->
+                <div id="info-board" contenteditable="true" class="info-area" placeholder="Tapez ici..."></div>
             </div>
 
-            <div class="grid grid-cols-2 gap-8 h-64">
-                <div class="glass-card p-8 flex items-center gap-8 border-rose-500/20">
-                    <div class="relative w-32 h-32 flex-shrink-0">
-                        <svg class="timer-svg w-32 h-32">
-                            <circle cx="64" cy="64" r="58" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
-                            <circle id="timer-progress" cx="64" cy="64" r="58" fill="transparent" stroke="#f43f5e" stroke-width="8" stroke-dasharray="364.4" stroke-dashoffset="0" class="timer-circle"></circle>
+            <div class="grid grid-cols-2 gap-8 h-48 shrink-0">
+                <div class="glass-card p-6 flex items-center gap-6">
+                    <div class="relative w-24 h-24 shrink-0">
+                        <svg class="w-24 h-24 -rotate-90">
+                            <circle cx="48" cy="48" r="44" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="6"></circle>
+                            <circle id="timer-progress" cx="48" cy="48" r="44" fill="transparent" stroke="#f43f5e" stroke-width="6" stroke-dasharray="276" stroke-dashoffset="0" class="transition-all"></circle>
                         </svg>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <i class="fas fa-hourglass-half text-slate-700 opacity-20 text-3xl"></i>
-                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center font-bold text-xs" id="timer-label">5m</div>
                     </div>
-                    <div class="flex-grow flex flex-col justify-center gap-4">
-                        <div class="flex items-baseline gap-2">
-                            <input type="number" id="timer-input" value="5" min="1" max="60" class="w-16 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-2xl font-bold text-white outline-none focus:border-rose-500">
-                            <span class="text-xs font-bold text-slate-500">MIN</span>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="timer-input" value="5" class="w-12 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xl font-bold">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Min</span>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="startTimer()" id="timer-btn" class="flex-grow bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-500/20">DÉMARRER</button>
-                            <button onclick="resetTimer()" class="w-12 bg-white/5 hover:bg-white/10 text-slate-400 rounded-xl flex items-center justify-center"><i class="fas fa-undo"></i></button>
+                            <button onclick="startTimer()" id="timer-btn" class="bg-rose-500 px-4 py-2 rounded-xl text-xs font-bold">DÉMARRER</button>
+                            <button onclick="resetTimer()" class="w-10 bg-white/5 rounded-xl flex items-center justify-center text-xs"><i class="fas fa-undo"></i></button>
                         </div>
                     </div>
                 </div>
 
-                <div class="glass-card p-8 flex flex-col justify-between border-indigo-500/20">
-                    <div class="flex items-center gap-3 mb-2">
-                        <i class="fas fa-quote-left text-indigo-500"></i>
-                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Le Mot du Jour</span>
-                    </div>
-                    <blockquote class="text-xl font-medium leading-relaxed text-slate-200 italic">
-                        "Enseigner, ce n'est pas remplir un vase, c'est allumer un feu."
-                    </blockquote>
-                    <cite class="text-xs font-bold text-indigo-400 mt-2 block">— Michel de Montaigne</cite>
+                <div class="glass-card p-6 flex flex-col justify-center">
+                    <blockquote class="text-base font-medium italic text-slate-200">"Allumer un feu."</blockquote>
+                    <cite class="text-[10px] font-bold text-indigo-400 mt-2">— Montaigne</cite>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="flex items-center justify-between px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
-        <div class="flex items-center gap-4">
-            <span class="text-slate-700">© 2026 Gilles Cormi</span>
-            <div class="w-1 h-1 rounded-full bg-indigo-500"></div>
-            <span>Tableau de Bord Pédagogique</span>
-        </div>
+    <footer class="flex items-center justify-between shrink-0 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+        <span>© 2026 Gilles Cormi | Tableau de Bord</span>
+        <span>BASTIA | Statut : Actif</span>
     </footer>
 
     <script>
-        const infoBoard = document.getElementById('info-board');
-
         function updateClock() {
             const now = new Date();
             const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-            const hDeg = (h % 12) * 30 + (m / 60) * 30, mDeg = m * 6, sDeg = s * 6;
-            document.getElementById('hour').style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
-            document.getElementById('min').style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
-            document.getElementById('sec').style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
+            document.getElementById('hour').style.transform = `translateX(-50%) rotate(${(h % 12) * 30 + (m / 60) * 30}deg)`;
+            document.getElementById('min').style.transform = `translateX(-50%) rotate(${m * 6}deg)`;
+            document.getElementById('sec').style.transform = `translateX(-50%) rotate(${s * 6}deg)`;
             document.getElementById('digital-clock').textContent = now.toLocaleTimeString('fr-FR');
             document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
         setInterval(updateClock, 1000); updateClock();
 
         function setTheme(theme) {
-            document.body.className = `h-full p-8 flex flex-col gap-8 theme-${theme}`;
+            document.body.className = `theme-${theme}`;
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-${theme}`).classList.add('active');
             localStorage.setItem('classe_theme', theme);
@@ -436,43 +244,26 @@
 
         let timerInterval, timeLeft, originalTime;
         function startTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval); timerInterval = null;
-                document.getElementById('timer-btn').textContent = "CONTINUER";
-                document.getElementById('timer-btn').className = "flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/20";
-                return;
-            }
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-btn').textContent = "REPRENDRE"; return; }
             if (!timeLeft) { timeLeft = parseInt(document.getElementById('timer-input').value) * 60; originalTime = timeLeft; }
             document.getElementById('timer-btn').textContent = "PAUSE";
-            document.getElementById('timer-btn').className = "flex-grow bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all";
             timerInterval = setInterval(() => {
-                timeLeft--; updateTimerDisplay();
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval); timerInterval = null;
-                    document.getElementById('timer-btn').textContent = "TERMINÉ !";
-                    new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
-                }
+                timeLeft--; 
+                const offset = 276 - (timeLeft / originalTime) * 276;
+                document.getElementById('timer-progress').style.strokeDashoffset = offset;
+                document.getElementById('timer-label').textContent = Math.ceil(timeLeft / 60) + 'm';
+                if (timeLeft <= 0) { clearInterval(timerInterval); new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); }
             }, 1000);
         }
-        function resetTimer() {
-            clearInterval(timerInterval); timerInterval = null; timeLeft = null;
-            document.getElementById('timer-btn').textContent = "DÉMARRER";
-            document.getElementById('timer-btn').className = "flex-grow bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-500/20";
-            document.getElementById('timer-progress').style.strokeDashoffset = 0;
-            document.getElementById('timer-input').value = 5;
-        }
-        function updateTimerDisplay() {
-            const progress = document.getElementById('timer-progress');
-            progress.style.strokeDashoffset = 364.4 - (timeLeft / originalTime) * 364.4;
-        }
+        function resetTimer() { clearInterval(timerInterval); timerInterval = null; timeLeft = null; document.getElementById('timer-progress').style.strokeDashoffset = 0; document.getElementById('timer-btn').textContent = "DÉMARRER"; document.getElementById('timer-label').textContent = document.getElementById('timer-input').value + 'm'; }
 
         function setNoise(mode) {
-            document.querySelectorAll('[id^="noise-"]').forEach(b => b.className = "flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold transition-all");
-            const map = { 'chut': ['noise-chut', 'rose', 'SILENCE'], 'murmure': ['noise-murmure', 'emerald', 'MURMURE'], 'libre': ['noise-libre', 'amber', 'GROUPE'] };
-            const [id, color, text] = map[mode];
-            document.getElementById(id).className = `flex-grow py-3 rounded-xl border border-${color}-500/40 bg-${color}-500/20 text-${color}-400 text-xs font-bold pulse-${color}`;
+            document.querySelectorAll('[id^="noise-"]').forEach(b => b.className = "flex-grow py-3 rounded-xl bg-white/5 text-xs font-bold transition-all");
+            const color = mode === 'chut' ? 'rose' : (mode === 'murmure' ? 'emerald' : 'amber');
+            document.getElementById('noise-' + mode).className = `flex-grow py-3 rounded-xl bg-${color}-500/20 text-${color}-400 text-xs font-bold pulse-${color}`;
         }
 
+        const infoBoard = document.getElementById('info-board');
         infoBoard.innerHTML = localStorage.getItem('classe_info_board_html') || "";
         infoBoard.addEventListener('input', () => localStorage.setItem('classe_info_board_html', infoBoard.innerHTML));
 
@@ -496,11 +287,9 @@
             }
             localStorage.setItem('classe_info_board_html', infoBoard.innerHTML);
         }
-        
-        // Restore overall font size if no selection (for the whole block)
-        const savedSize = localStorage.getItem('classe_font_size') || 'large';
-        const cssSizes = { 'large': '2.5rem', 'extra': '4rem', 'xxl': '6rem', 'giga': '9rem' };
-        infoBoard.style.fontSize = cssSizes[savedSize];
+        // Restore
+        const sSize = localStorage.getItem('classe_font_size') || 'large';
+        infoBoard.style.fontSize = { 'large': '2.5rem', 'extra': '4rem', 'xxl': '6rem', 'giga': '9rem' }[sSize];
     </script>
 </body>
 </html>
