@@ -63,19 +63,23 @@
 
         /* CLOCK */
         .clock-container {
-            width: 160px; height: 160px;
+            width: 200px; height: 200px;
             border-radius: 50%;
             background: rgba(15,23,42,0.8);
             border: 3px solid rgba(255,255,255,0.08);
             position: relative;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.4), 0 0 40px rgba(99,102,241,0.15);
         }
-        .clock-face::after { content:''; position:absolute; width:8px; height:8px; background:#fff; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; }
+        .clock-face::after { content:''; position:absolute; width:10px; height:10px; background:#fff; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; }
         .hand { position:absolute; bottom:50%; left:50%; transform-origin:bottom; border-radius:10px; transform:translateX(-50%); }
-        .hour-hand   { width:4px; height:45px; background:var(--clock-hands); z-index:3; }
-        .min-hand    { width:3px; height:65px; background:var(--clock-hands); opacity:.8; z-index:2; }
-        .second-hand { width:1px; height:72px; background:var(--accent-rose); z-index:1; }
-        .clock-num   { position:absolute; width:100%; height:100%; text-align:center; font-family:'Outfit'; font-weight:800; font-size:0.75rem; color:rgba(255,255,255,0.25); padding:5px; }
+        .hour-hand   { width:5px; height:60px; background:var(--clock-hands); z-index:3; }
+        .min-hand    { width:3px; height:85px; background:var(--clock-hands); opacity:.8; z-index:2; }
+        .second-hand { width:2px; height:95px; background:var(--accent-rose); z-index:1; }
+        .clock-num   { position:absolute; width:100%; height:100%; text-align:center; font-family:'Outfit'; font-weight:800; font-size:0.85rem; color:rgba(255,255,255,0.25); padding:8px; }
+
+        /* pHARe citation — texte noir sur thèmes clairs */
+        body.theme-day  #phare-texte, body.theme-sky  #phare-texte, body.theme-mint #phare-texte { color: #111827 !important; }
+        body.theme-day  #phare-auteur,body.theme-sky  #phare-auteur,body.theme-mint #phare-auteur{ color: #4338ca !important; }
 
         /* EDITOR AREA */
         .info-area {
@@ -163,14 +167,14 @@
         <!-- CARTE CITATION pHARe / Media -->
             <div class="glass-card p-4 shrink-0" style="border-left: 3px solid #6366f1;">
                 <div class="flex items-center gap-2 mb-2">
-                    <i class="fas fa-shield-heart text-indigo-400 text-xs"></i>
-                    <span class="text-[9px] font-black uppercase tracking-widest text-indigo-400">pHARe &amp; Médias</span>
+                    <i class="fas fa-shield-heart text-indigo-400 text-sm"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">pHARe &amp; Médias</span>
                 </div>
-                <p id="phare-texte" class="text-xs font-semibold leading-snug text-slate-200 italic transition-opacity duration-500">Chargement...</p>
-                <p id="phare-auteur" class="text-[9px] font-bold text-indigo-400 mt-1 transition-opacity duration-500"></p>
+                <p id="phare-texte" class="text-sm font-semibold leading-snug text-slate-100 italic transition-opacity duration-500">Chargement...</p>
+                <p id="phare-auteur" class="text-xs font-bold text-indigo-400 mt-2 transition-opacity duration-500"></p>
             </div>
 
-            <div class="glass-card p-4 flex flex-col items-center justify-center gap-3 flex-1">
+            <div class="glass-card p-4 flex flex-col items-center justify-end gap-3 flex-1" style="padding-top: 2rem;">
                 <div class="clock-container">
                     <div class="clock-face h-full w-full">
                         <div id="hour" class="hand hour-hand"></div>
