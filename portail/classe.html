@@ -140,20 +140,20 @@
             <button onclick="setTheme('cyber')" id="btn-cyber" class="theme-btn bg-black       text-indigo-400"><i class="fas fa-microchip"></i></button>
         </div>
 
-        <div class="glass-card px-5 py-2 flex items-center gap-4">
+        <div class="glass-card pl-12 pr-6 py-2.5 flex items-center gap-6">
             <div class="flex flex-col items-center">
-                <i id="meteo-icon" class="fas fa-sun text-amber-400 text-2xl"></i>
-                <span class="text-[9px] font-bold uppercase text-amber-400/70 tracking-wider mt-0.5">Ciel clair</span>
+                <i id="meteo-icon" class="fas fa-sun text-amber-400 text-3xl"></i>
+                <span class="text-[10px] font-black uppercase text-amber-500/80 tracking-widest mt-1">Ciel clair</span>
             </div>
-            <div class="w-px h-8 bg-white/10"></div>
+            <div class="w-px h-10 bg-white/10"></div>
             <div class="flex flex-col">
-                <span id="meteo-temp" class="font-display text-2xl font-extrabold leading-none">22°C</span>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Bastia</span>
+                <span id="meteo-temp" class="font-display text-3xl font-black leading-none text-white">22°C</span>
+                <span class="text-xs font-black uppercase tracking-widest text-emerald-400 mt-1">Bastia</span>
             </div>
-            <div class="w-px h-8 bg-white/10"></div>
-            <div class="flex flex-col gap-0.5 text-[10px] text-slate-400 font-medium">
-                <span><i class="fas fa-wind mr-1 text-sky-400"></i>15 km/h</span>
-                <span><i class="fas fa-droplet mr-1 text-blue-400"></i>62%</span>
+            <div class="w-px h-10 bg-white/10"></div>
+            <div class="flex flex-col gap-1 text-xs text-slate-400 font-bold">
+                <span class="flex items-center gap-2"><i class="fas fa-wind text-sky-400"></i> 15 km/h</span>
+                <span class="flex items-center gap-2"><i class="fas fa-droplet text-blue-400"></i> 62%</span>
             </div>
         </div>
     </header>
@@ -255,23 +255,23 @@
             <div class="grid grid-cols-[1fr_1.5fr] gap-6 shrink-0" style="height:150px">
 
                 <!-- TIMER -->
-                <div class="glass-card p-3 flex items-center gap-4">
-                    <div class="relative shrink-0" style="width:80px;height:80px">
-                        <svg width="80" height="80" style="transform:rotate(-90deg)">
-                            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
-                            <circle id="timer-ring" cx="40" cy="40" r="36" fill="none" stroke="#f43f5e" stroke-width="6" stroke-dasharray="226.2" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/>
+                <div class="glass-card p-3 flex items-center justify-center gap-5">
+                    <div class="relative shrink-0" style="width:90px;height:90px">
+                        <svg width="90" height="90" style="transform:rotate(-90deg)">
+                            <circle cx="45" cy="45" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="7"/>
+                            <circle id="timer-ring" cx="45" cy="45" r="40" fill="none" stroke="#f43f5e" stroke-width="7" stroke-dasharray="251.3" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/>
                         </svg>
-                        <div id="timer-label" class="absolute inset-0 flex items-center justify-center text-xs font-bold">5:00</div>
+                        <div id="timer-label" class="absolute inset-0 flex items-center justify-center text-base font-black">5:00</div>
                     </div>
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-2">
                             <input id="timer-input" type="number" value="5" min="1" max="99"
-                                class="w-12 bg-white/5 border border-white/10 rounded-lg px-1.5 py-0.5 text-lg font-bold text-white outline-none">
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Min</span>
+                                class="w-12 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xl font-black text-white outline-none">
+                            <span class="text-[10px] font-black text-slate-500 uppercase">Min</span>
                         </div>
                         <div class="flex gap-2">
-                            <button id="timer-btn" onclick="toggleTimer()" class="bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold py-1.5 px-3 rounded-xl transition-all">DÉMARRER</button>
-                            <button onclick="resetTimer()" class="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center text-xs text-slate-400"><i class="fas fa-undo"></i></button>
+                            <button id="timer-btn" onclick="toggleTimer()" class="bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black py-2 px-4 rounded-xl shadow-lg shadow-rose-500/20 transition-all uppercase tracking-tight">Démarrer</button>
+                            <button onclick="resetTimer()" class="w-9 h-9 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center text-sm text-slate-400 border border-white/5"><i class="fas fa-undo"></i></button>
                         </div>
                     </div>
                 </div>
