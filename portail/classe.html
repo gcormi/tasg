@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord de Classe | Gilles Cormi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --card-glass: rgba(30, 41, 59, 0.7);
+            --accent-indigo: #6366f1;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            color: #f1f5f9;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .font-display { font-family: 'Outfit', sans-serif; }
+
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* HORLOGE ANALOGIQUE MODERNE */
+        .clock-container {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.8);
+            border: 8px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 60px rgba(99, 102, 241, 0.2);
+        }
+
+        .clock-face::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%; left: 50%;
+            transform-origin: bottom;
+            border-radius: 10px;
+            transform: translateX(-50%);
+        }
+
+        .hour-hand { width: 6px; height: 70px; background: #fff; z-index: 3; }
+        .min-hand { width: 4px; height: 100px; background: rgba(255,255,255,0.7); z-index: 2; }
+        .second-hand { width: 2px; height: 110px; background: var(--accent-rose); z-index: 1; }
+
+        .number {
+            position: absolute;
+            width: 100%; height: 100%;
+            text-align: center;
+            font-weight: 800;
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.3);
+            padding: 10px;
+        }
+
+        /* TIMER PROGRESS RING */
+        .timer-svg { transform: rotate(-90deg); }
+        .timer-circle {
+            transition: stroke-dashoffset 1s linear;
+            stroke-linecap: round;
+        }
+
+        /* EDITABLE AREA */
+        .info-area {
+            background: transparent;
+            border: none;
+            width: 100%;
+            height: 100%;
+            resize: none;
+            color: #cbd5e1;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .pulse-emerald { animation: pulseE 2s infinite; }
+        @keyframes pulseE {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+    </style>
+</head>
+<body class="p-8 flex flex-col gap-8">
+
+    <!-- TOP SECTION: DATE & METEO -->
+    <header class="flex justify-between items-end">
+        <div class="f-up">
+            <h1 id="current-date" class="font-display font-extrabold text-5xl tracking-tight text-white mb-2">Dimanche 22 Mars</h1>
+            <p class="text-indigo-400 font-bold uppercase tracking-widest text-sm flex items-center gap-2">
+                <i class="fas fa-school"></i> 
+                Tableau de Bord de Classe · Gilles Cormi EI
+            </p>
+        </div>
+
+        <div class="glass-card px-8 py-4 flex items-center gap-6 border-indigo-500/30 shadow-indigo-500/20">
+            <div class="text-right">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Météo Collège</div>
+                <div class="text-2xl font-bold text-white" id="meteo-temp">14°C</div>
+            </div>
+            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-amber-400 text-2xl">
+                <i class="fas fa-sun" id="meteo-icon"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN GRID -->
+    <main class="grid grid-cols-12 gap-8 flex-grow">
+        
+        <!-- LEFT: CLOCK & NOISE (4 cols) -->
+        <div class="col-span-4 flex flex-col gap-8">
+            
+            <!-- HORLOGE -->
+            <div class="glass-card p-10 flex flex-col items-center justify-center flex-grow bg-indigo-900/10 border-indigo-500/20">
+                <div class="clock-container mb-8">
+                    <div class="clock-face w-full h-full relative" id="clock-face">
+                        <!-- Numbers generated by JS -->
+                    </div>
+                    <div class="hand hour-hand" id="hour-hand"></div>
+                    <div class="hand min-hand" id="min-hand"></div>
+                    <div class="hand second-hand" id="second-hand"></div>
+                </div>
+                <div id="digital-clock" class="text-4xl font-display font-black text-white tracking-widest opacity-80">17:54:20</div>
+            </div>
+
+            <!-- NIVEAU SONORE -->
+            <div class="glass-card p-6 border-emerald-500/20">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Consigne Niveau Sonore</span>
+                    <i class="fas fa-volume-down text-emerald-400"></i>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="setNoise('chut')" id="noise-chut" class="flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold hover:bg-rose-500/20 hover:text-rose-400 transition-all">SILENCE</button>
+                    <button onclick="setNoise('murmure')" id="noise-murmure" class="flex-grow py-3 rounded-xl border border-emerald-500/40 bg-emerald-500/20 text-emerald-400 text-xs font-bold pulse-emerald">MURMURE</button>
+                    <button onclick="setNoise('libre')" id="noise-libre" class="flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold hover:bg-amber-500/20 hover:text-amber-400 transition-all">GROUPE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: INFO & TIMER (8 cols) -->
+        <div class="col-span-8 flex flex-col gap-8">
+            
+            <!-- BLOC NOTES CENTRAL -->
+            <div class="glass-card p-10 flex-grow relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
+                    <i class="fas fa-pen-nib text-8xl text-white"></i>
+                </div>
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-slate-900 text-xs shadow-lg shadow-amber-500/40">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Informations & Travail à faire</span>
+                </div>
+                <!-- TEXT AREA EDITABLE -->
+                <textarea id="info-board" class="info-area" placeholder="Tapez ici les consignes, devoirs ou objectifs de la séance..."></textarea>
+            </div>
+
+            <!-- BOTTOM ROW: TIMER & MOT DU JOUR -->
+            <div class="grid grid-cols-2 gap-8 h-64">
+                
+                <!-- TIMER COMPTE A REBOURS -->
+                <div class="glass-card p-8 flex items-center gap-8 border-rose-500/20">
+                    <div class="relative w-32 h-32 flex-shrink-0">
+                        <svg class="timer-svg w-32 h-32">
+                            <circle cx="64" cy="64" r="58" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
+                            <circle id="timer-progress" cx="64" cy="64" r="58" fill="transparent" stroke="#f43f5e" stroke-width="8" stroke-dasharray="364.4" stroke-dashoffset="0" class="timer-circle"></circle>
+                        </svg>
+                        <div id="timer-text" class="absolute inset-0 flex items-center justify-center font-display font-black text-2xl text-white">10:00</div>
+                    </div>
+                    <div class="flex flex-col gap-2 flex-grow">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Chronomètre Activité</div>
+                        <div class="flex gap-2">
+                            <button onclick="startTimer(5)" class="w-full py-2 bg-white/5 rounded-lg text-[10px] font-bold hover:bg-rose-500/20 transition-all">5 MIN</button>
+                            <button onclick="startTimer(10)" class="w-full py-2 bg-white/5 rounded-lg text-[10px] font-bold hover:bg-rose-500/20 transition-all">10 MIN</button>
+                            <button onclick="startTimer(20)" class="w-full py-2 bg-white/5 rounded-lg text-[10px] font-bold hover:bg-rose-500/20 transition-all">20 MIN</button>
+                        </div>
+                        <button id="btn-timer-toggle" onclick="toggleTimer()" class="mt-2 w-full py-3 bg-rose-500 text-white rounded-xl font-bold shadow-lg shadow-rose-500/30 text-xs">COMMENCER</button>
+                    </div>
+                </div>
+
+                <!-- MOT DU JOUR / CITATION -->
+                <div class="glass-card p-8 bg-emerald-500/5 border-emerald-500/20 flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-lightbulb text-emerald-400 text-sm"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500/60">Le Mot / La Pensée du Jour</span>
+                    </div>
+                    <blockquote id="quote-text" class="text-xl font-display font-semibold italic text-slate-300 leading-snug">
+                        "Celui qui ne se trompe jamais est celui qui n'a jamais rien tenté."
+                    </blockquote>
+                    <cite class="mt-4 text-[10px] font-bold text-emerald-500 uppercase tracking-widest not-italic block">— Albert Einstein</cite>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- HORLOGE ---
+        const clockFace = document.getElementById('clock-face');
+        for (let i = 1; i <= 12; i++) {
+            const div = document.createElement('div');
+            div.className = 'number';
+            div.style.transform = `rotate(${i * 30}deg)`;
+            div.innerHTML = `<span style="display:inline-block; transform:rotate(-${i * 30}deg)">${i}</span>`;
+            clockFace.appendChild(div);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const sec = now.getSeconds();
+            const min = now.getMinutes();
+            const hour = now.getHours();
+
+            document.getElementById('second-hand').style.transform = `translateX(-50%) rotate(${sec * 6}deg)`;
+            document.getElementById('min-hand').style.transform = `translateX(-50%) rotate(${min * 6 + sec * 0.1}deg)`;
+            document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${hour * 30 + min * 0.5}deg)`;
+
+            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- DATE ---
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', options);
+
+        // --- TIMER ---
+        let timerSeconds = 600;
+        let initialSeconds = 600;
+        let timerActive = false;
+        let timerInterval = null;
+        const dashArray = 364.4;
+
+        function updateTimerUI() {
+            const m = Math.floor(timerSeconds / 60);
+            const s = timerSeconds % 60;
+            document.getElementById('timer-text').innerText = `${m}:${s.toString().padStart(2, '0')}`;
+            
+            const offset = dashArray - (timerSeconds / initialSeconds) * dashArray;
+            document.getElementById('timer-progress').style.strokeDashoffset = offset;
+        }
+
+        function startTimer(min) {
+            clearInterval(timerInterval);
+            timerSeconds = min * 60;
+            initialSeconds = timerSeconds;
+            timerActive = true;
+            updateTimerUI();
+            document.getElementById('btn-timer-toggle').innerText = "ARRÊTER";
+            
+            timerInterval = setInterval(() => {
+                if(timerSeconds > 0) {
+                    timerSeconds--;
+                    updateTimerUI();
+                } else {
+                    clearInterval(timerInterval);
+                    timerActive = false;
+                    document.getElementById('btn-timer-toggle').innerText = "FINI !";
+                    // Petit effet sonore discret possible ici
+                }
+            }, 1000);
+        }
+
+        function toggleTimer() {
+            if (timerActive) {
+                clearInterval(timerInterval);
+                timerActive = false;
+                document.getElementById('btn-timer-toggle').innerText = "REPRENDRE";
+            } else {
+                startTimer(timerSeconds / 60);
+            }
+        }
+
+        // --- NIVEAU SONORE ---
+        function setNoise(mode) {
+            const btnChut = document.getElementById('noise-chut');
+            const btnMurmure = document.getElementById('noise-murmure');
+            const btnLibre = document.getElementById('noise-libre');
+
+            [btnChut, btnMurmure, btnLibre].forEach(b => {
+                b.className = "flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold transition-all";
+            });
+
+            if(mode === 'chut') {
+                btnChut.className = "flex-grow py-3 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-400 text-xs font-bold pulse-rose";
+            } else if(mode === 'murmure') {
+                btnMurmure.className = "flex-grow py-3 rounded-xl border border-emerald-500/40 bg-emerald-500/20 text-emerald-400 text-xs font-bold pulse-emerald";
+            } else {
+                btnLibre.className = "flex-grow py-3 rounded-xl border border-amber-500/40 bg-amber-500/20 text-amber-400 text-xs font-bold pulse-amber";
+            }
+        }
+
+        // --- SAUVEGARDE AUTO DU BLOC NOTES ---
+        const infoBoard = document.getElementById('info-board');
+        infoBoard.value = localStorage.getItem('classe_info_board') || "";
+        infoBoard.addEventListener('input', () => {
+            localStorage.setItem('classe_info_board', infoBoard.value);
+        });
+
+        // --- QUOTES ---
+        const quotes = [
+            { t: "Celui qui ne se trompe jamais est celui qui n'a jamais rien tenté.", a: "Albert Einstein" },
+            { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela" },
+            { t: "Apprendre, c’est ne jamais trop tard pour devenir ce que l'on aurait pu être.", a: "George Eliot" },
+            { t: "La curiosité est le moteur de l'intelligence.", a: "Anonyme" },
+            { t: "L'erreur n'est pas l'échec, c'est une étape de la réussite.", a: "Anonyme" }
+        ];
+        const q = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quote-text').innerText = `"${q.t}"`;
+        document.querySelector('cite').innerText = `— ${q.a}`;
+    </script>
+</body>
+</html>
