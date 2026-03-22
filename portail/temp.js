@@ -1,346 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
 
-<head>
-    <script>
-        if (localStorage.getItem('portal_unlocked') !== 'true') {
-            window.location.href = 'index.html';
-        }
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Veille automatisée avec gestion de dossiers et synchronisation.">
-    <title>Veille Stratégique Pro | Gilles Cormi EI</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-light: #eef2ff;
-            --secondary: #0ea5e9;
-            --text-scale: 1;
-        }
-
-        html.dark-mode {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #475569;
-        }
-
-        html:not(.dark-mode) {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-        }
-
-        html.dyslexia-mode { font-family: 'OpenDyslexic', sans-serif !important; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .glass-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 1000;
-        }
-
-        html.dark-mode .glass-header { background: rgba(15, 23, 42, 0.85); }
-
-        .card-rss {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        html.dark-mode .card-rss { background: rgba(30, 41, 59, 0.7); border-color: var(--border-color); }
-
-        .card-rss:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.2);
-        }
-
-        .folder-section {
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 24px;
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 24px;
-        }
-
-        html.dark-mode .folder-section {
-            background: rgba(30, 41, 59, 0.4);
-            border-color: var(--border-color);
-        }
-
-        .btn-ai {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn {
-            opacity: 0;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .group:hover .action-btn { opacity: 1; }
-
-        #session-modal {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            z-index: 2000; align-items: center; justify-content: center;
-        }
-        #session-modal.active { display: flex; }
-
-        .accessibility-toggle {
-            position: fixed; bottom: 32px; right: 32px;
-            width: 50px; height: 50px; border-radius: 50%;
-            background: var(--primary); color: white;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 1001;
-        }
-
-        footer a { transition: color 0.2s; }
-        footer a:hover { color: var(--primary); }
-    </style>
-</head>
-
-<body class="antialiased min-h-screen flex flex-col">
-
-    <header class="sticky top-0 glass-header border-b border-slate-200/50 shadow-sm" style="z-index: 1000 !important;">
-        <div class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center relative">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-                    <i class="fas fa-satellite-dish"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-slate-900 dark:text-white leading-tight">Centre de Veille Pro</h1>
-                    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Gilles Cormi EI • Écosystème Sécurisé</p>
-                </div>
-            </div>
-            <div class="flex gap-2 items-center relative" style="z-index: 1001 !important;">
-                <span class="text-[8px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold shadow-sm">V4.2 STABLE</span>
-                <button id="btn-refresh" title="Actualiser les flux" class="text-xs font-bold bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">
-                    <i class="fas fa-sync-alt"></i> Actualiser
-                </button>
-                <div id="sync-indicator" class="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold ring-1 ring-emerald-500/20">
-                    <i class="fas fa-cloud"></i> Synchro Gilles
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="container mx-auto max-w-7xl px-6 py-12 flex-grow">
-        
-        <div id="local-status-msg" class="mb-8 bg-blue-50 border border-blue-100 text-blue-700 p-4 rounded-2xl text-xs flex items-center gap-3">
-            <i class="fas fa-info-circle"></i>
-            <span id="status-text">Initialisation du Cloud...</span>
-        </div>
-
-        <section class="mb-12 bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl shadow-indigo-500/5">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <h2 class="text-xl font-bold">Ajouter ou Importer</h2>
-                </div>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <input type="file" id="import-input" accept=".html" class="hidden">
-                    <label for="import-input" class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
-                        <i class="fas fa-file-import"></i> Import Chrome
-                    </label>
-                    <button id="btn-new-folder" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
-                        <i class="fas fa-folder-plus"></i> Nouveau Dossier
-                    </button>
-                </div>
-            </div>
-            
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="url" id="new-url" placeholder="Coller une URL (site ou flux RSS)..." 
-                       class="flex-grow px-6 py-4 rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20">
-                <select id="folder-select" class="px-4 py-4 rounded-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-700 outline-none">
-                    <option value="none">Dossier : Aucun</option>
-                </select>
-                <button id="btn-add-source" class="btn-ai px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 min-w-[180px]">
-                    <span id="btn-text">Ajouter</span>
-                </button>
-            </div>
-        </section>
-
-        <div class="mb-12">
-            <div class="flex items-center gap-3 mb-6">
-                <i class="fas fa-bolt text-indigo-600"></i>
-                <h2 class="text-2xl font-extrabold">Flux en Direct</h2>
-            </div>
-            <div id="rss-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
-
-        <div class="pt-8 border-t border-slate-200 dark:border-slate-700">
-            <div class="flex items-center gap-3 mb-8">
-                <i class="fas fa-star text-amber-500"></i>
-                <h2 class="text-2xl font-extrabold">Mes Dossiers</h2>
-            </div>
-            <div id="folders-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        </div>
-
-    </main>
-
-    <!-- Variables CSS et Tailwind JIT Trick -->
-    <div class="hidden text-indigo-400 text-rose-400 text-emerald-400 text-amber-400 text-cyan-400 text-violet-400 border-indigo-400 border-rose-400 border-emerald-400 border-amber-400 border-cyan-400 border-violet-400 hover:text-indigo-500 hover:text-rose-500 hover:text-emerald-500 hover:text-amber-500 hover:text-cyan-500 hover:text-violet-500 bg-indigo-500 bg-rose-500 bg-emerald-500 bg-amber-500 bg-cyan-500 bg-violet-500 ring-indigo-500 ring-rose-500 ring-emerald-500 ring-amber-500 ring-cyan-500 ring-violet-500 text-slate-400 hover:border-indigo-400 hover:border-emerald-400 hover:border-rose-400 hover:border-amber-400 hover:border-cyan-400 hover:border-violet-400"></div>
-
-    <!-- Modal Edition Dossier -->
-    <div id="folder-modal" class="hidden fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-sm z-[2000] border-none">
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl max-w-sm w-full mx-4 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4" id="folder-modal-title">Nouveau dossier</h3>
-            <input type="hidden" id="folder-edit-id">
-            
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Nom du dossier</label>
-            <input type="text" id="folder-edit-name" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 mb-6 autoComplete=off">
-            
-            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Couleur thématique</label>
-            <div class="flex gap-3 mb-8" id="folder-color-picker">
-                <button type="button" class="w-8 h-8 rounded-full bg-indigo-500 ring-2 ring-offset-2 ring-indigo-500 opacity-100" data-color="indigo"></button>
-                <button type="button" class="w-8 h-8 rounded-full bg-emerald-500 opacity-30 hover:opacity-100" data-color="emerald"></button>
-                <button type="button" class="w-8 h-8 rounded-full bg-amber-500 opacity-30 hover:opacity-100" data-color="amber"></button>
-                <button type="button" class="w-8 h-8 rounded-full bg-rose-500 opacity-30 hover:opacity-100" data-color="rose"></button>
-                <button type="button" class="w-8 h-8 rounded-full bg-cyan-500 opacity-30 hover:opacity-100" data-color="cyan"></button>
-                <button type="button" class="w-8 h-8 rounded-full bg-violet-500 opacity-30 hover:opacity-100" data-color="violet"></button>
-            </div>
-            <div class="flex gap-3">
-                <button id="btn-save-folder" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all">Enregistrer</button>
-                <button onclick="closeFolderModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Annuler</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Plus de modale session redondante -->
-
-    <!-- Modal Contenu Dossier (Favoris) -->
-    <div id="links-modal" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-md z-[2000] border-none">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-4xl w-full mx-4 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
-                <div class="flex items-center gap-4">
-                    <div id="links-modal-icon" class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
-                        <i class="fas fa-folder-open"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold" id="links-modal-title">Contenu du dossier</h3>
-                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest" id="links-modal-count">0 SITES ENREGISTRÉS</p>
-                    </div>
-                </div>
-                <button id="btn-close-links" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all flex items-center justify-center">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="p-8 overflow-y-auto" id="links-modal-container">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="links-modal-grid">
-                    <!-- Liens injectés ici -->
-                </div>
-            </div>
-            
-            <div class="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Glissez-déposez pour réorganiser (Beta)</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="border-t border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm mt-20">
-        <div class="container mx-auto max-w-7xl px-6 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-                <div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center text-white">
-                            <i class="fas fa-graduation-cap text-sm"></i>
-                        </div>
-                        <span class="font-extrabold text-slate-900 dark:text-white">Portail IA</span>
-                    </div>
-                    <p class="text-sm text-slate-500 leading-relaxed">Ingénierie pédagogique augmentée pour les enseignants. Suite d'outils libres et gratuits.</p>
-                </div>
-                <div>
-                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-5">Ressources</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-2"><i class="fas fa-book-open text-xs text-slate-300"></i> Philosophie du Projet</a></li>
-                        <li><a href="mailto:gilles@gcormi.fr" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-2"><i class="fas fa-envelope text-xs text-slate-300"></i> Contact : gilles@gcormi.fr</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-5">Outils phares</h3>
-                    <ul class="space-y-3">
-                        <li><a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-2"><i class="fas fa-microchip text-xs text-indigo-300"></i> Assistant de Conception</a></li>
-                        <li><a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-2"><i class="fas fa-universal-access text-xs text-emerald-300"></i> Adaptation Inclusive</a></li>
-                        <li><a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-2"><i class="fas fa-dice text-xs text-amber-300"></i> LudoTech Engine</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400">
-                <div class="text-xs font-bold tracking-tight">© 2026 Gilles Cormi EI · Ingénierie Pédagogique</div>
-                <div class="text-[10px] font-bold uppercase tracking-widest">Sous licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" class="underline decoration-dotted">CC BY-NC-ND 4.0</a></div>
-            </div>
-        </div>
-    </footer>
-
-    <div class="accessibility-toggle" id="acc-btn"><i class="fas fa-universal-access"></i></div>
-
-    <!-- INJECTION DES CLÉS FIREBASE ICI -->
-    <script>
-        window.__firebase_config = JSON.stringify({
-            apiKey: "AIzaSyAMyCPEipO3lr2o2OU4wVRETe708UArsOI",
-            authDomain: "maveillecg.firebaseapp.com",
-            projectId: "maveillecg",
-            storageBucket: "maveillecg.firebasestorage.app",
-            messagingSenderId: "823281436949",
-            appId: "1:823281436949:web:df46ec3073c7772818411c"
-        });
-        window.__app_id = "maveillecg";
-    </script>
-    <script>
-        window.onerror = function(msg, url, line) {
-            alert("Erreur Script: " + msg + "\nLigne: " + line);
-            return false;
-        };
-
-        window.closeLinksModal = () => {
-            const modal = document.getElementById('links-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-            }
-            document.body.style.overflow = '';
-        };
-
-        window.closeFolderModal = () => {
-            const modal = document.getElementById('folder-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-            }
-        };
-    </script>
-
-    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -444,11 +102,7 @@
             const sourcesRef = collection(db, 'artifacts', appId, 'users', uid, 'sources');
             
             unsubscribeFolders = onSnapshot(foldersRef, (snap) => {
-                folders = snap.docs.map(d => {
-                    const data = d.data();
-                    delete data.id; // Sécurité extrême pour ne pas écraser l'ID réel avec un null ou autre
-                    return { id: d.id, ...data };
-                }).filter(f => !forceDeletedFolders.has(f.id));
+                folders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 updateFolderUI();
                 renderFolders();
                 if (activeFolderInModal) window.openLinksModal(activeFolderInModal);
@@ -457,11 +111,7 @@
             });
             
             unsubscribeSources = onSnapshot(sourcesRef, (snap) => {
-                sources = snap.docs.map(d => {
-                    const data = d.data();
-                    delete data.id;
-                    return { id: d.id, ...data };
-                }).filter(s => !forceDeletedSources.has(s.id));
+                sources = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderFolders();
                 if (activeFolderInModal) window.openLinksModal(activeFolderInModal);
                 fetchAllFeeds(); // On lance le RSS en arrière-plan
@@ -471,14 +121,8 @@
         }
 
         function loadLocalData() {
-            folders = JSON.parse(localStorage.getItem('local_folders') || '[]').map(f => {
-                if(f.id === null) f.id = Date.now().toString() + Math.random().toString(36).substring(7);
-                return f;
-            });
-            sources = JSON.parse(localStorage.getItem('local_sources') || '[]').map(s => {
-                if(s.id === null) s.id = Date.now().toString() + Math.random().toString(36).substring(7);
-                return s;
-            });
+            folders = JSON.parse(localStorage.getItem('local_folders') || '[]');
+            sources = JSON.parse(localStorage.getItem('local_sources') || '[]');
             updateFolderUI();
             renderFolders();
         }
@@ -737,7 +381,7 @@
 
             if (id) {
                 if (isCloudEnabled && currentUser) {
-                    updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'folders', id), { name, color: activeColor }).catch(e => console.warn(e));
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'folders', id), { name, color: activeColor });
                 } else {
                     const idx = folders.findIndex(f => f.id === id);
                     if (idx > -1) {
@@ -749,11 +393,10 @@
                 }
                 showToast("Dossier mis à jour");
             } else {
-                const newFolder = { name, color: activeColor, createdAt: new Date().toISOString() };
+                const newFolder = { id: isCloudEnabled ? null : Date.now().toString(), name, color: activeColor, createdAt: new Date().toISOString() };
                 if (isCloudEnabled && currentUser) {
-                    addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'folders'), newFolder).catch(e => console.warn(e));
+                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'folders'), newFolder);
                 } else {
-                    newFolder.id = Date.now().toString();
                     folders.push(newFolder);
                     localStorage.setItem('local_folders', JSON.stringify(folders));
                     updateFolderUI();
@@ -902,6 +545,7 @@
                 }
 
                 const newSource = {
+                    id: isCloudEnabled ? null : Date.now().toString(),
                     name: domain, 
                     url, 
                     rss_url: rssUrlDetected, 
@@ -910,9 +554,8 @@
                 };
 
                 if (isCloudEnabled && currentUser) {
-                    addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'sources'), newSource).catch(e => console.warn(e));
+                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'sources'), newSource);
                 } else {
-                    newSource.id = Date.now().toString();
                     sources.push(newSource);
                     localStorage.setItem('local_sources', JSON.stringify(sources));
                     fetchAllFeeds();
@@ -1021,6 +664,4 @@
             }
         };
 
-    </script>
-</body>
-</html>
+    
