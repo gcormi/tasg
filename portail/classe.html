@@ -200,7 +200,7 @@
             <h1 id="current-date" class="font-display font-extrabold text-5xl tracking-tight text-white mb-2">Dimanche 22 Mars</h1>
             <p class="text-indigo-400 font-bold uppercase tracking-widest text-sm flex items-center gap-2">
                 <i class="fas fa-school"></i> 
-                Tableau de Bord de Classe · Gilles Cormi EI
+                Tableau de Bord de Classe · Gilles Cormi
             </p>
         </div>
 
@@ -448,14 +448,23 @@
         });
 
         function execCmd(cmd, value = null) {
-            document.execCommand(cmd, false, value);
+            // On s'assure que la zone est bien active
             infoBoard.focus();
+            if (cmd === 'backColor' && value) {
+                // Pour le surlignage
+                document.execCommand('hiliteColor', false, value);
+            } else {
+                document.execCommand(cmd, false, value);
+            }
+            // On sauvegarde direct après modif via bouton
+            localStorage.setItem('classe_info_board_html', infoBoard.innerHTML);
         }
 
         function changeFontSize(size) {
             const sizes = { 'small': '1.1rem', 'medium': '1.6rem', 'large': '2.5rem' };
             infoBoard.style.fontSize = sizes[size];
             localStorage.setItem('classe_font_size', size);
+            infoBoard.focus();
         }
         // Load font size
         changeFontSize(localStorage.getItem('classe_font_size') || 'medium');
