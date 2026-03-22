@@ -180,11 +180,13 @@
 
         /* Crucial fixes for user-applied styles */
         .info-area font[color], .info-area span[style*="color"] {
-            color: inherit;
+            color: revert !important;
         }
         .info-area font[size], .info-area span[style*="font-size"] {
+            font-size: revert !important;
             line-height: 1.2;
         }
+
 
 
 
