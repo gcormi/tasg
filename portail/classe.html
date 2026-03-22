@@ -180,12 +180,12 @@
 
         /* Crucial fixes for user-applied styles */
         .info-area font[color], .info-area span[style*="color"] {
-            color: revert !important;
+            color: inherit;
         }
         .info-area font[size], .info-area span[style*="font-size"] {
-            font-size: revert !important;
             line-height: 1.2;
         }
+
 
 
 
@@ -306,10 +306,10 @@
                         <button onmousedown="event.preventDefault(); execCmd('underline')" class="editor-btn underline text-sm" title="Souligner">U</button>
                         <button onmousedown="event.preventDefault(); execCmd('italic')" class="editor-btn italic text-sm" title="Italique">I</button>
                         <div class="w-px h-5 bg-white/10 mx-1"></div>
-                        <button onmousedown="event.preventDefault(); changeFontSize('small')" class="editor-btn text-[10px]" title="Petit">A</button>
-                        <button onmousedown="event.preventDefault(); changeFontSize('medium')" class="editor-btn text-xs" title="Moyen">A</button>
-                        <button onmousedown="event.preventDefault(); changeFontSize('large')" class="editor-btn text-base font-bold" title="Grand">A</button>
-                        <button onmousedown="event.preventDefault(); changeFontSize('extra')" class="editor-btn text-xl font-black" title="TITRE">A</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('large')" class="editor-btn text-xs" title="Normal">A</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('extra')" class="editor-btn text-sm font-bold" title="Grand">A</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('xxl')" class="editor-btn text-lg font-black" title="TRÈS GRAND">A</button>
+                        <button onmousedown="event.preventDefault(); changeFontSize('giga')" class="editor-btn text-2xl font-black text-rose-500" title="GIGA">A</button>
                         <div class="w-px h-5 bg-white/10 mx-1"></div>
                         <!-- TEXT COLORS -->
                         <div class="flex gap-1 bg-black/40 p-1 rounded-lg">
@@ -478,25 +478,23 @@
         });
 
         function execCmd(cmd, value = null) {
-            // we MUST NOT focus here if we want to keep current selection
-            document.execCommand(cmd, false, value);
-            // After applying, if we lost focus, bring it back
             infoBoard.focus();
+            document.execCommand(cmd, false, value);
             localStorage.setItem('classe_info_board_html', infoBoard.innerHTML);
         }
 
         function changeFontSize(size) {
+            infoBoard.focus();
             const selection = window.getSelection();
             if (selection.toString().length > 0) {
                 // browser mapping for font size 1-7
-                const sizes = { 'small': '2', 'medium': '4', 'large': '6', 'extra': '7' };
+                const sizes = { 'large': '4', 'extra': '5', 'xxl': '6', 'giga': '7' };
                 document.execCommand('fontSize', false, sizes[size]);
             } else {
-                const cssSizes = { 'small': '1.1rem', 'medium': '1.6rem', 'large': '2.5rem', 'extra': '4rem' };
+                const cssSizes = { 'large': '2.5rem', 'extra': '4rem', 'xxl': '6rem', 'giga': '9rem' };
                 infoBoard.style.fontSize = cssSizes[size];
                 localStorage.setItem('classe_font_size', size);
             }
-            infoBoard.focus();
         }
         // Load font size
         changeFontSize(localStorage.getItem('classe_font_size') || 'medium');
