@@ -81,8 +81,8 @@
         </div>
 
         <!-- Grille des raccourcis -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="hub-grid">
-            <!-- Les cartes seront injectées ici par JavaScript -->
+        <div class="flex flex-col gap-3 max-w-4xl mx-auto" id="hub-grid">
+            <!-- Les éléments de la liste seront injectés ici par JavaScript -->
         </div>
 
     </main>
@@ -114,6 +114,17 @@
                 badge: null
             },
             {
+                titre: "Webmail Académique",
+                description: "Accès à votre messagerie professionnelle.",
+                url: "https://login.ac-corse.fr/idp/profile/oidc/authorize?execution=e2s1",
+                icone: "fas fa-envelope",
+                couleurIco: "text-violet-500",
+                fondIco: "bg-violet-50 dark:bg-violet-900/30",
+                categorie: "Communication",
+                badge: "Académie"
+            },
+            // ================== OUTILS PERSONNELS ==================
+            {
                 titre: "Google Drive",
                 description: "Le stockage cloud universel de Google avec ses outils bureautiques collaboratifs.",
                 url: "https://drive.google.com/",
@@ -122,6 +133,26 @@
                 fondIco: "bg-emerald-50 dark:bg-emerald-900/30",
                 categorie: "Stockage Personnel",
                 badge: null
+            },
+            {
+                titre: "Gmail",
+                description: "Accès à votre messagerie Google Mail personnelle.",
+                url: "https://mail.google.com/",
+                icone: "fab fa-google",
+                couleurIco: "text-rose-500",
+                fondIco: "bg-rose-50 dark:bg-rose-900/30",
+                categorie: "Communication",
+                badge: "Perso"
+            },
+            {
+                titre: "Google Agenda",
+                description: "Votre calendrier pour organiser vos rendez-vous et événements.",
+                url: "https://calendar.google.com/",
+                icone: "fas fa-calendar-alt",
+                couleurIco: "text-blue-500",
+                fondIco: "bg-blue-50 dark:bg-blue-900/30",
+                categorie: "Organisation",
+                badge: "Perso"
             },
             // ================== INTELLIGENCE ARTIFICIELLE ==================
             {
@@ -170,33 +201,41 @@
         const grid = document.getElementById('hub-grid');
 
         hubLinks.forEach((link, index) => {
-            // Effet d'animation en cascade
-            const delayClass = `delay-${(index % 3 + 1) * 100}`;
+            // Effet d'animation en cascade : ici maximum 5-6 délais pour que ce soit fluide
+            const delayIndex = index < 6 ? index + 1 : 1;
+            const delayClass = `delay-${delayIndex * 100}`;
             
             const badgeHtml = link.badge 
-                ? `<span class="absolute top-4 right-4 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border border-slate-200 dark:border-slate-600">${link.badge}</span>` 
+                ? `<span class="hidden sm:inline-block bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-600">${link.badge}</span>` 
                 : '';
 
             const card = document.createElement('a');
             card.href = link.url;
             card.target = "_blank"; // S'ouvre dans un nouvel onglet !
-            card.className = `hub-card relative block bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 group animate-fade-up ${delayClass}`;
+            // Nouveau design de liste verticale
+            card.className = `group relative flex items-center justify-between bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-fade-up ${delayClass}`;
             
             card.innerHTML = `
-                ${badgeHtml}
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">${link.categorie}</p>
-                <div class="flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 transition-transform group-hover:scale-110 ${link.fondIco} ${link.couleurIco}">
+                <div class="flex items-center gap-4 md:gap-5 flex-grow min-w-0 pr-4">
+                    <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-xl md:text-2xl flex-shrink-0 transition-transform duration-300 group-hover:scale-110 ${link.fondIco} ${link.couleurIco}">
                         <i class="${link.icone}"></i>
                     </div>
-                    <div>
-                        <h3 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-brand-500 transition-colors">${link.titre}</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed mb-4">${link.description}</p>
+                    <div class="min-w-0 flex-grow">
+                        <div class="flex items-center gap-3 mb-0.5">
+                            <h3 class="font-display text-base md:text-lg font-bold text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors truncate">${link.titre}</h3>
+                            ${badgeHtml}
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-500 truncate">${link.description}</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center text-sm font-bold text-brand-600 dark:text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span>Ouvrir l'espace</span>
-                    <i class="fas fa-external-link-alt"></i>
+                
+                <div class="flex items-center gap-4 flex-shrink-0 pl-4 border-l border-slate-100 dark:border-slate-700">
+                    <p class="hidden md:block text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right w-32 truncate">
+                        ${link.categorie}
+                    </p>
+                    <div class="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/30 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                        <i class="fas fa-arrow-right -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                    </div>
                 </div>
             `;
             
