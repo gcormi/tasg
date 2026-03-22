@@ -1,402 +1,438 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post-its | Portail Éducatif</title>
-    <meta name="description" content="Gestionnaire de Post-its synchronisés en temps réel via Firebase.">
 
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Patrick+Hand&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK v10 (compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --font-hand: 'Caveat', cursive;
-            --font-ui: 'Inter', sans-serif;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: var(--font-ui);
-            background: #f0f4f8;
-            min-height: 100vh;
-        }
-
-        /* ===== BACKGROUND ===== */
-        .bg-pattern {
-            background-color: #e8edf2;
-            background-image:
-                radial-gradient(circle at 20% 20%, rgba(99,102,241,0.07) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(236,72,153,0.07) 0%, transparent 50%),
-                linear-gradient(rgba(148,163,184,0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148,163,184,0.15) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-        }
-
-        /* ===== GLASS HEADER ===== */
-        .glass-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        /* ===== POST-IT CARD ===== */
-        .postit-card {
-            font-family: var(--font-hand);
-            font-size: 1.15rem;
-            line-height: 1.6;
-            border-radius: 2px;
-            box-shadow:
-                2px 2px 0 rgba(0,0,0,0.04),
-                4px 6px 12px -2px rgba(0,0,0,0.14),
-                0 1px 3px rgba(0,0,0,0.08);
-            transform-origin: center;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
+            font-family: 'Inter', sans-serif;
+            background: #d6dde6;
+            height: 100vh;
             overflow: hidden;
-            animation: fadeInScale 0.4s ease-out forwards;
+            display: flex;
+            flex-direction: column;
         }
 
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.85) rotate(-1deg); }
-            to   { opacity: 1; transform: scale(1) rotate(var(--rot, 0deg)); }
+        /* ===== HEADER ===== */
+        header {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            z-index: 200;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
 
-        .postit-card:hover {
-            box-shadow:
-                2px 2px 0 rgba(0,0,0,0.04),
-                8px 16px 24px -4px rgba(0,0,0,0.2);
-            transform: translateY(-6px) scale(1.02) rotate(0deg) !important;
-            z-index: 10;
+        .header-left { display: flex; align-items: center; gap: 12px; }
+
+        .back-btn {
+            width: 38px; height: 38px;
+            background: white; border: 1.5px solid #e2e8f0;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #6366f1;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .back-btn:hover { background: #f5f3ff; border-color: #6366f1; }
+
+        .app-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+            flex-shrink: 0;
         }
 
-        /* Fold corner on each postit */
-        .postit-card::after {
+        .app-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem; color: #0f172a; line-height: 1.2; }
+        .sync-line { display: flex; align-items: center; font-size: 0.7rem; color: #94a3b8; font-weight: 500; margin-top: 2px; }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; }
+        .sync-dot.online  { background: #22c55e; animation: pulse-dot 2s infinite; }
+        .sync-dot.offline { background: #ef4444; }
+        .sync-dot.syncing { background: #f59e0b; animation: spin-dot 1s linear infinite; }
+        @keyframes pulse-dot { 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
+        @keyframes spin-dot  { to { transform: rotate(360deg); } }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+
+        .search-wrap { position: relative; }
+        .search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.8rem; pointer-events: none; }
+        .search-input {
+            background: #f8fafc; border: 1.5px solid #e2e8f0;
+            border-radius: 10px; padding: 8px 12px 8px 34px;
+            font-size: 0.82rem; outline: none;
+            transition: all 0.2s; width: 200px;
+        }
+        .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+        .counter-badge {
+            background: #f1f5f9; border: 1.5px solid #e2e8f0;
+            border-radius: 10px; padding: 6px 14px; text-align: center;
+        }
+        .counter-badge .num { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem; color: #6366f1; line-height: 1; }
+        .counter-badge .lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 700; }
+
+        .add-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white; border: none; border-radius: 12px;
+            padding: 9px 18px; font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .add-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 8px 24px rgba(99,102,241,0.45); }
+
+        /* ===== BOARD ===== */
+        #board {
+            flex: 1;
+            position: relative;
+            overflow: auto;
+            background-color: #c8d0da;
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(99,102,241,0.06) 0%, transparent 55%),
+                radial-gradient(circle at 85% 85%, rgba(236,72,153,0.05) 0%, transparent 55%),
+                linear-gradient(rgba(100,116,139,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100,116,139,0.1) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+            cursor: default;
+        }
+
+        /* Board inner (large canvas for post-its) */
+        #board-inner {
+            position: relative;
+            width: 3000px;
+            height: 2000px;
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        /* ===== POST-IT ===== */
+        .postit {
+            position: absolute;
+            width: 220px;
+            min-height: 160px;
+            padding: 32px 14px 16px 14px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1rem;
+            line-height: 1.65;
+            letter-spacing: 0.01em;
+            border-radius: 2px;
+            box-shadow: 3px 4px 14px -2px rgba(0,0,0,0.22), 1px 1px 2px rgba(0,0,0,0.06);
+            cursor: grab;
+            user-select: none;
+            transition: box-shadow 0.2s, transform 0.15s;
+            animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.75) rotate(var(--rot,0deg)); }
+            to   { opacity: 1; transform: scale(1) rotate(var(--rot,0deg)); }
+        }
+
+        .postit:active, .postit.dragging {
+            cursor: grabbing;
+            box-shadow: 6px 12px 30px -4px rgba(0,0,0,0.32), 3px 4px 8px rgba(0,0,0,0.1);
+            z-index: 999;
+            animation: none;
+            transform: scale(1.06) rotate(0deg) !important;
+        }
+
+        /* Tape effect */
+        .postit::before {
+            content: '';
+            position: absolute;
+            top: -3px; left: 50%; transform: translateX(-50%);
+            width: 54px; height: 16px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 0 0 3px 3px;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            pointer-events: none;
+        }
+
+        /* Corner fold */
+        .postit::after {
             content: '';
             position: absolute;
             bottom: 0; right: 0;
             width: 0; height: 0;
             border-style: solid;
-            border-width: 0 0 22px 22px;
-            border-color: transparent transparent rgba(0,0,0,0.12) transparent;
-            transition: all 0.3s ease;
-        }
-        .postit-card:hover::after {
-            border-bottom-color: rgba(0,0,0,0.18);
-            border-width: 0 0 28px 28px;
+            border-width: 0 0 20px 20px;
+            border-color: transparent transparent rgba(0,0,0,0.1) transparent;
+            pointer-events: none;
         }
 
-        /* Top tape effect */
-        .postit-card::before {
-            content: '';
-            position: absolute;
-            top: -4px; left: 50%;
-            transform: translateX(-50%);
-            width: 60px; height: 18px;
-            background: rgba(255,255,255,0.55);
-            border-radius: 0 0 3px 3px;
-            backdrop-filter: blur(2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        /* Colors */
+        .pi-yellow { background: #fff9c4; }
+        .pi-orange { background: #ffe0b2; }
+        .pi-pink   { background: #f8bbd0; }
+        .pi-blue   { background: #bbdefb; }
+        .pi-green  { background: #c8e6c9; }
+        .pi-purple { background: #e1bee7; }
+        .pi-cyan   { background: #b2ebf2; }
+        .pi-red    { background: #ffcdd2; }
+
+        .postit-title {
+            font-weight: 700; font-size: 1.05rem;
+            color: rgba(0,0,0,0.8);
+            margin-bottom: 5px;
+            word-break: break-word;
         }
 
-        /* === Post-it Colors === */
-        .pi-yellow  { background: #fff9c4; }
-        .pi-orange  { background: #ffe0b2; }
-        .pi-pink    { background: #f8bbd0; }
-        .pi-blue    { background: #bbdefb; }
-        .pi-green   { background: #c8e6c9; }
-        .pi-purple  { background: #e1bee7; }
-        .pi-cyan    { background: #b2ebf2; }
-        .pi-red     { background: #ffcdd2; }
+        .postit-content {
+            color: rgba(0,0,0,0.7);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
 
-        /* ===== FLOATING ADD BUTTON ===== */
-        .fab {
-            position: fixed;
-            bottom: 2rem; right: 2rem;
-            width: 60px; height: 60px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(99,102,241,0.4);
-            border: none;
-            font-size: 1.5rem;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 500;
+        .postit-date {
+            font-size: 0.65rem;
+            color: rgba(0,0,0,0.35);
+            margin-top: 10px;
+            font-family: 'Inter', sans-serif;
         }
-        .fab:hover {
-            transform: scale(1.15) rotate(90deg);
-            box-shadow: 0 12px 32px rgba(99,102,241,0.5);
+
+        .postit-delete {
+            position: absolute; top: 8px; right: 8px;
+            width: 22px; height: 22px;
+            background: none; border: none; border-radius: 50%;
+            color: rgba(0,0,0,0.22); cursor: pointer;
+            font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; opacity: 0;
+            z-index: 10;
         }
+        .postit:hover .postit-delete { opacity: 1; }
+        .postit-delete:hover { background: rgba(220,38,38,0.15); color: #dc2626; transform: scale(1.2); }
+
+        /* ===== EMPTY STATE ===== */
+        #empty-state {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            pointer-events: none;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #empty-state.visible { opacity: 1; pointer-events: auto; }
+        #empty-state .emoji { font-size: 4rem; margin-bottom: 16px; }
+        #empty-state h2 { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; color: #64748b; margin-bottom: 8px; }
+        #empty-state p { font-size: 0.9rem; color: #94a3b8; text-align: center; max-width: 300px; }
 
         /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed; inset: 0;
-            background: rgba(15,23,42,0.6);
+            background: rgba(15,23,42,0.55);
             backdrop-filter: blur(6px);
-            opacity: 0; visibility: hidden;
             z-index: 1000;
-            transition: all 0.3s ease;
             display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s ease;
         }
-        .modal-overlay.active {
-            opacity: 1; visibility: visible;
-        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
         .modal-box {
-            background: white;
-            border-radius: 24px;
-            padding: 32px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 24px 60px -12px rgba(0,0,0,0.3);
-            transform: scale(0.92) translateY(20px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: white; border-radius: 22px;
+            padding: 28px; width: 90%; max-width: 460px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+            transform: scale(0.9) translateY(16px);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .modal-overlay.active .modal-box {
-            transform: scale(1) translateY(0);
-        }
+        .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
 
-        /* Modal Textarea */
-        .postit-textarea {
-            font-family: 'Caveat', cursive;
-            font-size: 1.3rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px;
-            width: 100%;
-            resize: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
-            min-height: 130px;
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
         }
-        .postit-textarea:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+        .modal-header h2 {
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem; color: #0f172a;
+            display: flex; align-items: center; gap: 8px;
         }
-
-        /* Color Picker */
-        .color-dot {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-            flex-shrink: 0;
-        }
-        .color-dot:hover { transform: scale(1.2); }
-        .color-dot.selected {
-            border-color: #1e293b;
-            transform: scale(1.25);
-            box-shadow: 0 0 0 2px white, 0 0 0 4px #1e293b;
-        }
-
-        /* Title input */
-        .title-input {
-            font-family: 'Caveat', cursive;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 10px 14px;
-            width: 100%;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .title-input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
-        }
-
-        /* ===== SYNC STATUS ===== */
-        .sync-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        .sync-dot.online { background: #22c55e; animation: pulse 2s infinite; }
-        .sync-dot.offline { background: #ef4444; }
-        .sync-dot.syncing { background: #f59e0b; animation: spin 1s linear infinite; }
-        @keyframes pulse { 0%,100%{ opacity:1;} 50%{ opacity:0.5;} }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state { 
-            text-align: center; 
-            padding: 80px 20px;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn { from{ opacity:0; } to{ opacity:1; } }
-
-        /* ===== GRID LAYOUT ===== */
-        .postits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1.5rem;
-            align-items: start;
-        }
-
-        /* ===== SEARCH BAR ===== */
-        .search-bar {
-            background: rgba(255,255,255,0.9);
-            border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 10px 16px 10px 44px;
-            outline: none;
-            font-size: 0.875rem;
+        .modal-close {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: #f1f5f9; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #64748b; font-size: 0.9rem;
             transition: all 0.2s;
-            width: 100%;
         }
-        .search-bar:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+        .modal-close:hover { background: #fee2e2; color: #dc2626; }
+
+        .modal-label {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: #94a3b8; display: block; margin-bottom: 7px;
         }
 
-        /* Delete btn on card */
-        .delete-btn {
-            position: absolute;
-            top: 8px; right: 10px;
-            background: none; border: none;
-            color: rgba(0,0,0,0.25);
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: color 0.2s, transform 0.2s;
-            padding: 4px;
-            border-radius: 50%;
+        .modal-input {
+            font-family: 'Patrick Hand', cursive; font-size: 1.1rem;
+            width: 100%; border: 2px solid #e2e8f0; border-radius: 11px;
+            padding: 10px 13px; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .delete-btn:hover {
-            color: rgba(220,38,38,0.8);
-            transform: scale(1.3);
-        }
+        .modal-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 7px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .modal-textarea {
+            font-family: 'Patrick Hand', cursive; font-size: 1.1rem;
+            width: 100%; border: 2px solid #e2e8f0; border-radius: 11px;
+            padding: 10px 13px; outline: none; resize: none; min-height: 110px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .modal-textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+
+        .color-row { display: flex; flex-wrap: wrap; gap: 10px; }
+        .color-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 3px solid transparent; cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.14);
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .color-dot:hover { transform: scale(1.18); }
+        .color-dot.selected { border-color: #1e293b; transform: scale(1.22); box-shadow: 0 0 0 2px white, 0 0 0 4px #1e293b; }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+
+        .btn-cancel {
+            padding: 9px 18px; border-radius: 10px; border: none;
+            background: #f1f5f9; color: #64748b; font-weight: 700;
+            cursor: pointer; font-size: 0.875rem; transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #e2e8f0; }
+
+        .btn-save {
+            padding: 9px 22px; border-radius: 10px; border: none;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white; font-weight: 800; cursor: pointer; font-size: 0.875rem;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+            transition: all 0.2s;
+        }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+        .btn-save:disabled { opacity: 0.6; pointer-events: none; }
+
+        /* Scrollbars */
+        #board::-webkit-scrollbar { width: 8px; height: 8px; }
+        #board::-webkit-scrollbar-track { background: transparent; }
+        #board::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.3); border-radius: 8px; }
+        #board::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,0.5); }
+
+        /* Hint */
+        .drag-hint {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(15,23,42,0.75); color: white; font-size: 0.72rem; font-weight: 600;
+            padding: 7px 14px; border-radius: 20px; backdrop-filter: blur(6px);
+            pointer-events: none; opacity: 0; transition: opacity 0.5s;
+            white-space: nowrap; z-index: 100;
+        }
+        .drag-hint.visible { opacity: 1; }
     </style>
 </head>
 
-<body class="bg-pattern min-h-screen flex flex-col">
+<body>
 
     <!-- HEADER -->
-    <header class="glass-header sticky top-0 z-50 py-4 px-6 md:px-10">
-        <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 border border-slate-200 hover:bg-slate-50 transition-colors" title="Retour au portail">
-                    <i class="fas fa-arrow-left text-sm"></i>
-                </a>
-                <div class="w-11 h-11 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-yellow-200">
-                    <i class="fas fa-sticky-note text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-display text-lg font-bold text-slate-900 leading-tight" style="font-family:'Outfit',sans-serif;">Mes Post-its</h1>
-                    <div class="flex items-center text-[11px] text-slate-400 font-medium mt-0.5">
-                        <span class="sync-dot online" id="sync-dot"></span>
-                        <span id="sync-status">Synchronisé en temps réel</span>
-                    </div>
+    <header>
+        <div class="header-left">
+            <a href="index.html" class="back-btn" title="Retour au portail">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="app-icon"><i class="fas fa-sticky-note"></i></div>
+            <div>
+                <div class="app-title">Mes Post-its</div>
+                <div class="sync-line">
+                    <span class="sync-dot online" id="sync-dot"></span>
+                    <span id="sync-status">Synchronisé en temps réel</span>
                 </div>
             </div>
+        </div>
 
-            <div class="flex items-center gap-3">
-                <!-- Search -->
-                <div class="relative hidden sm:block">
-                    <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
-                    <input type="text" id="search-input" class="search-bar" placeholder="Rechercher dans mes post-its..." style="min-width:220px;">
-                </div>
-
-                <!-- Counter -->
-                <div class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-center hidden sm:block">
-                    <div class="text-lg font-extrabold text-indigo-600" id="count-display">0</div>
-                    <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Post-its</div>
-                </div>
+        <div class="header-right">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Rechercher...">
             </div>
+            <div class="counter-badge">
+                <div class="num" id="count-display">0</div>
+                <div class="lbl">Post-its</div>
+            </div>
+            <button class="add-btn" onclick="openModal()">
+                <i class="fas fa-plus"></i> Nouveau post-it
+            </button>
         </div>
     </header>
 
-    <!-- MAIN -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 md:px-8 py-8">
-
-        <!-- Empty State -->
-        <div id="empty-state" class="empty-state hidden">
-            <div class="text-8xl mb-6">📝</div>
-            <h2 class="text-2xl font-extrabold text-slate-700 mb-2" style="font-family:'Outfit',sans-serif;">Aucun post-it pour le moment</h2>
-            <p class="text-slate-500 mb-6 max-w-md mx-auto">Cliquez sur le bouton <strong class="text-indigo-600">+</strong> en bas à droite pour créer votre premier post-it. Il sera instantanément synchronisé sur tous vos appareils !</p>
-            <button onclick="openModal()" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-full font-bold shadow-lg shadow-indigo-200 hover:shadow-xl transition-all hover:-translate-y-1">
-                <i class="fas fa-plus"></i> Créer mon premier post-it
-            </button>
+    <!-- BOARD -->
+    <div id="board">
+        <div id="board-inner">
+            <!-- Post-its are injected here -->
+            <div id="empty-state">
+                <div class="emoji">📝</div>
+                <h2>Tableau vierge</h2>
+                <p>Cliquez sur <strong>"Nouveau post-it"</strong> pour créer votre première note. Vous pourrez ensuite la déplacer librement !</p>
+            </div>
         </div>
+    </div>
 
-        <!-- Grid -->
-        <div class="postits-grid" id="postits-grid"></div>
-
-    </main>
-
-    <!-- FAB Button -->
-    <button class="fab" onclick="openModal()" title="Ajouter un post-it" aria-label="Ajouter un post-it">
-        <i class="fas fa-plus"></i>
-    </button>
+    <!-- DRAG HINT -->
+    <div class="drag-hint" id="drag-hint">💡 Glissez les post-its pour les repositionner</div>
 
     <!-- MODAL -->
     <div class="modal-overlay" id="modal">
         <div class="modal-box">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-extrabold text-slate-900" style="font-family:'Outfit',sans-serif;">
-                    <i class="fas fa-sticky-note text-yellow-400 mr-2"></i>
-                    Nouveau post-it
-                </h2>
-                <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
+            <div class="modal-header">
+                <h2><i class="fas fa-sticky-note" style="color:#fbbf24"></i> Nouveau post-it</h2>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
 
-            <!-- Title -->
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Titre (optionnel)</label>
-                <input type="text" id="modal-title" class="title-input" placeholder="Ex: À faire aujourd'hui...">
+            <div style="margin-bottom:14px;">
+                <label class="modal-label">Titre (optionnel)</label>
+                <input type="text" id="modal-title" class="modal-input" placeholder="Ex: À faire, Idée, Important...">
             </div>
 
-            <!-- Content -->
-            <div class="mb-5">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Contenu *</label>
-                <textarea id="modal-content" class="postit-textarea" placeholder="Écrivez votre note ici..."></textarea>
+            <div style="margin-bottom:16px;">
+                <label class="modal-label">Contenu *</label>
+                <textarea id="modal-content" class="modal-textarea" placeholder="Écrivez votre note ici..."></textarea>
             </div>
 
-            <!-- Color Picker -->
-            <div class="mb-6">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Couleur</label>
-                <div class="flex flex-wrap gap-2.5" id="color-picker">
-                    <button type="button" class="color-dot selected" data-color="pi-yellow" style="background:#fff9c4;" title="Jaune"></button>
-                    <button type="button" class="color-dot" data-color="pi-orange" style="background:#ffe0b2;" title="Orange"></button>
-                    <button type="button" class="color-dot" data-color="pi-pink" style="background:#f8bbd0;" title="Rose"></button>
-                    <button type="button" class="color-dot" data-color="pi-blue" style="background:#bbdefb;" title="Bleu"></button>
-                    <button type="button" class="color-dot" data-color="pi-green" style="background:#c8e6c9;" title="Vert"></button>
-                    <button type="button" class="color-dot" data-color="pi-purple" style="background:#e1bee7;" title="Violet"></button>
-                    <button type="button" class="color-dot" data-color="pi-cyan" style="background:#b2ebf2;" title="Cyan"></button>
-                    <button type="button" class="color-dot" data-color="pi-red" style="background:#ffcdd2;" title="Rouge"></button>
+            <div style="margin-bottom:20px;">
+                <label class="modal-label">Couleur</label>
+                <div class="color-row" id="color-picker">
+                    <button class="color-dot selected" data-color="pi-yellow" style="background:#fff9c4" title="Jaune"></button>
+                    <button class="color-dot" data-color="pi-orange" style="background:#ffe0b2" title="Orange"></button>
+                    <button class="color-dot" data-color="pi-pink"   style="background:#f8bbd0" title="Rose"></button>
+                    <button class="color-dot" data-color="pi-blue"   style="background:#bbdefb" title="Bleu"></button>
+                    <button class="color-dot" data-color="pi-green"  style="background:#c8e6c9" title="Vert"></button>
+                    <button class="color-dot" data-color="pi-purple" style="background:#e1bee7" title="Violet"></button>
+                    <button class="color-dot" data-color="pi-cyan"   style="background:#b2ebf2" title="Cyan"></button>
+                    <button class="color-dot" data-color="pi-red"    style="background:#ffcdd2" title="Rouge"></button>
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="flex justify-end gap-3">
-                <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">
-                    Annuler
-                </button>
-                <button onclick="savePostit()" id="save-btn" class="px-6 py-2.5 rounded-xl font-extrabold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5">
-                    <i class="fas fa-save mr-2"></i>Enregistrer
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+                <button class="btn-save" id="save-btn" onclick="savePostit()">
+                    <i class="fas fa-save" style="margin-right:6px"></i>Enregistrer
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE + APP SCRIPT -->
+    <!-- SCRIPT -->
     <script>
-        // ====== FIREBASE CONFIG ======
+        // ====== FIREBASE ======
         const firebaseConfig = {
             apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
             authDomain: "portail-postits.firebaseapp.com",
@@ -405,7 +441,6 @@
             messagingSenderId: "494625342197",
             appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const postitsRef = db.collection('postits');
@@ -414,148 +449,248 @@
         let selectedColor = 'pi-yellow';
         let currentSearch = '';
         let allPostits = [];
+        let hintShown = false;
 
-        // Rotations légèrement aléatoires pour l'effet naturel
-        const rotations = [-2, -1.5, -1, 0, 0.5, 1, 1.5, 2];
-        function getRot() {
-            return rotations[Math.floor(Math.random() * rotations.length)];
+        // Subtle random rotation pool
+        const ROTS = [-2.5, -1.8, -1.2, -0.5, 0, 0.3, 0.9, 1.6, 2.2];
+        function getRot(id) {
+            // Deterministic based on id so it doesn't jump on re-render
+            let hash = 0;
+            for(let c of id) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffff;
+            return ROTS[hash % ROTS.length];
         }
 
         // ====== SYNC STATUS ======
         function setSyncStatus(state) {
             const dot = document.getElementById('sync-dot');
-            const label = document.getElementById('sync-status');
+            const lbl = document.getElementById('sync-status');
             dot.className = 'sync-dot ' + state;
-            if(state === 'online')  { label.textContent = 'Synchronisé en temps réel'; }
-            if(state === 'syncing') { label.textContent = 'Synchronisation...'; }
-            if(state === 'offline') { label.textContent = 'Hors ligne'; }
+            lbl.textContent = state === 'online' ? 'Synchronisé en temps réel' : state === 'syncing' ? 'Synchronisation...' : 'Hors ligne';
         }
 
-        // ====== REAL-TIME LISTENER (le cœur de Firebase) ======
-        postitsRef.orderBy('createdAt', 'desc').onSnapshot(
-            (snapshot) => {
-                allPostits = [];
-                snapshot.forEach(doc => {
-                    allPostits.push({ id: doc.id, ...doc.data() });
-                });
-                setSyncStatus('online');
-                renderPostits(allPostits);
-            },
-            (error) => {
-                console.error("Erreur Firebase:", error);
-                setSyncStatus('offline');
-            }
-        );
+        // ====== REAL-TIME LISTENER ======
+        postitsRef.onSnapshot(snapshot => {
+            allPostits = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            setSyncStatus('online');
+            renderBoard();
+        }, err => {
+            console.error(err);
+            setSyncStatus('offline');
+        });
 
-        // ====== RENDER ======
-        function renderPostits(list) {
-            const grid = document.getElementById('postits-grid');
+        // ====== RENDER BOARD ======
+        function renderBoard() {
+            const board = document.getElementById('board-inner');
             const emptyState = document.getElementById('empty-state');
-            const countDisplay = document.getElementById('count-display');
-            
-            const filtered = list.filter(p => {
-                if(!currentSearch) return true;
-                const q = currentSearch.toLowerCase();
-                return (p.title||'').toLowerCase().includes(q) || (p.content||'').toLowerCase().includes(q);
-            });
+            document.getElementById('count-display').textContent = allPostits.length;
 
-            countDisplay.textContent = list.length;
-            grid.innerHTML = '';
+            const q = currentSearch.toLowerCase();
+            const filtered = currentSearch
+                ? allPostits.filter(p => (p.title||'').toLowerCase().includes(q) || (p.content||'').toLowerCase().includes(q))
+                : allPostits;
+
+            // Remove old post-it elements (keep empty-state)
+            Array.from(board.querySelectorAll('.postit')).forEach(el => el.remove());
 
             if(filtered.length === 0) {
-                emptyState.classList.remove('hidden');
+                emptyState.classList.add('visible');
             } else {
-                emptyState.classList.add('hidden');
-                filtered.forEach(postit => {
-                    const rot = getRot();
+                emptyState.classList.remove('visible');
+
+                // Show drag hint only first time
+                if(!hintShown && allPostits.length > 0) {
+                    hintShown = true;
+                    const hint = document.getElementById('drag-hint');
+                    hint.classList.add('visible');
+                    setTimeout(() => hint.classList.remove('visible'), 3500);
+                }
+
+                filtered.forEach(p => {
+                    // Default random placement if no saved position
+                    const boardEl = document.getElementById('board');
+                    const vw = boardEl.clientWidth;
+                    const vh = boardEl.clientHeight;
+                    const defaultX = 40 + Math.floor(Math.random() * Math.max(vw - 280, 200));
+                    const defaultY = 40 + Math.floor(Math.random() * Math.max(vh - 280, 200));
+
+                    const x = typeof p.x === 'number' ? p.x : defaultX;
+                    const y = typeof p.y === 'number' ? p.y : defaultY;
+                    const rot = getRot(p.id);
+
                     const card = document.createElement('div');
-                    card.className = `postit-card ${postit.color || 'pi-yellow'} p-5 pt-7 relative`;
+                    card.className = `postit ${p.color || 'pi-yellow'}`;
+                    card.dataset.id = p.id;
+                    card.style.left = x + 'px';
+                    card.style.top  = y + 'px';
                     card.style.setProperty('--rot', rot + 'deg');
                     card.style.transform = `rotate(${rot}deg)`;
-                    
-                    const titleHtml = postit.title 
-                        ? `<div class="font-bold text-slate-800 text-lg mb-2 truncate">${escapeHtml(postit.title)}</div>` 
-                        : '';
-                    
-                    const dateStr = postit.createdAt?.toDate?.() 
-                        ? new Intl.DateTimeFormat('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }).format(postit.createdAt.toDate())
+
+                    const titleHtml = p.title ? `<div class="postit-title">${esc(p.title)}</div>` : '';
+                    const dateStr = p.createdAt?.toDate?.()
+                        ? new Intl.DateTimeFormat('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }).format(p.createdAt.toDate())
                         : '';
 
                     card.innerHTML = `
-                        <button class="delete-btn" onclick="deletePostit('${postit.id}')" title="Supprimer">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <button class="postit-delete" onclick="deletePostit('${p.id}')" title="Supprimer"><i class="fas fa-times"></i></button>
                         ${titleHtml}
-                        <div class="text-slate-700 leading-relaxed whitespace-pre-wrap break-words">${escapeHtml(postit.content)}</div>
-                        ${dateStr ? `<div class="mt-3 text-[11px] text-slate-500 opacity-70">${dateStr}</div>` : ''}
+                        <div class="postit-content">${esc(p.content)}</div>
+                        ${dateStr ? `<div class="postit-date">${dateStr}</div>` : ''}
                     `;
-                    grid.appendChild(card);
+
+                    makeDraggable(card, p.id);
+                    board.appendChild(card);
                 });
             }
         }
 
-        function escapeHtml(str) {
-            if(!str) return '';
-            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        function esc(s) {
+            return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        // ====== DRAG & DROP ======
+        let saveTimer = null;
+
+        function makeDraggable(el, docId) {
+            let startMouseX, startMouseY, startElX, startElY, isDragging = false;
+
+            function getPos(e) {
+                return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                                 : { x: e.clientX, y: e.clientY };
+            }
+
+            function onStart(e) {
+                // Don't drag if clicking delete button
+                if(e.target.closest('.postit-delete')) return;
+                e.preventDefault();
+
+                const pos = getPos(e);
+                startMouseX = pos.x;
+                startMouseY = pos.y;
+                startElX = parseInt(el.style.left) || 0;
+                startElY = parseInt(el.style.top)  || 0;
+                isDragging = false;
+
+                // Bring to front
+                el.style.zIndex = 999;
+
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup',   onEnd);
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend',  onEnd);
+            }
+
+            function onMove(e) {
+                e.preventDefault();
+                const pos = getPos(e);
+                const dx = pos.x - startMouseX;
+                const dy = pos.y - startMouseY;
+
+                if(!isDragging && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+                    isDragging = true;
+                    el.classList.add('dragging');
+                }
+
+                if(isDragging) {
+                    const board = document.getElementById('board');
+                    const newX = Math.max(0, startElX + dx + board.scrollLeft - (isDragging ? board.getBoundingClientRect().left - document.getElementById('board').getBoundingClientRect().left : 0));
+                    const newY = Math.max(0, startElY + dy + board.scrollTop - (isDragging ? board.getBoundingClientRect().top - document.getElementById('board').getBoundingClientRect().top : 0));
+
+                    el.style.left = (startElX + dx + board.scrollLeft - board.getBoundingClientRect().left + document.getElementById('board').getBoundingClientRect().left) + 'px';
+                    // Simpler: just offset from start
+                    const newLeft = Math.max(0, startElX + dx);
+                    const newTop  = Math.max(0, startElY + dy);
+                    el.style.left = newLeft + 'px';
+                    el.style.top  = newTop  + 'px';
+                }
+            }
+
+            function onEnd() {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup',   onEnd);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend',  onEnd);
+
+                el.style.zIndex = 5;
+
+                if(isDragging) {
+                    el.classList.remove('dragging');
+                    // Restore rotation
+                    const rot = getRot(docId);
+                    el.style.transform = `rotate(${rot}deg)`;
+                    isDragging = false;
+
+                    // Save position to Firebase (debounced)
+                    const newX = parseInt(el.style.left) || 0;
+                    const newY = parseInt(el.style.top)  || 0;
+                    clearTimeout(saveTimer);
+                    saveTimer = setTimeout(() => {
+                        setSyncStatus('syncing');
+                        postitsRef.doc(docId).update({ x: newX, y: newY })
+                            .then(() => setSyncStatus('online'))
+                            .catch(() => setSyncStatus('offline'));
+                    }, 400);
+                }
+            }
+
+            el.addEventListener('mousedown', onStart);
+            el.addEventListener('touchstart', onStart, { passive: false });
         }
 
         // ====== SAVE POSTIT ======
         async function savePostit() {
             const title   = document.getElementById('modal-title').value.trim();
             const content = document.getElementById('modal-content').value.trim();
-
             if(!content) {
-                document.getElementById('modal-content').focus();
-                document.getElementById('modal-content').style.borderColor = '#ef4444';
-                setTimeout(() => { document.getElementById('modal-content').style.borderColor = '#e2e8f0'; }, 1500);
+                const ta = document.getElementById('modal-content');
+                ta.style.borderColor = '#ef4444';
+                ta.focus();
+                setTimeout(() => ta.style.borderColor = '#e2e8f0', 1500);
                 return;
             }
 
             const btn = document.getElementById('save-btn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sauvegarde...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Sauvegarde...';
             setSyncStatus('syncing');
+
+            // Determine position in center of current view
+            const board = document.getElementById('board');
+            const x = board.scrollLeft + board.clientWidth  / 2 - 110;
+            const y = board.scrollTop  + board.clientHeight / 2 - 80;
 
             try {
                 await postitsRef.add({
-                    title,
-                    content,
+                    title, content,
                     color: selectedColor,
+                    x: Math.max(0, x),
+                    y: Math.max(0, y),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 closeModal();
-            } catch(err) {
-                console.error("Erreur lors de la sauvegarde:", err);
-                alert("Erreur de connexion à Firebase. Vérifiez votre connexion Internet.");
+            } catch(e) {
+                alert('Erreur Firebase : ' + e.message);
                 setSyncStatus('offline');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save mr-2"></i>Enregistrer';
+                btn.innerHTML = '<i class="fas fa-save" style="margin-right:6px"></i>Enregistrer';
             }
         }
 
-        // ====== DELETE POSTIT ======
+        // ====== DELETE ======
         async function deletePostit(id) {
-            if(!confirm("Supprimer ce post-it définitivement ?")) return;
+            if(!confirm('Supprimer ce post-it définitivement ?')) return;
             setSyncStatus('syncing');
-            try {
-                await postitsRef.doc(id).delete();
-            } catch(err) {
-                console.error("Erreur suppression:", err);
-                setSyncStatus('offline');
-            }
+            await postitsRef.doc(id).delete().catch(() => setSyncStatus('offline'));
         }
 
         // ====== MODAL ======
         function openModal() {
-            document.getElementById('modal').classList.add('active');
             document.getElementById('modal-title').value = '';
             document.getElementById('modal-content').value = '';
-            // Reset color to yellow
+            document.getElementById('modal-content').style.background = '#fff9c4';
             selectedColor = 'pi-yellow';
-            document.querySelectorAll('.color-dot').forEach(d => {
-                d.classList.toggle('selected', d.dataset.color === 'pi-yellow');
-            });
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.toggle('selected', d.dataset.color === 'pi-yellow'));
+            document.getElementById('modal').classList.add('active');
             setTimeout(() => document.getElementById('modal-title').focus(), 100);
         }
 
@@ -563,41 +698,30 @@
             document.getElementById('modal').classList.remove('active');
         }
 
-        // Close modal on overlay click
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if(e.target === document.getElementById('modal')) closeModal();
-        });
-
-        // Close modal on Escape
-        document.addEventListener('keydown', (e) => {
+        // Overlay click / Escape
+        document.getElementById('modal').addEventListener('click', e => { if(e.target === document.getElementById('modal')) closeModal(); });
+        document.addEventListener('keydown', e => {
             if(e.key === 'Escape') closeModal();
-            if(e.key === 'Enter' && (e.ctrlKey || e.metaKey) && document.getElementById('modal').classList.contains('active')) {
-                savePostit();
-            }
+            if((e.ctrlKey||e.metaKey) && e.key === 'Enter' && document.getElementById('modal').classList.contains('active')) savePostit();
         });
 
-        // ====== COLOR PICKER ======
+        // Color picker
+        const colorBgMap = { 'pi-yellow':'#fff9c4','pi-orange':'#ffe0b2','pi-pink':'#f8bbd0','pi-blue':'#bbdefb','pi-green':'#c8e6c9','pi-purple':'#e1bee7','pi-cyan':'#b2ebf2','pi-red':'#ffcdd2' };
         document.querySelectorAll('.color-dot').forEach(dot => {
             dot.addEventListener('click', () => {
                 document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
                 dot.classList.add('selected');
                 selectedColor = dot.dataset.color;
-                // Live preview on textarea
-                const textarea = document.getElementById('modal-content');
-                const colorMap = {
-                    'pi-yellow':'#fff9c4','pi-orange':'#ffe0b2','pi-pink':'#f8bbd0',
-                    'pi-blue':'#bbdefb','pi-green':'#c8e6c9','pi-purple':'#e1bee7',
-                    'pi-cyan':'#b2ebf2','pi-red':'#ffcdd2'
-                };
-                textarea.style.background = colorMap[selectedColor] || 'white';
+                document.getElementById('modal-content').style.background = colorBgMap[selectedColor] || 'white';
             });
         });
 
-        // ====== SEARCH ======
-        document.getElementById('search-input').addEventListener('input', (e) => {
+        // Search
+        document.getElementById('search-input').addEventListener('input', e => {
             currentSearch = e.target.value;
-            renderPostits(allPostits);
+            renderBoard();
         });
     </script>
+
 </body>
 </html>
