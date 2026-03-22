@@ -235,8 +235,8 @@
     </div>
 
     <!-- Modal de Session (Récupération) -->
-    <div id="session-modal" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-md z-[3000] items-center justify-center flex transition-all">
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl max-w-md w-full mx-4 shadow-2xl transition-all scale-95 opacity-0" id="session-modal-card">
+    <div id="session-modal" class="hidden fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-md z-[5000] items-center justify-center flex">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl max-w-md w-full mx-4 shadow-2xl relative" id="session-modal-card">
             <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                 <i class="fas fa-history text-indigo-500"></i> Récupérer ma session
             </h3>
@@ -432,19 +432,16 @@
             fetchAllFeeds();
         }
 
+        // --- ACTIONS GLOBALES ---
         window.toggleSessionModal = () => {
             const modal = document.getElementById('session-modal');
-            const card = document.getElementById('session-modal-card');
+            if (!modal) return;
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
-                setTimeout(() => {
-                    card.classList.remove('scale-95', 'opacity-0');
-                    card.classList.add('scale-100', 'opacity-100');
-                }, 10);
+                modal.classList.add('flex');
             } else {
-                card.classList.remove('scale-100', 'opacity-100');
-                card.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => modal.classList.add('hidden'), 300);
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }
         };
 
@@ -452,15 +449,24 @@
             const pwd = document.getElementById('master-password').value.trim();
             if (pwd.length < 4) return showToast("Code trop court", true);
             
-            showToast("Migration vers l'ancienne session...");
+            showToast("Chargement de la session...");
             sessionStorage.setItem('veille_master_recovery', pwd);
             
-            // Fermer et rafraîchir pour appliquer le nouvel UID
             toggleSessionModal();
-            setTimeout(() => window.location.reload(), 800);
+            setTimeout(() => window.location.reload(), 500);
         };
 
 
+        window.saveAndSync = async () => {
+            const pwd = document.getElementById('master-password').value.trim();
+            if (pwd.length < 4) return showToast("Code trop court", true);
+            
+            showToast("Chargement de la session...");
+            sessionStorage.setItem('veille_master_recovery', pwd);
+            
+            window.toggleSessionModal();
+            setTimeout(() => window.location.reload(), 500);
+        };
 
         // --- DATA MANAGEMENT ---
         function listenToData(uid) {
@@ -494,12 +500,14 @@
 
         function updateFolderUI() {
             const select = document.getElementById('folder-select');
+            if (!select) return;
             select.innerHTML = '<option value="none">Favoris non classés</option>';
-            folders.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
+            [...folders].sort((a,b) => (a.name || "").localeCompare(b.name || "")).forEach(f => {
                 select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
             });
             renderFolders();
         }
+
 
 
         async function fetchRSS(source) {
@@ -541,10 +549,11 @@
             if (!grid) return;
             grid.innerHTML = '';
             
-            const allDisplays = [...folders.sort((a,b) => a.name.localeCompare(b.name))];
+            const allDisplays = [...folders].sort((a,b) => (a.name || "").localeCompare(b.name || ""));
             
-            // On affiche TOUJOURS "Favoris non classés" pour éviter d'avoir une page vide
+            // On affiche TOUJOURS "Favoris non classés"
             allDisplays.push({ id: 'none', name: 'Favoris non classés', color: 'slate' });
+
 
             allDisplays.forEach(f => {
                 const folderLinks = sources.filter(s => f.id === 'none' ? (!s.folderId || s.folderId === 'none') : s.folderId === f.id);
@@ -565,11 +574,15 @@
                     </div>
                     
                     <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
-                        <button onclick="event.stopPropagation(); window.openLinksModal('${f.id}')" class="text-[10px] font-bold text-indigo-500 hover:underline uppercase tracking-wide">Ouvrir le dossier</button>
+                        <button onclick="event.stopPropagation(); window.openLinksModal('${f.id}')" class="text-[10px] font-bold text-indigo-500 hover:underline uppercase tracking-wide cursor-pointer">Ouvrir le dossier</button>
                         ${f.id !== 'none' ? `
                         <div class="flex gap-2">
-                            <i onclick="event.stopPropagation(); window.openFolderModal('${f.id}')" class="fas fa-edit text-slate-300 hover:text-indigo-500 text-xs p-1 cursor-pointer" title="Modifier"></i>
-                            <i onclick="event.stopPropagation(); window.deleteFolder('${f.id}')" class="fas fa-trash-alt text-slate-300 hover:text-red-500 text-xs p-1 cursor-pointer" title="Supprimer"></i>
+                            <button onclick="event.stopPropagation(); window.openFolderModal('${f.id}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-300 hover:text-indigo-600 transition-all cursor-pointer" title="Modifier">
+                                <i class="fas fa-edit text-[10px]"></i>
+                            </button>
+                            <button onclick="event.stopPropagation(); window.deleteFolder('${f.id}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-300 hover:text-rose-600 transition-all cursor-pointer" title="Supprimer">
+                                <i class="fas fa-trash-alt text-[10px]"></i>
+                            </button>
                         </div>` : ''}
                     </div>
                 `;
@@ -965,9 +978,11 @@
             setTimeout(() => t.remove(), 3000);
         }
 
-        initAuth();
-        document.getElementById('acc-btn').addEventListener('click', () => document.documentElement.classList.toggle('dark-mode'));
-        document.getElementById('btn-refresh').addEventListener('click', fetchAllFeeds);
+        (async () => {
+            await initAuth();
+            document.getElementById('acc-btn').addEventListener('click', () => document.documentElement.classList.toggle('dark-mode'));
+            document.getElementById('btn-refresh').addEventListener('click', fetchAllFeeds);
+        })();
     </script>
 </body>
 </html>
