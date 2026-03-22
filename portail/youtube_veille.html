@@ -14,6 +14,12 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script>
+        // Protection du portail - Doit être AVANT le reste du chargement
+        if (localStorage.getItem('portal_unlocked') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
