@@ -19,7 +19,6 @@
             --weather-text: #ffffff;
         }
 
-
         body {
             font-family: 'Inter', sans-serif;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,10 +94,6 @@
         body.theme-mint blockquote, body.theme-mint cite, body.theme-mint [contenteditable]:empty:before { color: #064e3b; }
         body.theme-mint .editor-btn { border-color: #86efac; color: #064e3b; }
 
-
-
-
-
         .font-display { font-family: 'Outfit', sans-serif; }
 
         .glass-card {
@@ -145,7 +140,6 @@
         .min-hand { width: 4px; height: 100px; background: var(--clock-hands); opacity: 0.8; z-index: 2; }
         .second-hand { width: 2px; height: 110px; background: var(--accent-rose); z-index: 1; }
 
-
         .number {
             position: absolute;
             width: 100%; height: 100%;
@@ -190,11 +184,6 @@
             color: #000 !important;
         }
 
-
-
-
-
-
         .glow-text {
             text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
         }
@@ -206,83 +195,135 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* EDITOR UI */
-        .editor-btn {
-            @apply w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-all border border-white/5 hover:bg-white/10 hover:border-white/20;
+        .pulse-rose { animation: pulseR 2s infinite; }
+        @keyframes pulseR {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
         }
-        .editor-btn.active { @apply bg-indigo-600 border-indigo-500 text-white; }
+
+        .pulse-amber { animation: pulseA 2s infinite; }
+        @keyframes pulseA {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        .editor-btn {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+        .editor-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .editor-btn.active { background: var(--accent-indigo); color: #fff; }
+
+        .theme-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .theme-btn:hover { transform: translateY(-2px); }
+        .theme-btn.active { border-color: var(--accent-indigo); box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
 
         [contenteditable]:empty:before {
             content: attr(placeholder);
             color: rgba(255,255,255,0.2);
-            cursor: text;
+            font-style: italic;
+        }
+
+        /* RESPONSIVE FIXES */
+        @media (max-height: 800px) {
+            .clock-container { width: 220px; height: 220px; }
+            .hour-hand { height: 50px; }
+            .min-hand { height: 80px; }
+            .second-hand { height: 90px; }
+            .timer-svg { width: 100px; height: 100px; }
         }
     </style>
 </head>
-<body class="p-8 flex flex-col gap-8">
+<body class="h-full bg-slate-950 p-8 flex flex-col gap-8 theme-night">
 
-    <!-- TOP SECTION: DATE & METEO -->
-    <header class="flex justify-between items-end">
-        <div class="f-up">
-            <h1 id="current-date" class="font-display font-extrabold text-5xl tracking-tight text-white mb-2">Dimanche 22 Mars</h1>
-            <p class="text-indigo-400 font-bold uppercase tracking-widest text-sm flex items-center gap-2">
-                <i class="fas fa-school"></i> 
-                Tableau de Bord de Classe · Gilles Cormi
-            </p>
+    <!-- HEADER: DATE & METEO -->
+    <header class="flex items-center justify-between px-4">
+        <div class="flex items-center gap-6">
+            <h1 id="current-date" class="text-3xl font-display font-extrabold tracking-tight text-white glow-text uppercase">---</h1>
+            <div class="h-8 w-px bg-white/10"></div>
+            <div id="digital-clock" class="text-3xl font-mono font-bold text-slate-400">00:00:00</div>
         </div>
 
-        <div class="flex items-center gap-6">
-            <div class="flex bg-black/20 p-1.5 rounded-2xl border border-white/5 order-2 lg:order-1 self-center">
-                <button onclick="setTheme('day')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Jour (Gris)"><i class="fas fa-adjust text-slate-400"></i></button>
-                <button onclick="setTheme('sky')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Bleu Ciel"><i class="fas fa-cloud text-sky-400"></i></button>
-                <button onclick="setTheme('mint')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Menthe"><i class="fas fa-leaf text-emerald-400"></i></button>
-                <button onclick="setTheme('night')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Nuit"><i class="fas fa-moon text-indigo-400"></i></button>
-                <button onclick="setTheme('cyber')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Cyber/Tech"><i class="fas fa-microchip text-rose-500"></i></button>
+        <!-- THEME CONTROLS -->
+        <div class="glass-card px-4 py-2 flex items-center gap-2">
+            <button onclick="setTheme('night')" id="btn-night" class="theme-btn bg-slate-900 text-indigo-400 active" title="Nuit Profonde">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button onclick="setTheme('day')" id="btn-day" class="theme-btn bg-white text-amber-500" title="Journée Claire">
+                <i class="fas fa-sun"></i>
+            </button>
+            <button onclick="setTheme('sky')" id="btn-sky" class="theme-btn bg-sky-100 text-sky-600" title="Ciel Bleu">
+                <i class="fas fa-cloud-sun"></i>
+            </button>
+            <button onclick="setTheme('mint')" id="btn-mint" class="theme-btn bg-emerald-50 text-emerald-600" title="Menthe Fraîche">
+                <i class="fas fa-leaf"></i>
+            </button>
+            <button onclick="setTheme('cyber')" id="btn-cyber" class="theme-btn bg-black text-indigo-500" title="Cyberpunk">
+                <i class="fas fa-microchip"></i>
+            </button>
+        </div>
+
+        <div class="glass-card px-6 py-3 flex items-center gap-4 border-emerald-500/20">
+            <div id="meteo-icon" class="text-2xl text-amber-400">
+                <i class="fas fa-sun"></i>
             </div>
-            
-            <!-- NEW METEO DESIGN -->
-            <div class="glass-card px-8 py-4 flex items-center gap-8 border-white/10 shadow-indigo-500/20 order-1 lg:order-2 bg-gradient-to-br from-indigo-500/10 to-transparent">
-                <div class="flex flex-col">
-                    <span class="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Station Météo</span>
-                    <div class="flex items-baseline gap-2">
-                        <span id="meteo-temp" class="text-4xl font-display font-black text-white glow-text" style="color: var(--weather-text)">16°</span>
-                        <span class="text-xs font-bold text-slate-400">ENSOLEILLÉ</span>
-                    </div>
-                </div>
-                <div class="relative w-16 h-16 flex items-center justify-center">
-                    <div class="absolute inset-0 bg-amber-400/20 blur-xl rounded-full animate-pulse"></div>
-                    <i id="meteo-icon" class="fas fa-sun text-4xl text-amber-400 relative z-10 animate-bounce" style="animation-duration: 3s;"></i>
-                </div>
-            </div>
+            <span id="meteo-temp" class="text-2xl font-display font-extrabold text-white">22°C</span>
+            <span id="meteo-desc" class="text-sm font-bold uppercase tracking-widest text-emerald-500">Ajaccio</span>
         </div>
     </header>
 
-    <!-- MAIN GRID -->
-    <main class="grid grid-cols-12 gap-8 flex-grow">
-        
-        <!-- LEFT: CLOCK & NOISE (4 cols) -->
+    <main class="flex-grow grid grid-cols-12 gap-8">
+        <!-- LEFT: ANALOG CLOCK & NOISE (4 cols) -->
         <div class="col-span-4 flex flex-col gap-8">
-            
-            <!-- HORLOGE -->
-            <div class="glass-card p-10 flex flex-col items-center justify-center flex-grow bg-indigo-900/10 border-indigo-500/20">
-                <div class="clock-container mb-8">
-                    <div class="clock-face w-full h-full relative" id="clock-face">
-                        <!-- Numbers generated by JS -->
+            <div class="glass-card p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
+                <div class="clock-container shadow-2xl">
+                    <div class="clock-face h-full w-full">
+                        <div id="hour" class="hand hour-hand"></div>
+                        <div id="min" class="hand min-hand"></div>
+                        <div id="sec" class="hand second-hand"></div>
+                        <div class="number" style="transform: rotate(30deg)"><span style="transform: rotate(-30deg); display: block">1</span></div>
+                        <div class="number" style="transform: rotate(60deg)"><span style="transform: rotate(-60deg); display: block">2</span></div>
+                        <div class="number" style="transform: rotate(90deg)"><span style="transform: rotate(-90deg); display: block">3</span></div>
+                        <div class="number" style="transform: rotate(120deg)"><span style="transform: rotate(-120deg); display: block">4</span></div>
+                        <div class="number" style="transform: rotate(150deg)"><span style="transform: rotate(-150deg); display: block">5</span></div>
+                        <div class="number" style="transform: rotate(180deg)"><span style="transform: rotate(-180deg); display: block">6</span></div>
+                        <div class="number" style="transform: rotate(210deg)"><span style="transform: rotate(-210deg); display: block">7</span></div>
+                        <div class="number" style="transform: rotate(240deg)"><span style="transform: rotate(-240deg); display: block">8</span></div>
+                        <div class="number" style="transform: rotate(270deg)"><span style="transform: rotate(-270deg); display: block">9</span></div>
+                        <div class="number" style="transform: rotate(300deg)"><span style="transform: rotate(-300deg); display: block">10</span></div>
+                        <div class="number" style="transform: rotate(330deg)"><span style="transform: rotate(-330deg); display: block">11</span></div>
+                        <div class="number" style="transform: rotate(360deg)"><span style="transform: rotate(-360deg); display: block">12</span></div>
                     </div>
-                    <div class="hand hour-hand" id="hour-hand"></div>
-                    <div class="hand min-hand" id="min-hand"></div>
-                    <div class="hand second-hand" id="second-hand"></div>
                 </div>
-                <div id="digital-clock" class="text-4xl font-display font-black text-white tracking-widest opacity-80">17:54:20</div>
+                <div id="analog-digital-link" class="text-sm font-bold text-slate-500 uppercase tracking-widest">Temps réel scolaire</div>
             </div>
 
-            <!-- NIVEAU SONORE -->
-            <div class="glass-card p-6 border-emerald-500/20">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Consigne Niveau Sonore</span>
-                    <i class="fas fa-volume-down text-emerald-400"></i>
+            <!-- NOISE CONTROL -->
+            <div class="glass-card p-8 flex flex-col gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Consigne Niveau Sonore</span>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-4">
                     <button onclick="setNoise('chut')" id="noise-chut" class="flex-grow py-3 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-400 text-xs font-bold pulse-rose">SILENCE</button>
                     <button onclick="setNoise('murmure')" id="noise-murmure" class="flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold hover:bg-emerald-500/20 hover:text-emerald-400 transition-all">MURMURE</button>
                     <button onclick="setNoise('libre')" id="noise-libre" class="flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold hover:bg-amber-500/20 hover:text-amber-400 transition-all">GROUPE</button>
@@ -292,7 +333,6 @@
 
         <!-- RIGHT: INFO & TIMER (8 cols) -->
         <div class="col-span-8 flex flex-col gap-8">
-            
             <!-- BLOC NOTES CENTRAL -->
             <div class="glass-card p-10 flex-grow relative overflow-hidden group">
                 <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
@@ -305,7 +345,6 @@
                         </div>
                         <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Informations & Travail à faire</span>
                     </div>
-                    
                     <!-- TEXT EDITOR TOOLS -->
                     <div class="flex items-center gap-2 bg-black/20 p-1.5 rounded-xl border border-white/5 shadow-inner">
                         <button onmousedown="event.preventDefault(); execCmd('bold')" class="editor-btn font-black text-sm" title="Gras">B</button>
@@ -335,7 +374,6 @@
 
             <!-- BOTTOM ROW: TIMER & MOT DU JOUR -->
             <div class="grid grid-cols-2 gap-8 h-64">
-                
                 <!-- TIMER COMPTE A REBOURS -->
                 <div class="glass-card p-8 flex items-center gap-8 border-rose-500/20">
                     <div class="relative w-32 h-32 flex-shrink-0">
@@ -343,117 +381,140 @@
                             <circle cx="64" cy="64" r="58" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
                             <circle id="timer-progress" cx="64" cy="64" r="58" fill="transparent" stroke="#f43f5e" stroke-width="8" stroke-dasharray="364.4" stroke-dashoffset="0" class="timer-circle"></circle>
                         </svg>
-                        <div id="timer-text" class="absolute inset-0 flex items-center justify-center font-display font-black text-2xl text-white">10:00</div>
-                    </div>
-                    <div class="flex flex-col gap-2 flex-grow">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Chronomètre Activité</div>
-                        <div class="flex gap-2">
-                            <button onclick="startTimer(10)" class="w-full py-2 bg-white/5 rounded-lg text-[10px] font-bold hover:bg-rose-500/20 transition-all">10 MIN</button>
-                            <button onclick="startTimer(20)" class="w-full py-2 bg-white/5 rounded-lg text-[10px] font-bold hover:bg-rose-500/20 transition-all">20 MIN</button>
-                            <button onclick="setCustomTimer()" class="w-full py-2 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold hover:bg-indigo-500/20 hover:text-indigo-400 transition-all">LIBRE</button>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-hourglass-half text-slate-700 opacity-20 text-3xl"></i>
                         </div>
-                        <button id="btn-timer-toggle" onclick="toggleTimer()" class="mt-2 w-full py-3 bg-rose-500 text-white rounded-xl font-bold shadow-lg shadow-rose-500/30 text-xs">COMMENCER</button>
+                    </div>
+                    <div class="flex-grow flex flex-col justify-center gap-4">
+                        <div class="flex items-baseline gap-2">
+                            <input type="number" id="timer-input" value="5" min="1" max="60" class="w-16 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-2xl font-bold text-white outline-none focus:border-rose-500">
+                            <span class="text-xs font-bold text-slate-500">MIN</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="startTimer()" id="timer-btn" class="flex-grow bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-500/20">DÉMARRER</button>
+                            <button onclick="resetTimer()" class="w-12 bg-white/5 hover:bg-white/10 text-slate-400 rounded-xl flex items-center justify-center"><i class="fas fa-undo"></i></button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- MOT DU JOUR / CITATION -->
-                <div class="glass-card p-8 bg-emerald-500/5 border-emerald-500/20 flex flex-col justify-center">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="fas fa-lightbulb text-emerald-400 text-sm"></i>
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500/60">Le Mot / La Pensée du Jour</span>
+                <!-- CITATION / MOT DU JOUR -->
+                <div class="glass-card p-8 flex flex-col justify-between border-indigo-500/20">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-quote-left text-indigo-500"></i>
+                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Le Mot du Jour</span>
                     </div>
-                    <blockquote id="quote-text" class="text-xl font-display font-semibold italic text-slate-300 leading-snug">
-                        "Celui qui ne se trompe jamais est celui qui n'a jamais rien tenté."
+                    <blockquote class="text-xl font-medium leading-relaxed text-slate-200 italic">
+                        "Enseigner, ce n'est pas remplir un vase, c'est allumer un feu."
                     </blockquote>
-                    <cite class="mt-4 text-[10px] font-bold text-emerald-500 uppercase tracking-widest not-italic block">— Albert Einstein</cite>
+                    <cite class="text-xs font-bold text-indigo-400 mt-2 block">— Michel de Montaigne</cite>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <script>
-        // --- HORLOGE ---
-        const clockFace = document.getElementById('clock-face');
-        for (let i = 1; i <= 12; i++) {
-            const div = document.createElement('div');
-            div.className = 'number';
-            div.style.transform = `rotate(${i * 30}deg)`;
-            div.innerHTML = `<span style="display:inline-block; transform:rotate(-${i * 30}deg)">${i}</span>`;
-            clockFace.appendChild(div);
-        }
+    <footer class="flex items-center justify-between px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+        <div class="flex items-center gap-4">
+            <span class="text-slate-700">© 2026 Gilles Cormi</span>
+            <div class="w-1 h-1 rounded-full bg-indigo-500"></div>
+            <span>Tableau de Bord Pédagogique</span>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-wifi text-[8px]"></i>
+                <span>Statut de la session : Actif</span>
+            </div>
+            <div class="flex items-center gap-2 text-indigo-400">
+                <i class="fas fa-shield-alt text-[8px]"></i>
+                <span>Focus Élèves : Optimisé</span>
+            </div>
+        </div>
+    </footer>
 
+    <script>
+        // --- HORLOGE ANALOGIQUE ---
         function updateClock() {
             const now = new Date();
-            const sec = now.getSeconds();
-            const min = now.getMinutes();
-            const hour = now.getHours();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
 
-            document.getElementById('second-hand').style.transform = `translateX(-50%) rotate(${sec * 6}deg)`;
-            document.getElementById('min-hand').style.transform = `translateX(-50%) rotate(${min * 6 + sec * 0.1}deg)`;
-            document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${hour * 30 + min * 0.5}deg)`;
+            const hDeg = (h % 12) * 30 + (m / 60) * 30;
+            const mDeg = m * 6;
+            const sDeg = s * 6;
 
-            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('hour').style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
+            document.getElementById('min').style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
+            document.getElementById('sec').style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
+
+            document.getElementById('digital-clock').textContent = now.toLocaleTimeString('fr-FR');
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- DATE ---
-        const options = { weekday: 'long', day: 'numeric', month: 'long' };
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', options);
+        // --- THEMES ---
+        function setTheme(theme) {
+            document.body.className = `h-full p-8 flex flex-col gap-8 theme-${theme}`;
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-${theme}`);
+            if(activeBtn) activeBtn.classList.add('active');
+            localStorage.setItem('classe_theme', theme);
+        }
+        setTheme(localStorage.getItem('classe_theme') || 'night');
 
         // --- TIMER ---
-        let timerSeconds = 600;
-        let initialSeconds = 600;
-        let timerActive = false;
-        let timerInterval = null;
-        const dashArray = 364.4;
+        let timerInterval;
+        let timeLeft;
+        let originalTime;
 
-        function updateTimerUI() {
-            const m = Math.floor(timerSeconds / 60);
-            const s = timerSeconds % 60;
-            document.getElementById('timer-text').innerText = `${m}:${s.toString().padStart(2, '0')}`;
-            
-            const offset = dashArray - (timerSeconds / initialSeconds) * dashArray;
-            document.getElementById('timer-progress').style.strokeDashoffset = offset;
-        }
+        function startTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                document.getElementById('timer-btn').textContent = "CONTINUER";
+                document.getElementById('timer-btn').className = "flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/20";
+                return;
+            }
 
-        function startTimer(min) {
-            clearInterval(timerInterval);
-            timerSeconds = min * 60;
-            initialSeconds = timerSeconds;
-            timerActive = true;
-            updateTimerUI();
-            document.getElementById('btn-timer-toggle').innerText = "ARRÊTER";
-            
+            const inputMin = parseInt(document.getElementById('timer-input').value);
+            if (!timeLeft) {
+                timeLeft = inputMin * 60;
+                originalTime = timeLeft;
+            }
+
+            document.getElementById('timer-btn').textContent = "PAUSE";
+            document.getElementById('timer-btn').className = "flex-grow bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all";
+
             timerInterval = setInterval(() => {
-                if(timerSeconds > 0) {
-                    timerSeconds--;
-                    updateTimerUI();
-                } else {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    timerActive = false;
-                    document.getElementById('btn-timer-toggle').innerText = "FINI !";
-                    // Petit effet sonore discret possible ici
+                    timerInterval = null;
+                    document.getElementById('timer-btn').textContent = "TERMINÉ !";
+                    new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
                 }
             }, 1000);
         }
 
-        function toggleTimer() {
-            if (timerActive) {
-                clearInterval(timerInterval);
-                timerActive = false;
-                document.getElementById('btn-timer-toggle').innerText = "REPRENDRE";
-            } else {
-                startTimer(timerSeconds / 60);
-            }
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timeLeft = null;
+            document.getElementById('timer-btn').textContent = "DÉMARRER";
+            document.getElementById('timer-btn').className = "flex-grow bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-500/20";
+            document.getElementById('timer-progress').style.strokeDashoffset = 0;
+            document.getElementById('timer-input').value = 5;
         }
 
-        function setCustomTimer() {
-            const min = prompt("Durée du chronomètre (en minutes) :", "15");
-            if (min && !isNaN(min)) {
-                startTimer(parseFloat(min));
-            }
+        function updateTimerDisplay() {
+            const progress = document.getElementById('timer-progress');
+            const circumference = 364.4; // 2 * PI * 58
+            const offset = circumference - (timeLeft / originalTime) * circumference;
+            progress.style.strokeDashoffset = offset;
         }
 
         // --- NIVEAU SONORE ---
@@ -493,7 +554,6 @@
             infoBoard.focus();
             const selection = window.getSelection();
             if (selection.toString().length > 0) {
-                // browser mapping for font size 1-7
                 const sizes = { 'large': '4', 'extra': '5', 'xxl': '6', 'giga': '7' };
                 document.execCommand('fontSize', false, sizes[size]);
             } else {
@@ -502,86 +562,7 @@
                 localStorage.setItem('classe_font_size', size);
             }
         }
-        // Load font size
-        changeFontSize(localStorage.getItem('classe_font_size') || 'medium');
-
-        // --- QUOTES (SCIENCE & TECH SPECIAL) ---
-        const quotes = [
-            { t: "La technologie, c'est l'art d'organiser le monde pour que nous n'ayons pas à le subir.", a: "Max Frisch", c: "tech" },
-            { t: "Innover, ce n'est pas avoir une nouvelle idée, c'est arrêter d'avoir une vieille idée.", a: "Edwin Land", c: "tech" },
-            { t: "La meilleure façon de prédire l'avenir, c'est de l'inventer.", a: "Alan Kay", c: "tech" },
-            { t: "Le génie est 1% d'inspiration et 99% de transpiration.", a: "Thomas Edison", c: "tech" },
-            { t: "Simplicité est la sophistication suprême.", a: "Léonard de Vinci", c: "tech" },
-            { t: "Toute technologie suffisamment avancée est indiscernable de la magie.", a: "Arthur C. Clarke", c: "tech" },
-            { t: "L'innovation distingue un leader d'un suiveur.", a: "Steve Jobs", c: "tech" },
-            { t: "Vos clients les plus mécontents sont votre plus grande source d'apprentissage.", a: "Bill Gates", c: "tech" },
-            { t: "Le présent est à eux ; le futur, pour lequel j'ai réellement travaillé, est à moi.", a: "Nikola Tesla", c: "tech" },
-            { t: "Je n'ai pas échoué. J'ai simplement trouvé 10 000 solutions qui ne fonctionnent pas.", a: "Thomas Edison", c: "tech" },
-            { t: "L'ingénieur est un homme qui sait faire avec un euro ce que n'importe quel imbécile saurait faire avec deux.", a: "Arthur M. Wellington", c: "tech" },
-            { t: "C'est en forgeant qu'on devient forgeron.", a: "Proverbe Français", c: "tech" },
-            { t: "Les obstacles sont ces choses effrayantes que vous voyez quand vous quittez vos yeux de votre objectif.", a: "Henry Ford", c: "tech" },
-            { t: "Rien ne se perd, rien ne se crée, tout se transforme.", a: "Antoine Lavoisier", c: "sci" },
-            { t: "Dans la vie, rien n'est à craindre, tout est à comprendre.", a: "Marie Curie", c: "sci" },
-            { t: "L'imagination est plus importante que le savoir.", a: "Albert Einstein", c: "sci" },
-            { t: "Ce que nous savons est une goutte d'eau, ce que nous ignorons est l'océan.", a: "Isaac Newton", c: "sci" },
-            { t: "Quelque part, quelque chose d'incroyable attend d'être connu.", a: "Carl Sagan", c: "sci" },
-            { t: "On ne force pas la curiosité, on l'éveille.", a: "Daniel Pennac", c: "sci" },
-            { t: "La science sans conscience n'est que ruine de l'âme.", a: "Rabelais", c: "sci" },
-            { t: "On ne peut pas apprendre à un homme quoi que ce soit, on peut seulement l'aider à le trouver en lui.", a: "Galilée", c: "sci" },
-            { t: "La science est la clé qui ouvre les portes du futur.", a: "Anonyme", c: "sci" },
-            { t: "L'univers est plein de choses magiques qui attendent patiemment que nos esprits s'aiguisent.", a: "Eden Phillpotts", c: "sci" },
-            { t: "La plus haute forme de recherche est de jouer.", a: "Albert Einstein", c: "sci" },
-            { t: "Si j'ai vu plus loin, c'est en montant sur les épaules de géants.", a: "Isaac Newton", c: "sci" },
-            { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela", c: "gen" },
-            { t: "L'important n'est pas de ne jamais tomber, mais de se relever à chaque fois.", a: "Confucius", c: "gen" },
-            { t: "Ceux qui ne peuvent pas changer d'avis ne peuvent rien changer du tout.", a: "George Bernard Shaw", c: "gen" },
-            { t: "Là où il y a une volonté, il y a un chemin.", a: "Lao Tseu", c: "gen" },
-            { t: "Le plaisir le plus délicat est de faire plaisir aux autres.", a: "Jean de La Bruyère", c: "gen" },
-            { t: "Le doute est le commencement de la sagesse.", a: "Aristote", c: "gen" },
-            { t: "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.", a: "Winston Churchill", c: "gen" },
-            { t: "L'intelligence, c'est la faculté d'adaptation au changement.", a: "Stephen Hawking", c: "sci" },
-            { t: "Le futur appartient à ceux qui croient à la beauté de leurs rêves.", a: "Eleanor Roosevelt", c: "gen" },
-            { t: "La logique vous mènera d'un point A à un point B. L'imagination vous mènera partout.", a: "Albert Einstein", c: "sci" },
-            { t: "Une personne qui n'a jamais commis d'erreur n'a jamais tenté d'innover.", a: "Albert Einstein", c: "gen" },
-            { t: "Tout ce qui est techniquement possible finit par arriver.", a: "Anonyme", c: "tech" },
-            { t: "L'informatique n'est pas plus la science des ordinateurs que l'astronomie n'est celle des télescopes.", a: "Edsger Dijkstra", c: "tech" },
-            { t: "Les machines devraient travailler, les gens devraient penser.", a: "IBM", c: "tech" },
-            { t: "La connaissance s’acquiert par l’expérience, tout le reste n’est que de l’information.", a: "Albert Einstein", c: "sci" },
-            { t: "Savoir écouter, c'est posséder, outre le sien, le cerveau des autres.", a: "Léonard de Vinci", c: "gen" },
-            { t: "Le dessin est la sincérité de l'art.", a: "Jean-Auguste-Dominique Ingres", c: "gen" },
-            { t: "Le but de l'éducation est de transformer un esprit vide en un esprit ouvert.", a: "Malcolm Forbes", c: "gen" },
-            { t: "La créativité, c'est l'intelligence qui s'amuse.", a: "Albert Einstein", c: "gen" },
-            { t: "Celui qui demande est un idiot pendant cinq minutes, celui qui ne demande pas reste un idiot pour toujours.", a: "Proverbe Chinois", c: "gen" },
-            { t: "On n'apprend pas à marcher en suivant des règles. On apprend en faisant et en tombant.", a: "Richard Branson", c: "gen" },
-            { t: "La vie est un mystère qu'il faut vivre, et non un problème à résoudre.", a: "Gandhi", c: "gen" },
-            { t: "Chaque difficulté rencontrée doit être l'occasion d'un nouveau progrès.", a: "Pierre de Coubertin", c: "gen" },
-            { t: "Rien n'est permanent, sauf le changement.", a: "Héraclite", c: "sci" },
-            { t: "La simplicité est la sophistication suprême.", a: "Léonard de Vinci", c: "gen" }
-        ];
-
-        function loadRandomQuote() {
-            const q = quotes[Math.floor(Math.random() * quotes.length)];
-            const quoteEl = document.getElementById('quote-text');
-            const citeEl = document.querySelector('cite');
-            const tagContainer = document.querySelector('.uppercase.tracking-widest.text-emerald-500\\/60');
-            
-            if (quoteEl) quoteEl.innerText = `"${q.t}"`;
-            if (citeEl) citeEl.innerText = `— ${q.a}`;
-            if (tagContainer) {
-                const tag = q.c === 'tech' ? 'Ingénierie & Innovation' : (q.c === 'sci' ? 'Sciences & Découverte' : 'Sagesse & Réflexion');
-                tagContainer.innerText = tag;
-            }
-        }
-
-        // --- THEMES ---
-        function setTheme(theme) {
-            document.body.className = `p-8 flex flex-col gap-8 theme-${theme}`;
-            localStorage.setItem('classe-theme', theme);
-        }
-        setTheme(localStorage.getItem('classe-theme') || 'night');
-
-        loadRandomQuote();
-        setInterval(loadRandomQuote, 1500000); // 25 minutes
+        changeFontSize(localStorage.getItem('classe_font_size') || 'large');
     </script>
 </body>
 </html>
