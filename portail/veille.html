@@ -139,10 +139,11 @@
                 </div>
             </div>
             <div class="flex gap-2 items-center relative" style="z-index: 1001 !important;">
+                <span class="text-[8px] bg-indigo-100 text-indigo-600 px-1 rounded font-bold">V3.2</span>
                 <button id="btn-refresh" title="Actualiser les flux" class="text-xs font-bold bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">
                     <i class="fas fa-sync-alt"></i> Actualiser
                 </button>
-                <button onclick="window.toggleSessionModal()" class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all cursor-pointer">
+                <button id="btn-session-trigger" class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-600 rounded-lg text-xs font-bold transition-all cursor-pointer">
                     <i class="fas fa-history text-[10px]"></i> Restaurer ma session
                 </button>
             </div>
@@ -228,7 +229,7 @@
             </div>
 
             <div class="flex gap-3">
-                <button onclick="saveFolder()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all">Enregistrer</button>
+                <button id="btn-save-folder" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all">Enregistrer</button>
                 <button onclick="closeFolderModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Annuler</button>
             </div>
         </div>
@@ -246,7 +247,7 @@
             <input type="password" id="master-password" placeholder="Votre ancien code (ex: 1234)" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 mb-6">
 
             <div class="flex flex-col gap-3">
-                <button onclick="saveAndSync()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                <button id="btn-save-session" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-sync"></i> Rechercher ma session
                 </button>
                 <button onclick="toggleSessionModal()" class="w-full py-2 text-slate-400 text-[10px] font-bold hover:text-slate-600 transition-all">
@@ -340,19 +341,28 @@
         window.__app_id = "maveillecg";
     </script>
     <script>
-        console.log("Veille UI Script Starting...");
-        window.toggleSessionModal = () => {
-            const modal = document.getElementById('session-modal');
-            if (!modal) return;
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
+        window.onerror = function(msg, url, line) {
+            alert("Erreur Script: " + msg + "\nLigne: " + line);
+            return false;
         };
 
-        window.saveAndSync = async () => {
-            const pwd = document.getElementById('master-password').value.trim();
-            if (pwd.length < 4) { alert("Code trop court"); return; }
-            sessionStorage.setItem('veille_master_recovery', pwd);
-            window.location.reload();
+        window.toggleSessionModal = () => {
+            const modal = document.getElementById('session-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+            }
+        };
+
+        window.closeLinksModal = () => {
+            const modal = document.getElementById('links-modal');
+            if(modal) modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.closeFolderModal = () => {
+            const modal = document.getElementById('folder-modal');
+            if(modal) modal.classList.add('hidden');
         };
     </script>
 
@@ -964,9 +974,22 @@
 
         (async () => {
             await initAuth();
-            document.getElementById('acc-btn').addEventListener('click', () => document.documentElement.classList.toggle('dark-mode'));
+            
+            // Listeners pour les boutons statiques
+            document.getElementById('btn-session-trigger')?.addEventListener('click', window.toggleSessionModal);
+            document.getElementById('btn-save-session')?.addEventListener('click', window.saveAndSync);
+            document.getElementById('btn-acc-toggle')?.addEventListener('click', () => document.documentElement.classList.toggle('dark-mode'));
             document.getElementById('btn-refresh').addEventListener('click', fetchAllFeeds);
+            document.getElementById('btn-save-folder')?.addEventListener('click', window.saveFolder);
         })();
+
+        window.saveAndSync = async () => {
+            const pwd = document.getElementById('master-password').value.trim();
+            if (pwd.length < 4) return showToast("Code trop court", true);
+            sessionStorage.setItem('veille_master_recovery', pwd);
+            window.location.reload();
+        };
+
     </script>
 </body>
 </html>
