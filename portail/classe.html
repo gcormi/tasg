@@ -291,7 +291,6 @@
     </header>
 
     <main class="flex-grow grid grid-cols-12 gap-8">
-        <!-- LEFT: ANALOG CLOCK & NOISE (4 cols) -->
         <div class="col-span-4 flex flex-col gap-8">
             <div class="glass-card p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
@@ -317,7 +316,6 @@
                 <div id="analog-digital-link" class="text-sm font-bold text-slate-500 uppercase tracking-widest">Temps réel scolaire</div>
             </div>
 
-            <!-- NOISE CONTROL -->
             <div class="glass-card p-8 flex flex-col gap-6">
                 <div class="flex items-center gap-3">
                     <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
@@ -331,9 +329,7 @@
             </div>
         </div>
 
-        <!-- RIGHT: INFO & TIMER (8 cols) -->
         <div class="col-span-8 flex flex-col gap-8">
-            <!-- BLOC NOTES CENTRAL -->
             <div class="glass-card p-10 flex-grow relative overflow-hidden group">
                 <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
                     <i class="fas fa-pen-nib text-8xl text-white"></i>
@@ -345,7 +341,6 @@
                         </div>
                         <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Informations & Travail à faire</span>
                     </div>
-                    <!-- TEXT EDITOR TOOLS -->
                     <div class="flex items-center gap-2 bg-black/20 p-1.5 rounded-xl border border-white/5 shadow-inner">
                         <button onmousedown="event.preventDefault(); execCmd('bold')" class="editor-btn font-black text-sm" title="Gras">B</button>
                         <button onmousedown="event.preventDefault(); execCmd('underline')" class="editor-btn underline text-sm" title="Souligner">U</button>
@@ -356,7 +351,6 @@
                         <button onmousedown="event.preventDefault(); changeFontSize('xxl')" class="editor-btn text-lg font-black" title="TRÈS GRAND">A</button>
                         <button onmousedown="event.preventDefault(); changeFontSize('giga')" class="editor-btn text-2xl font-black text-rose-500" title="GIGA">A</button>
                         <div class="w-px h-5 bg-white/10 mx-1"></div>
-                        <!-- TEXT COLORS -->
                         <div class="flex gap-1 bg-black/40 p-1 rounded-lg">
                             <button onmousedown="event.preventDefault(); execCmd('foreColor', '#ffffff')" class="w-4 h-4 rounded-full bg-white border border-white/20" title="Blanc/Défaut"></button>
                             <button onmousedown="event.preventDefault(); execCmd('foreColor', '#ef4444')" class="w-4 h-4 rounded-full bg-red-500" title="Rouge"></button>
@@ -368,13 +362,10 @@
                         <button onmousedown="event.preventDefault(); execCmd('backColor', '#fbbf24')" class="editor-btn text-amber-400" title="Surligner Jaune"><i class="fas fa-highlighter"></i></button>
                     </div>
                 </div>
-                <!-- CONTENT EDITABLE AREA -->
                 <div id="info-board" contenteditable="true" class="info-area overflow-y-auto" placeholder="Tapez ici les consignes, devoirs ou objectifs de la séance..."></div>
             </div>
 
-            <!-- BOTTOM ROW: TIMER & MOT DU JOUR -->
             <div class="grid grid-cols-2 gap-8 h-64">
-                <!-- TIMER COMPTE A REBOURS -->
                 <div class="glass-card p-8 flex items-center gap-8 border-rose-500/20">
                     <div class="relative w-32 h-32 flex-shrink-0">
                         <svg class="timer-svg w-32 h-32">
@@ -397,7 +388,6 @@
                     </div>
                 </div>
 
-                <!-- CITATION / MOT DU JOUR -->
                 <div class="glass-card p-8 flex flex-col justify-between border-indigo-500/20">
                     <div class="flex items-center gap-3 mb-2">
                         <i class="fas fa-quote-left text-indigo-500"></i>
@@ -418,142 +408,80 @@
             <div class="w-1 h-1 rounded-full bg-indigo-500"></div>
             <span>Tableau de Bord Pédagogique</span>
         </div>
-        <div class="flex items-center gap-8">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-wifi text-[8px]"></i>
-                <span>Statut de la session : Actif</span>
-            </div>
-            <div class="flex items-center gap-2 text-indigo-400">
-                <i class="fas fa-shield-alt text-[8px]"></i>
-                <span>Focus Élèves : Optimisé</span>
-            </div>
-        </div>
     </footer>
 
     <script>
-        // --- HORLOGE ANALOGIQUE ---
         function updateClock() {
             const now = new Date();
-            const h = now.getHours();
-            const m = now.getMinutes();
-            const s = now.getSeconds();
-
-            const hDeg = (h % 12) * 30 + (m / 60) * 30;
-            const mDeg = m * 6;
-            const sDeg = s * 6;
-
+            const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            const hDeg = (h % 12) * 30 + (m / 60) * 30, mDeg = m * 6, sDeg = s * 6;
             document.getElementById('hour').style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
             document.getElementById('min').style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
             document.getElementById('sec').style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
-
             document.getElementById('digital-clock').textContent = now.toLocaleTimeString('fr-FR');
-            
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
-        // --- THEMES ---
         function setTheme(theme) {
             document.body.className = `h-full p-8 flex flex-col gap-8 theme-${theme}`;
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`btn-${theme}`);
-            if(activeBtn) activeBtn.classList.add('active');
+            document.getElementById(`btn-${theme}`).classList.add('active');
             localStorage.setItem('classe_theme', theme);
         }
         setTheme(localStorage.getItem('classe_theme') || 'night');
 
-        // --- TIMER ---
-        let timerInterval;
-        let timeLeft;
-        let originalTime;
-
+        let timerInterval, timeLeft, originalTime;
         function startTimer() {
             if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
+                clearInterval(timerInterval); timerInterval = null;
                 document.getElementById('timer-btn').textContent = "CONTINUER";
                 document.getElementById('timer-btn').className = "flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/20";
                 return;
             }
-
-            const inputMin = parseInt(document.getElementById('timer-input').value);
-            if (!timeLeft) {
-                timeLeft = inputMin * 60;
-                originalTime = timeLeft;
-            }
-
+            if (!timeLeft) { timeLeft = parseInt(document.getElementById('timer-input').value) * 60; originalTime = timeLeft; }
             document.getElementById('timer-btn').textContent = "PAUSE";
             document.getElementById('timer-btn').className = "flex-grow bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all";
-
             timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-
+                timeLeft--; updateTimerDisplay();
                 if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
+                    clearInterval(timerInterval); timerInterval = null;
                     document.getElementById('timer-btn').textContent = "TERMINÉ !";
                     new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
                 }
             }, 1000);
         }
-
         function resetTimer() {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            timeLeft = null;
+            clearInterval(timerInterval); timerInterval = null; timeLeft = null;
             document.getElementById('timer-btn').textContent = "DÉMARRER";
             document.getElementById('timer-btn').className = "flex-grow bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-500/20";
             document.getElementById('timer-progress').style.strokeDashoffset = 0;
             document.getElementById('timer-input').value = 5;
         }
-
         function updateTimerDisplay() {
             const progress = document.getElementById('timer-progress');
-            const circumference = 364.4; // 2 * PI * 58
-            const offset = circumference - (timeLeft / originalTime) * circumference;
-            progress.style.strokeDashoffset = offset;
+            progress.style.strokeDashoffset = 364.4 - (timeLeft / originalTime) * 364.4;
         }
 
-        // --- NIVEAU SONORE ---
         function setNoise(mode) {
-            const btnChut = document.getElementById('noise-chut');
-            const btnMurmure = document.getElementById('noise-murmure');
-            const btnLibre = document.getElementById('noise-libre');
-
-            [btnChut, btnMurmure, btnLibre].forEach(b => {
-                b.className = "flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold transition-all";
-            });
-
-            if(mode === 'chut') {
-                btnChut.className = "flex-grow py-3 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-400 text-xs font-bold pulse-rose";
-            } else if(mode === 'murmure') {
-                btnMurmure.className = "flex-grow py-3 rounded-xl border border-emerald-500/40 bg-emerald-500/20 text-emerald-400 text-xs font-bold pulse-emerald";
-            } else {
-                btnLibre.className = "flex-grow py-3 rounded-xl border border-amber-500/40 bg-amber-500/20 text-amber-400 text-xs font-bold pulse-amber";
-            }
+            document.querySelectorAll('[id^="noise-"]').forEach(b => b.className = "flex-grow py-3 rounded-xl border border-white/5 bg-white/5 text-xs font-bold transition-all");
+            const map = { 'chut': ['noise-chut', 'rose', 'SILENCE'], 'murmure': ['noise-murmure', 'emerald', 'MURMURE'], 'libre': ['noise-libre', 'amber', 'GROUPE'] };
+            const [id, color, text] = map[mode];
+            document.getElementById(id).className = `flex-grow py-3 rounded-xl border border-${color}-500/40 bg-${color}-500/20 text-${color}-400 text-xs font-bold pulse-${color}`;
         }
 
-        // --- SAUVEGARDE AUTO DU BLOC NOTES ---
         const infoBoard = document.getElementById('info-board');
         infoBoard.innerHTML = localStorage.getItem('classe_info_board_html') || "";
-        
-        infoBoard.addEventListener('input', () => {
-            localStorage.setItem('classe_info_board_html', infoBoard.innerHTML);
-        });
+        infoBoard.addEventListener('input', () => localStorage.setItem('classe_info_board_html', infoBoard.innerHTML));
 
-        function execCmd(cmd, value = null) { infoBoard.focus(); document.execCommand('styleWithCSS', null, true); document.execCommand(cmd, false, value); localStorage.setItem('classe_info_board_html', infoBoard.innerHTML); } console.log(" EXEC CMD CALLED\, cmd, value); infoBoard.focus(); document.execCommand(\styleWithCSS\, null, true); document.execCommand(cmd, false, value); localStorage.setItem(\classe_info_board_html\, infoBoard.innerHTML); }
-            infoBoard.focus();
-            document.execCommand(cmd, false, value);
+        function execCmd(cmd, value = null) {
+            infoBoard.focus(); document.execCommand('styleWithCSS', null, true); document.execCommand(cmd, false, value);
             localStorage.setItem('classe_info_board_html', infoBoard.innerHTML);
         }
 
         function changeFontSize(size) {
             infoBoard.focus();
-            const selection = window.getSelection();
-            if (selection.toString().length > 0) {
+            if (window.getSelection().toString().length > 0) {
                 const sizes = { 'large': '4', 'extra': '5', 'xxl': '6', 'giga': '7' };
                 document.execCommand('fontSize', false, sizes[size]);
             } else {
@@ -566,4 +494,3 @@
     </script>
 </body>
 </html>
-
