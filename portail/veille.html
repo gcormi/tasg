@@ -454,26 +454,27 @@
         if (isCloudEnabled) {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // Vérifier si une session spécifique est demandée (récupération d'anciens favoris)
-                    let sessionPwd = localStorage.getItem('veille_master_recovery') || "Brigitte*1963";
+                    // Par défaut, on utilise le code "6463" s'il n'y a rien en local
+                    let sessionPwd = localStorage.getItem('veille_master_recovery') || "6463";
                     const effectiveUid = await hashPassword(sessionPwd);
                     currentUser = { uid: effectiveUid };
                     
-                    const label = sessionPwd === "Brigitte*1963" ? "Session Portail (Défaut)" : "Session Privée";
+                    const isDefault = sessionPwd === "6463";
+                    const label = isDefault ? "Session Gilles (Défaut)" : "Session Privée";
                     const sessionBadge = document.getElementById('current-session-id');
                     const triggerBtn = document.getElementById('btn-session-trigger');
                     
                     if (sessionBadge) {
-                        sessionBadge.textContent = "Session act : " + label;
+                        sessionBadge.textContent = "Session: " + label;
                     }
                     
                     if (triggerBtn) {
-                        if (sessionPwd !== "Brigitte*1963") {
+                        if (!isDefault) {
                             triggerBtn.innerHTML = `<i class="fas fa-user-check text-[10px]"></i> ${label}`;
                             triggerBtn.classList.remove('bg-indigo-50', 'text-indigo-600');
                             triggerBtn.classList.add('bg-emerald-50', 'text-emerald-600', 'ring-1', 'ring-emerald-500/30');
                         } else {
-                            triggerBtn.innerHTML = `<i class="fas fa-history text-[10px]"></i> Restaurer ma session`;
+                            triggerBtn.innerHTML = `<i class="fas fa-history text-[10px]"></i> Restaurer session`;
                             triggerBtn.classList.remove('bg-emerald-50', 'text-emerald-600', 'ring-1', 'ring-emerald-500/30');
                             triggerBtn.classList.add('bg-indigo-50', 'text-indigo-600');
                         }
@@ -492,6 +493,9 @@
 
 
         // --- DATA MANAGEMENT ---
+        let unsubscribeFolders = null;
+        let unsubscribeSources = null;
+
         function listenToData(uid) {
             if (!db) return;
             if(unsubscribeFolders) unsubscribeFolders();
@@ -630,6 +634,11 @@
 
             const folderLinks = sources.filter(s => folderId === 'none' ? (!s.folderId || s.folderId === 'none') : s.folderId === folderId);
             
+            const title = document.getElementById('links-modal-title');
+            const count = document.getElementById('links-modal-count');
+            const icon = document.getElementById('links-modal-icon');
+            const grid = document.getElementById('links-modal-grid');
+
             title.textContent = folder.name;
             count.textContent = `${folderLinks.length} SITE(S) ENREGISTRÉ(S)`;
             icon.className = `w-12 h-12 rounded-xl bg-${folder.color || 'indigo'}-100 text-${folder.color || 'indigo'}-600 flex items-center justify-center text-xl`;
@@ -799,13 +808,12 @@
             try {
                 if (isCloudEnabled && currentUser) {
                     await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'folders', id));
-                    // Détacher les liens en une seule fois
+                    // Détacher les liens individuellement pour éviter un blocage total si un lien pose problème
                     const sourcesInFolder = sources.filter(s => s.folderId === id);
-                    if (sourcesInFolder.length > 0) {
-                        const updates = sourcesInFolder.map(s => 
-                            updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'sources', s.id), { folderId: null })
-                        );
-                        await Promise.all(updates);
+                    for (const s of sourcesInFolder) {
+                        try {
+                            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'sources', s.id), { folderId: null });
+                        } catch(e) { console.warn("Erreur détachement lien:", s.id, e); }
                     }
                 } else {
                     folders = folders.filter(f => f.id !== id);
@@ -1034,7 +1042,7 @@
         };
 
         window.resetToDefaultSession = () => {
-            if (confirm("Revenir à la session par défaut du portail ?")) {
+            if (confirm("Revenir à la session par défaut (Gilles) ?")) {
                 localStorage.removeItem('veille_master_recovery');
                 window.location.reload();
             }
