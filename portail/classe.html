@@ -39,6 +39,14 @@
         body.theme-sky  #current-date, body.theme-sky  #digital-clock  { color: #0c4a6e; }
         body.theme-mint #current-date, body.theme-mint #digital-clock  { color: #064e3b; }
 
+        /* Citation lisible sur thèmes clairs */
+        body.theme-day blockquote, body.theme-day cite,
+        body.theme-sky blockquote, body.theme-sky cite,
+        body.theme-mint blockquote, body.theme-mint cite { color: #111827 !important; }
+        body.theme-day .info-area  { color: #1e293b; }
+        body.theme-sky .info-area  { color: #0c4a6e; }
+        body.theme-mint .info-area { color: #064e3b; }
+
         body.theme-day  .hour-hand,body.theme-sky .hour-hand,body.theme-mint .hour-hand { background: #1e293b; }
         body.theme-day  .min-hand, body.theme-sky .min-hand, body.theme-mint .min-hand  { background: #64748b; }
 
@@ -55,11 +63,12 @@
 
         /* CLOCK */
         .clock-container {
-            width: 220px; height: 220px;
+            width: 200px; height: 200px;
             border-radius: 50%;
             background: rgba(15,23,42,0.8);
-            border: 6px solid rgba(255,255,255,0.06);
+            border: 3px solid rgba(255,255,255,0.08);
             position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.4), 0 0 40px rgba(99,102,241,0.15);
         }
         .clock-face::after { content:''; position:absolute; width:10px; height:10px; background:#fff; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; }
         .hand { position:absolute; bottom:50%; left:50%; transform-origin:bottom; border-radius:10px; transform:translateX(-50%); }
@@ -127,10 +136,21 @@
             <button onclick="setTheme('cyber')" id="btn-cyber" class="theme-btn bg-black       text-indigo-400"><i class="fas fa-microchip"></i></button>
         </div>
 
-        <div class="glass-card px-4 py-2 flex items-center gap-3">
-            <i class="fas fa-sun text-amber-400 text-xl"></i>
-            <span id="meteo-temp" class="font-display text-xl font-extrabold">22°C</span>
-            <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Bastia</span>
+        <div class="glass-card px-5 py-2 flex items-center gap-4">
+            <div class="flex flex-col items-center">
+                <i id="meteo-icon" class="fas fa-sun text-amber-400 text-2xl"></i>
+                <span class="text-[9px] font-bold uppercase text-amber-400/70 tracking-wider mt-0.5">Ciel clair</span>
+            </div>
+            <div class="w-px h-8 bg-white/10"></div>
+            <div class="flex flex-col">
+                <span id="meteo-temp" class="font-display text-2xl font-extrabold leading-none">22°C</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Bastia</span>
+            </div>
+            <div class="w-px h-8 bg-white/10"></div>
+            <div class="flex flex-col gap-0.5 text-[10px] text-slate-400 font-medium">
+                <span><i class="fas fa-wind mr-1 text-sky-400"></i>15 km/h</span>
+                <span><i class="fas fa-droplet mr-1 text-blue-400"></i>62%</span>
+            </div>
         </div>
     </header>
 
@@ -138,7 +158,7 @@
     <main class="flex-1 grid grid-cols-12 gap-6 min-h-0">
 
         <!-- GAUCHE: horloge + bruit -->
-        <div class="col-span-4 flex flex-col gap-6 min-h-0">
+        <div class="col-span-3 flex flex-col gap-6 min-h-0">
 
             <div class="glass-card p-6 flex flex-col items-center justify-center gap-4 flex-1">
                 <div class="clock-container">
@@ -178,7 +198,7 @@
         </div>
 
         <!-- DROITE: éditeur + timer + citation -->
-        <div class="col-span-8 flex flex-col gap-6 min-h-0">
+        <div class="col-span-9 flex flex-col gap-6 min-h-0">
 
             <!-- ÉDITEUR -->
             <div class="glass-card p-6 flex flex-col flex-1 min-h-0">
