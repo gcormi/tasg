@@ -398,16 +398,15 @@
                 isCloudEnabled = true;
                 document.getElementById('status-text').textContent = "Cloud Activé : Synchronisation opérationnelle.";
             } else {
-                document.getElementById('status-text').textContent = "Mode Local : Vos données sont enregistrées uniquement sur ce navigateur.";
+                document.getElementById('status-text').textContent = "Mode Local activé.";
             }
         } catch (e) {
-            document.getElementById('status-text').textContent = "Mode Local activé.";
-            console.warn("Erreur locale:", e);
+            console.warn("Erreur config Firebase:", e);
         }
 
         let currentUser = null;
         let folders = [], sources = [];
-        let unsubscribeFolders = null, unsubscribeSources = null;
+        let activeFolderInModal = null; // Track which folder is open in modal
 
         const BASE_SOURCES = [
             { id: 'b1', name: "Ludomag", url: "https://www.ludomag.com/feed/", category: "Innovation", icon: "fa-newspaper" },
@@ -504,13 +503,17 @@
             unsubscribeFolders = onSnapshot(foldersRef, (snap) => {
                 folders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 updateFolderUI();
+                renderFolders();
+                if (activeFolderInModal) window.openLinksModal(activeFolderInModal);
             }, (error) => {
                 console.warn("Erreur Firestore (dossiers) :", error);
             });
             
             unsubscribeSources = onSnapshot(sourcesRef, (snap) => {
                 sources = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                fetchAllFeeds();
+                renderFolders();
+                if (activeFolderInModal) window.openLinksModal(activeFolderInModal);
+                fetchAllFeeds(); // On lance le RSS en arrière-plan
             }, (error) => {
                 console.warn("Erreur Firestore (sources) :", error);
             });
@@ -520,6 +523,7 @@
             folders = JSON.parse(localStorage.getItem('local_folders') || '[]');
             sources = JSON.parse(localStorage.getItem('local_sources') || '[]');
             updateFolderUI();
+            renderFolders();
         }
 
         function updateFolderUI() {
@@ -565,7 +569,6 @@
                         <a href="${item.link}" target="_blank" class="mt-auto text-[10px] font-bold text-indigo-600">Lire <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>`;
             });
-            renderFolders();
         }
 
         function renderFolders() {
@@ -618,13 +621,12 @@
 
         window.openLinksModal = (folderId) => {
             const modal = document.getElementById('links-modal');
-            const grid = document.getElementById('links-modal-grid');
-            const title = document.getElementById('links-modal-title');
-            const count = document.getElementById('links-modal-count');
-            const icon = document.getElementById('links-modal-icon');
-            
+            activeFolderInModal = folderId;
             const folder = folderId === 'none' ? { name: 'Favoris non classés', color: 'slate', id: 'none' } : folders.find(f => f.id === folderId);
-            if (!folder) return;
+            if (!folder) {
+                activeFolderInModal = null;
+                return;
+            }
 
             const folderLinks = sources.filter(s => folderId === 'none' ? (!s.folderId || s.folderId === 'none') : s.folderId === folderId);
             
@@ -657,15 +659,14 @@
             });
 
 
-            modal.classList.remove('hidden');
             modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
             document.body.style.overflow = 'hidden';
         };
 
         window.closeLinksModal = () => {
-            document.getElementById('links-modal').classList.add('hidden');
+            activeFolderInModal = null;
+            const modal = document.getElementById('links-modal');
+            if (modal) modal.style.display = 'none';
             document.body.style.overflow = '';
         };
 
@@ -973,24 +974,18 @@
         };
 
         window.deleteLink = async (id) => {
-            if(!confirm("Supprimer ce favori de votre collection ?")) return;
+            if(!confirm("Supprimer ce favori ?")) return;
             try {
                 if (isCloudEnabled && currentUser) {
                     await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'sources', id));
                 } else {
                     sources = sources.filter(s => s.id !== id);
                     localStorage.setItem('local_sources', JSON.stringify(sources));
-                }
-                
-                // Mettre à jour la modale si elle est ouverte
-                const openModalLink = sources.find(s => s.id === id);
-                if (openModalLink && document.getElementById('links-modal').classList.contains('hidden') === false) {
-                     openLinksModal(openModalLink.folderId || 'none');
-                } else {
-                    fetchAllFeeds();
+                    renderFolders();
                 }
                 showToast("Favori supprimé.");
             } catch(e) {
+                console.error("Delete error:", e);
                 showToast("Erreur lors de la suppression.", true);
             }
         };
