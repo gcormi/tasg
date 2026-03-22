@@ -139,7 +139,7 @@
                 </div>
             </div>
             <div class="flex gap-2 items-center relative" style="z-index: 1001 !important;">
-                <span class="text-[8px] bg-indigo-100 text-indigo-600 px-1 rounded font-bold">V3.2</span>
+                <span class="text-[8px] bg-indigo-100 text-indigo-600 px-1 rounded font-bold">V3.3</span>
                 <button id="btn-refresh" title="Actualiser les flux" class="text-xs font-bold bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">
                     <i class="fas fa-sync-alt"></i> Actualiser
                 </button>
@@ -972,20 +972,28 @@
             setTimeout(() => t.remove(), 3000);
         }
 
-        (async () => {
-            await initAuth();
-            
-            // Listeners pour les boutons statiques
-            document.getElementById('btn-session-trigger')?.addEventListener('click', window.toggleSessionModal);
-            document.getElementById('btn-save-session')?.addEventListener('click', window.saveAndSync);
+        // --- ATTACH LISTENERS IMMEDIATELY ---
+        function setupEventListeners() {
+            document.getElementById('btn-session-trigger')?.addEventListener('click', () => window.toggleSessionModal());
+            document.getElementById('btn-save-session')?.addEventListener('click', () => window.saveAndSync());
             document.getElementById('btn-acc-toggle')?.addEventListener('click', () => document.documentElement.classList.toggle('dark-mode'));
-            document.getElementById('btn-refresh').addEventListener('click', fetchAllFeeds);
-            document.getElementById('btn-save-folder')?.addEventListener('click', window.saveFolder);
+            document.getElementById('btn-refresh')?.addEventListener('click', () => fetchAllFeeds());
+            document.getElementById('btn-save-folder')?.addEventListener('click', () => window.saveFolder());
+            document.getElementById('btn-new-folder')?.addEventListener('click', () => window.openFolderModal());
+        }
+
+        // --- INIT WRAPPER ---
+        (async () => {
+            setupEventListeners(); // UI works immediately
+            try {
+                await initAuth();
+            } catch(e) { console.warn("Init Auth Failed, staying local"); }
         })();
 
         window.saveAndSync = async () => {
-            const pwd = document.getElementById('master-password').value.trim();
-            if (pwd.length < 4) return showToast("Code trop court", true);
+            const pwdInput = document.getElementById('master-password');
+            const pwd = pwdInput ? pwdInput.value.trim() : "";
+            if (pwd.length < 4) return alert("Code trop court");
             sessionStorage.setItem('veille_master_recovery', pwd);
             window.location.reload();
         };
