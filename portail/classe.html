@@ -19,14 +19,49 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             color: #f1f5f9;
             overflow: hidden;
             height: 100vh;
         }
+
+        /* THEMES */
+        body.theme-night {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.4) 0px, transparent 50%);
+            --card-glass: rgba(15, 23, 42, 0.7);
+        }
+
+        body.theme-day {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.5) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(224, 242, 254, 0.4) 0px, transparent 50%);
+            color: #1e293b;
+            --card-glass: rgba(255, 255, 255, 0.85);
+        }
+        body.theme-day .glass-card { border-color: rgba(0,0,0,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        body.theme-day #current-date { color: #0f172a; }
+        body.theme-day #digital-clock, body.theme-day blockquote { color: #334155; }
+        body.theme-day .info-area { color: #334155; }
+        body.theme-day [contenteditable]:empty:before { color: rgba(0,0,0,0.2); }
+        body.theme-day .clock-container { background: #fff; border-color: #f1f5f9; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+        body.theme-day .hour-hand { background: #1e293b; }
+        body.theme-day .min-hand { background: #94a3b8; }
+        body.theme-day .number { color: #cbd5e1; }
+
+        body.theme-cyber {
+            background-color: #050505;
+            background-image: 
+                linear-gradient(rgba(31, 41, 55, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(31, 41, 55, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            --card-glass: rgba(0, 0, 0, 0.8);
+        }
+        body.theme-cyber .glass-card { border-color: #6366f1; box-shadow: 0 0 30px rgba(99, 102, 241, 0.1); }
+
 
         .font-display { font-family: 'Outfit', sans-serif; }
 
@@ -115,6 +150,18 @@
             70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+
+        /* EDITOR UI */
+        .editor-btn {
+            @apply w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-all border border-white/5 hover:bg-white/10 hover:border-white/20;
+        }
+        .editor-btn.active { @apply bg-indigo-600 border-indigo-500 text-white; }
+
+        [contenteditable]:empty:before {
+            content: attr(placeholder);
+            color: rgba(255,255,255,0.2);
+            cursor: text;
+        }
     </style>
 </head>
 <body class="p-8 flex flex-col gap-8">
@@ -129,13 +176,21 @@
             </p>
         </div>
 
-        <div class="glass-card px-8 py-4 flex items-center gap-6 border-indigo-500/30 shadow-indigo-500/20">
-            <div class="text-right">
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Météo Collège</div>
-                <div class="text-2xl font-bold text-white" id="meteo-temp">14°C</div>
+        <div class="flex items-center gap-4">
+            <div class="flex bg-black/20 p-1 rounded-2xl border border-white/5 order-2 lg:order-1">
+                <button onclick="setTheme('day')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Jour"><i class="fas fa-sun text-amber-400"></i></button>
+                <button onclick="setTheme('night')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Nuit"><i class="fas fa-moon text-indigo-400"></i></button>
+                <button onclick="setTheme('cyber')" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors" title="Mode Cyber/Tech"><i class="fas fa-microchip text-emerald-400"></i></button>
             </div>
-            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-amber-400 text-2xl">
-                <i class="fas fa-sun" id="meteo-icon"></i>
+            
+            <div class="glass-card px-8 py-4 flex items-center gap-6 border-indigo-500/30 shadow-indigo-500/20 order-1 lg:order-2">
+                <div class="text-right">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Météo Collège</div>
+                    <div class="text-2xl font-bold text-white transition-colors" id="meteo-temp">16°C</div>
+                </div>
+                <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-amber-400 text-2xl">
+                    <i class="fas fa-cloud-sun" id="meteo-icon"></i>
+                </div>
             </div>
         </div>
     </header>
@@ -181,14 +236,26 @@
                 <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
                     <i class="fas fa-pen-nib text-8xl text-white"></i>
                 </div>
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-slate-900 text-xs shadow-lg shadow-amber-500/40">
-                        <i class="fas fa-sticky-note"></i>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-slate-900 text-xs shadow-lg shadow-amber-500/40">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Informations & Travail à faire</span>
                     </div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Informations & Travail à faire</span>
+                    
+                    <!-- TEXT EDITOR TOOLS -->
+                    <div class="flex items-center gap-1.5 bg-black/20 p-1 rounded-xl border border-white/5">
+                        <button onclick="execCmd('bold')" class="editor-btn" title="Gras"><i class="fas fa-bold"></i></button>
+                        <button onclick="execCmd('italic')" class="editor-btn" title="Italique"><i class="fas fa-italic"></i></button>
+                        <button onclick="execCmd('underline')" class="editor-btn" title="Souligner"><i class="fas fa-underline"></i></button>
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button onclick="execCmd('insertUnorderedList')" class="editor-btn" title="Liste"><i class="fas fa-list-ul"></i></button>
+                        <button onclick="execCmd('backColor', '#4f46e5')" class="editor-btn text-indigo-400" title="Surligner IDG"><i class="fas fa-highlighter"></i></button>
+                    </div>
                 </div>
-                <!-- TEXT AREA EDITABLE -->
-                <textarea id="info-board" class="info-area" placeholder="Tapez ici les consignes, devoirs ou objectifs de la séance..."></textarea>
+                <!-- CONTENT EDITABLE AREA -->
+                <div id="info-board" contenteditable="true" class="info-area overflow-y-auto" placeholder="Tapez ici les consignes, devoirs ou objectifs de la séance..."></div>
             </div>
 
             <!-- BOTTOM ROW: TIMER & MOT DU JOUR -->
@@ -328,22 +395,94 @@
 
         // --- SAUVEGARDE AUTO DU BLOC NOTES ---
         const infoBoard = document.getElementById('info-board');
-        infoBoard.value = localStorage.getItem('classe_info_board') || "";
+        infoBoard.innerHTML = localStorage.getItem('classe_info_board_html') || "";
+        
         infoBoard.addEventListener('input', () => {
-            localStorage.setItem('classe_info_board', infoBoard.value);
+            localStorage.setItem('classe_info_board_html', infoBoard.innerHTML);
         });
 
-        // --- QUOTES ---
+        function execCmd(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+            infoBoard.focus();
+        }
+
+        // --- QUOTES (SCIENCE & TECH SPECIAL) ---
         const quotes = [
-            { t: "Celui qui ne se trompe jamais est celui qui n'a jamais rien tenté.", a: "Albert Einstein" },
-            { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela" },
-            { t: "Apprendre, c’est ne jamais trop tard pour devenir ce que l'on aurait pu être.", a: "George Eliot" },
-            { t: "La curiosité est le moteur de l'intelligence.", a: "Anonyme" },
-            { t: "L'erreur n'est pas l'échec, c'est une étape de la réussite.", a: "Anonyme" }
+            { t: "La technologie, c'est l'art d'organiser le monde pour que nous n'ayons pas à le subir.", a: "Max Frisch", c: "tech" },
+            { t: "Innover, ce n'est pas avoir une nouvelle idée, c'est arrêter d'avoir une vieille idée.", a: "Edwin Land", c: "tech" },
+            { t: "La meilleure façon de prédire l'avenir, c'est de l'inventer.", a: "Alan Kay", c: "tech" },
+            { t: "Le génie est 1% d'inspiration et 99% de transpiration.", a: "Thomas Edison", c: "tech" },
+            { t: "Simplicité est la sophistication suprême.", a: "Léonard de Vinci", c: "tech" },
+            { t: "Toute technologie suffisamment avancée est indiscernable de la magie.", a: "Arthur C. Clarke", c: "tech" },
+            { t: "L'innovation distingue un leader d'un suiveur.", a: "Steve Jobs", c: "tech" },
+            { t: "Vos clients les plus mécontents sont votre plus grande source d'apprentissage.", a: "Bill Gates", c: "tech" },
+            { t: "Le présent est à eux ; le futur, pour lequel j'ai réellement travaillé, est à moi.", a: "Nikola Tesla", c: "tech" },
+            { t: "Je n'ai pas échoué. J'ai simplement trouvé 10 000 solutions qui ne fonctionnent pas.", a: "Thomas Edison", c: "tech" },
+            { t: "L'ingénieur est un homme qui sait faire avec un euro ce que n'importe quel imbécile saurait faire avec deux.", a: "Arthur M. Wellington", c: "tech" },
+            { t: "C'est en forgeant qu'on devient forgeron.", a: "Proverbe Français", c: "tech" },
+            { t: "Les obstacles sont ces choses effrayantes que vous voyez quand vous quittez vos yeux de votre objectif.", a: "Henry Ford", c: "tech" },
+            { t: "Rien ne se perd, rien ne se crée, tout se transforme.", a: "Antoine Lavoisier", c: "sci" },
+            { t: "Dans la vie, rien n'est à craindre, tout est à comprendre.", a: "Marie Curie", c: "sci" },
+            { t: "L'imagination est plus importante que le savoir.", a: "Albert Einstein", c: "sci" },
+            { t: "Ce que nous savons est une goutte d'eau, ce que nous ignorons est l'océan.", a: "Isaac Newton", c: "sci" },
+            { t: "Quelque part, quelque chose d'incroyable attend d'être connu.", a: "Carl Sagan", c: "sci" },
+            { t: "On ne force pas la curiosité, on l'éveille.", a: "Daniel Pennac", c: "sci" },
+            { t: "La science sans conscience n'est que ruine de l'âme.", a: "Rabelais", c: "sci" },
+            { t: "On ne peut pas apprendre à un homme quoi que ce soit, on peut seulement l'aider à le trouver en lui.", a: "Galilée", c: "sci" },
+            { t: "La science est la clé qui ouvre les portes du futur.", a: "Anonyme", c: "sci" },
+            { t: "L'univers est plein de choses magiques qui attendent patiemment que nos esprits s'aiguisent.", a: "Eden Phillpotts", c: "sci" },
+            { t: "La plus haute forme de recherche est de jouer.", a: "Albert Einstein", c: "sci" },
+            { t: "Si j'ai vu plus loin, c'est en montant sur les épaules de géants.", a: "Isaac Newton", c: "sci" },
+            { t: "L'éducation est l'arme la plus puissante pour changer le monde.", a: "Nelson Mandela", c: "gen" },
+            { t: "L'important n'est pas de ne jamais tomber, mais de se relever à chaque fois.", a: "Confucius", c: "gen" },
+            { t: "Ceux qui ne peuvent pas changer d'avis ne peuvent rien changer du tout.", a: "George Bernard Shaw", c: "gen" },
+            { t: "Là où il y a une volonté, il y a un chemin.", a: "Lao Tseu", c: "gen" },
+            { t: "Le plaisir le plus délicat est de faire plaisir aux autres.", a: "Jean de La Bruyère", c: "gen" },
+            { t: "Le doute est le commencement de la sagesse.", a: "Aristote", c: "gen" },
+            { t: "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.", a: "Winston Churchill", c: "gen" },
+            { t: "L'intelligence, c'est la faculté d'adaptation au changement.", a: "Stephen Hawking", c: "sci" },
+            { t: "Le futur appartient à ceux qui croient à la beauté de leurs rêves.", a: "Eleanor Roosevelt", c: "gen" },
+            { t: "La logique vous mènera d'un point A à un point B. L'imagination vous mènera partout.", a: "Albert Einstein", c: "sci" },
+            { t: "Une personne qui n'a jamais commis d'erreur n'a jamais tenté d'innover.", a: "Albert Einstein", c: "gen" },
+            { t: "Tout ce qui est techniquement possible finit par arriver.", a: "Anonyme", c: "tech" },
+            { t: "L'informatique n'est pas plus la science des ordinateurs que l'astronomie n'est celle des télescopes.", a: "Edsger Dijkstra", c: "tech" },
+            { t: "Les machines devraient travailler, les gens devraient penser.", a: "IBM", c: "tech" },
+            { t: "La connaissance s’acquiert par l’expérience, tout le reste n’est que de l’information.", a: "Albert Einstein", c: "sci" },
+            { t: "Savoir écouter, c'est posséder, outre le sien, le cerveau des autres.", a: "Léonard de Vinci", c: "gen" },
+            { t: "Le dessin est la sincérité de l'art.", a: "Jean-Auguste-Dominique Ingres", c: "gen" },
+            { t: "Le but de l'éducation est de transformer un esprit vide en un esprit ouvert.", a: "Malcolm Forbes", c: "gen" },
+            { t: "La créativité, c'est l'intelligence qui s'amuse.", a: "Albert Einstein", c: "gen" },
+            { t: "Celui qui demande est un idiot pendant cinq minutes, celui qui ne demande pas reste un idiot pour toujours.", a: "Proverbe Chinois", c: "gen" },
+            { t: "On n'apprend pas à marcher en suivant des règles. On apprend en faisant et en tombant.", a: "Richard Branson", c: "gen" },
+            { t: "La vie est un mystère qu'il faut vivre, et non un problème à résoudre.", a: "Gandhi", c: "gen" },
+            { t: "Chaque difficulté rencontrée doit être l'occasion d'un nouveau progrès.", a: "Pierre de Coubertin", c: "gen" },
+            { t: "Rien n'est permanent, sauf le changement.", a: "Héraclite", c: "sci" },
+            { t: "La simplicité est la sophistication suprême.", a: "Léonard de Vinci", c: "gen" }
         ];
-        const q = quotes[Math.floor(Math.random() * quotes.length)];
-        document.getElementById('quote-text').innerText = `"${q.t}"`;
-        document.querySelector('cite').innerText = `— ${q.a}`;
+
+        function loadRandomQuote() {
+            const q = quotes[Math.floor(Math.random() * quotes.length)];
+            const quoteEl = document.getElementById('quote-text');
+            const citeEl = document.querySelector('cite');
+            const tagContainer = document.querySelector('.uppercase.tracking-widest.text-emerald-500\\/60');
+            
+            if (quoteEl) quoteEl.innerText = `"${q.t}"`;
+            if (citeEl) citeEl.innerText = `— ${q.a}`;
+            if (tagContainer) {
+                const tag = q.c === 'tech' ? 'Ingénierie & Innovation' : (q.c === 'sci' ? 'Sciences & Découverte' : 'Sagesse & Réflexion');
+                tagContainer.innerText = tag;
+            }
+        }
+
+        // --- THEMES ---
+        function setTheme(theme) {
+            document.body.className = `p-8 flex flex-col gap-8 theme-${theme}`;
+            localStorage.setItem('classe-theme', theme);
+        }
+        setTheme(localStorage.getItem('classe-theme') || 'night');
+
+        loadRandomQuote();
+        setInterval(loadRandomQuote, 1500000); // 25 minutes
     </script>
 </body>
 </html>
