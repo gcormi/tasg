@@ -1922,7 +1922,7 @@
                 </div>
 
                 <h3><i class="fas fa-sitemap"></i> Architecture de l'Écosystème</h3>
-                <p>L'application se décompose en <strong>cinq familles fonctionnelles complémentaires</strong> :</p>
+                <p>L'application se décompose en <strong>six familles fonctionnelles complémentaires</strong> :</p>
 
                 <div class="modal-pillar">
                     <div class="modal-pillar-icon">📖</div>
@@ -1961,6 +1961,14 @@
                     <div class="modal-pillar-content">
                         <strong>E. Inclusion &amp; Accessibilit&eacute; TAS</strong>
                         <p>Deux outils d&eacute;di&eacute;s aux &eacute;l&egrave;ves pr&eacute;sentant des Troubles des Apprentissages Sp&eacute;cifiques (DYS, TDAH, dyspraxie&hellip;) : <strong>Adaptation Inclusive</strong> pour reformater n&rsquo;importe quelle ressource p&eacute;dagogique, et <strong>Lecteur Adaptatif</strong> pour une lecture bionique, audio et &eacute;pur&eacute;e. Le z&egrave;bre &#129427;, symbole des profils neuroatypiques, rappelle qu&rsquo;aucun &eacute;l&egrave;ve ne se ressemble &mdash; et qu&rsquo;aucun ne doit &ecirc;tre laiss&eacute; de c&ocirc;t&eacute;.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">☁️</div>
+                    <div class="modal-pillar-content">
+                        <strong>F. Veille & Organisation</strong>
+                        <p>Outils de veille pédagogique garantis "Zéro Distraction" (Veille Pro, YouTube EduSync) et d'accès centralisé aux espaces académiques et assistants de nouvelle génération (Hub Personnel & IA).</p>
                     </div>
                 </div>
 
@@ -2276,9 +2284,8 @@
                     const counters = entry.target.parentElement.querySelectorAll('.counter');
                     counters.forEach(c => {
                         const text = c.textContent.trim();
-                        if (text === '13') animateCounter(c, 13, '');
-                        else if (text === '100%') { c.textContent = '0%'; animateCounter(c, 100, '%'); }
-                        else if (text === '6') animateCounter(c, 6, '');
+                        if (text === '100%') { c.textContent = '0%'; animateCounter(c, 100, '%'); }
+                        else if (!isNaN(parseInt(text))) { animateCounter(c, parseInt(text), ''); }
                     });
                 }
             });
