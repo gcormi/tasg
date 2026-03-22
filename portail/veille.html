@@ -339,6 +339,22 @@
         });
         window.__app_id = "maveillecg";
     </script>
+    <script>
+        console.log("Veille UI Script Starting...");
+        window.toggleSessionModal = () => {
+            const modal = document.getElementById('session-modal');
+            if (!modal) return;
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        };
+
+        window.saveAndSync = async () => {
+            const pwd = document.getElementById('master-password').value.trim();
+            if (pwd.length < 4) { alert("Code trop court"); return; }
+            sessionStorage.setItem('veille_master_recovery', pwd);
+            window.location.reload();
+        };
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -432,41 +448,9 @@
             fetchAllFeeds();
         }
 
-        // --- ACTIONS GLOBALES ---
-        window.toggleSessionModal = () => {
-            const modal = document.getElementById('session-modal');
-            if (!modal) return;
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        };
+        // --- UI FUNCTIONS ---
+        // (Moved to non-module script above for immediate availability)
 
-        window.saveAndSync = async () => {
-            const pwd = document.getElementById('master-password').value.trim();
-            if (pwd.length < 4) return showToast("Code trop court", true);
-            
-            showToast("Chargement de la session...");
-            sessionStorage.setItem('veille_master_recovery', pwd);
-            
-            toggleSessionModal();
-            setTimeout(() => window.location.reload(), 500);
-        };
-
-
-        window.saveAndSync = async () => {
-            const pwd = document.getElementById('master-password').value.trim();
-            if (pwd.length < 4) return showToast("Code trop court", true);
-            
-            showToast("Chargement de la session...");
-            sessionStorage.setItem('veille_master_recovery', pwd);
-            
-            window.toggleSessionModal();
-            setTimeout(() => window.location.reload(), 500);
-        };
 
         // --- DATA MANAGEMENT ---
         function listenToData(uid) {
