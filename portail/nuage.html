@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuage Explorer | Crash Test WebDAV</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'] },
+                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' } }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .dark-mode { background-color: #0f172a; color: #f1f5f9; }
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .dark-mode .glass-header { background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        #login-overlay { display: flex; }
+        #login-overlay.hidden { display: none; }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col overflow-hidden relative">
+
+    <!-- Header -->
+    <header class="glass-header z-20 py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                <i class="fas fa-cloud"></i>
+            </div>
+            <div>
+                <h1 class="font-display font-bold text-slate-900 dark:text-white leading-tight">Nuage Explorer</h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Connexion API Apps.education.fr</p>
+            </div>
+        </div>
+        <button id="theme-toggle" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-brand-500 transition-colors flex items-center justify-center">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
+    <!-- Espace Principal (Résultats ou Erreurs) -->
+    <main class="flex-grow p-8 overflow-y-auto bg-slate-50 dark:bg-slate-900/50" id="main-content">
+        <div class="max-w-4xl mx-auto" id="dashboard">
+            <h2 class="font-display text-2xl font-bold mb-6">Contenu de votre Nuage</h2>
+            
+            <div id="loader" class="hidden text-center py-20">
+                <i class="fas fa-circle-notch fa-spin text-brand-500 text-4xl mb-4"></i>
+                <p class="text-slate-500">Tentative de connexion à l'API de l'État... (Croisons les doigts !)</p>
+            </div>
+
+            <!-- Grille des Fichiers -->
+            <div id="files-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 hidden">
+                <!-- Les dossiers/fichiers apparaîtront ici -->
+            </div>
+
+            <!-- Espace d'Erreur (CORS ou Auth) -->
+            <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl">
+                <div class="flex items-center gap-4 mb-4">
+                    <i class="fas fa-shield-alt text-4xl text-red-500"></i>
+                    <div>
+                        <h3 class="font-bold text-lg">Le verdict est tombé ! Mur de sécurité détecté.</h3>
+                        <p class="text-sm opacity-80" id="error-details">Détails de l'erreur...</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm font-medium leading-relaxed">
+                    Comme redouté, le serveur de l'État (Nextcloud Nuage) rejette cette tentative de connexion. 
+                    Même avec votre bon mot de passe, c'est ce qu'on appelle une <strong class="underline">erreur CORS</strong>.<br><br>
+                    Pour faire simple : le serveur refuse formellement de transmettre vos précieux fichiers à une application située sur un autre domaine (comme votre ordinateur ou la Forge). Il s'agit d'une très bonne sécurité pour le Ministère, mais cela empêche la création d'une application "frontend pure" comme les nôtres.
+                </p>
+                <button onclick="location.reload()" class="mt-6 px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors">
+                    Réessayer
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modale de Connexion Nuage -->
+    <div id="login-overlay" class="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-md items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-8 transform transition-all border border-slate-100 dark:border-slate-700">
+            
+            <div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-3xl mx-auto mb-6 shadow-sm border border-brand-100">
+                <i class="fas fa-cloud"></i>
+            </div>
+            
+            <h2 class="text-2xl font-display font-bold text-center text-slate-900 dark:text-white mb-2">Accès au Nuage</h2>
+            <p class="text-center text-slate-500 text-sm mb-6">Connectez-vous à votre espace personnel apps.education.fr via l'API WebDAV.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email académique</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="email" id="nuage-email" placeholder="prenom.nom@ac-..." 
+                            class="w-full bg-slate-50 dark:bg-slate-900 text-sm py-3 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-500/30 font-medium">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Mot de passe Nuage</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="nuage-pwd" placeholder="Votre mot de passe" 
+                            class="w-full bg-slate-50 dark:bg-slate-900 text-sm py-3 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-brand-500/30">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2"><i class="fas fa-info-circle"></i> Il est recommandé de créer un "mot de passe d'application" dans les paramètres de sécurité de votre Nuage.</p>
+                </div>
+                
+                <button id="btn-connect" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 mt-4">
+                    <i class="fas fa-rocket"></i> Lancer la connexion API
+                </button>
+            </div>
+            
+            <p class="text-center text-[10px] text-slate-400 mt-6 font-medium uppercase tracking-wider">Crash test expérimental</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginOverlay = document.getElementById('login-overlay');
+        const btnConnect = document.getElementById('btn-connect');
+        const emailInput = document.getElementById('nuage-email');
+        const pwdInput = document.getElementById('nuage-pwd');
+        
+        const loader = document.getElementById('loader');
+        const filesGrid = document.getElementById('files-grid');
+        const errorArea = document.getElementById('error-message');
+        const errorDetails = document.getElementById('error-details');
+
+        // Dark Mode Toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark-mode');
+        });
+
+        // Lancement de Test WebDAV
+        btnConnect.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const pwd = pwdInput.value.trim();
+            
+            if(!email || !pwd) {
+                alert("Veuillez saisir votre email et votre mot de passe.");
+                return;
+            }
+
+            // Fermeture de la modale et lancement du chargement
+            loginOverlay.classList.add('hidden');
+            loader.classList.remove('hidden');
+            filesGrid.classList.add('hidden');
+            errorArea.classList.add('hidden');
+
+            try {
+                // Création du jeton Basic Auth
+                // IMPORTANT: btoa encode en base64 (email:motdepasse) pour l'entête HTTP Basic.
+                const authHeader = 'Basic ' + btoa(unescape(encodeURIComponent(email + ':' + pwd)));
+                
+                // L'URI standard de Nextcloud pour WebDAV
+                const webdavUrl = 'https://nuage.apps.education.fr/remote.php/webdav/';
+                
+                // Requête HTTP PROPFIND (Méthode WebDAV pour lister les dossiers)
+                const response = await fetch(webdavUrl, {
+                    method: 'PROPFIND', // Interrogation des métadonnées des fichiers
+                    headers: {
+                        'Authorization': authHeader,
+                        'Depth': '1', // Demande juste les fichiers du dossier racine (1 niveau de profondeur)
+                        'Content-Type': 'application/xml',
+                        // Tentative de feinter l'API (cela ne changera rien au CORS mais au cas où)
+                        'Sec-Fetch-Mode': 'cors' 
+                    }
+                });
+
+                if (response.ok) {
+                    // MIRACLE ! L'état ne bloque pas le CORS
+                    const xmlText = await response.text();
+                    loader.classList.add('hidden');
+                    alert("C'EST UN MIRACLE, LA CONNEXION A RÉUSSI ! Le Ministère a ouvert les vannes !");
+                    console.log(xmlText);
+                    // On pourrait parser le XML ici et afficher la grille, mais ce succès est peu probable.
+                } else if(response.status === 401) {
+                    // Accès refusé : Mauvais mot de passe ou mot de passe d'app.
+                    throw new Error("401 Non autorisé : Identifiants incorrects ou vous DEVEZ générer un Mot de Passe d'Application (App Password) depuis les réglages sécurité de votre Nuage.");
+                } else {
+                    throw new Error(`Erreur ${response.status}: Rejet de l'API.`);
+                }
+            } catch (error) {
+                // Le navigateur bloque la méthode PROPFIND (Failed to fetch) à cause du CORS
+                loader.classList.add('hidden');
+                errorArea.classList.remove('hidden');
+                
+                if(error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorDetails.innerHTML = "Échec du Fetch. Le navigateur a bloqué la requête Ajax (CORS Policy). <br>Explication technique : <em>No 'Access-Control-Allow-Origin' header is present on the requested resource.</em>";
+                } else {
+                    errorDetails.innerHTML = error.message;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
