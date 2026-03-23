@@ -269,8 +269,8 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-2">
-                            <input id="timer-input" type="number" value="5" min="1" max="99"
-                                class="w-12 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xl font-black text-white outline-none">
+                            <input id="timer-input" type="number" value="5" min="5" max="50" onchange="resetTimer()"
+                                class="w-14 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xl font-black text-white outline-none">
                             <span class="text-[10px] font-black text-slate-500 uppercase">Min</span>
                         </div>
                         <div class="flex gap-2">
@@ -405,7 +405,7 @@
         const min = Math.floor(timeLeft / 60).toString().padStart(2,'0');
         const sec = (timeLeft % 60).toString().padStart(2,'0');
         document.getElementById('timer-label').textContent = min + ':' + sec;
-        const offset = 276.5 - (timeLeft / originalTime) * 276.5;
+        const offset = 251.3 - (timeLeft / originalTime) * 251.3;
         document.getElementById('timer-ring').style.strokeDashoffset = offset;
     }
 
@@ -417,8 +417,13 @@
             return;
         }
         if (!timeLeft) {
-            timeLeft = parseInt(document.getElementById('timer-input').value) * 60;
+            let val = parseInt(document.getElementById('timer-input').value);
+            if (isNaN(val) || val < 5) val = 5;
+            if (val > 50) val = 50;
+            document.getElementById('timer-input').value = val;
+            timeLeft = val * 60;
             originalTime = timeLeft;
+            updateTimerDisplay();
         }
         btn.textContent = 'PAUSE';
         timerInterval = setInterval(() => {
@@ -436,7 +441,10 @@
         clearInterval(timerInterval); timerInterval = null; timeLeft = null;
         document.getElementById('timer-btn').textContent = 'DÉMARRER';
         document.getElementById('timer-ring').style.strokeDashoffset = 0;
-        const v = document.getElementById('timer-input').value;
+        let v = parseInt(document.getElementById('timer-input').value);
+        if (isNaN(v) || v < 5) v = 5;
+        if (v > 50) v = 50;
+        document.getElementById('timer-input').value = v;
         document.getElementById('timer-label').textContent = v + ':00';
     }
 
