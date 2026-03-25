@@ -3,840 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface IA Multi-Fournisseurs</title>
+    <title>Assistant Pédagogique - Interface IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #f8fafc;
         }
         #loading-spinner {
             border: 4px solid rgba(0, 0, 0, .1);
-            border-left-color: #3b82f6; /* Bleu */
+            border-left-color: #2563eb; 
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* Style pour l'aperçu HTML */
-        #preview-output {
-            background-color: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            min-height: 200px;
-            padding: 1rem;
-            overflow-wrap: break-word;
-        }
-        /* Styles pour la sortie brute */
-        #raw-output-container pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: monospace;
-            background-color: #1f2937; /* Gris foncé */
-            color: #f9fafb; /* Blanc cassé */
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-        }
-        /* Styles pour les onglets */
-        .tab-button {
-            padding: 0.5rem 1rem;
-            font-weight: 500;
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .ai-card {
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            background-color: #f1f5f9;
+        }
+        .ai-card:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        .ai-card.active {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+        }
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
             border-bottom: 2px solid transparent;
-            color: #6b7280; /* Gris */
+            color: #64748b;
+            transition: all 0.2s;
         }
         .tab-button.active {
-            color: #3b82f6; /* Bleu */
-            border-bottom-color: #3b82f6;
+            color: #2563eb;
+            border-bottom-color: #2563eb;
         }
+        #preview-output {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            min-height: 200px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-8">
 
-    <div class="bg-white w-full max-w-3xl p-6 sm:p-8 rounded-xl shadow-lg relative">
+    <div class="bg-white w-full max-w-4xl p-6 sm:p-10 rounded-3xl shadow-2xl relative border border-slate-200">
         
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Interface IA Multi-Fournisseurs 🤖</h1>
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-black text-slate-900 italic flex items-center justify-center gap-3">
+                <i class="fas fa-microchip text-blue-600"></i> Assistant Multi-IA
+            </h1>
+            <p class="text-slate-500 text-sm mt-2 font-medium uppercase tracking-widest text-blue-800">Prêt pour l'hébergement (Forge)</p>
+        </header>
 
-        <!-- ==================================== -->
-        <!-- SECTION 1: CONFIGURATION DE L'IA     -->
-        <!-- ==================================== -->
-        <div id="config-section">
-            <h2 class="text-lg font-semibold text-gray-700 mb-3">Configuration de l'IA</h2>
-            <p class="text-sm text-gray-600 mb-4">Choisissez votre fournisseur d'IA et entrez votre clé API. Elle sera sauvegardée dans votre navigateur.</p>
-            
-            <label for="ai-selector" class="block text-sm font-medium text-gray-700 mb-1">Fournisseur d'IA</label>
-            <select id="ai-selector" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
-                <option value="gemini">Google (Gemini Gratuit)</option>
-                <option value="openrouter">OpenRouter (Clé Payante)</option>
+        <!-- 1. SÉLECTION DE L'IA -->
+        <div class="mb-10">
+            <p class="text-center text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">Étape 1 : Choisir le moteur d'IA</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="ai-selector-container">
+                <div data-value="albert" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
+                    <span class="text-3xl">🇫🇷</span>
+                    <span class="font-bold text-slate-800">IA Albert</span>
+                    <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Souverain</span>
+                </div>
+                <div data-value="gemini" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
+                    <span class="text-3xl">🌐</span>
+                    <span class="font-bold text-slate-800">Gemini</span>
+                    <span class="text-[10px] bg-green-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Gratuit</span>
+                </div>
+                <div data-value="openrouter" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
+                    <span class="text-3xl">🚀</span>
+                    <span class="font-bold text-slate-800">OpenRouter</span>
+                    <span class="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Premium</span>
+                </div>
+            </div>
+            <!-- Sélecteur invisible pour script -->
+            <select id="ai-selector" class="hidden">
+                <option value="albert">albert</option>
+                <option value="gemini">gemini</option>
+                <option value="openrouter">openrouter</option>
             </select>
-
-            <!-- Menu dynamique pour OpenRouter (Modèles) -->
-            <div id="openrouter-model-config" class="hidden w-full mb-4">
-                <label for="openrouter-model-selector" class="block text-sm font-medium text-gray-700 mb-1">Modèle OpenRouter</label>
-                <select id="openrouter-model-selector" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="anthropic/claude-4.5-sonnet">Claude 4.5 Sonnet (Qualité Max)</option>
-                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Rapide/Équilibré)</option>
-                    <option value="openai/gpt-5">OpenAI GPT-5 (Qualité Max)</option>
-                    <option value="mistralai/mistral-medium-3">Mistral Medium 3 (Équilibré)</option>
-                    <option value="anthropic/claude-4.1-opus">Claude 4.1 Opus (Qualité Max)</option>
-                    <option value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</option>
-                </select>
-
-                <!-- SÉLECTEUR DE NIVEAU DE DÉTAIL -->
-                <fieldset class="mt-4">
-                    <legend class="block text-sm font-medium text-gray-700 mb-2">Niveau de Détail (pour OpenRouter)</legend>
-                    <div class="flex flex-col sm:flex-row sm:gap-4">
-                        <div class="flex items-center gap-x-3 mb-2 sm:mb-0">
-                            <input id="detail-complet" name="detail-level" type="radio" value="complet" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600" checked>
-                            <label for="detail-complet" class="block text-sm font-medium leading-6 text-gray-900">Complet (Défaut, très long)</label>
-                        </div>
-                        <div class="flex items-center gap-x-3 mb-2 sm:mb-0">
-                            <input id="detail-equilibre" name="detail-level" type="radio" value="equilibre" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
-                            <label for="detail-equilibre" class="block text-sm font-medium leading-6 text-gray-900">Équilibré (Moyen)</label>
-                        </div>
-                        <div class="flex items-center gap-x-3">
-                            <input id="detail-concis" name="detail-level" type="radio" value="concis" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
-                            <label for="detail-concis" class="block text-sm font-medium leading-6 text-gray-900">Concise (Rapide)</label>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
-
-            <label for="api-key-input" class="block text-sm font-medium text-gray-700 mb-1">Clé API</label>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="password" id="api-key-input" placeholder="Entrez votre clé API ici..." class="flex-grow p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button id="save-key-button" class="bg-blue-600 text-white font-semibold py-3 px-5 rounded-lg shadow-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    Sauvegarder
-                </button>
-            </div>
-            <p class="text-xs text-gray-500 mt-3">⚠️ Votre clé est stockée localement. Ne l'utilisez pas sur un appareil public.</p>
         </div>
 
-        <!-- ==================================== -->
-        <!-- SECTION 2: PROMPT UTILISATEUR        -->
-        <!-- ==================================== -->
-        <div id="prompt-section" class="hidden">
-            <div class="flex justify-between items-center mb-4">
-                <h2 id="config-status-text" class="text-lg font-semibold text-green-700"></h2>
-                <button id="change-ai-button" class="text-sm text-blue-600 hover:text-blue-800 hover:underline">Changer d'IA</button>
-            </div>
-
-            <label for="prompt-input" class="block text-sm font-medium text-gray-700 mb-2">Votre Prompt Complet :</label>
-            <textarea id="prompt-input" rows="8" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Collez votre prompt complet ici (ex: 'Rédige un cours sur...')"></textarea>
+        <!-- 2. ZONE DE CONFIGURATION -->
+        <div id="config-section" class="bg-blue-50/50 p-6 rounded-2xl border-2 border-blue-100 mb-8 transition-all">
+            <h2 class="text-sm font-black text-blue-800 mb-4 uppercase tracking-tighter flex items-center gap-2">
+                <i class="fas fa-key"></i> Configuration de l'accès
+            </h2>
             
-            <!-- La note d'avertissement a été supprimée comme demandé -->
-            
-            <button id="generate-button" class="w-full bg-green-600 text-white font-bold py-3 px-5 rounded-lg shadow-md hover:bg-green-700 transition-colors mt-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-gray-400">
-                Générer
-            </button>
-        </div>
-
-        <!-- ==================================== -->
-        <!-- SECTION 3: RÉSULTATS                 -->
-        <!-- ==================================== -->
-        <div id="results-section" class="mt-6 hidden">
-            <div id="loading-spinner" class="mx-auto my-4 hidden"></div>
-
-            <!-- Barre d'état pour la génération par étapes -->
-            <div id="status-bar" class="hidden text-center text-sm text-gray-600 my-2">
-                <p id="status-text">Génération en cours...</p>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                    <div id="status-progress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            <div id="model-config-area" class="mb-4">
+                <div id="albert-model-config">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Modèle Albert :</label>
+                    <select id="albert-model-selector" class="w-full p-3 border border-slate-200 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="openai/gpt-oss-120b">Albert 120B (Meilleure précision)</option>
+                        <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Plus rapide)</option>
+                        <option value="Qwen/Qwen3-Coder-30B-A3B-Instruct">Qwen Coder (Pour le code)</option>
+                    </select>
+                </div>
+                <div id="openrouter-model-config" class="hidden">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Modèle OpenRouter :</label>
+                    <select id="openrouter-model-selector" class="w-full p-3 border border-slate-200 rounded-xl text-sm bg-white">
+                        <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                        <option value="openai/gpt-4o">GPT-4o</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Onglets de Résultat -->
-            <div class="flex border-b border-gray-200">
-                <button id="tab-preview" class="tab-button active">Aperçu</button>
-                <button id="tab-raw" class="tab-button">Texte ou Code</button>
-            </div>
-
-            <div id="preview-output" class="mt-4 p-4 border border-gray-200 rounded-lg min-h-[150px] bg-gray-50">
-                <!-- Le contenu HTML généré ira ici -->
-            </div>
-
-            <div id="raw-output-container" class="mt-4 hidden">
-                <pre><code id="raw-output" class="text-sm"></code></pre>
-                <button id="copy-text-button" class="mt-2 bg-gray-600 text-white text-xs font-medium py-1 px-3 rounded-md hover:bg-gray-700">
-                    <i class="fas fa-copy mr-1"></i> Copier
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="password" id="api-key-input" placeholder="Collez votre clé secrète..." class="flex-grow p-4 border border-slate-200 rounded-xl text-sm shadow-inner bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <button id="save-key-button" class="bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 shadow-lg transition-all">
+                    ACTIVER
                 </button>
             </div>
-
-            <!-- NOUVELLE SECTION: BOUTONS D'EXPORT -->
-            <div id="export-section" class="mt-6 pt-4 border-t border-gray-200 flex gap-4">
-                <button id="export-html-button" class="flex-1 bg-blue-600 text-white font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <i class="fas fa-file-code mr-2"></i> Exporter en HTML
-                </button>
-                <button id="export-text-button" class="flex-1 bg-gray-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    <i class="fas fa-file-alt mr-2"></i> Exporter en Texte
-                </button>
-            </div>
-
         </div>
 
+        <!-- 3. RÉGLAGES TECHNIQUES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="p-4 border border-slate-200 rounded-2xl bg-white shadow-sm flex flex-col justify-center">
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Niveau de rédaction</p>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input name="detail-level" type="radio" value="complet" checked class="w-4 h-4"> Complet
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input name="detail-level" type="radio" value="equilibre" class="w-4 h-4"> Moyen
+                    </label>
+                </div>
+            </div>
+
+            <div class="p-4 border border-amber-200 rounded-2xl bg-amber-50/50">
+                <p class="text-[10px] font-bold text-amber-600 uppercase mb-2 tracking-widest">Mode de Connexion</p>
+                <div class="flex flex-col gap-2">
+                    <select id="proxy-selector" class="text-[10px] p-2 border border-amber-200 rounded-lg bg-white font-bold text-amber-900 outline-none">
+                        <option value="direct">Connexion DIRECTE (Optimisée Forge)</option>
+                        <option value="corsproxy">Passer par Proxy 1 (corsproxy.io)</option>
+                        <option value="thingproxy">Passer par Proxy 2 (thingproxy)</option>
+                    </select>
+                    <button id="test-connection-btn" class="text-[9px] font-bold uppercase text-blue-600 hover:text-blue-800 text-left border-b border-blue-200 w-max">
+                        <i class="fas fa-vial"></i> Tester la connexion
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SECTION PROMPT -->
+        <div id="prompt-section" class="space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <span id="config-status-text" class="text-[11px] font-bold text-green-600 flex items-center gap-1 uppercase">
+                    <i class="fas fa-check-circle"></i> Service configuré
+                </span>
+                <button id="clear-key-button" class="text-[10px] text-red-400 font-bold hover:text-red-600 uppercase">Effacer la clé</button>
+            </div>
+            <textarea id="prompt-input" rows="6" class="w-full p-5 border-2 border-slate-100 rounded-2xl shadow-inner focus:border-blue-400 outline-none text-sm bg-slate-50/30" placeholder="Collez le prompt ici..."></textarea>
+            <button id="generate-button" class="w-full bg-blue-600 text-white font-black py-5 px-6 rounded-2xl hover:bg-blue-700 shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-0 disabled:bg-slate-300">
+                <i class="fas fa-wand-magic-sparkles mr-2"></i> GÉNÉRER LE MANUEL SCOLAIRE
+            </button>
+        </div>
+
+        <!-- 5. RÉSULTATS -->
+        <div id="results-section" class="mt-12 hidden border-t-2 border-slate-50 pt-10">
+            <div id="loading-spinner" class="mx-auto my-8 hidden"></div>
+            <div id="status-bar" class="hidden mb-10">
+                <div class="flex justify-between text-xs font-black text-blue-600 mb-3 uppercase tracking-tighter"><p id="status-text">Prêt...</p><span id="progress-percent">0%</span></div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200"><div id="status-progress" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div></div>
+            </div>
+            <div class="flex border-b border-slate-100 mb-6">
+                <button id="tab-preview" class="tab-button active uppercase text-xs tracking-widest flex items-center gap-2"><i class="fas fa-desktop"></i> Aperçu</button>
+                <button id="tab-raw" class="tab-button uppercase text-xs tracking-widest flex items-center gap-2"><i class="fas fa-code"></i> Code</button>
+            </div>
+            <div id="preview-output" class="mt-4 overflow-y-auto max-h-[800px] custom-scrollbar prose max-w-none border border-slate-50"></div>
+            <div id="raw-output-container" class="mt-4 hidden relative">
+                <pre><code id="raw-output" class="text-[11px] leading-relaxed block p-6 bg-slate-900 rounded-2xl text-slate-300"></code></pre>
+                <button id="copy-text-button" class="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white text-[10px] font-black py-2 px-4 rounded-lg border border-white/20 transition-all uppercase"><i class="fas fa-copy"></i> Copier</button>
+            </div>
+            <div class="mt-10 grid grid-cols-2 gap-4">
+                <button id="export-html-button" class="bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-black transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"><i class="fas fa-file-arrow-down"></i> HTML</button>
+                <button id="export-text-button" class="bg-white border-2 border-slate-200 text-slate-700 font-black py-4 rounded-2xl shadow-lg hover:bg-slate-50 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"><i class="fas fa-file-lines"></i> Texte</button>
+            </div>
+        </div>
+
+        <!-- ZONE DIAGNOSTIC -->
+        <div id="error-diagnostic" class="mt-8 hidden p-5 bg-red-50 border-2 border-red-100 rounded-2xl">
+            <p class="font-black text-red-700 text-sm mb-2 flex items-center gap-2"><i class="fas fa-bug"></i> Rapport technique</p>
+            <div id="error-details" class="text-[10px] text-red-600 font-mono leading-relaxed overflow-x-auto"></div>
+            <div class="mt-4 flex gap-2">
+                <a href="https://albert.api.gouv.fr/chat/" target="_blank" class="bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded hover:bg-red-800 no-underline">Ouvrir Albert manuellement</a>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- CONSTANTES DE STOCKAGE ---
-        const STORAGE_SELECTED_AI = 'selectedAI';
-        const STORAGE_GEMINI_KEY = 'geminiApiKey';
-        const STORAGE_OPENROUTER_KEY = 'openrouterApiKey';
-        const STORAGE_OPENROUTER_MODEL = 'openrouterSelectedModel';
-        const STORAGE_OPENROUTER_DETAIL_LEVEL = 'openrouterDetailLevel';
+        const STO = { AI: 'selectedAI', GEM: 'geminiApiKey', ORO: 'openrouterApiKey', ALB: 'albertApiKey', ALB_MOD: 'albertSelectedModel' };
+        
+        const PROXIES = {
+            corsproxy: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+            thingproxy: (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
+            direct: (u) => u
+        };
 
-        // --- ÉLÉMENTS DU DOM ---
-        const configSection = document.getElementById('config-section');
-        const promptSection = document.getElementById('prompt-section');
-        const aiSelector = document.getElementById('ai-selector');
-        const apiKeyInput = document.getElementById('api-key-input');
-        const saveKeyButton = document.getElementById('save-key-button');
-        
-        // Sélecteurs OpenRouter
-        const openrouterModelConfig = document.getElementById('openrouter-model-config');
-        const openrouterModelSelector = document.getElementById('openrouter-model-selector');
-        
-        const configStatusText = document.getElementById('config-status-text');
-        const changeAiButton = document.getElementById('change-ai-button');
-        const promptInput = document.getElementById('prompt-input');
-        const generateButton = document.getElementById('generate-button');
-        
-        const resultsSection = document.getElementById('results-section');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        
-        // Barre d'état
-        const statusBar = document.getElementById('status-bar');
-        const statusText = document.getElementById('status-text');
-        const statusProgress = document.getElementById('status-progress');
-        
-        // Onglets de sortie
-        const tabPreview = document.getElementById('tab-preview');
-        const tabRaw = document.getElementById('tab-raw');
-        const previewOutput = document.getElementById('preview-output');
-        const rawOutputContainer = document.getElementById('raw-output-container');
-        const rawOutput = document.getElementById('raw-output');
-        const copyTextButton = document.getElementById('copy-text-button');
+        const EL = {
+            config: () => document.getElementById('config-section'),
+            promptSec: () => document.getElementById('prompt-section'),
+            aiSel: () => document.getElementById('ai-selector'),
+            aiCards: () => document.querySelectorAll('.ai-card'),
+            keyInp: () => document.getElementById('api-key-input'),
+            saveBtn: () => document.getElementById('save-key-button'),
+            clearBtn: () => document.getElementById('clear-key-button'),
+            albertCfg: () => document.getElementById('albert-model-config'),
+            albertMod: () => document.getElementById('albert-model-selector'),
+            orCfg: () => document.getElementById('openrouter-model-config'),
+            orMod: () => document.getElementById('openrouter-model-selector'),
+            statusTxt: () => document.getElementById('config-status-text'),
+            promptInp: () => document.getElementById('prompt-input'),
+            genBtn: () => document.getElementById('generate-button'),
+            resSec: () => document.getElementById('results-section'),
+            spinner: () => document.getElementById('loading-spinner'),
+            bar: () => document.getElementById('status-bar'),
+            statTxt: () => document.getElementById('status-text'),
+            prog: () => document.getElementById('status-progress'),
+            perc: () => document.getElementById('progress-percent'),
+            prev: () => document.getElementById('preview-output'),
+            raw: () => document.getElementById('raw-output'),
+            rawCont: () => document.getElementById('raw-output-container'),
+            tabPrev: () => document.getElementById('tab-preview'),
+            tabRaw: () => document.getElementById('tab-raw'),
+            proxySel: () => document.getElementById('proxy-selector'),
+            diag: () => document.getElementById('error-diagnostic'),
+            errDet: () => document.getElementById('error-details'),
+            testBtn: () => document.getElementById('test-connection-btn')
+        };
 
-        // NOUVEAU: Éléments des boutons d'export
-        const exportHtmlButton = document.getElementById('export-html-button');
-        const exportTextButton = document.getElementById('export-text-button');
-
-        // --- CONFIGURATIONS DES IA ---
         const AI_CONFIGS = {
-            'gemini': {
-                name: "Google (Gemini Gratuit)",
-                storageKey: STORAGE_GEMINI_KEY,
-                getApiUrl: (cleApi) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${cleApi}`,
-                getHeaders: (cleApi) => ({ 'Content-Type': 'application/json' }),
-                getPayload: (prompt, model) => ({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { 
-                        responseMimeType: "text/plain", // Demande du texte brut
-                    }
+            'albert': {
+                name: "IA Albert", storageKey: STO.ALB,
+                url: 'https://albert.api.gouv.fr/v1/chat/completions',
+                getHeaders: (k) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${k}` }),
+                getPayload: (p, m, h = []) => ({
+                    model: m || "openai/gpt-oss-120b",
+                    messages: h.length > 0 ? [...h, { role: 'user', content: p }] : [{ role: 'user', content: p }],
+                    temperature: 0.7, max_tokens: 4096
                 }),
-                parseResponse: (result) => {
-                    if (!result.candidates || !result.candidates[0].content.parts[0].text) {
-                        if (result.candidates && result.candidates[0].finishReason === 'SAFETY') {
-                            throw new Error("Réponse bloquée par les filtres de sécurité de Gemini.");
-                        }
-                         if (result.promptFeedback && result.promptFeedback.blockReason) {
-                            throw new Error(`Prompt bloqué par Gemini. Raison: ${result.promptFeedback.blockReason}`);
-                        }
-                        throw new Error("Réponse de l'API Gemini invalide ou bloquée.");
-                    }
-                    return result.candidates[0].content.parts[0].text;
-                }
+                parseRes: (r) => r.choices[0].message.content
+            },
+            'gemini': {
+                name: "Google Gemini", storageKey: STO.GEM,
+                url: (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${k}`,
+                getHeaders: () => ({ 'Content-Type': 'application/json' }),
+                getPayload: (p) => ({ contents: [{ parts: [{ text: p }] }] }),
+                parseRes: (r) => r.candidates[0].content.parts[0].text
             },
             'openrouter': {
-                name: "OpenRouter (Clé Payante)",
-                storageKey: STORAGE_OPENROUTER_KEY,
-                getApiUrl: () => 'https://openrouter.ai/api/v1/chat/completions',
-                getHeaders: (cleApi) => ({
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cleApi}`
+                name: "OpenRouter", storageKey: STO.ORO,
+                url: 'https://openrouter.ai/api/v1/chat/completions',
+                getHeaders: (k) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${k}` }),
+                getPayload: (p, m, h = []) => ({
+                    model: m || "anthropic/claude-3.5-sonnet",
+                    messages: h.length > 0 ? [...h, { role: 'user', content: p }] : [{ role: 'user', content: p }]
                 }),
-                // getPayload est géré différemment pour OpenRouter (dans gererGeneration)
-                getPayload: (prompt, model, chatHistory = []) => {
-                    let messages = [];
-                    
-                    if (chatHistory.length > 0) {
-                        // Mode conversationnel (pour la génération par étapes)
-                        messages = [
-                            ...chatHistory,
-                            { role: 'user', content: prompt } // Le prompt est la nouvelle instruction
-                        ];
-                    } else {
-                        // Requête unique (pour les prompts courts)
-                        messages = [ { role: 'user', content: prompt } ];
-                    }
-                    
-                    return {
-                        model: model, 
-                        messages: messages
-                    };
-                },
-                parseResponse: (result) => {
-                    if (!result.choices || !result.choices[0].message.content) {
-                        throw new Error("Réponse de l'API OpenRouter invalide.");
-                    }
-                    return result.choices[0].message.content;
-                }
+                parseRes: (r) => r.choices[0].message.content
             }
         };
 
-        // --- FONCTIONS PRINCIPALES ---
+        async function callAPI(prompt, key, type, model, history = []) {
+            const config = AI_CONFIGS[type];
+            const baseUrl = typeof config.url === 'function' ? config.url(key) : config.url;
+            const targetUrl = PROXIES[EL.proxySel().value](baseUrl);
 
-        /**
-         * Appel générique à une API d'IA
-         */
-        async function callGenerationAPI(promptUtilisateur, cleApi, aiType, model, chatHistory = []) {
-            const config = AI_CONFIGS[aiType];
-            if (!config) {
-                throw new Error(`Configuration AI non trouvée pour: ${aiType}`);
-            }
-
-            const API_URL = config.getApiUrl(cleApi);
-            const headers = config.getHeaders(cleApi);
-            const payload = config.getPayload(promptUtilisateur, model, chatHistory);
-
-            // Tenter d'effectuer l'appel API
             try {
-                const response = await fetch(API_URL, {
+                const response = await fetch(targetUrl, {
                     method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(payload)
+                    headers: config.getHeaders(key),
+                    body: JSON.stringify(config.getPayload(prompt, model, history))
                 });
 
-                const result = await response.json();
-
-                if (response.ok) {
-                    // Succès, renvoyer la réponse
-                    return config.parseResponse(result);
-                } else {
-                    // Gérer les erreurs de l'API (ex: 400, 401, 429)
-                    let errorMsg = `Erreur API: ${response.status} ${response.statusText}.`;
-                    if (result.error && result.error.message) {
-                        errorMsg += ` Détail: ${result.error.message}`;
-                    } else if (result.detail) {
-                         errorMsg += ` Détail: ${result.detail}`;
-                    }
-                    throw new Error(errorMsg);
+                if (!response.ok) {
+                    const txt = await response.text();
+                    throw new Error(`Serveur : ${response.status}. ${txt.substring(0, 100)}`);
                 }
-            } catch (error) {
-                // Gérer les erreurs réseau (ex: CORS, fetch échoué)
-                console.error("Erreur réseau ou fetch:", error);
-                // Renvoie l'erreur pour qu'elle soit gérée par gererGeneration
-                throw new Error(`Erreur réseau: ${error.message}.`);
-            }
-        }
 
-        /**
-         * Bascule entre la section de configuration et la section de prompt
-         */
-        function basculerSections(cleExiste, aiType = '') {
-            if (cleExiste && aiType) {
-                configSection.classList.add('hidden');
-                promptSection.classList.remove('hidden');
-                
-                const config = AI_CONFIGS[aiType];
-                let statusMsg = `Connecté à : <strong class="text-gray-900">${config.name}</strong>`;
-                
-                if (aiType === 'openrouter') {
-                    const modelName = localStorage.getItem(STORAGE_OPENROUTER_MODEL) || openrouterModelSelector.value;
-                    const modelFriendlyName = openrouterModelSelector.querySelector(`option[value="${modelName}"]`)?.textContent || modelName;
-                    statusMsg += ` (Modèle: ${modelFriendlyName})`;
+                const data = await response.json();
+                return config.parseRes(data);
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                if (err.message.includes('Failed to fetch')) {
+                    throw new Error("ERREUR DE CONNEXION : Le serveur d'IA bloque la requête venant de votre navigateur. Si vous êtes sur la Forge, essayez le mode Proxy 1.");
                 }
-                configStatusText.innerHTML = statusMsg;
-
-            } else {
-                configSection.classList.remove('hidden');
-                promptSection.classList.add('hidden');
-                resultsSection.classList.add('hidden');
-                updateApiKeyInput(); // Met à jour les champs en fonction de la sélection
+                throw err;
             }
         }
 
-        /**
-         * Met à jour l'affichage de la configuration en fonction de l'IA sélectionnée
-         */
-        function updateApiKeyInput() {
-            const selectedAI = aiSelector.value;
-            const config = AI_CONFIGS[selectedAI];
-            if (!config) return;
-
-            // Gérer l'affichage des options OpenRouter
-            if (selectedAI === 'openrouter') {
-                openrouterModelConfig.classList.remove('hidden');
-                // Charger les préférences sauvegardées pour OpenRouter
-                openrouterModelSelector.value = localStorage.getItem(STORAGE_OPENROUTER_MODEL) || 'anthropic/claude-4.5-sonnet';
-                const detailLevel = localStorage.getItem(STORAGE_OPENROUTER_DETAIL_LEVEL) || 'complet';
-                document.getElementById(`detail-${detailLevel}`).checked = true;
-            } else {
-                openrouterModelConfig.classList.add('hidden');
-            }
-
-            // Mettre à jour le champ de la clé API
-            const cleSauvegardee = localStorage.getItem(config.storageKey);
-            apiKeyInput.value = cleSauvegardee || '';
-            apiKeyInput.placeholder = `Entrez votre clé API pour ${config.name}...`;
-        }
-        
-        /**
-         * Sauvegarde la clé API et les préférences dans le localStorage
-         */
-        function sauvegarderCle() {
-            const selectedAI = aiSelector.value;
-            const config = AI_CONFIGS[selectedAI];
-            const cle = apiKeyInput.value.trim();
+        function updateUI() {
+            const sel = EL.aiSel().value;
+            EL.aiCards().forEach(c => c.classList.toggle('active', c.getAttribute('data-value') === sel));
+            EL.albertCfg().classList.toggle('hidden', sel !== 'albert');
+            EL.orCfg().classList.toggle('hidden', sel !== 'openrouter');
             
-            if (cle) {
-                localStorage.setItem(config.storageKey, cle);
-                localStorage.setItem(STORAGE_SELECTED_AI, selectedAI);
-                
-                // Sauvegarder aussi les options OpenRouter si sélectionné
-                if (selectedAI === 'openrouter') {
-                    localStorage.setItem(STORAGE_OPENROUTER_MODEL, openrouterModelSelector.value);
-                    const detailLevel = document.querySelector('input[name="detail-level"]:checked').value;
-                    localStorage.setItem(STORAGE_OPENROUTER_DETAIL_LEVEL, detailLevel);
-                }
-                
-                basculerSections(true, selectedAI);
+            const savedKey = localStorage.getItem(AI_CONFIGS[sel].storageKey);
+            if (savedKey) {
+                EL.config().classList.add('hidden');
+                EL.promptSec().classList.remove('hidden');
+                EL.statusTxt().innerHTML = `<i class="fas fa-check-circle"></i> ${AI_CONFIGS[sel].name} : Connecté`;
             } else {
-                // Utiliser une boîte de dialogue modale simple au lieu d'alert()
-                showError("Veuillez entrer une clé API valide.");
+                EL.config().classList.remove('hidden');
+                EL.promptSec().classList.add('hidden');
+                EL.keyInp().value = '';
             }
         }
-        
-        /**
-         * Retourne à l'écran de configuration
-         */
-        function changerIA() {
-            basculerSections(false);
-        }
 
-        /**
-         * Point d'entrée principal pour la génération
-         */
         async function gererGeneration() {
-            const prompt = promptInput.value.trim();
-            const activeAI = localStorage.getItem(STORAGE_SELECTED_AI);
-            
-            if (!activeAI) {
-                showError("Erreur : Aucune IA sélectionnée.");
-                basculerSections(false);
-                return;
-            }
-            
-            const config = AI_CONFIGS[activeAI];
-            const cleApi = localStorage.getItem(config.storageKey);
+            const prompt = EL.promptInp().value.trim();
+            const aiType = EL.aiSel().value;
+            const key = localStorage.getItem(AI_CONFIGS[aiType].storageKey);
+            const model = aiType === 'albert' ? EL.albertMod().value : (aiType === 'openrouter' ? EL.orMod().value : '');
 
-            if (!prompt) {
-                showError("Veuillez entrer un message.");
-                return;
-            }
-            if (!cleApi) {
-                showError(`Erreur : Clé API non trouvée pour ${config.name}.`);
-                basculerSections(false);
-                return;
-            }
-
-            // --- Démarrer l'état de chargement ---
-            loadingSpinner.classList.remove('hidden');
-            resultsSection.classList.remove('hidden');
-            previewOutput.innerHTML = ''; 
-            rawOutput.textContent = ''; 
-            generateButton.disabled = true;
-            generateButton.textContent = "Génération en cours...";
-            statusBar.classList.add('hidden'); // Cacher la barre d'état au début
-            afficherOnglet('preview'); 
+            if (!prompt || !key) return;
+            EL.spinner().classList.remove('hidden'); EL.resSec().classList.remove('hidden');
+            EL.diag().classList.add('hidden'); EL.prev().innerHTML = ''; EL.raw().textContent = ''; EL.genBtn().disabled = true;
 
             try {
-                // --- Logique de routage ---
-                // Vérifier si c'est un prompt structuré (avec des **X.**)
-                const isStructuredPrompt = /\*\*(1\.|[0-9]+\.)[\s\S]+\*\*/i.test(prompt);
-                
-                if (activeAI === 'gemini') {
-                    // --- MÉTHODE 1: REQUÊTE UNIQUE (Gemini) ---
-                    statusBar.classList.remove('hidden');
-                    statusText.textContent = "Génération en cours (requête unique)...";
-                    statusProgress.style.width = "50%"; // Barre statique
-                    
-                    const model = null; // Gemini n'utilise pas le sélecteur de modèle
-                    const textContent = (await callGenerationAPI(prompt, cleApi, activeAI, model)).trim();
-                    
-                    afficherResultat(textContent, true);
-                    statusText.textContent = "Génération terminée !";
-                    statusProgress.style.width = "100%";
-
-                } else if (activeAI === 'openrouter') {
-                    // --- NOUVELLE LOGIQUE POUR OPENROUTER ---
-                    const detailLevel = document.querySelector('input[name="detail-level"]:checked').value;
-                    const model = localStorage.getItem(STORAGE_OPENROUTER_MODEL);
-
-                    if (detailLevel === 'complet' && isStructuredPrompt) {
-                        // --- MÉTHODE 2: OPENROUTER - COMPLET (par étapes) ---
-                        // Le prompt est trop long, on le découpe.
-                        await genererCoursParEtape(prompt, cleApi, activeAI, model); 
-
-                    } else {
-                        // --- MÉTHODE 3: OPENROUTER - ÉQUILIBRÉ ou CONCISE (requête unique) ---
-                        // Le prompt est modifié pour être plus court, OU envoyé tel quel.
-                        statusBar.classList.remove('hidden');
-                        statusText.textContent = `Génération en cours (Niveau: ${detailLevel})...`;
-                        statusProgress.style.width = "50%";
-
-                        let modifiedPrompt = prompt; // Commence avec l'original
-                        
-                        // *** DÉBUT DE LA CORRECTION ***
-                        // Vérifier si le prompt est un "prompt de cours" (contient les mots magiques)
-                        const isCoursePrompt = /DÉVELOPPEMENT DU COURS/i.test(prompt) || /structure de développement en 8 étapes/i.test(prompt);
-
-                        if (isCoursePrompt && detailLevel === 'equilibre') {
-                            // S'applique SEULEMENT si c'est un cours ET qu'on veut l'équilibrer
-                            modifiedPrompt = `IMPORTANT: Rédige une version ÉQUILIBRÉE et concise du cours en suivant le cahier des charges ci-dessous. Ne traite que les 2 ou 3 points les plus importants de chaque section (par ex: Définition, Analogie, Cas concret pour la section 5). \n\n--- CAHIER DES CHARGES ORIGINAL ---\n\n${prompt}`;
-                        } else if (isCoursePrompt && detailLevel === 'concis') {
-                            // S'applique SEULEMENT si c'est un cours ET qu'on veut le résumer
-                            modifiedPrompt = `IMPORTANT: Rédige une version TRÈS CONCISE du cours en suivant le cahier des charges ci-dessous. Va à l'essentiel. Ne traite que le point principal de chaque section (par ex: Définition simple pour la section 5). \n\n--- CAHIER DES CHARGES ORIGINAL ---\n\n${prompt}`;
-                        }
-                        // Si ce n'est PAS un "isCoursePrompt", 'modifiedPrompt' reste identique au 'prompt' original, 
-                        // et la logique "Équilibré/Concise" est ignorée.
-                        // *** FIN DE LA CORRECTION ***
-                        
-                        // On envoie le prompt (modifié ou non) en UNE SEULE FOIS
-                        const textContent = (await callGenerationAPI(modifiedPrompt, cleApi, activeAI, model)).trim();
-                        
-                        afficherResultat(textContent, true);
-                        statusText.textContent = "Génération terminée !";
-                        statusProgress.style.width = "100%";
-                    }
-                }
-
-            } catch (error) {
-                console.error("Erreur lors de la génération :", error);
-                afficherResultat(`Erreur : ${error.message}`, false);
-                afficherOnglet('raw'); // Afficher l'erreur dans l'onglet brut
-            } finally {
-                // --- Terminer l'état de chargement ---
-                loadingSpinner.classList.add('hidden');
-                generateButton.disabled = false;
-                generateButton.textContent = "Générer";
-                // Ne pas cacher la barre d'état si elle a été utilisée
-                if (statusBar.style.width === "100%") {
-                    // Reste affichée avec "Terminé"
-                } else {
-                    statusBar.classList.add('hidden');
-                }
-            }
-        }
-
-        /**
-         * NOUVELLE FONCTION: Générateur par étapes pour OpenRouter
-         */
-        async function genererCoursParEtape(fullPrompt, cleApi, aiType, model) {
-            const config = AI_CONFIGS[aiType];
-            const taskQueue = [];
-
-            // 1. SUPPRIMÉ: La modification du prompt se fait maintenant dans "gererGeneration"
-            // Le "fullPrompt" reçu ici est déjà le bon (le "complet").
-
-            // 2. Parser le prompt pour trouver les sections
-            // Regex dynamique qui trouve **X.** (avec X = nombre)
-            const sectionRegex = /\*\*((\d+)\.[\s\S]+?)\*\*/gi;
-            const matches = [...fullPrompt.matchAll(sectionRegex)];
-
-            // 3. Parser le prompt pour trouver les notions de la Section 5 (si elle existe)
-            let savoirs = [];
-            const savoirsRegex = /listé dans "([^"]+)"/i;
-            const savoirsMatch = savoirsRegex.exec(fullPrompt);
-            // Trouver la section 5
-            const section5Match = [...matches].find(m => m[2] === '5');
-
-            if (savoirsMatch && savoirsMatch[1] && section5Match) {
-                savoirs = savoirsMatch[1].split('. ').filter(s => s.trim().length > 0);
-            }
-
-            // 4. Construire la file d'attente des tâches
-            if (matches.length > 0) {
-                 for (const match of matches) {
-                    const sectionTitle = match[1].trim(); // e.g., "1. TITRE DE LA SÉQUENCE"
-                    const sectionNumber = match[2].trim(); // e.g., "1"
-
-                    if (sectionNumber === "5" && savoirs.length > 0) {
-                        // Cas spécial pour la section 5 : une tâche par notion
-                        for (const savoir of savoirs) {
-                            const savoirTrimmed = savoir.replace(/\./g, ''); // Enlève les points
-                            taskQueue.push({
-                                title: `Section 5 (Notion: ${savoirTrimmed})`,
-                                // Demande à l'IA de rédiger la sous-partie
-                                subPrompt: `Maintenant, rédige la sous-partie de la section **5. DÉVELOPPEMENT DU COURS** pour la notion de **"${savoirTrimmed}"**. Respecte le cahier des charges.`
-                            });
-                        }
-                    } else {
-                        // Tâche normale pour les autres sections
-                        taskQueue.push({
-                            title: `Section ${sectionNumber}`,
-                            // Demande à l'IA de rédiger cette section
-                            subPrompt: `Maintenant, rédige la section **${sectionTitle}**. Respecte le cahier des charges.`
-                        });
-                    }
-                }
-            } else {
-                // Si aucune section n'est trouvée, envoyer le prompt en une fois
-                taskQueue.push({
-                    title: "Prompt complet",
-                    subPrompt: fullPrompt
-                });
-            }
-
-            // 5. Initialiser la barre d'état et la sortie
-            statusBar.classList.remove('hidden');
-            let fullHtmlOutput = "";
-            let fullRawOutput = "";
-            
-            // Gérer l'historique de chat.
-            // Le premier message est le cahier des charges complet.
-            let chatHistory = [
-                { role: 'user', content: `Tu es un expert en pédagogie et tu vas rédiger un cours en HTML. Voici le cahier des charges complet que tu dois suivre à la lettre pour toutes mes demandes : \n\n[CAHIER DES CHARGES COMPLET]\n${fullPrompt}` },
-                { role: 'assistant', content: "J'ai bien compris. Je suis prêt à rédiger le cours section par section. Quelle est la première section que tu souhaites ?" }
-            ];
-
-            // 6. Exécuter la file d'attente
-            const totalTasks = taskQueue.length;
-            for (let i = 0; i < totalTasks; i++) {
-                const task = taskQueue[i];
-                
-                // Mettre à jour l'état
-                const progress = Math.round(((i + 1) / totalTasks) * 100);
-                statusText.textContent = `Génération... (Étape ${i + 1}/${totalTasks}: ${task.title})`;
-                statusProgress.style.width = `${progress}%`;
-                
-                // const model = localStorage.getItem(STORAGE_OPENROUTER_MODEL); // Déjà passé en paramètre
-                
-                // --- Appel API Conversationnel ---
-                // Le "prompt" est maintenant juste la nouvelle instruction
-                const newText = await callGenerationAPI(task.subPrompt, cleApi, aiType, model, chatHistory);
-                
-                // Ajouter la nouvelle instruction et la réponse à l'historique
-                chatHistory.push({ role: 'user', content: task.subPrompt });
-                chatHistory.push({ role: 'assistant', content: newText });
-                
-                // Mettre à jour la sortie
-                const cleanHtml = newText
-                    .replace(/^```(html|xml)\n?/, '')
-                    .replace(/```$/, '')
-                    .trim();
-                
-                fullHtmlOutput += cleanHtml + "\n\n";
-                fullRawOutput += newText + "\n\n"; // Garder le texte brut avec les ```
-                
-                // Mettre à jour l'aperçu en temps réel
-                previewOutput.innerHTML = fullHtmlOutput;
-                rawOutput.textContent = fullRawOutput;
-                
-                // Faire défiler l'aperçu vers le bas
-                previewOutput.scrollTop = previewOutput.scrollHeight;
-            }
-
-            // Terminé
-            statusText.textContent = "Génération terminée !";
-            statusProgress.style.width = "100%";
-        }
-
-        /**
-         * Affiche le résultat final dans les onglets
-         */
-        function afficherResultat(content, isSuccess) {
-            if (isSuccess) {
-                // Tenter de nettoyer le HTML s'il est enveloppé dans des marqueurs de code
-                const cleanHtml = content
-                    .replace(/^```(html|xml)\n?/, '')
-                    .replace(/```$/, '')
-                    .trim();
-
-                rawOutput.textContent = content; // L'onglet brut obtient tout
-
-                // Vérifier si c'est du HTML plausible
-                const isHtml = cleanHtml.startsWith('<') && cleanHtml.endsWith('>');
-
-                if (isHtml && cleanHtml.length > 20) { 
-                    previewOutput.innerHTML = cleanHtml;
-                    afficherOnglet('preview');
-                } else {
-                    // Si ce n'est pas du HTML, le mettre dans une balise <pre> pour l'aperçu
-                    previewOutput.innerHTML = `<pre class="text-sm text-gray-800 whitespace-pre-wrap">${content}</pre>`;
-                    afficherOnglet('raw'); // Basculer sur l'onglet brut si ce n'est pas du HTML
-                }
-            } else {
-                // Afficher un message d'erreur
-                rawOutput.textContent = content; // Erreur dans l'onglet brut
-                previewOutput.innerHTML = `<div class="p-4 rounded-md bg-red-50">
-                    <h3 class="text-sm font-medium text-red-800">Erreur de Génération</h3>
-                    <p class="mt-2 text-sm text-red-700">${content}</p>
-                </div>`;
-                afficherOnglet('preview'); // Afficher aussi l'erreur dans l'aperçu
-            }
-        }
-        
-        /**
-         * Affiche une erreur non bloquante (remplace alert())
-         */
-        function showError(message) {
-            // Pourrait être remplacé par une vraie modale
-            console.error(message);
-            // Afficher l'erreur dans la section de résultat si elle est visible
-            if (!resultsSection.classList.contains('hidden')) {
-                afficherResultat(message, false);
-            } else {
-                // Si la section de résultat n'est pas visible, on peut utiliser un petit toast
-                // Pour l'instant, on se contente de la console.
-            }
-        }
-
-        /**
-         * Gère le basculement entre les onglets "Aperçu" et "Texte ou Code"
-         */
-        function afficherOnglet(type) {
-            if (type === 'preview') {
-                previewOutput.classList.remove('hidden');
-                rawOutputContainer.classList.add('hidden');
-                tabPreview.classList.add('active');
-                tabRaw.classList.remove('active');
-            } else { // type === 'raw'
-                previewOutput.classList.add('hidden');
-                rawOutputContainer.classList.remove('hidden');
-                tabRaw.classList.add('active');
-                tabPreview.classList.remove('active');
-            }
-        }
-
-        /**
-         * Copie le contenu de l'onglet "Texte ou Code" dans le presse-papiers
-         */
-        function copierTexte() {
-            const text = rawOutput.textContent;
-            const buttonText = copyTextButton.innerHTML; // Sauvegarder le contenu HTML (icône + texte)
-            
-            // Utiliser document.execCommand pour une meilleure compatibilité dans les iframes
-            try {
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.position = "fixed";  // Hors de l'écran
-                textArea.style.top = 0;
-                textArea.style.left = 0;
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                copyTextButton.textContent = "Copié !";
-                setTimeout(() => { copyTextButton.innerHTML = buttonText; }, 2000);
+                const res = await callAPI(prompt, key, aiType, model);
+                const clean = res.replace(/```html|```/g, '').trim();
+                EL.prev().innerHTML = clean; EL.raw().textContent = clean;
             } catch (e) {
-                showError("La copie a échoué. Veuillez copier manuellement.");
+                EL.diag().classList.remove('hidden');
+                EL.errDet().innerText = e.message;
+                EL.prev().innerHTML = `<p class="text-red-600 font-bold">⚠️ Échec de la génération.</p>`;
+            } finally {
+                EL.spinner().classList.add('hidden'); EL.genBtn().disabled = false;
             }
         }
 
-        // --- NOUVELLES FONCTIONS D'EXPORT ---
-
-        /**
-         * Crée et télécharge un fichier
-         */
-        function downloadFile(filename, content, mimeType) {
-            const blob = new Blob([content], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-            const element = document.createElement('a');
-            element.href = url;
-            element.download = filename;
-            document.body.appendChild(element); // Requis pour Firefox
-            element.click();
-            // Nettoyer après le clic
-            setTimeout(() => {
-                document.body.removeChild(element);
-                window.URL.revokeObjectURL(url);
-            }, 0);
-        }
-
-        /**
-         * Exporte le contenu HTML.
-         * Si la sortie brute est du HTML, télécharge-la.
-         * Sinon, télécharge l'aperçu formaté.
-         */
-        function exportHtml() {
-            const rawContent = rawOutput.textContent.trim();
-            if (rawContent.startsWith('<!DOCTYPE html') || rawContent.startsWith('<html')) {
-                // La source est un document HTML complet. Télécharge-la.
-                downloadFile('cours_genere.html', rawContent, 'text/html;charset=utf-8,');
-            } else {
-                // La source est du texte brut. Télécharge l'aperçu (qui a des balises <pre>).
-                const previewContent = previewOutput.innerHTML;
-                const fullHtml = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Export Aperçu</title><style>body { font-family: sans-serif; margin: 2rem; } pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; background: #f4f4f4; padding: 1rem; border-radius: 5px; }</style></head><body>${previewContent}</body></html>`;
-                downloadFile('apercu_cours.html', fullHtml, 'text/html;charset=utf-8,');
-            }
-        }
-
-        /**
-         * Exporte le contenu texte brut
-         */
-        function exportText() {
-            const textContent = rawOutput.textContent;
-            downloadFile('cours_texte.txt', textContent, 'text/plain;charset=utf-8,');
-        }
-
-
-        // --- ÉCOUTEURS D'ÉVÉNEMENTS ---
-        
         document.addEventListener('DOMContentLoaded', () => {
-            // Logique pour adapter l'affichage si l'outil est dans une iframe
-            if (window.self !== window.top) {
-                // En mode "embarqué" (iframe), pas besoin de marges grises
-                document.body.classList.remove('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4');
-            } else {
-                // En mode "standalone", centrer le contenu
-                document.body.classList.add('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4');
-            }
+            const savedAI = localStorage.getItem(STO.AI) || 'albert';
+            EL.aiSel().value = savedAI;
+            updateUI();
 
-            // Charger la configuration sauvegardée
-            const selectedAI = localStorage.getItem(STORAGE_SELECTED_AI) || 'gemini';
-            aiSelector.value = selectedAI;
+            EL.aiCards().forEach(card => {
+                card.onclick = () => {
+                    EL.aiSel().value = card.getAttribute('data-value');
+                    localStorage.setItem(STO.AI, EL.aiSel().value);
+                    updateUI();
+                };
+            });
+
+            EL.saveBtn().onclick = () => {
+                const ai = EL.aiSel().value;
+                const key = EL.keyInp().value.trim();
+                if(!key) return;
+                localStorage.setItem(AI_CONFIGS[ai].storageKey, key);
+                updateUI();
+            };
+
+            EL.testBtn().onclick = async () => {
+                const ai = EL.aiSel().value;
+                const key = localStorage.getItem(AI_CONFIGS[ai].storageKey);
+                if (!key) return alert("Configurez une clé d'abord.");
+                EL.testBtn().innerHTML = '<i class="fas fa-spinner fa-spin"></i> Test...';
+                try {
+                    await callAPI("Test minimal. Réponds 'OK'.", key, ai, "");
+                    alert("✅ Succès ! Connexion établie.");
+                } catch(e) {
+                    alert("❌ Échec : " + e.message);
+                } finally {
+                    EL.testBtn().innerHTML = '<i class="fas fa-vial"></i> Tester la connexion';
+                }
+            };
             
-            const config = AI_CONFIGS[selectedAI];
-            const cleSauvegardee = config ? localStorage.getItem(config.storageKey) : null;
+            EL.clearBtn().onclick = () => {
+                localStorage.removeItem(AI_CONFIGS[EL.aiSel().value].storageKey);
+                updateUI();
+            };
 
-            if (cleSauvegardee) {
-                basculerSections(true, selectedAI);
-            } else {
-                basculerSections(false);
-            }
+            EL.genBtn().onclick = gererGeneration;
+            EL.tabPrev().onclick = () => { EL.prev().classList.remove('hidden'); EL.rawCont().classList.add('hidden'); EL.tabPrev().classList.add('active'); EL.tabRaw().classList.remove('active'); };
+            EL.tabRaw().onclick = () => { EL.prev().classList.add('hidden'); EL.rawCont().classList.remove('hidden'); EL.tabRaw().classList.add('active'); EL.tabPrev().classList.remove('active'); };
+            
+            document.getElementById('copy-text-button').onclick = () => { navigator.clipboard.writeText(EL.raw().textContent); alert("Code copié !"); };
+            document.getElementById('export-html-button').onclick = () => { const blob = new Blob([EL.raw().textContent], { type: 'text/html' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'manuel.html'; a.click(); };
+            document.getElementById('export-text-button').onclick = () => { const blob = new Blob([EL.raw().textContent], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'manuel.txt'; a.click(); };
         });
-
-        // Mettre à jour l'UI si le fournisseur d'IA change
-        aiSelector.addEventListener('change', updateApiKeyInput);
-        
-        // Sauvegarder la clé et les préférences
-        saveKeyButton.addEventListener('click', sauvegarderCle);
-        
-        // Revenir à l'écran de configuration
-        changeAiButton.addEventListener('click', changerIA);
-        
-        // Lancer la génération
-        generateButton.addEventListener('click', gererGeneration);
-        
-        // Gérer les onglets de sortie
-        tabPreview.addEventListener('click', () => afficherOnglet('preview'));
-        tabRaw.addEventListener('click', () => afficherOnglet('raw'));
-        
-        // Bouton Copier
-        copyTextButton.addEventListener('click', copierTexte);
-
-        // NOUVEAU: Écouteurs pour les boutons d'export
-        exportHtmlButton.addEventListener('click', exportHtml);
-        exportTextButton.addEventListener('click', exportText);
-
     </script>
 </body>
 </html>
