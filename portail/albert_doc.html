@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albert Express - Générateur de Documents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        body { font-family: 'Outfit', sans-serif; background: #f0f2f5; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .loader { border-top-color: #000091; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+
+    <div class="max-w-2xl w-full glass rounded-3xl shadow-2xl overflow-hidden border border-white">
+        <!-- Header -->
+        <div class="bg-[#000091] p-6 text-white text-center">
+            <h1 class="text-2xl font-extrabold tracking-tight">ALBERTDOC <span class="font-light">v1.0</span></h1>
+            <p class="text-blue-200 text-xs uppercase font-bold tracking-widest mt-1">Générateur de fiche pédagogique</p>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <!-- Etape 1 : Clé -->
+            <div id="step-key" class="space-y-4">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider">Votre Clé API Albert</label>
+                <input type="password" id="apiKey" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition-all font-mono" placeholder="sk-...">
+                <button onclick="saveKey()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 transition-all shadow-lg active:scale-95">
+                    CONFIGURER L'ACCÈS
+                </button>
+            </div>
+
+            <!-- Etape 2 : Création (Cachée par défaut) -->
+            <div id="step-create" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                    <span class="text-xs font-bold text-emerald-700"><i class="fas fa-check-circle"></i> Albert est prêt</span>
+                    <button onclick="resetKey()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Changer de clé</button>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-wider">Sujet de la fiche</label>
+                    <input type="text" id="subject" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none" placeholder="Ex: Le cycle de l'eau, La programmation en 4e...">
+                </div>
+
+                <button id="genBtn" onclick="generate()" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-black shadow-xl transition-all flex items-center justify-center gap-3">
+                    <i class="fas fa-magic"></i> GÉNÉRER LE DOCUMENT
+                </button>
+            </div>
+
+            <!-- Zone de chargement -->
+            <div id="loading" class="hidden flex flex-col items-center py-10 space-y-4">
+                <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+                <p class="text-sm font-bold text-slate-500 animate-pulse uppercase tracking-tighter">Albert rédige votre fiche...</p>
+            </div>
+
+            <!-- Résultat -->
+            <div id="result" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-black text-slate-400 uppercase">Document généré</h3>
+                    <button onclick="downloadDoc()" class="text-blue-600 font-bold text-xs hover:underline uppercase">Télécharger (HTML)</button>
+                </div>
+                <div id="output" class="p-6 border-2 border-slate-100 rounded-3xl bg-white text-sm prose max-w-none shadow-inner"></div>
+                <button onclick="location.reload()" class="w-full py-3 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-slate-600">Recommencer</button>
+            </div>
+
+            <!-- Console de Debug (Discrète) -->
+            <div id="debug" class="mt-8 p-3 bg-slate-900 rounded-xl hidden">
+                <p class="text-[9px] font-mono text-emerald-400" id="debug-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'albert_mini_key';
+        
+        // Initialisation
+        window.onload = () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                document.getElementById('step-key').classList.add('hidden');
+                document.getElementById('step-create').classList.remove('hidden');
+                document.getElementById('apiKey').value = saved;
+            }
+        };
+
+        function saveKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            if(!key) return alert("Entrez une clé !");
+            localStorage.setItem(STORAGE_KEY, key);
+            document.getElementById('step-key').classList.add('hidden');
+            document.getElementById('step-create').classList.remove('hidden');
+        }
+
+        function resetKey() {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+
+        async function generate() {
+            const subject = document.getElementById('subject').value.trim();
+            const key = localStorage.getItem(STORAGE_KEY);
+            if(!subject) return alert("Entrez un sujet !");
+
+            const btn = document.getElementById('genBtn');
+            const loader = document.getElementById('loading');
+            const resArea = document.getElementById('result');
+            const debug = document.getElementById('debug');
+            const debugTxt = document.getElementById('debug-text');
+
+            btn.classList.add('hidden');
+            loader.classList.remove('hidden');
+            debug.classList.remove('hidden');
+            debugTxt.innerText = "Connexion à Albert en cours...";
+
+            // Configuration de l'appel direct (Optimisé pour la Forge)
+            const url = "https://albert.api.gouv.fr/v1/chat/completions";
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({
+                        model: "openai/gpt-oss-120b",
+                        messages: [
+                            { role: "system", content: "Tu es un assistant pédagogique. Rédige une fiche de synthèse claire en HTML (utilise h2, p, ul, li)." },
+                            { role: "user", content: `Rédige une fiche de cours sur le sujet suivant : ${subject}` }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+
+                debugTxt.innerText += `\nStatut serveur : ${response.status}`;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = data.choices[0].message.content;
+                    document.getElementById('output').innerHTML = content;
+                    resArea.classList.remove('hidden');
+                    debug.classList.add('hidden');
+                } else {
+                    const err = await response.text();
+                    throw new Error(`Albert refuse la connexion (${response.status}).`);
+                }
+            } catch (e) {
+                debugTxt.innerHTML = `<span class="text-red-400">ERREUR : ${e.message}</span>\n<br>Note : Si vous voyez 'Failed to fetch', Albert bloque l'origine Forge.`;
+                btn.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        function downloadDoc() {
+            const content = document.getElementById('output').innerHTML;
+            const blob = new Blob(['<!DOCTYPE html><html><body>' + content + '</body></html>'], {type: 'text/html'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'fiche_albert.html';
+            a.click();
+        }
+    </script>
+</body>
+</html>
