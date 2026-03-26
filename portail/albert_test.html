@@ -3,77 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testeur Albert API - Spécial Forge</title>
+    <title>Diagnostic Albert API - Expert Forge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        .log-entry { font-family: 'Courier New', monospace; font-size: 11px; border-bottom: 1px solid #e2e8f0; padding: 6px 0; }
-        .error { color: #dc2626; font-weight: bold; }
-        .success { color: #059669; font-weight: bold; }
+        .log-entry { font-family: 'Courier New', monospace; font-size: 11px; border-bottom: 1px solid #e2e8f0; padding: 8px 0; }
+        .error { color: #dc2626; font-weight: bold; background: #fef2f2; }
+        .success { color: #059669; font-weight: bold; background: #f0fdf4; }
         .info { color: #4b5563; }
-        .proxy-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; margin-left: 8px; }
+        .warning { color: #92400e; font-weight: bold; background: #fffbeb; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 md:p-12">
+<body class="bg-slate-100 min-h-screen p-4 md:p-8">
 
-    <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
         <!-- Header -->
-        <div class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-2xl font-black italic tracking-tight">ALBERT API DIAGNOSTIC</h1>
-            <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Version Spéciale Hébergement Forge</p>
+        <div class="bg-slate-900 p-8 text-white">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-black italic tracking-tighter text-blue-400">ALBERT DEBUGGER</h1>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Analyseur de flux réseau - Spécial Hébergement</p>
+                </div>
+                <div class="bg-slate-800 px-3 py-1 rounded-full text-[10px] border border-slate-700 font-mono" id="env-badge">Détection...</div>
+            </div>
         </div>
 
         <div class="p-8">
-            <!-- Instructions -->
-            <div class="mb-8 p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800 text-xs leading-relaxed">
-                <p class="font-bold mb-2"><i class="fas fa-info-circle"></i> À lire avant de tester :</p>
-                <ul class="list-disc pl-4 space-y-1">
-                    <li><strong>En Local :</strong> L'erreur "Failed to fetch" est quasi-inévitable sans extension.</li>
-                    <li><strong>Sur la Forge :</strong> Si le test échoue, c'est que la Forge bloque les appels sortants vers les proxys.</li>
-                    <li><strong>Conseil :</strong> Utilisez le "Proxy 1" en priorité, c'est le plus compatible avec Albert.</li>
-                </ul>
+            <!-- État du réseau -->
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-3">Vérification de Sortie (CSP)</h3>
+                    <div class="flex gap-2">
+                        <button onclick="testOutbound('https://www.google.com')" class="text-[9px] bg-slate-200 px-2 py-1 rounded hover:bg-slate-300 transition-all font-bold">TESTER SORTIE WEB</button>
+                        <button onclick="testOutbound('https://api.albert.education.fr/v1/models')" class="text-[9px] bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-all font-bold">TESTER ACCÈS ALBERT</button>
+                    </div>
+                </div>
+                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                    <p class="text-[10px] font-bold text-amber-800 leading-tight">
+                        <i class="fas fa-exclamation-triangle"></i> Si "Failed to fetch" apparaît partout sur la Forge, cela signifie que votre projet a une politique de sécurité (CSP) qui bloque les domaines externes.
+                    </p>
+                </div>
             </div>
 
             <!-- Formulaire -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="md:col-span-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Clé API Albert</label>
-                    <input type="password" id="apiKey" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 outline-none transition-all font-mono text-sm" placeholder="sk-...">
-                </div>
-
+            <div class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Choisir le Relais (Proxy)</label>
-                    <select id="proxySelect" class="w-full p-3 bg-white border-2 border-slate-100 rounded-xl text-sm font-bold">
-                        <option value="corsproxy">Proxy 1 (corsproxy.io)</option>
-                        <option value="thingproxy">Proxy 2 (thingproxy.io)</option>
-                        <option value="allorigins">Proxy 3 (allorigins.win)</option>
-                        <option value="direct">SANS PROXY (Direct)</option>
-                    </select>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">Clé API (sk-...)</label>
+                    <input type="password" id="apiKey" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 outline-none transition-all font-mono text-sm shadow-inner" placeholder="Entrez votre clé Albert">
                 </div>
 
-                <div class="flex items-end">
-                    <button id="testBtn" class="w-full bg-blue-600 text-white font-black py-3 rounded-xl hover:bg-blue-700 shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
-                        <i class="fas fa-bolt"></i> LANCER LE TEST
-                    </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">Relais de Sécurité (Proxy CORS)</label>
+                        <select id="proxySelect" class="w-full p-4 bg-white border-2 border-slate-200 rounded-2xl text-sm font-bold shadow-sm outline-none focus:border-blue-500">
+                            <option value="corsproxy">Option A : corsproxy.io (Le plus fiable)</option>
+                            <option value="codetabs">Option B : api.codetabs.com (Secondaire)</option>
+                            <option value="thingproxy">Option C : thingproxy.io (Robuste)</option>
+                            <option value="allorigins">Option D : allorigins.win (Wrapper)</option>
+                            <option value="direct">SANS PROXY (Direct - Très risqué)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button id="testBtn" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700 shadow-xl flex items-center justify-center gap-2 transition-transform active:scale-95">
+                            <i class="fas fa-satellite-dish"></i> TESTER LA CONNEXION
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Journal -->
-            <div class="space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Journal technique</h3>
-                    <button onclick="document.getElementById('logs').innerHTML=''" class="text-[10px] text-slate-400 hover:text-red-500 uppercase font-bold">Effacer</button>
+            <div class="mt-10">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-terminal"></i> Console de diagnostic
+                    </h3>
+                    <button onclick="document.getElementById('logs').innerHTML=''" class="text-[9px] font-bold text-slate-400 hover:text-red-500 uppercase tracking-tighter">Effacer les logs</button>
                 </div>
-                <div id="logs" class="bg-slate-900 text-slate-300 p-4 rounded-2xl h-60 overflow-y-auto custom-scrollbar border-4 border-slate-800 shadow-inner">
-                    <div class="log-entry info italic">Système prêt. Entrez votre clé.</div>
+                <div id="logs" class="bg-slate-900 text-slate-300 p-6 rounded-2xl h-80 overflow-y-auto border-4 border-slate-800 shadow-2xl custom-scrollbar">
+                    <div class="log-entry info italic">Initialisation du système de diagnostic...</div>
                 </div>
             </div>
 
-            <!-- Réponse -->
-            <div id="resultBox" class="mt-8 hidden animate-bounce-short">
-                <div class="p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-100">
-                    <h4 class="text-xs font-black text-emerald-800 uppercase mb-2">Réponse d'Albert :</h4>
-                    <p id="resultContent" class="text-sm text-emerald-700 font-medium"></p>
+            <!-- Résultat -->
+            <div id="resultBox" class="mt-8 hidden">
+                <div class="p-6 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-start gap-4">
+                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-black text-emerald-800 uppercase mb-1">Succès ! Réponse d'Albert :</h4>
+                        <p id="resultContent" class="text-sm text-emerald-700 font-mono"></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,7 +109,16 @@
             btn: document.getElementById('testBtn'),
             logs: document.getElementById('logs'),
             box: document.getElementById('resultBox'),
-            content: document.getElementById('resultContent')
+            content: document.getElementById('resultContent'),
+            badge: document.getElementById('env-badge')
+        };
+
+        // Détection de l'environnement
+        window.onload = () => {
+            const protocol = window.location.protocol;
+            const host = window.location.hostname;
+            el.badge.innerText = `${protocol} // ${host || 'Local'}`;
+            if (protocol === 'file:') writeLog("ATTENTION : Mode local détecté. Les erreurs CORS sont quasi-systématiques.", "warning");
         };
 
         function writeLog(msg, type = 'info') {
@@ -97,27 +129,38 @@
             el.logs.scrollTop = el.logs.scrollHeight;
         }
 
+        async function testOutbound(url) {
+            writeLog(`Test de sortie vers ${url}...`);
+            try {
+                const res = await fetch(url, { mode: 'no-cors' });
+                writeLog(`✅ Sortie possible (Le navigateur a pu envoyer la requête).`, "success");
+            } catch (e) {
+                writeLog(`❌ Sortie BLOQUÉE : ${e.message}`, "error");
+                writeLog("CONSEIL : La Forge semble bloquer les appels vers l'extérieur via CSP.", "warning");
+            }
+        }
+
         async function testAlbert() {
             const key = el.key.value.trim();
-            if (!key) return alert("Veuillez saisir votre clé API !");
+            if (!key) return alert("Clé API manquante.");
 
             el.btn.disabled = true;
-            el.btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> TEST EN COURS...';
+            el.btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> TRAITEMENT...';
             el.box.classList.add('hidden');
-            writeLog(`Démarrage du test pour : ${el.proxy.value}`);
-
+            
             const endpoint = "https://albert.api.gouv.fr/v1/chat/completions";
             let target;
 
-            // Logique de Proxy
             switch(el.proxy.value) {
                 case 'corsproxy': target = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`; break;
+                case 'codetabs': target = `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(endpoint)}`; break;
                 case 'thingproxy': target = `https://thingproxy.freeboard.io/fetch/${endpoint}`; break;
                 case 'allorigins': target = `https://api.allorigins.win/get?url=${encodeURIComponent(endpoint)}`; break;
                 default: target = endpoint;
             }
 
-            writeLog(`Cible finale : ${target}`);
+            writeLog(`Tentative via ${el.proxy.value}...`);
+            writeLog(`Cible : ${target.substring(0, 50)}...`);
 
             try {
                 const response = await fetch(target, {
@@ -128,32 +171,33 @@
                     },
                     body: JSON.stringify({
                         model: "openai/gpt-oss-120b",
-                        messages: [{ role: "user", content: "Réponds 'OK'." }],
+                        messages: [{ role: "user", content: "Réponds OK" }],
                         max_tokens: 5
                     })
                 });
 
-                writeLog(`Réponse du serveur reçue. Code : ${response.status}`);
+                writeLog(`HTTP Status : ${response.status}`);
 
                 if (response.ok) {
                     const data = await response.json();
-                    writeLog("Succès ! L'API Albert est accessible.", "success");
+                    writeLog("CONTRAT REMPLI : L'IA a répondu.", "success");
                     el.box.classList.remove('hidden');
-                    el.content.innerText = data.choices[0].message.content;
+                    el.content.innerText = data.choices ? data.choices[0].message.content : "Format de réponse inattendu.";
                 } else {
                     const errorMsg = await response.text();
                     writeLog(`ERREUR SERVEUR : ${errorMsg.substring(0, 100)}`, "error");
-                    if (response.status === 401) writeLog("CONSEIL : Votre clé API est probablement erronée.", "error");
-                    if (response.status === 403) writeLog("CONSEIL : Le serveur bloque la requête. Changez de Proxy.", "error");
+                    if (response.status === 401) writeLog("Vérifiez votre clé API sur le portail Albert.", "warning");
+                    if (response.status === 403) writeLog("Le serveur ou le proxy rejette la requête.", "warning");
                 }
             } catch (err) {
                 writeLog(`ERREUR NAVIGATEUR : ${err.message}`, "error");
                 if (err.message.includes('Failed to fetch')) {
-                    writeLog("DIAGNOSTIC : Blocage CORS. Le navigateur refuse la sortie.", "error");
+                    writeLog("DIAGNOSTIC : Échec critique du pré-contrôle (CORS Preflight).", "error");
+                    writeLog("L'URL du proxy est probablement bloquée par la Forge ou par Albert.", "info");
                 }
             } finally {
                 el.btn.disabled = false;
-                el.btn.innerHTML = '<i class="fas fa-bolt"></i> LANCER LE TEST';
+                el.btn.innerHTML = '<i class="fas fa-satellite-dish"></i> TESTER LA CONNEXION';
             }
         }
 
