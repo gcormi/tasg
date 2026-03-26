@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testeur Albert API - Spécial Forge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .log-entry { font-family: 'Courier New', monospace; font-size: 11px; border-bottom: 1px solid #e2e8f0; padding: 6px 0; }
+        .error { color: #dc2626; font-weight: bold; }
+        .success { color: #059669; font-weight: bold; }
+        .info { color: #4b5563; }
+        .proxy-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; margin-left: 8px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-12">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-2xl font-black italic tracking-tight">ALBERT API DIAGNOSTIC</h1>
+            <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Version Spéciale Hébergement Forge</p>
+        </div>
+
+        <div class="p-8">
+            <!-- Instructions -->
+            <div class="mb-8 p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800 text-xs leading-relaxed">
+                <p class="font-bold mb-2"><i class="fas fa-info-circle"></i> À lire avant de tester :</p>
+                <ul class="list-disc pl-4 space-y-1">
+                    <li><strong>En Local :</strong> L'erreur "Failed to fetch" est quasi-inévitable sans extension.</li>
+                    <li><strong>Sur la Forge :</strong> Si le test échoue, c'est que la Forge bloque les appels sortants vers les proxys.</li>
+                    <li><strong>Conseil :</strong> Utilisez le "Proxy 1" en priorité, c'est le plus compatible avec Albert.</li>
+                </ul>
+            </div>
+
+            <!-- Formulaire -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Clé API Albert</label>
+                    <input type="password" id="apiKey" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 outline-none transition-all font-mono text-sm" placeholder="sk-...">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Choisir le Relais (Proxy)</label>
+                    <select id="proxySelect" class="w-full p-3 bg-white border-2 border-slate-100 rounded-xl text-sm font-bold">
+                        <option value="corsproxy">Proxy 1 (corsproxy.io)</option>
+                        <option value="thingproxy">Proxy 2 (thingproxy.io)</option>
+                        <option value="allorigins">Proxy 3 (allorigins.win)</option>
+                        <option value="direct">SANS PROXY (Direct)</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <button id="testBtn" class="w-full bg-blue-600 text-white font-black py-3 rounded-xl hover:bg-blue-700 shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+                        <i class="fas fa-bolt"></i> LANCER LE TEST
+                    </button>
+                </div>
+            </div>
+
+            <!-- Journal -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Journal technique</h3>
+                    <button onclick="document.getElementById('logs').innerHTML=''" class="text-[10px] text-slate-400 hover:text-red-500 uppercase font-bold">Effacer</button>
+                </div>
+                <div id="logs" class="bg-slate-900 text-slate-300 p-4 rounded-2xl h-60 overflow-y-auto custom-scrollbar border-4 border-slate-800 shadow-inner">
+                    <div class="log-entry info italic">Système prêt. Entrez votre clé.</div>
+                </div>
+            </div>
+
+            <!-- Réponse -->
+            <div id="resultBox" class="mt-8 hidden animate-bounce-short">
+                <div class="p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-100">
+                    <h4 class="text-xs font-black text-emerald-800 uppercase mb-2">Réponse d'Albert :</h4>
+                    <p id="resultContent" class="text-sm text-emerald-700 font-medium"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const el = {
+            key: document.getElementById('apiKey'),
+            proxy: document.getElementById('proxySelect'),
+            btn: document.getElementById('testBtn'),
+            logs: document.getElementById('logs'),
+            box: document.getElementById('resultBox'),
+            content: document.getElementById('resultContent')
+        };
+
+        function writeLog(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.innerHTML = `<span>[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            el.logs.appendChild(div);
+            el.logs.scrollTop = el.logs.scrollHeight;
+        }
+
+        async function testAlbert() {
+            const key = el.key.value.trim();
+            if (!key) return alert("Veuillez saisir votre clé API !");
+
+            el.btn.disabled = true;
+            el.btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> TEST EN COURS...';
+            el.box.classList.add('hidden');
+            writeLog(`Démarrage du test pour : ${el.proxy.value}`);
+
+            const endpoint = "https://albert.api.gouv.fr/v1/chat/completions";
+            let target;
+
+            // Logique de Proxy
+            switch(el.proxy.value) {
+                case 'corsproxy': target = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`; break;
+                case 'thingproxy': target = `https://thingproxy.freeboard.io/fetch/${endpoint}`; break;
+                case 'allorigins': target = `https://api.allorigins.win/get?url=${encodeURIComponent(endpoint)}`; break;
+                default: target = endpoint;
+            }
+
+            writeLog(`Cible finale : ${target}`);
+
+            try {
+                const response = await fetch(target, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({
+                        model: "openai/gpt-oss-120b",
+                        messages: [{ role: "user", content: "Réponds 'OK'." }],
+                        max_tokens: 5
+                    })
+                });
+
+                writeLog(`Réponse du serveur reçue. Code : ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    writeLog("Succès ! L'API Albert est accessible.", "success");
+                    el.box.classList.remove('hidden');
+                    el.content.innerText = data.choices[0].message.content;
+                } else {
+                    const errorMsg = await response.text();
+                    writeLog(`ERREUR SERVEUR : ${errorMsg.substring(0, 100)}`, "error");
+                    if (response.status === 401) writeLog("CONSEIL : Votre clé API est probablement erronée.", "error");
+                    if (response.status === 403) writeLog("CONSEIL : Le serveur bloque la requête. Changez de Proxy.", "error");
+                }
+            } catch (err) {
+                writeLog(`ERREUR NAVIGATEUR : ${err.message}`, "error");
+                if (err.message.includes('Failed to fetch')) {
+                    writeLog("DIAGNOSTIC : Blocage CORS. Le navigateur refuse la sortie.", "error");
+                }
+            } finally {
+                el.btn.disabled = false;
+                el.btn.innerHTML = '<i class="fas fa-bolt"></i> LANCER LE TEST';
+            }
+        }
+
+        el.btn.onclick = testAlbert;
+    </script>
+
+</body>
+</html>
