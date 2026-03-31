@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.4</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.5</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -432,10 +432,10 @@
                     const r = await fetchAlbert(alk, 'Réponds juste: OK', 5);
                     if(r.ok) {
                         res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='✅ [v2.4] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
+                        res.textContent='✅ [v2.5] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
                     } else {
                         res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='❌ [v2.4] Albert a refusé l\'accès (Erreur '+r.status+')';
+                        res.textContent='❌ [v2.5] Albert a refusé l\'accès (Erreur '+r.status+')';
                     }
                 } catch(err) {
                     res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.7rem;margin-bottom:14px;line-height:1.4;white-space:pre-wrap;overflow-x:auto';
@@ -577,9 +577,15 @@
                 if(alk) {
                     try {
                         const r = await fetchAlbert(alk, prompt, 300);
-                        if(r.ok) raw = r.text;
-                        else toast('Albert a refusé la connexion (Code '+r.status+')');
-                    } catch(err) { console.warn('Tous les relais Albert ont échoué', err); }
+                        if(r.ok) {
+                            raw = r.text;
+                        } else {
+                            toast('❌ Albert a refusé la connexion ('+r.status+')');
+                        }
+                    } catch(err) { 
+                        console.warn('Tous les relais Albert ont échoué', err); 
+                        toast('❌ Échec de tous les relais Albert');
+                    }
                 } else if(gek) {
                     // Gemini si pas d'Albert (attention : bloqué en EU)
                     const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key='+gek, {
@@ -587,15 +593,39 @@
                         body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:300, temperature:0.2}})
                     });
                     if(r.ok) raw=(await r.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
-                    else { const j=await r.json(); console.warn('Gemini bloqué:', j.error?.message); }
+                    else { const j=await r.json(); toast('❌ Gemini bloqué ('+r.status+')'); }
                 }
-                // Extraction JSON robuste
-                const match = raw.match(/\{[^{}]+\}/);
-                if(match) {
-                    const parsed = JSON.parse(match[0]);
-                    if(parsed.desc) data = parsed;
+                
+                // ── Extraction JSON ultra-robuste ──
+                if(raw) {
+                    // Nettoyer les balises Markdown éventuelles renvoyées par l'IA
+                    const cleanText = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const iStart = cleanText.indexOf('{');
+                    const iEnd   = cleanText.lastIndexOf('}');
+                    
+                    if(iStart !== -1 && iEnd !== -1) {
+                        const jsonStr = cleanText.substring(iStart, iEnd + 1);
+                        try {
+                            const parsed = JSON.parse(jsonStr);
+                            if(parsed.desc || parsed.title) {
+                                data = { ...data, ...parsed }; // Fusion avec l'extraction Microlink
+                                toast('🪄 Description IA générée !');
+                            } else {
+                                toast('⚠️ L\'IA n\'a pas renvoyé la description.');
+                            }
+                        } catch(e) {
+                            console.warn("JSON IA invalide:", jsonStr);
+                            toast('❌ Format de réponse IA illisible');
+                        }
+                    } else {
+                        console.warn("Pas d'objet JSON trouvé dans:", raw);
+                        toast('❌ L\'IA n\'a pas respecté le format JSON.');
+                    }
                 }
-            } catch(err) { console.warn('IA ignorée:',err.message); }
+            } catch(err) { 
+                console.warn('IA ignorée:', err.message); 
+                toast('❌ Erreur technique IA');
+            }
         }
 
         try {
