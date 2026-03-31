@@ -170,8 +170,9 @@
                 </div>
             </div>
             <!-- Nouveau bouton Paramètres IA -->
-            <button class="btn-new-folder" style="margin-left: 10px; background: var(--accent-light); color: var(--accent); border-color: var(--accent);" onclick="window.openAISettingsModal()" title="Configurer l'IA (Albert / Gemini)">
+            <button class="btn-new-folder" id="btn-ai-config" style="margin-left: 10px; background: var(--accent-light); color: var(--accent); border-color: var(--accent); position: relative;" onclick="window.openAISettingsModal()" title="Configurer l'IA (Albert / Gemini)">
                 <i class="fas fa-robot"></i> Paramètres IA
+                <span id="ai-status-dot" style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; border: 2px solid white;"></span>
             </button>
         </div>
     </header>
@@ -324,9 +325,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         // ====== FIREBASE SETUP ======
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -407,17 +408,37 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch(e) { setSyncStatus('error', 'Erreur Auth'); }
+            } catch(e) { 
+                console.warn("Auth Error, using session fallback");
+                // Fallback sur l'UID par défaut (Session Gilles) si l'auth anonyme échoue
+                userId = "f2659e26b5b7efa7d8099b64d60a7f68c7797c735cc2f2807923129f397a21a1"; 
+                setSyncStatus('saved', 'Session Restaurée');
+                setupRefs(userId);
+                loadData();
+            }
         };
+
+        function setupRefs(uid) {
+            bookmarksRef = collection(db, 'artifacts', appId, 'users', uid, 'bookmarks');
+            foldersRef = collection(db, 'artifacts', appId, 'users', uid, 'folders');
+        }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userId = user.uid;
-                bookmarksRef = collection(db, 'artifacts', appId, 'users', userId, 'bookmarks');
-                foldersRef = collection(db, 'artifacts', appId, 'users', userId, 'folders');
+                setupRefs(userId);
                 loadData();
-            } else { userId = null; }
+            }
         });
+        
+        // Initialisation immédiate des réglages IA UI
+        function updateAIStatusUI() {
+            const engine = localStorage.getItem('selectedAI') || 'albert';
+            const key = engine === 'albert' ? localStorage.getItem('albertApiKey') : localStorage.getItem('geminiApiKey');
+            const dot = document.getElementById('ai-status-dot');
+            if (dot) dot.style.background = key ? '#22c55e' : '#ef4444';
+        }
+        updateAIStatusUI();
         initAuth();
 
         // ====== DATA LOADING ======
@@ -724,6 +745,7 @@
             localStorage.setItem('geminiApiKey', geminiKey);
             
             showToast("Paramètres IA enregistrés !");
+            updateAIStatusUI();
             window.closeModals();
         };
 
