@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.8</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.9</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -285,9 +285,16 @@
         }
         grid.innerHTML = data.map(f => {
             const folder = allFolders.find(d=>d.id===f.folderId);
+            const folderColor = folder ? (folder.color || '#6366f1') : null;
+            
+            const cardStyle  = folderColor ? `border-left: 5px solid ${folderColor};` : '';
+            const tagStyle   = folderColor ? `background: ${folderColor}1A; color: ${folderColor};` : '';
+            const linkStyle  = folderColor ? `color: ${folderColor};` : '';
+            
             const folderHtml = folder
-                ? `<span class="c-folder"><div class="folder-dot" style="background:${folder.color||'#6366f1'}"></div>${folder.name}</span>`
+                ? `<span class="c-folder"><div class="folder-dot" style="background:${folderColor}"></div><span style="color:${folderColor};font-weight:600">${folder.name}</span></span>`
                 : '';
+            
             const descHtml = f.desc
                 ? `<div class="c-desc">${f.desc}</div>`
                 : `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px dashed #e2e8f0">
@@ -295,9 +302,10 @@
                     <button class="refresh-btn" data-id="${f.id}" data-url="${f.url}" style="border:none;background:#eef2ff;color:#6366f1;border-radius:6px;padding:3px 8px;font-size:.7rem;cursor:pointer;white-space:nowrap">
                         <i class="fas fa-rotate-right"></i> Récupérer
                     </button></div>`;
-            return `<div class="card" draggable="true" ondragstart="dragStart(event,'${f.id}')" ondragend="dragEnd(event)">
+            
+            return `<div class="card" style="${cardStyle}" draggable="true" ondragstart="dragStart(event,'${f.id}')" ondragend="dragEnd(event)">
                 <div class="c-head">
-                    <span class="c-tag">${f.tag||'Lien'}</span>
+                    <span class="c-tag" style="${tagStyle}">${f.tag||'Lien'}</span>
                     <div style="display:flex;gap:8px;align-items:center">
                         <span class="c-drag"><i class="fas fa-grip-vertical"></i></span>
                         <button class="c-del" onclick="delFav('${f.id}')"><i class="fas fa-times"></i></button>
@@ -306,7 +314,7 @@
                 <div class="c-title">${(f.title||f.url).substring(0,70)}</div>
                 ${descHtml}
                 <div class="c-foot">
-                    <a href="${f.url}" target="_blank" rel="noopener" class="c-link">Consulter <i class="fas fa-arrow-up-right-from-square"></i></a>
+                    <a href="${f.url}" target="_blank" rel="noopener" class="c-link" style="${linkStyle}">Consulter <i class="fas fa-arrow-up-right-from-square"></i></a>
                     ${folderHtml}
                 </div>
             </div>`;
