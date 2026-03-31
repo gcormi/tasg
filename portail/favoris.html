@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.2</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.4</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -165,8 +165,8 @@
         </p>
         <span class="m-label">Clé Google Gemini</span>
         <input type="password" id="k-gemini" class="m-input" placeholder="AIzaSy...">
-        <span class="m-label">Clé Albert AI (gouv.fr)</span>
-        <input type="password" id="k-albert" class="m-input" placeholder="Bearer key...">
+        <span class="m-label">Clé Albert AI ou URL Worker Cloudflare</span>
+        <input type="password" id="k-albert" class="m-input" placeholder="sk-... ou https://...workers.dev">
         <div id="ai-test-result" style="font-size:.78rem; margin-bottom:14px; min-height:20px; display:none; padding:10px 14px; border-radius:10px;"></div>
         <div style="display:flex; gap:8px">
             <button class="m-btn" style="background:#f1f5f9; color:#64748b; flex:1" onclick="testAIKey()">🔍 Tester la clé</button>
@@ -432,10 +432,10 @@
                     const r = await fetchAlbert(alk, 'Réponds juste: OK', 5);
                     if(r.ok) {
                         res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='✅ [v2.2] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
+                        res.textContent='✅ [v2.4] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
                     } else {
                         res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='❌ [v2.2] Albert a refusé la clé (Erreur '+r.status+')';
+                        res.textContent='❌ [v2.4] Albert a refusé l\'accès (Erreur '+r.status+')';
                     }
                 } catch(err) {
                     res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.7rem;margin-bottom:14px;line-height:1.4;white-space:pre-wrap;overflow-x:auto';
@@ -470,19 +470,41 @@
     }
     function closeOverlay() { document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); }
 
-    // ── MOTEUR MULTI-RELAIS ALBERT ────────────────────────────────────
-    async function fetchAlbert(key, promptText, tokens=300) {
-        // Liste INTÉGRALE des proxys depuis albert_test.html pour garantir un passage CSP
-        let logs = [];
-        const baseEndpoint = "https://albert.api.gouv.fr/v1/chat/completions";
+    // ── MOTEUR MULTI-RELAIS ALBERT ET SUPPORT WORKER ──────────────────
+    async function fetchAlbert(keyOrUrl, promptText, tokens=300) {
         
-        // Ordre : proxy codetabs (rapide, contourne CORS), corsproxy, API directes
+        // 1. SI C'EST UN WORKER CLOUDFLARE (Solution ultime anti-CORS de la Forge)
+        if(keyOrUrl.startsWith('http://') || keyOrUrl.startsWith('https://')) {
+            try {
+                const response = await fetch(keyOrUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: promptText, model: 'openai/gpt-oss-120b', temperature: 0.7 })
+                });
+                if(response.ok) {
+                    const data = await response.json();
+                    if(data.error) throw new Error(data.error);
+                    return { ok: true, text: data.choices?.[0]?.message?.content || '', methodUsed: 'Worker Cloudflare' };
+                }
+                return { ok: false, status: response.status, methodUsed: 'Worker Cloudflare' };
+            } catch(e) {
+                throw new Error("Échec du Worker : " + e.message);
+            }
+        }
+
+        // 2. SINON C'EST UNE CLÉ DIRECTE (On essaye les proxys officiels et communautaires)
+        let logs = [];
+        
+        // URL de PING officiel (etalab)
+        const baseEndpoint = "https://albert.api.etalab.gouv.fr/v1/chat/completions";
+        
+        // Ordre : proxy Officiel Educ, API Etalab directe, API Educ, codetabs, corsproxy
         const endpoints = [
+            { id: "Proxy Educ-AI", url: "https://proxy.educ-ai.fr/v1/chat/completions" },
+            { id: "API Etalab Direct", url: baseEndpoint },
+            { id: "API Educ Direct", url: "https://api.albert.education.fr/v1/chat/completions" },
             { id: "Proxy Codetabs", url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(baseEndpoint)}` },
-            { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` },
-            { id: "API Gouv", url: baseEndpoint },
-            { id: "API Educ", url: "https://api.albert.education.fr/v1/chat/completions" },
-            { id: "Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${baseEndpoint}` }
+            { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` }
         ];
         
         const bodyStr = JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:promptText}], max_tokens:tokens});
@@ -491,7 +513,7 @@
             try {
                 const response = await fetch(ep.url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + keyOrUrl },
                     body: bodyStr
                 });
                 
@@ -511,7 +533,8 @@
             }
         }
         
-        // Si RIEN n'a marché, on renvoie le rapport complet
+        // Si RIEN n'a marché, on renvoie un message expliquant qu'il faut utiliser le Worker
+        logs.push(`\n👉 SOLUTION : La Forge bloque tous les relais.\nVous devez utiliser l'URL de votre Worker Cloudflare à la place de la clé 'sk-...'.`);
         throw new Error(logs.join('\n'));
     }
 
