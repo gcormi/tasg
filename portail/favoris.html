@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.7</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.8</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -422,7 +422,7 @@
         res.style.display='block'; res.style.background='#f8fafc'; res.style.color='#64748b'; res.textContent='⏳ Test en cours...';
         try {
             if(gek) {
-                const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+gek, {
+                const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key='+gek, {
                     method:'POST', headers:{'Content-Type':'application/json'},
                     body: JSON.stringify({contents:[{parts:[{text:'Réponds juste: OK'}]}]})
                 });
@@ -475,8 +475,8 @@
             try {
                 let raw='';
                 if(gek) {
-                    // Essai Gemini 1.5-flash (plus compatible)
-                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+gek, {
+                    // Gemini 2.0 Flash Lite (modèle gratuit actuel)
+                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key='+gek, {
                         method:'POST', headers:{'Content-Type':'application/json'},
                         body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:300, temperature:0.2}})
                     });
