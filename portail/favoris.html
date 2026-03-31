@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.9.1</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.9.2</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -428,24 +428,33 @@
             // Tester Albert en PRIORITÉ (fonctionne en France/EU)
             if(alk) {
                 try {
-                    // Utilisation locale + Forge d'un Proxy CORS transparent pour bypasser le blocage strict
-                    const target = 'https://corsproxy.io/?' + encodeURIComponent('https://albert.api.gouv.fr/v1/chat/completions');
-                    const r = await fetch(target, {
+                    // API Education Nationale (Autorise CORS depuis la Forge apps.education.fr !)
+                    const r = await fetch('https://api.albert.education.fr/v1/chat/completions', {
                         method:'POST',
                         headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
                         body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:'Réponds uniquement: OK'}], max_tokens:5})
                     });
                     if(r.ok) {
                         res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='✅ Clé Albert valide ! L\'IA va analyser vos liens en français.';
+                        res.textContent='✅ Clé Albert Education valide !';
                     } else {
-                        const j = await r.json().catch(()=>({}));
-                        res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='❌ Albert erreur '+r.status+' : '+(j.error?.message||'Clé invalide ou expirée');
+                        // Si ça échoue, on essaye l'API gouv centrale
+                        const r2 = await fetch('https://albert.api.gouv.fr/v1/chat/completions', {
+                            method:'POST',
+                            headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
+                            body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:'Réponds uniquement: OK'}], max_tokens:5})
+                        });
+                        if (r2.ok) {
+                            res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
+                            res.textContent='✅ Clé Albert Gouv valide !';
+                        } else {
+                            res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
+                            res.textContent='❌ Albert erreur '+r2.status+' : Clé invalide';
+                        }
                     }
                 } catch(fetchErr) {
                     res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px;line-height:1.5';
-                    res.innerHTML='⚠️ Impossible de joindre Albert même avec relais (CORS). Erreur : ' + fetchErr.message;
+                    res.innerHTML='⚠️ Impossible de joindre Albert (CORS ou réseau bloqué).<br>L\'erreur : ' + fetchErr.message;
                 }
                 return;
             }
@@ -514,14 +523,22 @@
                 let raw='';
                 // Albert EN PRIORITÉ (fonctionne en France, gratuit, fiable)
                 if(alk) {
-                    const target = 'https://corsproxy.io/?' + encodeURIComponent('https://albert.api.gouv.fr/v1/chat/completions');
-                    const r = await fetch(target, {
-                        method:'POST',
-                        headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
-                        body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}], max_tokens:300})
-                    });
-                    if(r.ok) raw=(await r.json()).choices?.[0]?.message?.content||'';
-                    else toast('Albert erreur serveur '+r.status);
+                    try {
+                        let r = await fetch('https://api.albert.education.fr/v1/chat/completions', {
+                            method:'POST',
+                            headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
+                            body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}], max_tokens:300})
+                        });
+                        if(!r.ok) {
+                            r = await fetch('https://albert.api.gouv.fr/v1/chat/completions', {
+                                method:'POST',
+                                headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
+                                body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}], max_tokens:300})
+                            });
+                        }
+                        if(r.ok) raw=(await r.json()).choices?.[0]?.message?.content||'';
+                        else toast('Albert erreur serveur '+r.status);
+                    } catch(e) { console.warn('Erreur Albert', e); }
                 } else if(gek) {
                     // Gemini si pas d'Albert (attention : bloqué en EU)
                     const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key='+gek, {
