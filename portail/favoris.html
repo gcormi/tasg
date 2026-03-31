@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.5</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.6</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -158,13 +158,20 @@
 <!-- Modal IA -->
 <div class="overlay" id="overlay-ai">
     <div class="modal-box">
-        <div class="m-title">🤖 Paramètres IA</div>
-        <span class="m-label">Clé Albert AI (gouv.fr)</span>
-        <input type="password" id="k-albert" class="m-input" placeholder="Bearer key...">
+        <div class="m-title">🤖 Enrichissement IA</div>
+        <p style="font-size:.8rem; color:#64748b; margin-bottom:18px; line-height:1.5">
+            Sans clé IA : le titre et la description sont extraits automatiquement du site.<br>
+            Avec une clé : l'IA génère une vraie <strong>explication du site</strong> en français.
+        </p>
         <span class="m-label">Clé Google Gemini</span>
         <input type="password" id="k-gemini" class="m-input" placeholder="AIzaSy...">
-        <p style="font-size:.75rem; color:#94a3b8; margin-bottom:16px">L'IA extrait le titre, la description et la catégorie de chaque lien ajouté.</p>
-        <button class="m-btn m-btn-primary" onclick="saveAI()">Enregistrer</button>
+        <span class="m-label">Clé Albert AI (gouv.fr)</span>
+        <input type="password" id="k-albert" class="m-input" placeholder="Bearer key...">
+        <div id="ai-test-result" style="font-size:.78rem; margin-bottom:14px; min-height:20px; display:none; padding:10px 14px; border-radius:10px;"></div>
+        <div style="display:flex; gap:8px">
+            <button class="m-btn" style="background:#f1f5f9; color:#64748b; flex:1" onclick="testAIKey()">🔍 Tester la clé</button>
+            <button class="m-btn m-btn-primary" style="flex:2" onclick="saveAI()">Enregistrer</button>
+        </div>
         <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Fermer</button>
     </div>
 </div>
@@ -365,10 +372,11 @@
         closeOverlay(); toast('Dossier créé !');
     }
 
-    // ── IA ────────────────────────────────────────────────────────────
     function openAI() {
         document.getElementById('k-albert').value=localStorage.getItem('fav_albert')||'';
         document.getElementById('k-gemini').value=localStorage.getItem('fav_gemini')||'';
+        const res = document.getElementById('ai-test-result');
+        res.style.display='none';
         document.getElementById('overlay-ai').classList.add('open');
     }
     function saveAI() {
@@ -377,6 +385,27 @@
         const has = localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini');
         document.getElementById('ai-dot').className='ai-dot'+(has?' on':'');
         closeOverlay(); toast('Clés IA sauvegardées ✅');
+    }
+    async function testAIKey() {
+        const res = document.getElementById('ai-test-result');
+        const gek = document.getElementById('k-gemini').value.trim();
+        const alk = document.getElementById('k-albert').value.trim();
+        if(!gek && !alk) { res.style.display='block'; res.style.background='#fef2f2'; res.style.color='#ef4444'; res.textContent='❌ Aucune clé renseignée.'; return; }
+        res.style.display='block'; res.style.background='#f8fafc'; res.style.color='#64748b'; res.textContent='⏳ Test en cours...';
+        try {
+            if(gek) {
+                const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+gek, {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({contents:[{parts:[{text:'Réponds juste: OK'}]}]})
+                });
+                if(r.ok) { res.style.background='#f0fdf4'; res.style.color='#16a34a'; res.textContent='✅ Clé Gemini valide ! L\'IA est opérationnelle.'; }
+                else { const j=await r.json(); res.style.background='#fef2f2'; res.style.color='#ef4444'; res.textContent='❌ Gemini erreur '+r.status+': '+(j.error?.message||'Clé invalide ou quota dépassé'); }
+            } else {
+                const r = await fetch('https://albert.api.gouv.fr/v1/models', { headers:{'Authorization':'Bearer '+alk} });
+                if(r.ok) { res.style.background='#f0fdf4'; res.style.color='#16a34a'; res.textContent='✅ Clé Albert valide !'; }
+                else { res.style.background='#fef2f2'; res.style.color='#ef4444'; res.textContent='❌ Albert erreur '+r.status+': Clé invalide ou expirée'; }
+            }
+        } catch(err) { res.style.background='#fef2f2'; res.style.color='#ef4444'; res.textContent='❌ Erreur réseau : '+err.message; }
     }
     function closeOverlay() { document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); }
 
@@ -413,40 +442,32 @@
         const gek = localStorage.getItem('fav_gemini');
 
         if(alk||gek) {
-            const prompt = `Analyse ce site web. Retourne UNIQUEMENT un JSON sur une seule ligne, sans markdown : {"title":"titre du site en français","desc":"description en 1 phrase","tag":"catégorie en 1 mot"}. URL : ${url}`;
+            // Prompt demandant une EXPLICATION réelle du site (2 phrases)
+            const prompt = `Tu es un assistant de veille documentaire. Donne une explication claire et informative de ce site web en 2 phrases maximum, en français. Retourne UNIQUEMENT ce JSON sur une ligne : {"title":"nom du site","desc":"Explication : à quoi sert ce site, qui l'utilise, quel est son contenu principal.","tag":"catégorie en 1 mot ex: Éducation/Technologie/Actualités/Finance"}. URL : ${url}`;
             try {
                 let raw='';
-                if(alk) {
+                if(gek) {
+                    // Essai Gemini 1.5-flash (plus compatible)
+                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+gek, {
+                        method:'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:300, temperature:0.2}})
+                    });
+                    if(r.ok) raw=(await r.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
+                    else { const j=await r.json(); toast('Gemini '+r.status+': '+(j.error?.message||'Erreur clé')); }
+                } else if(alk) {
                     const r = await fetch('https://albert.api.gouv.fr/v1/chat/completions', {
                         method:'POST',
                         headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
-                        body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}], max_tokens:200})
+                        body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}], max_tokens:300})
                     });
                     if(r.ok) raw=(await r.json()).choices?.[0]?.message?.content||'';
-                    else toast('Albert: erreur '+r.status);
-                } else {
-                    // Gemini 2.0 Flash (plus récent)
-                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+gek, {
-                        method:'POST',
-                        headers:{'Content-Type':'application/json'},
-                        body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:200, temperature:0.1}})
-                    });
-                    if(r.ok) raw=(await r.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
-                    else {
-                        // Fallback Gemini 1.5 flash si 2.0 échoue
-                        const r2 = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+gek, {
-                            method:'POST',
-                            headers:{'Content-Type':'application/json'},
-                            body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
-                        });
-                        if(r2.ok) raw=(await r2.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
-                    }
+                    else toast('Albert erreur '+r.status);
                 }
                 // Extraction JSON robuste
                 const match = raw.match(/\{[^{}]+\}/);
                 if(match) {
                     const parsed = JSON.parse(match[0]);
-                    if(parsed.title) data = parsed;
+                    if(parsed.desc) data = parsed; // n'écrase que si l'IA a bien répondu
                 }
             } catch(err) { console.warn('IA ignorée:',err.message); }
         }
