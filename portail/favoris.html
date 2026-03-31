@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.6</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.7</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -114,6 +114,8 @@
     <div class="h-right">
         <button class="btn-icon" onclick="openAI()"><i class="fas fa-robot"></i> IA <div class="ai-dot" id="ai-dot"></div></button>
         <button class="btn-icon" onclick="openFolderModal()"><i class="fas fa-folder-plus"></i> Dossier</button>
+        <button class="btn-icon" onclick="document.getElementById('file-import').click()"><i class="fas fa-file-import"></i> Importer</button>
+        <input type="file" id="file-import" accept=".html" style="display:none" onchange="importBookmarks(event)">
     </div>
 </header>
 
@@ -690,6 +692,118 @@
     // Init badge IA
     if(localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini'))
         document.getElementById('ai-dot').className='ai-dot on';
+
+    // ── IMPORT DE FAVORIS BROWSER (Chrome, Firefox, Opera) ───────────
+    async function importBookmarks(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+
+        toast('📂 Lecture du fichier (Cela peut prendre qq secondes)...');
+        const text = await file.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+
+        let importedCount = 0;
+        let duplicateCount = 0;
+        let foldersCreated = 0;
+        
+        let toInsert = [];
+        let existingUrls = new Set(allFavs.map(f => f.url));
+
+        async function parseDL(dlNode, currentFolderId) {
+            const children = dlNode.children;
+            let tempFolderId = currentFolderId;
+
+            for(let i=0; i<children.length; i++) {
+                const child = children[i];
+                if(child.tagName === 'DT') {
+                    const a = child.querySelector('A');
+                    const h3 = child.querySelector('H3');
+
+                    if(h3) {
+                        const folderName = h3.textContent.trim();
+                        let fId = null;
+                        const existingF = allFolders.find(f => f.name.toLowerCase() === folderName.toLowerCase());
+                        if(existingF) {
+                            fId = existingF.id;
+                        } else {
+                            // On crée le dossier en base et on attend pour récupérer son ID
+                            const res = await fldRef.add({name: folderName, color: '#64748b', createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+                            fId = res.id;
+                            foldersCreated++;
+                            allFolders.push({id: fId, name: folderName, color: '#64748b'});
+                        }
+                        tempFolderId = fId;
+
+                        const innerDL = child.querySelector('DL');
+                        if(innerDL) await parseDL(innerDL, fId);
+                        
+                    } else if(a) {
+                        const url = a.href;
+                        const title = a.textContent.trim() || url;
+                        if(url.startsWith('http')) {
+                            if(existingUrls.has(url)) {
+                                duplicateCount++;
+                            } else {
+                                toInsert.push({
+                                    url: url, title: title, desc: '', tag: 'Import',
+                                    folderId: currentFolderId,
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                                existingUrls.add(url);
+                                importedCount++;
+                            }
+                        }
+                    }
+                } else if(child.tagName === 'DL') {
+                    await parseDL(child, tempFolderId);
+                }
+            }
+        }
+
+        const rootDL = doc.querySelector('DL');
+        if(!rootDL) {
+            alert('❌ Fichier ignoré. Seuls les fichiers .html exportés depuis Chrome/Firefox sont gérés.');
+            e.target.value = '';
+            return;
+        }
+
+        try {
+            await parseDL(rootDL, null);
+
+            if(toInsert.length > 0) {
+                toast(`🚀 Sauvegarde de ${toInsert.length} favoris vers Firebase...`);
+                // Envoi par lots (Firebase batch) pour gérer des milliers de favoris rapidement sans faire crasher la base
+                let batches = [];
+                let curBatch = db.batch();
+                let ops = 0;
+
+                for (let data of toInsert) {
+                    curBatch.set(favRef.doc(), data);
+                    ops++;
+                    if (ops === 450) {
+                        batches.push(curBatch.commit());
+                        curBatch = db.batch();
+                        ops = 0;
+                    }
+                }
+                if (ops > 0) batches.push(curBatch.commit());
+                await Promise.all(batches);
+            }
+
+            let msg = `✅ Import terminé avec succès :\n`;
+            msg += `• ${importedCount} nouveaux favoris ajoutés.\n`;
+            if(foldersCreated > 0) msg += `• ${foldersCreated} nouveaux dossiers créés.\n`;
+            if(duplicateCount > 0) msg += `• ⚠️ ${duplicateCount} doublons ont été ignorés.`;
+            alert(msg);
+
+        } catch(err) {
+            console.error(err);
+            alert("❌ Une erreur est survenue pendant l'importation : " + err.message);
+        }
+
+        e.target.value = '';
+    }
 </script>
 </body>
 </html>
