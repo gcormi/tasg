@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+        // Vérification de sécurité du portail
+        try {
+            if (localStorage.getItem('portal_unlocked') !== 'true') {
+                if (window.location.protocol !== 'about:' && window.location.protocol !== 'blob:') {
+                    window.location.href = 'index.html';
+                }
+            }
+        } catch (e) {
+            console.warn("Accès bloqué :", e);
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoris | Portail Éducatif</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f0f4f8;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --accent: #6366f1;
+            --accent-light: #eef2ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ====== HEADER ====== */
+        .app-header {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .back-btn { width: 34px; height: 34px; border-radius: 9px; background: white; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--accent); transition: all 0.2s; text-decoration: none; }
+        .back-btn:hover { background: var(--accent-light); border-color: var(--accent); }
+        .app-icon { width: 38px; height: 38px; background: linear-gradient(135deg, #3b82f6, #2dd4bf); border-radius: 11px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .app-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: var(--text); }
+        
+        .sync-status { display: flex; align-items: center; font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+        .sync-dot { width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
+        .sync-dot.saved { background: #22c55e; }
+        .sync-dot.saving { background: #f59e0b; animation: pulse 1s infinite; }
+        .sync-dot.error { background: #ef4444; }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+        /* ====== MAIN ====== */
+        .main-content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        /* ====== FORM ====== */
+        .add-url-container { background: white; padding: 12px; border-radius: 16px; border: 1px solid var(--border); display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s; }
+        .add-url-container:focus-within { border-color: var(--accent); box-shadow: 0 4px 20px rgba(99,102,241,0.1); }
+        .url-input-wrap { flex: 1; display: flex; align-items: center; background: #f8fafc; border-radius: 10px; padding: 0 16px; }
+        .url-input-wrap i { color: #94a3b8; margin-right: 12px; }
+        .url-input { width: 100%; padding: 14px 0; border: none; background: transparent; outline: none; font-size: 0.95rem; color: var(--text); }
+        .btn-add { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 10px; padding: 14px 24px; font-weight: 700; cursor: pointer; display: flex; gap: 8px; align-items: center; transition: all 0.2s; white-space: nowrap; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99,102,241,0.3); }
+        .btn-add:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* ====== FOLDERS ====== */
+        .folders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .folders-header h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; color: var(--text); }
+        .btn-new-folder { background: white; border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
+        .btn-new-folder:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+        .folders-container { display: flex; gap: 10px; flex-wrap: wrap; }
+        .folder-tab { background: white; border: 1.5px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; user-select: none; }
+        .folder-tab:hover { background: #f8fafc; }
+        .folder-tab.active { background: var(--text); color: white; border-color: var(--text); }
+        
+        /* Drag & Drop Visuals */
+        .folder-tab.drag-over { background: var(--accent-light); color: var(--accent); border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+        
+        /* Actions sur l'onglet du dossier */
+        .folder-actions { display: flex; align-items: center; gap: 2px; margin-left: 4px; opacity: 0.5; transition: 0.2s; }
+        .folder-tab:hover .folder-actions { opacity: 1; }
+        .folder-action-btn { background: none; border: none; color: inherit; cursor: pointer; font-size: 0.75rem; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .folder-action-btn:hover { background: rgba(0,0,0,0.08); color: var(--text); }
+        .folder-action-btn.delete:hover { color: #ef4444; background: #fee2e2; }
+
+        /* Couleurs du dossier */
+        .color-picker-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .color-dot { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: all 0.2s; }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.selected { border-color: white; outline: 3px solid var(--text); transform: scale(1.15); }
+
+        /* ====== GRID ====== */
+        .bookmarks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .bookmark-card { background: white; border-radius: 16px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 12px; transition: all 0.2s; cursor: grab; }
+        .bookmark-card:active { cursor: grabbing; }
+        .bookmark-card:hover { box-shadow: 0 12px 24px rgba(0,0,0,0.06); transform: translateY(-2px); border-color: #cbd5e1; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .card-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text); line-height: 1.3; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
+        .card-tag { background: var(--accent-light); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+        
+        .card-summary { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;}
+        
+        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+        .card-link { color: #3b82f6; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+        .card-link:hover { text-decoration: underline; }
+        
+        .card-actions { display: flex; gap: 6px; }
+        .btn-action { width: 32px; height: 32px; border-radius: 8px; background: #f8fafc; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-action:hover { background: #e2e8f0; color: var(--text); }
+        .btn-action.delete:hover { background: #fee2e2; color: #ef4444; }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; color: var(--text-muted); grid-column: 1 / -1; }
+        .empty-state i { font-size: 3rem; opacity: 0.3; margin-bottom: 16px; }
+        .empty-state h2 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+
+        /* ====== MODALS ====== */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.2s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box { background: white; border-radius: 16px; padding: 24px; width: 90%; max-width: 400px; transform: scale(0.95); transition: 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        
+        .modal-title { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+        .modal-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+        
+        .modal-input, .modal-select { width: 100%; border: 2px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 0.95rem; outline: none; font-family: 'Inter', sans-serif; margin-bottom: 20px; transition: 0.2s; }
+        .modal-input:focus, .modal-select:focus { border-color: var(--accent); }
+        
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-cancel { padding: 10px 16px; border-radius: 10px; border: none; background: #f1f5f9; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-confirm { padding: 10px 20px; border-radius: 10px; border: none; background: var(--accent); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-confirm.danger { background: #ef4444; }
+        .btn-confirm:hover { filter: brightness(1.1); }
+
+        /* ====== TOAST ====== */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px); background: rgba(15,23,42,0.85); color: white; padding: 12px 24px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; backdrop-filter: blur(8px); z-index: 2000; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; opacity: 0; display: flex; align-items: center; gap: 8px; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn" title="Retour"><i class="fas fa-arrow-left"></i></a>
+            <div class="app-icon"><i class="fas fa-bookmark"></i></div>
+            <div>
+                <div class="app-title">Favoris Intelligents</div>
+                <div class="sync-status">
+                    <span class="sync-dot saving" id="sync-dot"></span>
+                    <span id="sync-label">Connexion...</span>
+                </div>
+            </div>
+            <!-- Nouveau bouton Paramètres IA -->
+            <button class="btn-new-folder" style="margin-left: 10px; background: var(--accent-light); color: var(--accent); border-color: var(--accent);" onclick="window.openAISettingsModal()" title="Configurer l'IA (Albert / Gemini)">
+                <i class="fas fa-robot"></i> Paramètres IA
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Form -->
+        <form class="add-url-container" id="add-form">
+            <div class="url-input-wrap">
+                <i class="fas fa-link"></i>
+                <input type="url" id="url-input" class="url-input" placeholder="Collez un lien (article, vidéo, outil...)" required autocomplete="off">
+            </div>
+            <button type="submit" class="btn-add" id="btn-add">
+                <i class="fas fa-magic"></i> Analyser
+            </button>
+        </form>
+
+        <!-- Folders Section -->
+        <div>
+            <div class="folders-header">
+                <h3>Mes Dossiers</h3>
+                <div style="display: flex; gap: 8px;">
+                    <input type="file" id="import-file" accept=".html" style="display: none;">
+                    <button class="btn-new-folder" onclick="document.getElementById('import-file').click()" title="Importer des favoris (HTML Chrome/Edge)">
+                        <i class="fas fa-file-import"></i> Importer
+                    </button>
+                    <button class="btn-new-folder" onclick="window.openAddFolderModal()">
+                        <i class="fas fa-plus"></i> Nouveau
+                    </button>
+                </div>
+            </div>
+            <div class="folders-container" id="folders-container">
+                <!-- Injecté par JS -->
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="bookmarks-grid" id="bookmarks-grid">
+            <!-- Injecté par JS -->
+        </div>
+    </main>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <i class="fas fa-info-circle" id="toast-icon"></i>
+        <span id="toast-msg">Message</span>
+    </div>
+
+    <!-- MODAL: AJOUTER / MODIFIER DOSSIER -->
+    <div class="modal-overlay" id="modal-folder">
+        <div class="modal-box">
+            <h3 class="modal-title" id="modal-folder-title">Nouveau dossier</h3>
+            <p class="modal-desc" id="modal-folder-desc">Saisissez un nom et une couleur pour votre dossier.</p>
+            
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Nom du dossier</label>
+            <input type="text" id="input-folder-name" class="modal-input" placeholder="Ex: Recettes, Tech, Voyage..." autocomplete="off">
+            
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Couleur</label>
+            <div class="color-picker-row" id="color-picker">
+                <button class="color-dot selected" data-color="#64748b" style="background:#64748b"></button>
+                <button class="color-dot" data-color="#6366f1" style="background:#6366f1"></button>
+                <button class="color-dot" data-color="#3b82f6" style="background:#3b82f6"></button>
+                <button class="color-dot" data-color="#14b8a6" style="background:#14b8a6"></button>
+                <button class="color-dot" data-color="#10b981" style="background:#10b981"></button>
+                <button class="color-dot" data-color="#f59e0b" style="background:#f59e0b"></button>
+                <button class="color-dot" data-color="#ef4444" style="background:#ef4444"></button>
+                <button class="color-dot" data-color="#ec4899" style="background:#ec4899"></button>
+                <button class="color-dot" data-color="#8b5cf6" style="background:#8b5cf6"></button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="window.closeModals()">Annuler</button>
+                <button class="btn-confirm" onclick="window.saveFolder()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DÉPLACER LIEN -->
+    <div class="modal-overlay" id="modal-move">
+        <div class="modal-box">
+            <h3 class="modal-title">Déplacer le favori</h3>
+            <p class="modal-desc">Choisissez le dossier de destination :</p>
+            <select id="select-folder-move" class="modal-select"></select>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="window.closeModals()">Annuler</button>
+                <button class="btn-confirm" onclick="window.confirmMove()">Déplacer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: MODIFIER FAVORI -->
+    <div class="modal-overlay" id="modal-bookmark-edit">
+        <div class="modal-box">
+            <h3 class="modal-title">Modifier le favori</h3>
+            <p class="modal-desc">Ajustez les informations du lien.</p>
+            
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Titre</label>
+            <input type="text" id="edit-bookmark-title" class="modal-input" placeholder="Titre du lien">
+            
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Résumé / Description</label>
+            <textarea id="edit-bookmark-summary" class="modal-input" style="min-height: 80px; resize: vertical;" placeholder="Courte description"></textarea>
+
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Lien (URL)</label>
+            <input type="url" id="edit-bookmark-url" class="modal-input" placeholder="https://...">
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="window.closeModals()">Annuler</button>
+                <button class="btn-confirm" onclick="window.saveBookmarkEdit()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMATION GÉNÉRIQUE -->
+    <div class="modal-overlay" id="modal-confirm">
+        <div class="modal-box">
+            <h3 class="modal-title" id="confirm-title">Confirmation</h3>
+            <p class="modal-desc" id="confirm-desc">Êtes-vous sûr ?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="window.closeModals()">Annuler</button>
+                <button class="btn-confirm danger" id="btn-confirm-action">Confirmer</button>
+            </div>
+        </div>
+    <!-- MODAL: PARAMÈTRES IA -->
+    <div class="modal-overlay" id="modal-ai-settings" style="z-index: 1001;">
+        <div class="modal-box" style="max-width: 450px;">
+            <h3 class="modal-title"><i class="fas fa-robot"></i> Configuration de l'IA</h3>
+            <p class="modal-desc">Choisissez votre moteur d'IA pour l'analyse automatique et la classification des favoris.</p>
+            
+            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Moteur d'IA</label>
+            <select id="select-ai-engine" class="modal-select">
+                <option value="albert">Albert AI (Gouv.fr - Recommandé)</option>
+                <option value="gemini">Google Gemini</option>
+            </select>
+
+            <div id="settings-albert">
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Clé API Albert (sk-...)</label>
+                <input type="password" id="input-albert-key" class="modal-input" placeholder="Entrez votre clé Albert">
+                <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 15px; margin-top: -15px;">La clé est stockée localement dans votre navigateur.</p>
+            </div>
+
+            <div id="settings-gemini" style="display: none;">
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Clé API Gemini</label>
+                <input type="password" id="input-gemini-key" class="modal-input" placeholder="Entrez votre clé Gemini">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="window.closeModals()">Annuler</button>
+                <button class="btn-confirm" onclick="window.saveAISettings()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ====== FIREBASE SETUP ======
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
+            authDomain: "portail-postits.firebaseapp.com",
+            projectId: "portail-postits",
+            storageBucket: "portail-postits.firebasestorage.app",
+            messagingSenderId: "494625342197",
+            appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // ====== STATE ======
+        let bookmarks = [];
+        let folders = [];
+        let currentFilter = 'Tous';
+        let userId = null;
+        let bookmarksRef = null;
+        let foldersRef = null;
+        
+        let confirmCallback = null;
+        let bookmarkToMoveId = null;
+        
+        let editingFolderId = null;
+        let editingFolderOldName = null;
+        let selectedFolderColor = '#64748b';
+
+        // ====== UI STATUS & TOAST ======
+        function setSyncStatus(state, msg) {
+            const dot = document.getElementById('sync-dot');
+            dot.className = 'sync-dot ' + state;
+            document.getElementById('sync-label').textContent = msg || 'Synchronisé';
+        }
+
+        let toastTimer;
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            t.style.background = isError ? '#ef4444' : 'rgba(15,23,42,0.9)';
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ====== MODALS SYSTEM ======
+        window.closeModals = () => {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            confirmCallback = null;
+            editingFolderId = null;
+            editingFolderOldName = null;
+        };
+
+        function showConfirmModal(title, desc, callback, btnText = "Confirmer", isDanger = true) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-desc').textContent = desc;
+            const btn = document.getElementById('btn-confirm-action');
+            btn.textContent = btnText;
+            if(isDanger) btn.classList.add('danger'); else btn.classList.remove('danger');
+            confirmCallback = callback;
+            document.getElementById('modal-confirm').classList.add('active');
+        }
+
+        document.getElementById('btn-confirm-action').addEventListener('click', () => {
+            if(confirmCallback) confirmCallback();
+            window.closeModals();
+        });
+
+        // ====== AUTH ======
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch(e) { setSyncStatus('error', 'Erreur Auth'); }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                bookmarksRef = collection(db, 'artifacts', appId, 'users', userId, 'bookmarks');
+                foldersRef = collection(db, 'artifacts', appId, 'users', userId, 'folders');
+                loadData();
+            } else { userId = null; }
+        });
+        initAuth();
+
+        // ====== DATA LOADING ======
+        function loadData() {
+            if (!userId) return;
+            onSnapshot(bookmarksRef, (snapshot) => {
+                bookmarks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                bookmarks.sort((a,b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                renderUI();
+                setSyncStatus('saved', 'Synchronisé');
+            });
+            onSnapshot(foldersRef, (snapshot) => {
+                folders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderUI();
+            });
+        }
+
+        // ====== RENDER ENGINE ======
+        function getUniqueTags() {
+            const tags = new Set(folders.map(f => f.name));
+            bookmarks.forEach(b => { if(b.tag && b.tag !== 'Non classé') tags.add(b.tag); });
+            return Array.from(tags).sort((a, b) => a.localeCompare(b));
+        }
+
+        function renderUI() {
+            renderFolders();
+            renderBookmarks();
+        }
+
+        function renderFolders() {
+            const container = document.getElementById('folders-container');
+            const allTags = getUniqueTags();
+            
+            if (currentFilter !== 'Tous' && currentFilter !== 'Non classé' && !allTags.includes(currentFilter)) {
+                currentFilter = 'Tous';
+            }
+
+            let html = `
+                <div class="folder-tab ${currentFilter === 'Tous' ? 'active' : ''}" 
+                     onclick="window.setFilter('Tous')"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                     ondragleave="this.classList.remove('drag-over')"
+                     ondrop="window.handleDrop(event, 'Tous')">
+                    <i class="fas fa-layer-group"></i> Tous
+                </div>
+                <div class="folder-tab ${currentFilter === 'Non classé' ? 'active' : ''}" 
+                     onclick="window.setFilter('Non classé')"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                     ondragleave="this.classList.remove('drag-over')"
+                     ondrop="window.handleDrop(event, 'Non classé')">
+                    <i class="fas fa-inbox"></i> Non classé
+                </div>
+            `;
+            
+            allTags.forEach(tag => {
+                const folderDoc = folders.find(f => f.name === tag);
+                const folderColor = folderDoc?.color || '#64748b';
+                const folderId = folderDoc?.id;
+                
+                const styleActive = currentFilter === tag ? `background: ${folderColor}; border-color: ${folderColor}; color: white;` : '';
+                const iconColor = currentFilter === tag ? 'white' : folderColor;
+
+                html += `
+                    <div class="folder-tab ${currentFilter === tag ? 'active' : ''}" 
+                         style="${styleActive}"
+                         onclick="window.setFilter('${escHtml(tag)}')"
+                         ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                         ondragleave="this.classList.remove('drag-over')"
+                         ondrop="window.handleDrop(event, '${escHtml(tag)}')">
+                        <i class="fas fa-folder${currentFilter === tag ? '-open' : ''}" style="color: ${iconColor}"></i> ${escHtml(tag)}
+                        
+                        <div class="folder-actions">
+                            ${folderId ? `
+                            <button class="folder-action-btn" onclick="event.stopPropagation(); window.openEditFolderModal('${folderId}', '${escHtml(tag)}', '${folderColor}')" title="Modifier le dossier">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            ` : ''}
+                            <button class="folder-action-btn delete" onclick="event.stopPropagation(); window.promptDeleteFolder('${escHtml(tag)}')" title="Supprimer le dossier">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderBookmarks() {
+            const grid = document.getElementById('bookmarks-grid');
+            const filtered = currentFilter === 'Tous' 
+                ? bookmarks 
+                : bookmarks.filter(b => b.tag === currentFilter || (currentFilter==='Non classé' && !b.tag));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h2>Dossier vide</h2>
+                        <p>Collez un lien ou glissez-y vos favoris !</p>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(b => `
+                <div class="bookmark-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${b.id}')">
+                    <div class="card-header">
+                        <h3 class="card-title" title="${escHtml(b.title)}">${escHtml(b.title)}</h3>
+                        <span class="card-tag">${escHtml(b.tag || 'Non classé')}</span>
+                    </div>
+                    <p class="card-summary" title="${escHtml(b.summary)}">${escHtml(b.summary)}</p>
+                    <div class="card-footer">
+                        <a href="${escHtml(b.url)}" target="_blank" rel="noopener noreferrer" class="card-link" title="${escHtml(b.url)}">
+                            Ouvrir <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <div class="card-actions">
+                            <button class="btn-action" onclick="window.openEditBookmarkModal('${b.id}')" title="Modifier le lien">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="btn-action" onclick="window.openMoveModal('${b.id}')" title="Déplacer">
+                                <i class="fas fa-folder-open"></i>
+                            </button>
+                            <button class="btn-action delete" onclick="window.promptDeleteBookmark('${b.id}')" title="Supprimer">
+                                <i class="fas fa-trash-alt"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ====== DOSSIERS ACTIONS ======
+        window.setFilter = (tag) => { currentFilter = tag; renderUI(); };
+
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+                e.target.classList.add('selected');
+                selectedFolderColor = e.target.dataset.color;
+            });
+        });
+
+        function setSelectedColorUI(colorHex) {
+            selectedFolderColor = colorHex;
+            document.querySelectorAll('.color-dot').forEach(d => {
+                d.classList.toggle('selected', d.dataset.color === colorHex);
+            });
+        }
+
+        window.openAddFolderModal = () => {
+            editingFolderId = null;
+            editingFolderOldName = null;
+            document.getElementById('modal-folder-title').textContent = "Nouveau dossier";
+            document.getElementById('modal-folder-desc').textContent = "Saisissez un nom et une couleur pour votre dossier.";
+            document.getElementById('input-folder-name').value = '';
+            setSelectedColorUI('#64748b');
+            document.getElementById('modal-folder').classList.add('active');
+            setTimeout(() => document.getElementById('input-folder-name').focus(), 100);
+        };
+
+        window.openEditFolderModal = (id, currentName, currentColor) => {
+            editingFolderId = id;
+            editingFolderOldName = currentName;
+            document.getElementById('modal-folder-title').textContent = "Modifier le dossier";
+            document.getElementById('modal-folder-desc').textContent = "Modifiez le nom ou la couleur du dossier.";
+            document.getElementById('input-folder-name').value = currentName;
+            setSelectedColorUI(currentColor);
+            document.getElementById('modal-folder').classList.add('active');
+            setTimeout(() => {
+                const input = document.getElementById('input-folder-name');
+                input.focus(); input.select();
+            }, 100);
+        };
+
+        window.saveFolder = async () => {
+            const name = document.getElementById('input-folder-name').value.trim();
+            if (!name) return;
+            
+            const exists = folders.find(f => f.name.toLowerCase() === name.toLowerCase() && f.id !== editingFolderId);
+            if(name === 'Tous' || name === 'Non classé' || exists) {
+                showToast("Ce nom de dossier existe déjà.", true);
+                return;
+            }
+
+            window.closeModals();
+
+            if (editingFolderId) {
+                await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'folders', editingFolderId), { 
+                    name: name, color: selectedFolderColor 
+                });
+                
+                if (editingFolderOldName !== name) {
+                    const linksToUpdate = bookmarks.filter(b => b.tag === editingFolderOldName);
+                    for(let b of linksToUpdate) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'bookmarks', b.id), { tag: name });
+                    }
+                    if (currentFilter === editingFolderOldName) currentFilter = name;
+                }
+                showToast("Dossier mis à jour !");
+            } else {
+                await addDoc(foldersRef, { name: name, color: selectedFolderColor, createdAt: serverTimestamp() });
+                showToast(`Dossier "${name}" créé !`);
+            }
+        };
+
+        window.promptDeleteFolder = (folderName) => {
+            showConfirmModal(
+                `Supprimer "${folderName}" ?`,
+                `Le dossier sera supprimé. Ses liens seront déplacés dans "Non classé" pour ne pas les perdre.`,
+                async () => {
+                    const links = bookmarks.filter(b => b.tag === folderName);
+                    for(let b of links) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'bookmarks', b.id), { tag: 'Non classé' });
+                    }
+                    const folderDoc = folders.find(f => f.name === folderName);
+                    if (folderDoc) {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'folders', folderDoc.id));
+                    }
+                    showToast("Dossier supprimé.");
+                }
+            );
+        };
+
+        // ====== DÉPLACER (DRAG & DROP + MODAL) ======
+        window.handleDrop = async (e, targetFolder) => {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const bookmarkId = e.dataTransfer.getData('text/plain');
+            if(!bookmarkId) return;
+            
+            const newTag = targetFolder === 'Tous' ? 'Non classé' : targetFolder;
+            await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'bookmarks', bookmarkId), { tag: newTag });
+            showToast(`Lien déplacé vers ${newTag}`);
+        };
+
+        window.openEditBookmarkModal = (bookmarkId) => {
+            bookmarkToMoveId = bookmarkId; // On réutilise cette variable pour stocker l'ID en cours d'édition
+            const b = bookmarks.find(x => x.id === bookmarkId);
+            if (!b) return;
+
+            document.getElementById('edit-bookmark-title').value = b.title || '';
+            document.getElementById('edit-bookmark-summary').value = b.summary || '';
+            document.getElementById('edit-bookmark-url').value = b.url || '';
+            document.getElementById('modal-bookmark-edit').classList.add('active');
+        };
+
+        window.saveBookmarkEdit = async () => {
+            if(!bookmarkToMoveId) return;
+            const newTitle = document.getElementById('edit-bookmark-title').value.trim();
+            const newSummary = document.getElementById('edit-bookmark-summary').value.trim();
+            const newUrl = document.getElementById('edit-bookmark-url').value.trim();
+            
+            if(!newTitle || !newUrl) return;
+
+            window.closeModals();
+            await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'bookmarks', bookmarkToMoveId), { 
+                title: newTitle, 
+                summary: newSummary,
+                url: newUrl 
+            });
+            showToast(`Lien mis à jour !`);
+        };
+
+        window.confirmMove = async () => {
+            if(!bookmarkToMoveId) return;
+            const newTag = document.getElementById('select-folder-move').value;
+            window.closeModals();
+            await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'bookmarks', bookmarkToMoveId), { tag: newTag });
+            showToast(`Lien déplacé vers ${newTag}`);
+        };
+
+        // ====== BOOKMARK ACTIONS ======
+        window.promptDeleteBookmark = (id) => {
+            showConfirmModal("Supprimer ce favori ?", "Cette action est définitive.", async () => {
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'bookmarks', id));
+                showToast("Favori supprimé.");
+            });
+        };
+
+        // ====== AI SETTINGS ======
+        window.openAISettingsModal = () => {
+            document.getElementById('modal-ai-settings').classList.add('active');
+            const engine = localStorage.getItem('selectedAI') || 'albert';
+            document.getElementById('select-ai-engine').value = engine;
+            document.getElementById('input-albert-key').value = localStorage.getItem('albertApiKey') || '';
+            document.getElementById('input-gemini-key').value = localStorage.getItem('geminiApiKey') || '';
+            
+            // Toggle view
+            const toggle = () => {
+                const val = document.getElementById('select-ai-engine').value;
+                document.getElementById('settings-albert').style.display = val === 'albert' ? 'block' : 'none';
+                document.getElementById('settings-gemini').style.display = val === 'gemini' ? 'block' : 'none';
+            };
+            document.getElementById('select-ai-engine').onchange = toggle;
+            toggle();
+        };
+
+        window.saveAISettings = () => {
+            const engine = document.getElementById('select-ai-engine').value;
+            const albertKey = document.getElementById('input-albert-key').value;
+            const geminiKey = document.getElementById('input-gemini-key').value;
+            
+            localStorage.setItem('selectedAI', engine);
+            localStorage.setItem('albertApiKey', albertKey);
+            localStorage.setItem('geminiApiKey', geminiKey);
+            
+            showToast("Paramètres IA enregistrés !");
+            window.closeModals();
+        };
+
+        async function analyzeUrlWithAI(url) {
+            const engine = localStorage.getItem('selectedAI') || 'albert';
+            const albertKey = localStorage.getItem('albertApiKey');
+            const geminiKey = localStorage.getItem('geminiApiKey');
+            
+            if (engine === 'albert' && !albertKey) {
+                showToast("Claude Albert : Clé manquante. Utilisation du mode manuel.", true);
+                return manualFallback(url);
+            }
+            if (engine === 'gemini' && !geminiKey) {
+                showToast("Gemini : Clé manquante. Utilisation du mode manuel.", true);
+                return manualFallback(url);
+            }
+
+            try {
+                showToast(`IA (${engine}) en cours d'analyse...`);
+                
+                const prompt = `Analyse l'URL suivante: ${url}. 
+                Retourne une réponse JSON STRICTE (sans markdown) avec: 
+                - title: un titre clair
+                - description: un résumé court (1-2 phrases)
+                - category: un nom de catégorie court et pertinent (ex: Tech, Education, Outils, Veille, News, Loisirs)
+                EXEMPLE: {"title": "Google", "description": "Moteur de recherche mondial.", "category": "Outils"}`;
+
+                let response, data;
+
+                if (engine === 'albert') {
+                    response = await fetch("https://albert.api.gouv.fr/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${albertKey}`
+                        },
+                        body: JSON.stringify({
+                            model: "openai/gpt-oss-120b",
+                            messages: [{ role: "user", content: prompt }],
+                            temperature: 0.1
+                        })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || "Erreur Albert");
+                    const content = result.choices[0].message.content;
+                    data = JSON.parse(content.replace(/```json|```/g, '').trim());
+                } else {
+                    // Moteur Gemini
+                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { response_mime_type: "application/json" }
+                        })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || "Erreur Gemini");
+                    data = JSON.parse(result.candidates[0].content.parts[0].text);
+                }
+
+                return {
+                    title: data.title || "Lien analysé",
+                    description: data.description || "Aucune description générée.",
+                    category: data.category || "Import"
+                };
+            } catch (err) {
+                console.error("AI Error:", err);
+                showToast("L'IA a échoué. Utilisation du mode manuel.", true);
+                return manualFallback(url);
+            }
+        }
+
+        function manualFallback(url) {
+            try {
+                const urlObj = new URL(url);
+                return {
+                    title: urlObj.hostname,
+                    description: "Favori ajouté sans analyse IA (clé API manquante ou erreur).",
+                    category: "Import"
+                };
+            } catch(e) {
+                return { title: url, description: "Lien non classé", category: "Import" };
+            }
+        }
+
+        document.getElementById('add-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('url-input');
+            let url = input.value.trim();
+            if (!url || !bookmarksRef) return;
+            if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+            const btn = document.getElementById('btn-add');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse...';
+            setSyncStatus('saving', 'Analyse...');
+
+            try {
+                const aiResult = await analyzeUrlWithAI(url);
+                const newTag = aiResult.category || "Autre";
+                
+                if(!folders.find(f => f.name.toLowerCase() === newTag.toLowerCase()) && newTag !== 'Autre') {
+                    await addDoc(foldersRef, { name: newTag, color: '#64748b', createdAt: serverTimestamp() });
+                }
+
+                await addDoc(bookmarksRef, {
+                    url: url, 
+                    title: aiResult.title || url, 
+                    summary: aiResult.description || "Aucune description.",
+                    tag: newTag, 
+                    createdAt: serverTimestamp()
+                });
+
+                input.value = '';
+                showToast("Favori ajouté !");
+            } catch (error) {
+                showToast("Erreur d'analyse. Ajout annulé.", true);
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic"></i> Analyser';
+                setSyncStatus('saved', 'Synchronisé');
+            }
+        });
+
+        // ====== IMPORT CHROME BOOKMARKS ======
+        document.getElementById('import-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const html = event.target.result;
+                const parser = new DOMParser();
+                const docParsed = parser.parseFromString(html, "text/html");
+                const links = Array.from(docParsed.querySelectorAll("a"));
+                
+                if (links.length === 0) {
+                    showToast("Aucun favori trouvé.", true);
+                    return;
+                }
+
+                showConfirmModal(
+                    "Importer les favoris ?", 
+                    `Nous avons trouvé ${links.length} favoris dans ce fichier. L'importation peut prendre un instant.`,
+                    async () => {
+                        setSyncStatus('saving', 'Importation...');
+                        try {
+                            let importedTags = new Set();
+                            const itemsToSave = links.map(a => {
+                                let tag = "Import Navigateur";
+                                let dl = a.closest('dl');
+                                if (dl && dl.previousElementSibling && dl.previousElementSibling.tagName === 'H3') {
+                                    tag = dl.previousElementSibling.textContent;
+                                }
+                                if (tag === "Bookmarks bar" || tag === "Bookmarks Bar" || tag === "Volet des favoris") tag = "Barre de favoris";
+                                importedTags.add(tag);
+                                return { url: a.href, title: a.textContent || a.href, tag };
+                            });
+
+                            for (let tag of importedTags) {
+                                if (!folders.find(f => f.name.toLowerCase() === tag.toLowerCase()) && tag !== 'Non classé') {
+                                    await addDoc(foldersRef, { name: tag, color: '#64748b', createdAt: serverTimestamp() });
+                                }
+                            }
+
+                            for (let i = 0; i < itemsToSave.length; i += 50) {
+                                const chunk = itemsToSave.slice(i, i + 50);
+                                await Promise.all(chunk.map(item => 
+                                    addDoc(bookmarksRef, {
+                                        url: item.url, title: item.title.substring(0, 150),
+                                        summary: "Importé depuis le navigateur.", tag: item.tag, createdAt: serverTimestamp()
+                                    })
+                                ));
+                            }
+                            showToast(`${links.length} favoris importés !`);
+                        } catch (error) {
+                            showToast("Une erreur est survenue.", true);
+                        } finally {
+                            e.target.value = ''; 
+                            setSyncStatus('saved', 'Synchronisé');
+                        }
+                    },
+                    "Lancer l'importation", false
+                );
+            };
+            reader.readAsText(file);
+        });
+
+        function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    </script>
+</body>
+</html>
