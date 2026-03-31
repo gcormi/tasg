@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.9</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v3.0</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -182,7 +182,7 @@
 <!-- Modal Dossier -->
 <div class="overlay" id="overlay-folder">
     <div class="modal-box">
-        <div class="m-title">📁 Nouveau dossier</div>
+        <div class="m-title" id="modal-folder-title">📁 Nouveau dossier</div>
         <span class="m-label">Nom</span>
         <input type="text" id="folder-name-in" class="m-input" placeholder="ex: Pédagogie, IA, Veille...">
         <span class="m-label">Couleur</span>
@@ -196,7 +196,7 @@
             <div class="cir" data-color="#06b6d4" style="background:#06b6d4"></div>
             <div class="cir" data-color="#64748b" style="background:#64748b"></div>
         </div>
-        <button class="m-btn m-btn-primary" onclick="saveFolder()">Créer le dossier</button>
+        <button class="m-btn m-btn-primary" id="modal-folder-btn" onclick="saveFolder()">Créer le dossier</button>
         <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Annuler</button>
     </div>
 </div>
@@ -218,7 +218,7 @@
     const favRef = db.collection('favoris');
     const fldRef = db.collection('favoris_folders');
 
-    let allFavs=[], allFolders=[], activeFilter='all', selectedColor='#6366f1', draggingId=null;
+    let allFavs=[], allFolders=[], activeFilter='all', selectedColor='#6366f1', draggingId=null, editingFolderId=null;
 
     // ── STATUT ────────────────────────────────────────────────────────
     const setSync = (cls,msg) => {
@@ -255,7 +255,10 @@
                 <button class="fold-btn" onclick="filterByFolder('${f.id}')" style="color:${isActive?c:''}">
                     <div class="folder-dot" style="background:${c}"></div> ${f.name}
                 </button>
-                <button class="fold-del" onclick="delFolder('${f.id}')"><i class="fas fa-trash"></i></button>
+                <div style="display:flex;">
+                    <button class="fold-del" style="color:#94a3b8" onclick="openFolderModal('${f.id}')"><i class="fas fa-pen"></i></button>
+                    <button class="fold-del" onclick="delFolder('${f.id}')"><i class="fas fa-trash"></i></button>
+                </div>
             </div>`;
         }).join('');
     }
@@ -472,16 +475,54 @@
     document.querySelector('.cir.selected').style.outlineColor = '#1e293b';
 
     // ── DOSSIERS ─────────────────────────────────────────────────────
-    function openFolderModal() {
-        document.getElementById('folder-name-in').value='';
+    function openFolderModal(id = null) {
+        editingFolderId = id;
+        const mt = document.getElementById('modal-folder-title');
+        const mb = document.getElementById('modal-folder-btn');
+        
+        if(id) {
+            const f = allFolders.find(x=>x.id===id);
+            document.getElementById('folder-name-in').value = f.name;
+            mt.innerHTML = '📁 Modifier le dossier';
+            mb.textContent = 'Enregistrer';
+            // Set picker color
+            document.querySelectorAll('.cir').forEach(c => {
+                c.classList.remove('selected'); c.style.outlineColor = 'transparent';
+                if(c.dataset.color === f.color || (!f.color && c.dataset.color==='#6366f1')) {
+                    c.classList.add('selected'); c.style.outlineColor = '#1e293b';
+                }
+            });
+            selectedColor = f.color || '#6366f1';
+        } else {
+            document.getElementById('folder-name-in').value='';
+            mt.innerHTML = '📁 Nouveau dossier';
+            mb.textContent = 'Créer le dossier';
+            // Reset picker color
+            document.querySelectorAll('.cir').forEach(c => {
+                c.classList.remove('selected'); c.style.outlineColor = 'transparent';
+                if(c.dataset.color === '#6366f1') {
+                    c.classList.add('selected'); c.style.outlineColor = '#1e293b';
+                }
+            });
+            selectedColor = '#6366f1';
+        }
+
         document.getElementById('overlay-folder').classList.add('open');
         setTimeout(()=>document.getElementById('folder-name-in').focus(),300);
     }
+
     async function saveFolder() {
         const name = document.getElementById('folder-name-in').value.trim();
         if(!name) return;
-        await fldRef.add({name, color:selectedColor, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-        closeOverlay(); toast('Dossier créé !');
+        
+        if(editingFolderId) {
+            await fldRef.doc(editingFolderId).update({name, color:selectedColor});
+            toast('Dossier modifié !');
+        } else {
+            await fldRef.add({name, color:selectedColor, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+            toast('Dossier créé !');
+        }
+        closeOverlay();
     }
 
     function openAI() {
@@ -770,11 +811,15 @@
                         if(existingF) {
                             fId = existingF.id;
                         } else {
+                            // Assigner une couleur vibrante aléatoire
+                            const pal = ['#6366f1','#8b5cf6','#ec4899','#ef4444','#f59e0b','#22c55e','#06b6d4'];
+                            const rc = pal[Math.floor(Math.random()*pal.length)];
+                            
                             // On crée le dossier en base et on attend pour récupérer son ID
-                            const res = await fldRef.add({name: folderName, color: '#64748b', createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+                            const res = await fldRef.add({name: folderName, color: rc, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
                             fId = res.id;
                             foldersCreated++;
-                            allFolders.push({id: fId, name: folderName, color: '#64748b'});
+                            allFolders.push({id: fId, name: folderName, color: rc});
                         }
                         tempFolderId = fId;
 
