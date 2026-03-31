@@ -8,56 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        #loading-spinner {
-            border: 4px solid rgba(0, 0, 0, .1);
-            border-left-color: #2563eb; 
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        #loading-spinner { border: 4px solid rgba(0, 0, 0, .1); border-left-color: #2563eb; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .ai-card {
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid transparent;
-            background-color: #f1f5f9;
-        }
-        .ai-card:hover {
-            background-color: #e2e8f0;
-            transform: translateY(-2px);
-        }
-        .ai-card.active {
-            border-color: #2563eb;
-            background-color: #eff6ff;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
-        }
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-bottom: 2px solid transparent;
-            color: #64748b;
-            transition: all 0.2s;
-        }
-        .tab-button.active {
-            color: #2563eb;
-            border-bottom-color: #2563eb;
-        }
-        #preview-output {
-            background: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            min-height: 200px;
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-        }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .ai-card { cursor: pointer; transition: all 0.3s; border: 2px solid transparent; background-color: #f1f5f9; }
+        .ai-card.active { border-color: #2563eb; background-color: #eff6ff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .tab-button { padding: 0.75rem 1.5rem; font-weight: 600; border-bottom: 2px solid transparent; color: #64748b; }
+        .tab-button.active { color: #2563eb; border-bottom-color: #2563eb; }
+        #preview-output { background: white; padding: 2rem; border-radius: 0.75rem; min-height: 200px; }
+        .console-log { font-family: monospace; font-size: 10px; background: #1e293b; color: #34d399; padding: 10px; border-radius: 8px; max-height: 150px; overflow-y: auto; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-8">
@@ -68,50 +27,39 @@
             <h1 class="text-3xl font-black text-slate-900 italic flex items-center justify-center gap-3">
                 <i class="fas fa-microchip text-blue-600"></i> Assistant Multi-IA
             </h1>
-            <p class="text-slate-500 text-sm mt-2 font-medium uppercase tracking-widest text-blue-800">Prêt pour l'hébergement (Forge)</p>
+            <p class="text-slate-500 text-sm mt-2 font-medium uppercase tracking-widest text-blue-800">Interface Optimisée Worker & Forge</p>
         </header>
 
         <!-- 1. SÉLECTION DE L'IA -->
-        <div class="mb-10">
-            <p class="text-center text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">Étape 1 : Choisir le moteur d'IA</p>
+        <div class="mb-8">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="ai-selector-container">
                 <div data-value="albert" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
                     <span class="text-3xl">🇫🇷</span>
                     <span class="font-bold text-slate-800">IA Albert</span>
-                    <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Souverain</span>
+                    <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">RELAIS ACTIF</span>
                 </div>
                 <div data-value="gemini" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
                     <span class="text-3xl">🌐</span>
                     <span class="font-bold text-slate-800">Gemini</span>
-                    <span class="text-[10px] bg-green-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Gratuit</span>
+                    <span class="text-[10px] bg-green-600 text-white px-2 py-0.5 rounded-full font-bold">GRATUIT</span>
                 </div>
                 <div data-value="openrouter" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
                     <span class="text-3xl">🚀</span>
                     <span class="font-bold text-slate-800">OpenRouter</span>
-                    <span class="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Premium</span>
+                    <span class="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full font-bold">PREMIUM</span>
                 </div>
             </div>
-            <!-- Sélecteur invisible pour script -->
-            <select id="ai-selector" class="hidden">
-                <option value="albert">albert</option>
-                <option value="gemini">gemini</option>
-                <option value="openrouter">openrouter</option>
-            </select>
+            <select id="ai-selector" class="hidden"><option value="albert">albert</option><option value="gemini">gemini</option><option value="openrouter">openrouter</option></select>
         </div>
 
-        <!-- 2. ZONE DE CONFIGURATION -->
-        <div id="config-section" class="bg-blue-50/50 p-6 rounded-2xl border-2 border-blue-100 mb-8 transition-all">
-            <h2 class="text-sm font-black text-blue-800 mb-4 uppercase tracking-tighter flex items-center gap-2">
-                <i class="fas fa-key"></i> Configuration de l'accès
-            </h2>
-            
+        <!-- 2. CONFIGURATION -->
+        <div id="config-section" class="bg-blue-50/50 p-6 rounded-2xl border-2 border-blue-100 mb-8">
             <div id="model-config-area" class="mb-4">
                 <div id="albert-model-config">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Modèle Albert :</label>
-                    <select id="albert-model-selector" class="w-full p-3 border border-slate-200 rounded-xl text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="openai/gpt-oss-120b">Albert 120B (Meilleure précision)</option>
-                        <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Plus rapide)</option>
-                        <option value="Qwen/Qwen3-Coder-30B-A3B-Instruct">Qwen Coder (Pour le code)</option>
+                    <select id="albert-model-selector" class="w-full p-3 border border-slate-200 rounded-xl text-sm bg-white outline-none">
+                        <option value="openai/gpt-oss-120b">Albert 120B (Souverain)</option>
+                        <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small</option>
                     </select>
                 </div>
                 <div id="openrouter-model-config" class="hidden">
@@ -124,184 +72,153 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3">
-                <input type="password" id="api-key-input" placeholder="Collez votre clé secrète..." class="flex-grow p-4 border border-slate-200 rounded-xl text-sm shadow-inner bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-                <button id="save-key-button" class="bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 shadow-lg transition-all">
-                    ACTIVER
+                <input type="text" id="api-key-input" placeholder="https://votre-worker.workers.dev" class="flex-grow p-4 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none font-mono">
+                <button id="save-key-button" class="bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 shadow-lg">CONNECTER</button>
+                <button id="test-connection-button" class="bg-white border border-slate-200 text-slate-600 font-bold py-4 px-4 rounded-xl hover:bg-slate-50 transition-colors text-xs flex items-center gap-2">
+                    <i class="fas fa-plug"></i> Tester
                 </button>
             </div>
+            <p id="config-help" class="text-[10px] text-blue-600 mt-2 italic font-medium"><i class="fas fa-info-circle"></i> Entrez l'URL de votre Worker Cloudflare pour Albert, ou votre clé API pour les autres.</p>
         </div>
 
-        <!-- 3. RÉGLAGES TECHNIQUES -->
+        <!-- 3. RÉGLAGES RÉSEAU & CONSOLE -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div class="p-4 border border-slate-200 rounded-2xl bg-white shadow-sm flex flex-col justify-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Niveau de rédaction</p>
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                        <input name="detail-level" type="radio" value="complet" checked class="w-4 h-4"> Complet
-                    </label>
-                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                        <input name="detail-level" type="radio" value="equilibre" class="w-4 h-4"> Moyen
-                    </label>
-                </div>
+            <div class="p-4 border border-slate-200 rounded-2xl bg-white shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Logs de connexion</p>
+                <div id="console-output" class="console-log">Prêt pour les tests...</div>
             </div>
 
             <div class="p-4 border border-amber-200 rounded-2xl bg-amber-50/50">
-                <p class="text-[10px] font-bold text-amber-600 uppercase mb-2 tracking-widest">Mode de Connexion</p>
-                <div class="flex flex-col gap-2">
-                    <select id="proxy-selector" class="text-[10px] p-2 border border-amber-200 rounded-lg bg-white font-bold text-amber-900 outline-none">
-                        <option value="direct">Connexion DIRECTE (Optimisée Forge)</option>
-                        <option value="corsproxy">Passer par Proxy 1 (corsproxy.io)</option>
-                        <option value="thingproxy">Passer par Proxy 2 (thingproxy)</option>
-                    </select>
-                    <button id="test-connection-btn" class="text-[9px] font-bold uppercase text-blue-600 hover:text-blue-800 text-left border-b border-blue-200 w-max">
-                        <i class="fas fa-vial"></i> Tester la connexion
-                    </button>
-                </div>
+                <p class="text-[10px] font-bold text-amber-600 uppercase mb-2">Proxy CORS (OpenRouter uniquement)</p>
+                <select id="proxy-selector" class="w-full text-[10px] p-2 border border-amber-200 rounded-lg bg-white font-bold outline-none">
+                    <option value="direct">1. Sans Proxy (Direct)</option>
+                    <option value="corsproxy">2. Proxy (corsproxy.io)</option>
+                </select>
+                <p class="text-[9px] text-amber-700 mt-2 italic">Automatiquement géré par votre Worker pour Albert.</p>
             </div>
         </div>
 
         <!-- 4. SECTION PROMPT -->
         <div id="prompt-section" class="space-y-4">
             <div class="flex justify-between items-center px-2">
-                <span id="config-status-text" class="text-[11px] font-bold text-green-600 flex items-center gap-1 uppercase">
-                    <i class="fas fa-check-circle"></i> Service configuré
-                </span>
-                <button id="clear-key-button" class="text-[10px] text-red-400 font-bold hover:text-red-600 uppercase">Effacer la clé</button>
+                <span id="config-status-text" class="text-[11px] font-bold text-green-600 uppercase italic">Connecté</span>
+                <button id="clear-key-button" class="text-[10px] text-red-400 font-bold hover:text-red-600 uppercase underline">Réinitialiser</button>
             </div>
-            <textarea id="prompt-input" rows="6" class="w-full p-5 border-2 border-slate-100 rounded-2xl shadow-inner focus:border-blue-400 outline-none text-sm bg-slate-50/30" placeholder="Collez le prompt ici..."></textarea>
-            <button id="generate-button" class="w-full bg-blue-600 text-white font-black py-5 px-6 rounded-2xl hover:bg-blue-700 shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-0 disabled:bg-slate-300">
-                <i class="fas fa-wand-magic-sparkles mr-2"></i> GÉNÉRER LE MANUEL SCOLAIRE
+            <textarea id="prompt-input" rows="5" class="w-full p-4 border-2 border-slate-100 rounded-2xl shadow-inner text-sm bg-slate-50/30" placeholder="Saisissez votre demande ici..."></textarea>
+            <button id="generate-button" class="w-full bg-blue-600 text-white font-black py-4 px-6 rounded-2xl hover:bg-blue-700 shadow-xl disabled:bg-slate-300">
+                <i class="fas fa-wand-magic-sparkles mr-2"></i> GÉNÉRER LE DOCUMENT
             </button>
         </div>
 
         <!-- 5. RÉSULTATS -->
-        <div id="results-section" class="mt-12 hidden border-t-2 border-slate-50 pt-10">
-            <div id="loading-spinner" class="mx-auto my-8 hidden"></div>
-            <div id="status-bar" class="hidden mb-10">
-                <div class="flex justify-between text-xs font-black text-blue-600 mb-3 uppercase tracking-tighter"><p id="status-text">Prêt...</p><span id="progress-percent">0%</span></div>
-                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200"><div id="status-progress" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div></div>
+        <div id="results-section" class="mt-10 hidden border-t-2 border-slate-50 pt-10">
+            <div id="loading-spinner" class="mx-auto my-4 hidden"></div>
+            
+            <div class="flex border-b border-slate-100 mb-4 text-xs font-bold uppercase">
+                <button id="tab-preview" class="tab-button active">Aperçu</button>
+                <button id="tab-raw" class="tab-button">Code HTML</button>
             </div>
-            <div class="flex border-b border-slate-100 mb-6">
-                <button id="tab-preview" class="tab-button active uppercase text-xs tracking-widest flex items-center gap-2"><i class="fas fa-desktop"></i> Aperçu</button>
-                <button id="tab-raw" class="tab-button uppercase text-xs tracking-widest flex items-center gap-2"><i class="fas fa-code"></i> Code</button>
-            </div>
-            <div id="preview-output" class="mt-4 overflow-y-auto max-h-[800px] custom-scrollbar prose max-w-none border border-slate-50"></div>
+            
+            <div id="preview-output" class="mt-4 overflow-y-auto max-h-[600px] border prose max-w-none shadow-inner"></div>
+            
             <div id="raw-output-container" class="mt-4 hidden relative">
-                <pre><code id="raw-output" class="text-[11px] leading-relaxed block p-6 bg-slate-900 rounded-2xl text-slate-300"></code></pre>
-                <button id="copy-text-button" class="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white text-[10px] font-black py-2 px-4 rounded-lg border border-white/20 transition-all uppercase"><i class="fas fa-copy"></i> Copier</button>
+                <pre><code id="raw-output" class="text-[10px] block p-4 bg-slate-900 rounded-xl text-slate-300 overflow-x-auto"></code></pre>
+                <button id="copy-text-button" class="absolute top-4 right-4 bg-white/10 text-white text-[9px] px-2 py-1 rounded border border-white/20">COPIER</button>
             </div>
-            <div class="mt-10 grid grid-cols-2 gap-4">
-                <button id="export-html-button" class="bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-black transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"><i class="fas fa-file-arrow-down"></i> HTML</button>
-                <button id="export-text-button" class="bg-white border-2 border-slate-200 text-slate-700 font-black py-4 rounded-2xl shadow-lg hover:bg-slate-50 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"><i class="fas fa-file-lines"></i> Texte</button>
-            </div>
-        </div>
-
-        <!-- ZONE DIAGNOSTIC -->
-        <div id="error-diagnostic" class="mt-8 hidden p-5 bg-red-50 border-2 border-red-100 rounded-2xl">
-            <p class="font-black text-red-700 text-sm mb-2 flex items-center gap-2"><i class="fas fa-bug"></i> Rapport technique</p>
-            <div id="error-details" class="text-[10px] text-red-600 font-mono leading-relaxed overflow-x-auto"></div>
-            <div class="mt-4 flex gap-2">
-                <a href="https://albert.api.gouv.fr/chat/" target="_blank" class="bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded hover:bg-red-800 no-underline">Ouvrir Albert manuellement</a>
+            
+            <div class="mt-8 flex gap-4">
+                <button id="export-html-button" class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest">Exporter HTML</button>
             </div>
         </div>
     </div>
 
     <script>
-        const STO = { AI: 'selectedAI', GEM: 'geminiApiKey', ORO: 'openrouterApiKey', ALB: 'albertApiKey', ALB_MOD: 'albertSelectedModel' };
+        const STO = { AI: 'selectedAI', GEM: 'geminiApiKey', ORO: 'openrouterApiKey', ALB: 'albertWorkerUrl' };
         
-        const PROXIES = {
-            corsproxy: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-            thingproxy: (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
-            direct: (u) => u
-        };
-
         const EL = {
             config: () => document.getElementById('config-section'),
             promptSec: () => document.getElementById('prompt-section'),
-            aiSel: () => document.getElementById('ai-selector'),
             aiCards: () => document.querySelectorAll('.ai-card'),
+            aiSel: () => document.getElementById('ai-selector'),
             keyInp: () => document.getElementById('api-key-input'),
             saveBtn: () => document.getElementById('save-key-button'),
+            testBtn: () => document.getElementById('test-connection-button'),
             clearBtn: () => document.getElementById('clear-key-button'),
-            albertCfg: () => document.getElementById('albert-model-config'),
-            albertMod: () => document.getElementById('albert-model-selector'),
-            orCfg: () => document.getElementById('openrouter-model-config'),
+            albMod: () => document.getElementById('albert-model-selector'),
             orMod: () => document.getElementById('openrouter-model-selector'),
             statusTxt: () => document.getElementById('config-status-text'),
             promptInp: () => document.getElementById('prompt-input'),
             genBtn: () => document.getElementById('generate-button'),
             resSec: () => document.getElementById('results-section'),
             spinner: () => document.getElementById('loading-spinner'),
-            bar: () => document.getElementById('status-bar'),
-            statTxt: () => document.getElementById('status-text'),
-            prog: () => document.getElementById('status-progress'),
-            perc: () => document.getElementById('progress-percent'),
             prev: () => document.getElementById('preview-output'),
             raw: () => document.getElementById('raw-output'),
             rawCont: () => document.getElementById('raw-output-container'),
-            tabPrev: () => document.getElementById('tab-preview'),
-            tabRaw: () => document.getElementById('tab-raw'),
             proxySel: () => document.getElementById('proxy-selector'),
-            diag: () => document.getElementById('error-diagnostic'),
-            errDet: () => document.getElementById('error-details'),
-            testBtn: () => document.getElementById('test-connection-btn')
+            console: () => document.getElementById('console-output')
         };
 
         const AI_CONFIGS = {
             'albert': {
                 name: "IA Albert", storageKey: STO.ALB,
-                url: 'https://albert.api.gouv.fr/v1/chat/completions',
-                getHeaders: (k) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${k}` }),
-                getPayload: (p, m, h = []) => ({
-                    model: m || "openai/gpt-oss-120b",
-                    messages: h.length > 0 ? [...h, { role: 'user', content: p }] : [{ role: 'user', content: p }],
-                    temperature: 0.7, max_tokens: 4096
-                }),
+                getUrl: (w) => w,
+                getHeaders: () => ({ 'Content-Type': 'application/json' }),
+                getPayload: (p, m) => ({ message: p, model: m, temperature: 0.7 }),
                 parseRes: (r) => r.choices[0].message.content
             },
             'gemini': {
-                name: "Google Gemini", storageKey: STO.GEM,
-                url: (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${k}`,
+                name: "Gemini", storageKey: STO.GEM,
+                getUrl: (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${k}`,
                 getHeaders: () => ({ 'Content-Type': 'application/json' }),
                 getPayload: (p) => ({ contents: [{ parts: [{ text: p }] }] }),
                 parseRes: (r) => r.candidates[0].content.parts[0].text
             },
             'openrouter': {
                 name: "OpenRouter", storageKey: STO.ORO,
-                url: 'https://openrouter.ai/api/v1/chat/completions',
+                getUrl: () => 'https://openrouter.ai/api/v1/chat/completions',
                 getHeaders: (k) => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${k}` }),
-                getPayload: (p, m, h = []) => ({
-                    model: m || "anthropic/claude-3.5-sonnet",
-                    messages: h.length > 0 ? [...h, { role: 'user', content: p }] : [{ role: 'user', content: p }]
-                }),
+                getPayload: (p, m) => ({ model: m, messages: [{ role: 'user', content: p }] }),
                 parseRes: (r) => r.choices[0].message.content
             }
         };
 
-        async function callAPI(prompt, key, type, model, history = []) {
-            const config = AI_CONFIGS[type];
-            const baseUrl = typeof config.url === 'function' ? config.url(key) : config.url;
-            const targetUrl = PROXIES[EL.proxySel().value](baseUrl);
+        function log(msg, isError = false) {
+            const time = new Date().toLocaleTimeString();
+            EL.console().innerHTML += `<div class="${isError ? 'text-red-400' : 'text-emerald-400'}">[${time}] ${msg}</div>`;
+            EL.console().scrollTop = EL.console().scrollHeight;
+        }
 
+        async function callAPI(prompt, key, type, model) {
+            const config = AI_CONFIGS[type];
+            let targetUrl = typeof config.getUrl === 'function' ? config.getUrl(key) : config.getUrl;
+
+            if (type === 'openrouter' && EL.proxySel().value === 'corsproxy') {
+                targetUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+            }
+
+            log(`Appel à ${config.name}...`);
+            
             try {
                 const response = await fetch(targetUrl, {
                     method: 'POST',
                     headers: config.getHeaders(key),
-                    body: JSON.stringify(config.getPayload(prompt, model, history))
+                    body: JSON.stringify(config.getPayload(prompt, model))
                 });
 
-                if (!response.ok) {
-                    const txt = await response.text();
-                    throw new Error(`Serveur : ${response.status}. ${txt.substring(0, 100)}`);
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error?.message || data.error || `Erreur ${response.status}`);
+                    return config.parseRes(data);
+                } else {
+                    const text = await response.text();
+                    if (text.includes("error code: 1016")) {
+                        throw new Error("ERREUR 1016 : Le Worker n'arrive pas à joindre l'API d'Albert. Vérifiez l'URL de l'API dans votre code Worker.");
+                    }
+                    throw new Error(`Réponse non-JSON reçue du serveur.`);
                 }
-
-                const data = await response.json();
-                return config.parseRes(data);
             } catch (err) {
-                console.error("Fetch Error:", err);
-                if (err.message.includes('Failed to fetch')) {
-                    throw new Error("ERREUR DE CONNEXION : Le serveur d'IA bloque la requête venant de votre navigateur. Si vous êtes sur la Forge, essayez le mode Proxy 1.");
-                }
+                log(`ÉCHEC : ${err.message}`, true);
                 throw err;
             }
         }
@@ -309,41 +226,21 @@
         function updateUI() {
             const sel = EL.aiSel().value;
             EL.aiCards().forEach(c => c.classList.toggle('active', c.getAttribute('data-value') === sel));
-            EL.albertCfg().classList.toggle('hidden', sel !== 'albert');
-            EL.orCfg().classList.toggle('hidden', sel !== 'openrouter');
+            document.getElementById('albert-model-config').classList.toggle('hidden', sel !== 'albert');
+            document.getElementById('openrouter-model-config').classList.toggle('hidden', sel !== 'openrouter');
             
+            EL.keyInp().type = (sel === 'albert') ? 'text' : 'password';
+            EL.keyInp().placeholder = (sel === 'albert') ? "https://mon-worker.workers.dev" : "Collez votre clé API...";
+
             const savedKey = localStorage.getItem(AI_CONFIGS[sel].storageKey);
             if (savedKey) {
                 EL.config().classList.add('hidden');
                 EL.promptSec().classList.remove('hidden');
-                EL.statusTxt().innerHTML = `<i class="fas fa-check-circle"></i> ${AI_CONFIGS[sel].name} : Connecté`;
+                EL.statusTxt().innerText = `${AI_CONFIGS[sel].name} : Connecté`;
             } else {
                 EL.config().classList.remove('hidden');
                 EL.promptSec().classList.add('hidden');
                 EL.keyInp().value = '';
-            }
-        }
-
-        async function gererGeneration() {
-            const prompt = EL.promptInp().value.trim();
-            const aiType = EL.aiSel().value;
-            const key = localStorage.getItem(AI_CONFIGS[aiType].storageKey);
-            const model = aiType === 'albert' ? EL.albertMod().value : (aiType === 'openrouter' ? EL.orMod().value : '');
-
-            if (!prompt || !key) return;
-            EL.spinner().classList.remove('hidden'); EL.resSec().classList.remove('hidden');
-            EL.diag().classList.add('hidden'); EL.prev().innerHTML = ''; EL.raw().textContent = ''; EL.genBtn().disabled = true;
-
-            try {
-                const res = await callAPI(prompt, key, aiType, model);
-                const clean = res.replace(/```html|```/g, '').trim();
-                EL.prev().innerHTML = clean; EL.raw().textContent = clean;
-            } catch (e) {
-                EL.diag().classList.remove('hidden');
-                EL.errDet().innerText = e.message;
-                EL.prev().innerHTML = `<p class="text-red-600 font-bold">⚠️ Échec de la génération.</p>`;
-            } finally {
-                EL.spinner().classList.add('hidden'); EL.genBtn().disabled = false;
             }
         }
 
@@ -352,49 +249,44 @@
             EL.aiSel().value = savedAI;
             updateUI();
 
-            EL.aiCards().forEach(card => {
-                card.onclick = () => {
-                    EL.aiSel().value = card.getAttribute('data-value');
-                    localStorage.setItem(STO.AI, EL.aiSel().value);
-                    updateUI();
-                };
-            });
-
-            EL.saveBtn().onclick = () => {
-                const ai = EL.aiSel().value;
-                const key = EL.keyInp().value.trim();
-                if(!key) return;
-                localStorage.setItem(AI_CONFIGS[ai].storageKey, key);
-                updateUI();
-            };
-
+            EL.aiCards().forEach(card => card.onclick = () => { EL.aiSel().value = card.getAttribute('data-value'); localStorage.setItem(STO.AI, EL.aiSel().value); updateUI(); });
+            EL.saveBtn().onclick = () => { const key = EL.keyInp().value.trim(); if(key) { localStorage.setItem(AI_CONFIGS[EL.aiSel().value].storageKey, key); updateUI(); log("Connexion configurée."); } };
+            EL.clearBtn().onclick = () => { localStorage.removeItem(AI_CONFIGS[EL.aiSel().value].storageKey); updateUI(); log("Déconnexion."); };
+            
             EL.testBtn().onclick = async () => {
                 const ai = EL.aiSel().value;
-                const key = localStorage.getItem(AI_CONFIGS[ai].storageKey);
-                if (!key) return alert("Configurez une clé d'abord.");
-                EL.testBtn().innerHTML = '<i class="fas fa-spinner fa-spin"></i> Test...';
-                try {
-                    await callAPI("Test minimal. Réponds 'OK'.", key, ai, "");
-                    alert("✅ Succès ! Connexion établie.");
-                } catch(e) {
-                    alert("❌ Échec : " + e.message);
-                } finally {
-                    EL.testBtn().innerHTML = '<i class="fas fa-vial"></i> Tester la connexion';
-                }
-            };
-            
-            EL.clearBtn().onclick = () => {
-                localStorage.removeItem(AI_CONFIGS[EL.aiSel().value].storageKey);
-                updateUI();
+                const key = EL.keyInp().value.trim() || localStorage.getItem(AI_CONFIGS[ai].storageKey);
+                if(!key) return alert("Veuillez entrer une URL ou une clé.");
+                EL.testBtn().innerText = "...";
+                try { await callAPI("Dis OK", key, ai, ""); alert("✅ Test réussi !"); } catch(e) { alert("❌ Échec."); }
+                finally { EL.testBtn().innerHTML = '<i class="fas fa-plug"></i> Tester'; }
             };
 
-            EL.genBtn().onclick = gererGeneration;
-            EL.tabPrev().onclick = () => { EL.prev().classList.remove('hidden'); EL.rawCont().classList.add('hidden'); EL.tabPrev().classList.add('active'); EL.tabRaw().classList.remove('active'); };
-            EL.tabRaw().onclick = () => { EL.prev().classList.add('hidden'); EL.rawCont().classList.remove('hidden'); EL.tabRaw().classList.add('active'); EL.tabPrev().classList.remove('active'); };
-            
+            EL.genBtn().onclick = async () => {
+                const prompt = EL.promptInp().value.trim();
+                const ai = EL.aiSel().value;
+                const key = localStorage.getItem(AI_CONFIGS[ai].storageKey);
+                const model = ai === 'albert' ? EL.albMod().value : (ai === 'openrouter' ? EL.orMod().value : '');
+
+                if (!prompt) return;
+                EL.resSec().classList.remove('hidden'); EL.spinner().classList.remove('hidden');
+                EL.prev().innerHTML = ''; EL.genBtn().disabled = true;
+
+                try {
+                    const res = await callAPI(prompt, key, ai, model);
+                    const clean = res.replace(/```html|```/g, '').trim();
+                    EL.prev().innerHTML = clean; EL.raw().textContent = clean;
+                } catch (e) {
+                    EL.prev().innerHTML = `<p class="text-red-600 p-4 bg-red-50 rounded">Erreur : ${e.message}</p>`;
+                } finally {
+                    EL.spinner().classList.add('hidden'); EL.genBtn().disabled = false;
+                }
+            };
+
+            document.getElementById('tab-preview').onclick = () => { EL.prev().classList.remove('hidden'); EL.rawCont().classList.add('hidden'); document.getElementById('tab-preview').classList.add('active'); document.getElementById('tab-raw').classList.remove('active'); };
+            document.getElementById('tab-raw').onclick = () => { EL.prev().classList.add('hidden'); EL.rawCont().classList.remove('hidden'); document.getElementById('tab-raw').classList.add('active'); document.getElementById('tab-preview').classList.remove('active'); };
             document.getElementById('copy-text-button').onclick = () => { navigator.clipboard.writeText(EL.raw().textContent); alert("Code copié !"); };
             document.getElementById('export-html-button').onclick = () => { const blob = new Blob([EL.raw().textContent], { type: 'text/html' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'manuel.html'; a.click(); };
-            document.getElementById('export-text-button').onclick = () => { const blob = new Blob([EL.raw().textContent], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'manuel.txt'; a.click(); };
         });
     </script>
 </body>

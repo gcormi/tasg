@@ -3,166 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Albert Express - Générateur de Documents</title>
+    <title>Assistant Multi-IA - Forge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
-        body { font-family: 'Outfit', sans-serif; background: #f0f2f5; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .loader { border-top-color: #000091; animation: spin 1s linear infinite; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .ai-card { cursor: pointer; transition: all 0.3s; border: 2px solid transparent; background-color: #f1f5f9; }
+        .ai-card.active { border-color: #2563eb; background-color: #eff6ff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .loader { border-top-color: #2563eb; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        #preview-output { min-height: 200px; }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-8">
 
-    <div class="max-w-2xl w-full glass rounded-3xl shadow-2xl overflow-hidden border border-white">
-        <!-- Header -->
-        <div class="bg-[#000091] p-6 text-white text-center">
-            <h1 class="text-2xl font-extrabold tracking-tight">ALBERTDOC <span class="font-light">v1.0</span></h1>
-            <p class="text-blue-200 text-xs uppercase font-bold tracking-widest mt-1">Générateur de fiche pédagogique</p>
+    <div class="bg-white w-full max-w-4xl p-6 sm:p-10 rounded-3xl shadow-2xl relative border border-slate-200">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-black text-slate-900 italic flex items-center justify-center gap-3">
+                <i class="fas fa-microchip text-blue-600"></i> Assistant Multi-IA
+            </h1>
+            <p class="text-slate-500 text-sm mt-2 font-medium uppercase tracking-widest text-blue-800">Prêt pour l'hébergement (Forge + Worker)</p>
+        </header>
+
+        <!-- 1. SÉLECTION DE L'IA -->
+        <div class="mb-8">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 text-center">Étape 1 : Choisir le moteur d'IA</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="ai-selector-container">
+                <div data-value="albert" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2 active">
+                    <span class="text-3xl">🇫🇷</span>
+                    <span class="font-bold text-slate-800">IA Albert</span>
+                    <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">WORKER ACTIF</span>
+                </div>
+                <div data-value="gemini" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
+                    <span class="text-3xl">🌐</span>
+                    <span class="font-bold text-slate-800">Gemini</span>
+                    <span class="text-[10px] bg-green-600 text-white px-2 py-0.5 rounded-full font-bold">GRATUIT</span>
+                </div>
+                <div data-value="openrouter" class="ai-card p-5 rounded-2xl flex flex-col items-center gap-2">
+                    <span class="text-3xl">🚀</span>
+                    <span class="font-bold text-slate-800">OpenRouter</span>
+                    <span class="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full font-bold">PREMIUM</span>
+                </div>
+            </div>
         </div>
 
-        <div class="p-8 space-y-6">
-            <!-- Etape 1 : Clé -->
-            <div id="step-key" class="space-y-4">
-                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider">Votre Clé API Albert</label>
-                <input type="password" id="apiKey" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition-all font-mono" placeholder="sk-...">
-                <button onclick="saveKey()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 transition-all shadow-lg active:scale-95">
-                    CONFIGURER L'ACCÈS
-                </button>
+        <!-- 2. CONFIGURATION DYNAMIQUE -->
+        <div id="config-section" class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8 transition-all">
+            <div class="flex justify-between items-end mb-2">
+                <label id="config-label" class="block text-xs font-black text-slate-500 uppercase tracking-widest">URL du Worker Cloudflare</label>
             </div>
+            
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="api-key-input" placeholder="https://gillecormi.gilles-cormi.workers.dev" class="flex-grow p-4 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none font-mono">
+                <button id="save-key-button" class="bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-700 shadow-lg whitespace-nowrap">CONNECTER</button>
+            </div>
+            <p id="config-help" class="text-[10px] text-blue-600 mt-3 italic"><i class="fas fa-shield-alt"></i> La clé secrète est protégée côté serveur. Renseignez uniquement le lien du Worker.</p>
+        </div>
 
-            <!-- Etape 2 : Création (Cachée par défaut) -->
-            <div id="step-create" class="hidden space-y-6">
-                <div class="flex justify-between items-center bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                    <span class="text-xs font-bold text-emerald-700"><i class="fas fa-check-circle"></i> Albert est prêt</span>
-                    <button onclick="resetKey()" class="text-[10px] font-bold text-slate-400 uppercase hover:text-red-500">Changer de clé</button>
+        <!-- INDICATEUR DE STATUT -->
+        <div class="flex justify-between items-center px-2 mb-4">
+            <span id="config-status-text" class="text-xs font-bold text-slate-400 uppercase flex items-center gap-2">
+                <i class="fas fa-circle text-red-400" id="status-dot"></i> <span id="status-msg">Non connecté</span>
+            </span>
+            <button id="clear-key-button" class="text-[10px] text-red-400 font-bold hover:text-red-600 uppercase underline hidden">Effacer la configuration</button>
+        </div>
+
+        <!-- 3. PARAMÈTRES ET PROMPT -->
+        <div id="prompt-section" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div class="p-4 border border-slate-200 rounded-xl bg-slate-50">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Niveau de rédaction</p>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 text-sm font-medium cursor-pointer"><input type="radio" name="niveau" value="complet" checked class="text-blue-600"> Complet</label>
+                        <label class="flex items-center gap-2 text-sm font-medium cursor-pointer"><input type="radio" name="niveau" value="moyen" class="text-blue-600"> Moyen</label>
+                    </div>
                 </div>
-
-                <div class="space-y-3">
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-wider">Sujet de la fiche</label>
-                    <input type="text" id="subject" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none" placeholder="Ex: Le cycle de l'eau, La programmation en 4e...">
+                
+                <div class="p-4 border border-slate-200 rounded-xl bg-slate-50">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Modèle (Si applicable)</p>
+                    <select id="model-selector" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white outline-none">
+                        <option value="openai/gpt-oss-120b">Albert 120B (Défaut)</option>
+                        <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small</option>
+                    </select>
                 </div>
-
-                <button id="genBtn" onclick="generate()" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-black shadow-xl transition-all flex items-center justify-center gap-3">
-                    <i class="fas fa-magic"></i> GÉNÉRER LE DOCUMENT
-                </button>
             </div>
 
-            <!-- Zone de chargement -->
-            <div id="loading" class="hidden flex flex-col items-center py-10 space-y-4">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
-                <p class="text-sm font-bold text-slate-500 animate-pulse uppercase tracking-tighter">Albert rédige votre fiche...</p>
-            </div>
+            <textarea id="prompt-input" rows="5" class="w-full p-5 border-2 border-slate-100 rounded-2xl shadow-inner text-sm bg-slate-50 focus:bg-white focus:border-blue-400 outline-none transition-colors" placeholder="Collez votre prompt ici..."></textarea>
+            
+            <button id="generate-button" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl hover:bg-blue-700 shadow-xl disabled:bg-slate-300 transition-all flex items-center justify-center gap-3 uppercase tracking-widest">
+                <i class="fas fa-wand-magic-sparkles"></i> GÉNÉRER LE DOCUMENT
+            </button>
+        </div>
 
-            <!-- Résultat -->
-            <div id="result" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xs font-black text-slate-400 uppercase">Document généré</h3>
-                    <button onclick="downloadDoc()" class="text-blue-600 font-bold text-xs hover:underline uppercase">Télécharger (HTML)</button>
+        <!-- 4. RÉSULTATS -->
+        <div id="results-section" class="mt-10 hidden border-t-2 border-slate-100 pt-8">
+            <div id="loading-spinner" class="flex flex-col items-center justify-center py-8 hidden">
+                <div class="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full loader mb-4"></div>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">L'IA rédige votre contenu...</p>
+            </div>
+            
+            <div id="result-content" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">Résultat généré</h3>
+                    <button onclick="copyResult()" class="text-[10px] font-bold text-blue-600 uppercase hover:underline"><i class="fas fa-copy"></i> Copier HTML</button>
                 </div>
-                <div id="output" class="p-6 border-2 border-slate-100 rounded-3xl bg-white text-sm prose max-w-none shadow-inner"></div>
-                <button onclick="location.reload()" class="w-full py-3 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-slate-600">Recommencer</button>
+                <div id="preview-output" class="p-6 bg-white border-2 border-slate-100 rounded-2xl shadow-inner prose max-w-none text-sm overflow-y-auto max-h-[500px]"></div>
+                
+                <div class="mt-6 flex gap-4">
+                    <button onclick="downloadHtml()" class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-slate-900 transition-colors">
+                        <i class="fas fa-file-export mr-2"></i> Télécharger HTML
+                    </button>
+                </div>
             </div>
-
-            <!-- Console de Debug (Discrète) -->
-            <div id="debug" class="mt-8 p-3 bg-slate-900 rounded-xl hidden">
-                <p class="text-[9px] font-mono text-emerald-400" id="debug-text"></p>
-            </div>
+            
+            <div id="error-content" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-medium"></div>
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'albert_mini_key';
-        
-        // Initialisation
-        window.onload = () => {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                document.getElementById('step-key').classList.add('hidden');
-                document.getElementById('step-create').classList.remove('hidden');
-                document.getElementById('apiKey').value = saved;
+        // Configuration des IAs
+        const AI_CONFIGS = {
+            'albert': {
+                name: "IA Albert",
+                storageKey: 'albertWorkerUrl',
+                label: "URL du Worker Cloudflare",
+                placeholder: "https://gillecormi.gilles-cormi.workers.dev",
+                help: "<i class='fas fa-shield-alt'></i> La clé secrète est protégée côté serveur. Renseignez uniquement le lien de votre Worker.",
+                type: 'password' // On peut le laisser en text pour l'URL
+            },
+            'gemini': {
+                name: "Gemini",
+                storageKey: 'geminiApiKey',
+                label: "Clé API Gemini",
+                placeholder: "AIzaSy...",
+                help: "Entrez votre clé API Google Gemini standard.",
+                type: 'password'
+            },
+            'openrouter': {
+                name: "OpenRouter",
+                storageKey: 'openrouterApiKey',
+                label: "Clé API OpenRouter",
+                placeholder: "sk-or-v1-...",
+                help: "Entrez votre clé API OpenRouter.",
+                type: 'password'
             }
         };
 
-        function saveKey() {
-            const key = document.getElementById('apiKey').value.trim();
-            if(!key) return alert("Entrez une clé !");
-            localStorage.setItem(STORAGE_KEY, key);
-            document.getElementById('step-key').classList.add('hidden');
-            document.getElementById('step-create').classList.remove('hidden');
-        }
+        let currentAI = 'albert';
 
-        function resetKey() {
-            localStorage.removeItem(STORAGE_KEY);
-            location.reload();
-        }
+        // Éléments du DOM
+        const el = {
+            cards: document.querySelectorAll('.ai-card'),
+            configLabel: document.getElementById('config-label'),
+            configInput: document.getElementById('api-key-input'),
+            configHelp: document.getElementById('config-help'),
+            saveBtn: document.getElementById('save-key-button'),
+            clearBtn: document.getElementById('clear-key-button'),
+            statusDot: document.getElementById('status-dot'),
+            statusMsg: document.getElementById('status-msg'),
+            prompt: document.getElementById('prompt-input'),
+            genBtn: document.getElementById('generate-button'),
+            resSec: document.getElementById('results-section'),
+            spinner: document.getElementById('loading-spinner'),
+            resContent: document.getElementById('result-content'),
+            preview: document.getElementById('preview-output'),
+            errContent: document.getElementById('error-content'),
+            modelSel: document.getElementById('model-selector')
+        };
 
-        async function generate() {
-            const subject = document.getElementById('subject').value.trim();
-            const key = localStorage.getItem(STORAGE_KEY);
-            if(!subject) return alert("Entrez un sujet !");
-
-            const btn = document.getElementById('genBtn');
-            const loader = document.getElementById('loading');
-            const resArea = document.getElementById('result');
-            const debug = document.getElementById('debug');
-            const debugTxt = document.getElementById('debug-text');
-
-            btn.classList.add('hidden');
-            loader.classList.remove('hidden');
-            debug.classList.remove('hidden');
-            debugTxt.innerText = "Connexion à Albert en cours...";
-
-            // Configuration de l'appel direct (Optimisé pour la Forge)
-            const url = "https://albert.api.gouv.fr/v1/chat/completions";
+        // Mise à jour de l'interface selon l'IA choisie
+        function updateUI() {
+            const config = AI_CONFIGS[currentAI];
             
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${key}`
-                    },
-                    body: JSON.stringify({
-                        model: "openai/gpt-oss-120b",
-                        messages: [
-                            { role: "system", content: "Tu es un assistant pédagogique. Rédige une fiche de synthèse claire en HTML (utilise h2, p, ul, li)." },
-                            { role: "user", content: `Rédige une fiche de cours sur le sujet suivant : ${subject}` }
-                        ],
-                        temperature: 0.7
-                    })
-                });
+            // Mise à jour des cartes
+            el.cards.forEach(c => c.classList.toggle('active', c.getAttribute('data-value') === currentAI));
+            
+            // Mise à jour de la zone de configuration
+            el.configLabel.innerText = config.label;
+            el.configInput.placeholder = config.placeholder;
+            el.configInput.type = currentAI === 'albert' ? 'text' : 'password';
+            el.configHelp.innerHTML = config.help;
 
-                debugTxt.innerText += `\nStatut serveur : ${response.status}`;
+            // Modèles spécifiques à OpenRouter si besoin
+            if(currentAI === 'openrouter') {
+                el.modelSel.innerHTML = '<option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option><option value="openai/gpt-4o">GPT-4o</option>';
+            } else if(currentAI === 'albert') {
+                el.modelSel.innerHTML = '<option value="openai/gpt-oss-120b">Albert 120B (Défaut)</option><option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small</option>';
+            } else {
+                el.modelSel.innerHTML = '<option value="gemini-2.5-flash">Gemini Flash</option>';
+            }
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const content = data.choices[0].message.content;
-                    document.getElementById('output').innerHTML = content;
-                    resArea.classList.remove('hidden');
-                    debug.classList.add('hidden');
-                } else {
-                    const err = await response.text();
-                    throw new Error(`Albert refuse la connexion (${response.status}).`);
-                }
-            } catch (e) {
-                debugTxt.innerHTML = `<span class="text-red-400">ERREUR : ${e.message}</span>\n<br>Note : Si vous voyez 'Failed to fetch', Albert bloque l'origine Forge.`;
-                btn.classList.remove('hidden');
-            } finally {
-                loader.classList.add('hidden');
+            checkConnection();
+        }
+
+        // Vérifie si une configuration est enregistrée
+        function checkConnection() {
+            const config = AI_CONFIGS[currentAI];
+            const savedValue = localStorage.getItem(config.storageKey);
+
+            if (savedValue) {
+                el.configInput.value = savedValue;
+                el.statusDot.classList.replace('text-red-400', 'text-green-500');
+                el.statusMsg.innerText = `${config.name} : Connecté`;
+                el.statusMsg.classList.add('text-green-600');
+                el.clearBtn.classList.remove('hidden');
+            } else {
+                el.configInput.value = '';
+                el.statusDot.classList.replace('text-green-500', 'text-red-400');
+                el.statusMsg.innerText = `${config.name} : Non configuré`;
+                el.statusMsg.classList.remove('text-green-600');
+                el.clearBtn.classList.add('hidden');
             }
         }
 
-        function downloadDoc() {
-            const content = document.getElementById('output').innerHTML;
-            const blob = new Blob(['<!DOCTYPE html><html><body>' + content + '</body></html>'], {type: 'text/html'});
+        // Événements de sélection d'IA
+        el.cards.forEach(card => {
+            card.addEventListener('click', () => {
+                currentAI = card.getAttribute('data-value');
+                updateUI();
+            });
+        });
+
+        // Sauvegarder la configuration
+        el.saveBtn.addEventListener('click', () => {
+            const val = el.configInput.value.trim();
+            if (!val) return alert("Veuillez remplir le champ.");
+            
+            // Petite vérification pour Albert (doit être une URL)
+            if (currentAI === 'albert' && !val.startsWith('http')) {
+                return alert("L'URL du Worker doit commencer par https://");
+            }
+
+            localStorage.setItem(AI_CONFIGS[currentAI].storageKey, val);
+            checkConnection();
+        });
+
+        // Effacer la configuration
+        el.clearBtn.addEventListener('click', () => {
+            localStorage.removeItem(AI_CONFIGS[currentAI].storageKey);
+            checkConnection();
+        });
+
+        // Fonction d'appel API universelle
+        async function callUniversalAPI(promptText) {
+            const configValue = localStorage.getItem(AI_CONFIGS[currentAI].storageKey);
+            if (!configValue) throw new Error("Veuillez d'abord configurer la connexion (URL ou Clé).");
+
+            const model = el.modelSel.value;
+            let targetUrl, headers, body;
+
+            // 1. ALBERT VIA WORKER CLOUDFLARE
+            if (currentAI === 'albert') {
+                targetUrl = configValue; // L'URL du Worker
+                headers = { 'Content-Type': 'application/json' };
+                body = JSON.stringify({ 
+                    message: promptText, 
+                    model: model, 
+                    temperature: 0.7 
+                });
+            } 
+            // 2. GEMINI DIRECT
+            else if (currentAI === 'gemini') {
+                targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${configValue}`;
+                headers = { 'Content-Type': 'application/json' };
+                body = JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] });
+            } 
+            // 3. OPENROUTER DIRECT (Peut nécessiter un proxy sur la Forge, on utilise corsproxy par défaut)
+            else if (currentAI === 'openrouter') {
+                targetUrl = `https://corsproxy.io/?https://openrouter.ai/api/v1/chat/completions`;
+                headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${configValue}` };
+                body = JSON.stringify({ model: model, messages: [{ role: 'user', content: promptText }] });
+            }
+
+            const response = await fetch(targetUrl, { method: 'POST', headers, body });
+            
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(`Erreur réseau (${response.status}) : ${err}`);
+            }
+
+            const data = await response.json();
+
+            // Extraction selon l'API
+            if (currentAI === 'albert') {
+                if(data.error) throw new Error(data.error);
+                return data.choices[0].message.content;
+            } else if (currentAI === 'openrouter') {
+                return data.choices[0].message.content;
+            } else if (currentAI === 'gemini') {
+                return data.candidates[0].content.parts[0].text;
+            }
+        }
+
+        // Lancer la génération
+        el.genBtn.addEventListener('click', async () => {
+            let promptText = el.prompt.value.trim();
+            if (!promptText) return alert("Veuillez entrer un prompt.");
+
+            // Ajout du niveau de rédaction
+            const niveau = document.querySelector('input[name="niveau"]:checked').value;
+            if (niveau === 'moyen') promptText += "\n\n(Consigne stricte : Fais une réponse de taille moyenne, va à l'essentiel tout en restant clair. Formate ta réponse en HTML propre avec <h2>, <ul> et <p>.)";
+            if (niveau === 'complet') promptText += "\n\n(Consigne stricte : Fais une réponse très détaillée, complète, structurée et exhaustive. Formate ta réponse en HTML propre avec <h2>, <h3>, <ul> et <p>.)";
+
+            // UI
+            el.resSec.classList.remove('hidden');
+            el.resContent.classList.add('hidden');
+            el.errContent.classList.add('hidden');
+            el.spinner.classList.remove('hidden');
+            el.genBtn.disabled = true;
+
+            try {
+                let result = await callUniversalAPI(promptText);
+                
+                // Nettoyage des balises markdown HTML si présentes
+                result = result.replace(/```html/g, '').replace(/```/g, '');
+                
+                el.preview.innerHTML = result;
+                el.resContent.classList.remove('hidden');
+            } catch (error) {
+                el.errContent.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> ${error.message}`;
+                el.errContent.classList.remove('hidden');
+            } finally {
+                el.spinner.classList.add('hidden');
+                el.genBtn.disabled = false;
+            }
+        });
+
+        // Fonctions utilitaires
+        function copyResult() {
+            navigator.clipboard.writeText(el.preview.innerHTML);
+            alert("Code HTML copié !");
+        }
+
+        function downloadHtml() {
+            const content = el.preview.innerHTML;
+            const fullHtml = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><style>body{font-family:sans-serif;line-height:1.6;color:#333;max-width:800px;margin:40px auto;padding:20px;}h2{color:#000091;border-bottom:2px solid #000091;}h3{color:#2563eb;}</style></head><body>${content}</body></html>`;
+            const blob = new Blob([fullHtml], {type: 'text/html'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'fiche_albert.html';
+            a.download = 'document_genere.html';
             a.click();
         }
+
+        // Init
+        updateUI();
     </script>
 </body>
 </html>
