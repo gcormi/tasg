@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.5</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.6</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -337,24 +337,67 @@
         } catch(err) { toast('Erreur déplacement'); }
     }
 
-    // ── REFRESH DESCRIPTION (Microlink à la demande) ───────────────────
+    // ── REFRESH DESCRIPTION (Microlink + IA à la demande) ──────────────
     async function refreshDesc(id, url) {
-        toast('⏳ Récupération en cours...');
+        toast('⏳ Analyse en cours...');
+        const update = {};
+        
+        // 1. Microlink en base
         try {
             const ml = await fetch('https://api.microlink.io/?url=' + encodeURIComponent(url));
             const mj = await ml.json();
             if(mj.status==='success' && mj.data) {
-                const update = {};
                 if(mj.data.title)       update.title = mj.data.title;
                 if(mj.data.description) update.desc  = mj.data.description;
-                if(Object.keys(update).length) {
-                    await favRef.doc(id).update(update);
-                    toast('✅ Description mise à jour !');
-                } else {
-                    toast('Aucune description trouvée pour ce site.');
+            }
+        } catch(err) { console.warn('Microlink erreur', err); }
+
+        // 2. IA Si clé présente
+        const alk = localStorage.getItem('fav_albert');
+        const gek = localStorage.getItem('fav_gemini');
+        
+        if(alk || gek) {
+            toast('⏳ IA en cours de réflexion...');
+            const prompt = `Tu es un assistant de veille documentaire. Donne une explication claire et informative de ce site web en 2 phrases maximum, en français. Retourne UNIQUEMENT ce JSON sur une ligne : {"title":"nom du site","desc":"Explication en 2 phrases","tag":"Catégorie"}. URL : ${url}`;
+            let raw = '';
+            
+            try {
+                if(alk) {
+                    const r = await fetchAlbert(alk, prompt, 300);
+                    if(r.ok) raw = r.text;
+                } else if(gek) {
+                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key='+gek, {
+                        method:'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:300, temperature:0.2}})
+                    });
+                    if(r.ok) raw=(await r.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
                 }
-            } else { toast('Microlink n\'a pas pu lire ce site.'); }
-        } catch(err) { toast('Erreur réseau : ' + err.message); }
+
+                if(raw) {
+                    const cleanText = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const iStart = cleanText.indexOf('{');
+                    const iEnd   = cleanText.lastIndexOf('}');
+                    if(iStart !== -1 && iEnd !== -1) {
+                        const parsed = JSON.parse(cleanText.substring(iStart, iEnd + 1));
+                        if(parsed.desc || parsed.title) {
+                            if(parsed.title) update.title = parsed.title;
+                            if(parsed.desc) update.desc = parsed.desc;
+                            if(parsed.tag) update.tag = parsed.tag; // Optionnel
+                            toast('🪄 Description IA générée !');
+                        }
+                    }
+                }
+            } catch(e) { console.warn('Erreur IA au refresh', e); }
+        }
+
+        if(Object.keys(update).length) {
+            try {
+                await favRef.doc(id).update(update);
+                toast('✅ Favori mis à jour !');
+            } catch(e) { toast('❌ Erreur écriture BDD'); }
+        } else {
+            toast('⚠️ Impossible de récupérer les infos de ce site.');
+        }
     }
 
     // ── SUPPRESSION ───────────────────────────────────────────────────
@@ -432,10 +475,10 @@
                     const r = await fetchAlbert(alk, 'Réponds juste: OK', 5);
                     if(r.ok) {
                         res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='✅ [v2.5] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
+                        res.textContent='✅ [v2.6] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
                     } else {
                         res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='❌ [v2.5] Albert a refusé l\'accès (Erreur '+r.status+')';
+                        res.textContent='❌ [v2.6] Albert a refusé l\'accès (Erreur '+r.status+')';
                     }
                 } catch(err) {
                     res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.7rem;margin-bottom:14px;line-height:1.4;white-space:pre-wrap;overflow-x:auto';
