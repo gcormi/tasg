@@ -6,76 +6,94 @@
     <title>Favoris IA | Portail</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Même SDK que postits.html, sans auth -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        header { flex-shrink: 0; background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); z-index: 100; }
-        .h-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { width: 36px; height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6366f1; text-decoration: none; transition:.2s; }
-        .back-btn:hover { background: #eef2ff; }
-        .app-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg,#6366f1,#8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(99,102,241,.3); }
-        .app-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #0f172a; }
-        .sync-line { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 600; color: #94a3b8; margin-top: 2px; }
-        .sdot { width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; }
-        .sdot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-        .sdot.error { background: #ef4444; }
-        .h-right { display: flex; gap: 10px; }
-        .btn-icon { display: flex; align-items: center; gap: 7px; padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: .82rem; font-weight: 700; color: #64748b; cursor: pointer; transition:.2s; }
-        .btn-icon:hover { border-color: #6366f1; color: #6366f1; }
-        .ai-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
-        .ai-dot.on { background: #22c55e; }
+        header { flex-shrink:0; background:white; border-bottom:1px solid #e2e8f0; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,.05); z-index:100; }
+        .h-left { display:flex; align-items:center; gap:12px; }
+        .back-btn { width:36px; height:36px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#6366f1; text-decoration:none; transition:.2s; }
+        .back-btn:hover { background:#eef2ff; }
+        .app-icon { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; color:white; font-size:1.1rem; box-shadow:0 4px 12px rgba(99,102,241,.3); }
+        .app-title { font-family:'Outfit',sans-serif; font-weight:800; font-size:1rem; color:#0f172a; }
+        .sync-line { display:flex; align-items:center; gap:6px; font-size:.7rem; font-weight:600; color:#94a3b8; margin-top:2px; }
+        .sdot { width:8px; height:8px; border-radius:50%; background:#fbbf24; transition:.3s; }
+        .sdot.online { background:#22c55e; box-shadow:0 0 6px #22c55e; }
+        .sdot.error { background:#ef4444; }
+        .h-right { display:flex; gap:10px; }
+        .btn-icon { display:flex; align-items:center; gap:7px; padding:8px 14px; background:white; border:1.5px solid #e2e8f0; border-radius:10px; font-size:.82rem; font-weight:700; color:#64748b; cursor:pointer; transition:.2s; font-family:inherit; }
+        .btn-icon:hover { border-color:#6366f1; color:#6366f1; }
+        .ai-dot { width:7px; height:7px; border-radius:50%; background:#ef4444; }
+        .ai-dot.on { background:#22c55e; }
 
         .layout { flex:1; display:flex; overflow:hidden; }
-        .sidebar { width: 220px; background: white; border-right: 1px solid #e2e8f0; padding: 18px 14px; display: flex; flex-direction: column; overflow-y: auto; }
-        .sb-title { font-size:.65rem; font-weight:800; text-transform:uppercase; color:#cbd5e1; letter-spacing:.1em; padding: 4px 8px 12px; }
-        .sb-btn { width:100%; padding:9px 12px; border-radius:10px; border:none; background:none; text-align:left; font-size:.82rem; font-weight:600; color:#64748b; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.18s; margin-bottom:2px; }
+        .sidebar { width:230px; background:white; border-right:1px solid #e2e8f0; padding:18px 14px; display:flex; flex-direction:column; overflow-y:auto; gap:2px; }
+        .sb-title { font-size:.65rem; font-weight:800; text-transform:uppercase; color:#cbd5e1; letter-spacing:.1em; padding:4px 8px 10px; }
+        .sb-btn { width:100%; padding:9px 12px; border-radius:10px; border:none; background:none; text-align:left; font-size:.82rem; font-weight:600; color:#64748b; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.18s; }
         .sb-btn:hover { background:#f8fafc; color:#6366f1; }
         .sb-btn.active { background:#eef2ff; color:#6366f1; }
         .sb-count { margin-left:auto; background:#f1f5f9; color:#94a3b8; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:20px; }
+        .fold-row { display:flex; align-items:center; gap:2px; border-radius:10px; transition:.18s; }
+        .fold-row:hover { background:#f8fafc; }
+        .fold-row.active-row .fold-btn { color:#6366f1; }
+        .fold-btn { flex:1; padding:9px 12px; border:none; background:none; text-align:left; font-size:.82rem; font-weight:600; color:#64748b; cursor:pointer; display:flex; align-items:center; gap:8px; }
+        .fold-del { flex-shrink:0; border:none; background:none; color:#fca5a5; cursor:pointer; padding:4px 7px; border-radius:7px; font-size:.7rem; transition:.2s; }
+        .fold-del:hover { color:#ef4444; background:#fef2f2; }
+        /* Zone de dépôt active */
+        .fold-row.drag-over { background:#eef2ff; outline:2px dashed #6366f1; }
+        .sb-btn.drag-over { background:#eef2ff; outline:2px dashed #6366f1; }
 
         .content { flex:1; padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:20px; }
         .add-bar { background:white; padding:8px; border-radius:16px; display:flex; gap:8px; border:1.5px solid #e2e8f0; box-shadow:0 4px 16px rgba(0,0,0,.04); }
         .add-bar input { flex:1; border:none; outline:none; padding:10px 18px; font-size:.9rem; font-family:inherit; }
-        .btn-add { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; border-radius:11px; padding:10px 22px; font-weight:750; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.2s; font-family:inherit; }
+        .btn-add { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; border-radius:11px; padding:10px 22px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.2s; font-family:inherit; white-space:nowrap; }
         .btn-add:hover { transform:translateY(-1px); }
         .btn-add:disabled { opacity:.6; cursor:wait; }
 
         .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:18px; }
-        .card { background:white; border-radius:18px; padding:18px; border:1.5px solid #f1f5f9; display:flex; flex-direction:column; gap:10px; transition:.25s; animation:pop .3s ease; }
+        .card { background:white; border-radius:18px; padding:18px; border:1.5px solid #f1f5f9; display:flex; flex-direction:column; gap:10px; transition:.25s; animation:pop .3s ease; cursor:grab; }
+        .card:active { cursor:grabbing; }
         @keyframes pop { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
         .card:hover { border-color:#6366f1; box-shadow:0 8px 28px -8px rgba(99,102,241,.12); transform:translateY(-2px); }
+        .card.dragging { opacity:.4; transform:scale(.97); border-style:dashed; }
         .c-head { display:flex; justify-content:space-between; align-items:flex-start; }
         .c-tag { font-size:.62rem; font-weight:800; text-transform:uppercase; background:#eef2ff; color:#6366f1; padding:3px 9px; border-radius:20px; }
         .c-del { background:none; border:none; color:#e2e8f0; cursor:pointer; transition:.2s; font-size:.9rem; }
         .c-del:hover { color:#ef4444; }
+        .c-drag { color:#e2e8f0; font-size:.75rem; cursor:grab; }
         .c-title { font-family:'Outfit',sans-serif; font-weight:750; font-size:.98rem; color:#1e293b; line-height:1.3; }
-        .c-desc { font-size:.78rem; color:#64748b; line-height:1.55; flex:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+        .c-desc { font-size:.78rem; color:#64748b; line-height:1.55; flex:1; display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
         .c-foot { padding-top:12px; border-top:1px solid #f8fafc; display:flex; align-items:center; justify-content:space-between; }
         .c-link { font-size:.8rem; font-weight:700; color:#6366f1; text-decoration:none; display:flex; align-items:center; gap:5px; }
         .c-link:hover { text-decoration:underline; }
-        .c-date { font-size:.65rem; color:#cbd5e1; }
+        .c-folder { font-size:.65rem; color:#94a3b8; display:flex; align-items:center; gap:4px; }
         .empty { text-align:center; padding:80px 20px; color:#94a3b8; grid-column:1/-1; }
         .empty .ei { font-size:4rem; opacity:.2; margin-bottom:16px; }
         .empty h2 { font-family:'Outfit',sans-serif; font-size:1.1rem; margin-bottom:8px; color:#64748b; }
 
+        /* COULEURS DOSSIERS */
+        .color-picker { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+        .cir { width:26px; height:26px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:.2s; }
+        .cir:hover { transform:scale(1.15); }
+        .cir.selected { border-color:#1e293b; transform:scale(1.2); box-shadow:0 0 0 2px white, 0 0 0 4px var(--c); }
+        .folder-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
         .overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:.3s; }
         .overlay.open { opacity:1; visibility:visible; }
-        .modal-box { background:white; border-radius:22px; padding:28px; width:380px; max-width:90%; transform:scale(.95); transition:transform .3s; box-shadow:0 25px 60px rgba(0,0,0,.18); }
+        .modal-box { background:white; border-radius:22px; padding:28px; width:400px; max-width:92vw; transform:scale(.95); transition:transform .3s; box-shadow:0 25px 60px rgba(0,0,0,.18); }
         .overlay.open .modal-box { transform:scale(1); }
         .m-title { font-family:'Outfit',sans-serif; font-weight:800; font-size:1.1rem; margin-bottom:20px; }
         .m-label { font-size:.7rem; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:6px; }
         .m-input { width:100%; padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:11px; outline:none; margin-bottom:16px; font-family:inherit; font-size:.9rem; transition:.2s; }
         .m-input:focus { border-color:#6366f1; }
-        .m-btn { width:100%; padding:12px; border:none; border-radius:12px; font-weight:750; cursor:pointer; font-family:inherit; transition:.2s; }
+        .m-btn { width:100%; padding:12px; border:none; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:.2s; font-size:.9rem; }
         .m-btn-primary { background:#6366f1; color:white; }
         .m-btn-primary:hover { background:#4f46e5; }
         .m-btn-ghost { background:none; color:#94a3b8; margin-top:8px; }
 
-        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:.85rem; font-weight:600; opacity:0; transition:.3s; pointer-events:none; z-index:9999; }
+        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:.85rem; font-weight:600; opacity:0; transition:.3s; pointer-events:none; z-index:9999; white-space:nowrap; }
         .toast.show { opacity:1; transform:translateX(-50%) translateY(-10px); }
     </style>
 </head>
@@ -92,49 +110,80 @@
     </div>
     <div class="h-right">
         <button class="btn-icon" onclick="openAI()"><i class="fas fa-robot"></i> IA <div class="ai-dot" id="ai-dot"></div></button>
-        <button class="btn-icon" onclick="document.getElementById('overlay-folder').classList.add('open')"><i class="fas fa-folder-plus"></i> Dossier</button>
+        <button class="btn-icon" onclick="openFolderModal()"><i class="fas fa-folder-plus"></i> Dossier</button>
     </div>
 </header>
 
 <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sb-title">Ma Collection</div>
-        <button class="sb-btn active" onclick="filterBy('all',this)"><i class="fas fa-layer-group"></i> Tout voir <span class="sb-count" id="total-count">0</span></button>
-        <button class="sb-btn" onclick="filterBy('none',this)"><i class="fas fa-inbox"></i> Non classés</button>
-        <div style="border-top:1px solid #f1f5f9; margin:12px 0; padding-top:12px">
+        <button class="sb-btn active" id="btn-all"
+            ondragover="event.preventDefault(); this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="dropToFolder(event, null)"
+            onclick="filterBy('all', this)">
+            <i class="fas fa-layer-group"></i> Tout voir
+            <span class="sb-count" id="total-count">0</span>
+        </button>
+        <button class="sb-btn" id="btn-none"
+            ondragover="event.preventDefault(); this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="dropToFolder(event, 'none')"
+            onclick="filterBy('none', this)">
+            <i class="fas fa-inbox"></i> Non classés
+        </button>
+        <div style="border-top:1px solid #f1f5f9; margin:10px 0; padding-top:10px">
             <div class="sb-title">Dossiers</div>
             <div id="folder-list"></div>
-            <button class="sb-btn" style="color:#94a3b8; font-style:italic" onclick="document.getElementById('overlay-folder').classList.add('open')"><i class="fas fa-plus"></i> Nouveau dossier</button>
+            <button class="sb-btn" style="color:#94a3b8; font-style:italic; margin-top:4px" onclick="openFolderModal()">
+                <i class="fas fa-plus"></i> Nouveau dossier
+            </button>
         </div>
     </aside>
 
     <main class="content">
         <form class="add-bar" onsubmit="handleAdd(event)">
             <input type="url" id="url-field" placeholder="Collez l'URL d'un article ou site web..." required>
-            <button type="submit" class="btn-add" id="btn-submit"><i class="fas fa-wand-sparkles"></i> Analyser & Ajouter</button>
+            <button type="submit" class="btn-add" id="btn-submit">
+                <i class="fas fa-wand-sparkles"></i> Analyser &amp; Ajouter
+            </button>
         </form>
         <div class="grid" id="grid"></div>
     </main>
 </div>
 
+<!-- Modal IA -->
 <div class="overlay" id="overlay-ai">
     <div class="modal-box">
         <div class="m-title">🤖 Paramètres IA</div>
         <span class="m-label">Clé Albert AI (gouv.fr)</span>
         <input type="password" id="k-albert" class="m-input" placeholder="Bearer key...">
         <span class="m-label">Clé Google Gemini</span>
-        <input type="password" id="k-gemini" class="m-input" placeholder="AIza...">
+        <input type="password" id="k-gemini" class="m-input" placeholder="AIzaSy...">
+        <p style="font-size:.75rem; color:#94a3b8; margin-bottom:16px">L'IA extrait le titre, la description et la catégorie de chaque lien ajouté.</p>
         <button class="m-btn m-btn-primary" onclick="saveAI()">Enregistrer</button>
         <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Fermer</button>
     </div>
 </div>
 
+<!-- Modal Dossier -->
 <div class="overlay" id="overlay-folder">
     <div class="modal-box">
         <div class="m-title">📁 Nouveau dossier</div>
-        <span class="m-label">Nom du dossier</span>
-        <input type="text" id="folder-name-in" class="m-input" placeholder="ex: Pédagogie, Inclusion, IA...">
-        <button class="m-btn m-btn-primary" onclick="saveFolder()">Créer</button>
+        <span class="m-label">Nom</span>
+        <input type="text" id="folder-name-in" class="m-input" placeholder="ex: Pédagogie, IA, Veille...">
+        <span class="m-label">Couleur</span>
+        <div class="color-picker" id="color-picker">
+            <div class="cir selected" data-color="#6366f1" style="background:#6366f1; --c:#6366f1"></div>
+            <div class="cir" data-color="#8b5cf6" style="background:#8b5cf6; --c:#8b5cf6"></div>
+            <div class="cir" data-color="#ec4899" style="background:#ec4899; --c:#ec4899"></div>
+            <div class="cir" data-color="#ef4444" style="background:#ef4444; --c:#ef4444"></div>
+            <div class="cir" data-color="#f59e0b" style="background:#f59e0b; --c:#f59e0b"></div>
+            <div class="cir" data-color="#22c55e" style="background:#22c55e; --c:#22c55e"></div>
+            <div class="cir" data-color="#06b6d4" style="background:#06b6d4; --c:#06b6d4"></div>
+            <div class="cir" data-color="#64748b" style="background:#64748b; --c:#64748b"></div>
+        </div>
+        <button class="m-btn m-btn-primary" onclick="saveFolder()">Créer le dossier</button>
         <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Annuler</button>
     </div>
 </div>
@@ -142,7 +191,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    // MÊME CONFIG ET MÊME APPROCHE QUE POSTITS.HTML
+    // ── FIREBASE (même que postits.html) ──────────────────────────────
     const firebaseConfig = {
         apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
         authDomain: "portail-postits.firebaseapp.com",
@@ -151,186 +200,254 @@
         messagingSenderId: "494625342197",
         appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const db     = firebase.firestore();
     const favRef = db.collection('favoris');
     const fldRef = db.collection('favoris_folders');
 
-    let allFavs = [], allFolders = [], activeFilter = 'all';
+    let allFavs=[], allFolders=[], activeFilter='all', selectedColor='#6366f1', draggingId=null;
 
-    function setSync(cls, msg) {
+    // ── STATUT ────────────────────────────────────────────────────────
+    const setSync = (cls,msg) => {
         document.getElementById('sdot').className = 'sdot ' + cls;
         document.getElementById('slabel').textContent = msg;
-    }
-
-    function toast(msg) {
+    };
+    const toast = msg => {
         const t = document.getElementById('toast');
-        t.textContent = msg; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
+        t.textContent=msg; t.classList.add('show');
+        setTimeout(()=>t.classList.remove('show'),3000);
+    };
 
-    // ÉCOUTE TEMPS RÉEL (identique à postits.html)
+    // ── LISTENERS FIREBASE ────────────────────────────────────────────
     favRef.onSnapshot(snap => {
-        allFavs = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        setSync('online', 'Synchronisé en temps réel');
+        allFavs = snap.docs.map(d=>({id:d.id,...d.data()}));
+        setSync('online','Synchronisé en temps réel');
         renderCards();
-    }, err => {
-        console.error(err);
-        setSync('error', 'Erreur: ' + err.code);
-    });
+    }, err => { setSync('error','Erreur: '+err.code); });
 
     fldRef.orderBy('name').onSnapshot(snap => {
-        allFolders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        allFolders = snap.docs.map(d=>({id:d.id,...d.data()}));
         renderFolders();
-    }, () => {});
+    }, ()=>{});
 
+    // ── RENDU DOSSIERS ────────────────────────────────────────────────
     function renderFolders() {
-        document.getElementById('folder-list').innerHTML = allFolders.map(f => `
-            <div style="display:flex; align-items:center; gap:4px">
-                <button class="sb-btn ${activeFilter === f.id ? 'active' : ''}" style="flex:1" onclick="filterByFolder('${f.id}')">
-                    <i class="fas fa-folder"></i> ${f.name}
+        document.getElementById('folder-list').innerHTML = allFolders.map(f => {
+            const c = f.color || '#6366f1';
+            const isActive = activeFilter === f.id;
+            return `<div class="fold-row${isActive?' active-row':''}" id="frow-${f.id}"
+                ondragover="event.preventDefault(); document.getElementById('frow-${f.id}').classList.add('drag-over')"
+                ondragleave="document.getElementById('frow-${f.id}').classList.remove('drag-over')"
+                ondrop="dropToFolder(event,'${f.id}')">
+                <button class="fold-btn" onclick="filterByFolder('${f.id}')" style="color:${isActive?c:''}">
+                    <div class="folder-dot" style="background:${c}"></div> ${f.name}
                 </button>
-                <button onclick="delFolder('${f.id}')" title="Supprimer" style="flex-shrink:0; border:none; background:none; color:#fca5a5; cursor:pointer; padding:4px 6px; border-radius:6px; transition:.2s" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#fca5a5'">
-                    <i class="fas fa-trash" style="font-size:.7rem"></i>
-                </button>
-            </div>
-        `).join('');
+                <button class="fold-del" onclick="delFolder('${f.id}')"><i class="fas fa-trash"></i></button>
+            </div>`;
+        }).join('');
     }
 
+    // ── RENDU CARTES ──────────────────────────────────────────────────
     function renderCards() {
         const grid = document.getElementById('grid');
         document.getElementById('total-count').textContent = allFavs.length;
-        let data = [...allFavs].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-        if (activeFilter === 'none') data = data.filter(f => !f.folderId);
-        else if (activeFilter !== 'all') data = data.filter(f => f.folderId === activeFilter);
+        let data = [...allFavs].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+        if      (activeFilter==='none') data = data.filter(f=>!f.folderId);
+        else if (activeFilter!=='all')  data = data.filter(f=>f.folderId===activeFilter);
 
         if (!data.length) {
-            grid.innerHTML = `<div class="empty"><div class="ei"><i class="fas fa-bookmark"></i></div>
+            grid.innerHTML=`<div class="empty"><div class="ei"><i class="fas fa-bookmark"></i></div>
                 <h2>Aucun favori ici</h2><p style="font-size:.85rem">Collez une URL ci-dessus pour commencer.</p></div>`;
             return;
         }
-        grid.innerHTML = data.map(f => `
-            <div class="card">
+        grid.innerHTML = data.map(f => {
+            const folder = allFolders.find(d=>d.id===f.folderId);
+            const folderHtml = folder
+                ? `<span class="c-folder"><div class="folder-dot" style="background:${folder.color||'#6366f1'}"></div>${folder.name}</span>`
+                : '';
+            return `<div class="card" draggable="true"
+                ondragstart="dragStart(event,'${f.id}')"
+                ondragend="dragEnd(event)">
                 <div class="c-head">
                     <span class="c-tag">${f.tag||'Lien'}</span>
-                    <button class="c-del" onclick="delFav('${f.id}')"><i class="fas fa-times"></i></button>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <span class="c-drag"><i class="fas fa-grip-vertical"></i></span>
+                        <button class="c-del" onclick="delFav('${f.id}')"><i class="fas fa-times"></i></button>
+                    </div>
                 </div>
-                <div class="c-title">${f.title||f.url}</div>
+                <div class="c-title">${(f.title||f.url).substring(0,70)}</div>
                 <div class="c-desc">${f.desc||''}</div>
                 <div class="c-foot">
                     <a href="${f.url}" target="_blank" rel="noopener" class="c-link">Consulter <i class="fas fa-arrow-up-right-from-square"></i></a>
+                    ${folderHtml}
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     }
 
+    // ── FILTRES ───────────────────────────────────────────────────────
     function filterBy(id, el) {
-        activeFilter = id;
-        document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
-        if (el) el.classList.add('active');
-        renderCards();
+        activeFilter=id;
+        document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+        if(el) el.classList.add('active');
+        renderFolders(); renderCards();
     }
-
-    // Filtrage depuis les dossiers dynamiques (re-render la sidebar)
     function filterByFolder(id) {
-        activeFilter = id;
-        renderFolders();   // rerendre pour mettre à jour les classes active
-        renderCards();
+        activeFilter=id;
+        renderFolders(); renderCards();
     }
 
+    // ── DRAG & DROP ───────────────────────────────────────────────────
+    function dragStart(e, id) {
+        draggingId = id;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(()=>e.target.classList.add('dragging'), 0);
+    }
+    function dragEnd(e) {
+        e.target.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+        draggingId = null;
+    }
+    async function dropToFolder(e, folderId) {
+        e.preventDefault();
+        document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+        if (!draggingId) return;
+        const newId = (folderId==='none' || !folderId) ? null : folderId;
+        try {
+            await favRef.doc(draggingId).update({folderId: newId});
+            toast('Favori déplacé ✓');
+        } catch(err) { toast('Erreur déplacement'); }
+    }
+
+    // ── SUPPRESSION ───────────────────────────────────────────────────
     async function delFav(id) {
-        if (!confirm('Supprimer ce favori ?')) return;
-        await favRef.doc(id).delete();
-        toast('Supprimé');
+        if(!confirm('Supprimer ce favori ?')) return;
+        await favRef.doc(id).delete(); toast('Supprimé');
     }
-
     async function delFolder(id) {
-        if (!confirm('Supprimer ce dossier ? Les favoris resteront non classés.')) return;
-        // Détacher les favoris de ce dossier
-        const concerned = allFavs.filter(f => f.folderId === id);
-        await Promise.all(concerned.map(f => favRef.doc(f.id).update({folderId: null})));
-        await fldRef.doc(id).delete();
-        if (activeFilter === id) filterBy('all', document.querySelector('.sb-btn'));
+        if(!confirm('Supprimer ce dossier ? Les favoris resteront.')) return;
+        const batch = db.batch();
+        allFavs.filter(f=>f.folderId===id).forEach(f=>batch.update(favRef.doc(f.id),{folderId:null}));
+        batch.delete(fldRef.doc(id));
+        await batch.commit();
+        if(activeFilter===id) filterBy('all', document.getElementById('btn-all'));
         toast('Dossier supprimé');
     }
 
+    // ── COULEUR PICKER ────────────────────────────────────────────────
+    document.querySelectorAll('.cir').forEach(c => {
+        c.addEventListener('click', ()=>{
+            document.querySelectorAll('.cir').forEach(x=>x.classList.remove('selected'));
+            c.classList.add('selected');
+            selectedColor = c.dataset.color;
+        });
+    });
+
+    // ── DOSSIERS ─────────────────────────────────────────────────────
+    function openFolderModal() {
+        document.getElementById('folder-name-in').value='';
+        document.getElementById('overlay-folder').classList.add('open');
+        setTimeout(()=>document.getElementById('folder-name-in').focus(),300);
+    }
     async function saveFolder() {
         const name = document.getElementById('folder-name-in').value.trim();
-        if (!name) return;
-        await fldRef.add({name, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-        document.getElementById('folder-name-in').value = '';
+        if(!name) return;
+        await fldRef.add({name, color:selectedColor, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
         closeOverlay(); toast('Dossier créé !');
     }
 
+    // ── IA ────────────────────────────────────────────────────────────
     function openAI() {
-        document.getElementById('k-albert').value = localStorage.getItem('fav_albert')||'';
-        document.getElementById('k-gemini').value = localStorage.getItem('fav_gemini')||'';
+        document.getElementById('k-albert').value=localStorage.getItem('fav_albert')||'';
+        document.getElementById('k-gemini').value=localStorage.getItem('fav_gemini')||'';
         document.getElementById('overlay-ai').classList.add('open');
     }
     function saveAI() {
         localStorage.setItem('fav_albert', document.getElementById('k-albert').value.trim());
         localStorage.setItem('fav_gemini', document.getElementById('k-gemini').value.trim());
         const has = localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini');
-        document.getElementById('ai-dot').className = 'ai-dot' + (has ? ' on' : '');
+        document.getElementById('ai-dot').className='ai-dot'+(has?' on':'');
         closeOverlay(); toast('Clés IA sauvegardées ✅');
     }
-    function closeOverlay() { document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open')); }
+    function closeOverlay() { document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); }
 
+    // ── AJOUT ─────────────────────────────────────────────────────────
     async function handleAdd(e) {
         e.preventDefault();
         const input = document.getElementById('url-field');
-        const btn = document.getElementById('btn-submit');
-        const url = input.value.trim();
-        if (!url) return;
+        const btn   = document.getElementById('btn-submit');
+        const url   = input.value.trim();
+        if(!url) return;
 
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse...';
+        btn.disabled=true;
+        btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Analyse...';
 
-        // Extraction basique du titre et domaine sans IA
-        let hostname = '';
-        try { hostname = new URL(url).hostname.replace('www.',''); } catch(e) {}
-        let data = {title: hostname || url, desc: 'Lien enregistré depuis ' + hostname, tag: 'Lien'};
+        // Fallback sans IA : domaine du site
+        let hostname='';
+        try { hostname = new URL(url).hostname.replace('www.',''); } catch(e){}
+        let data = { title: hostname||url, desc:'Lien ajouté depuis '+hostname, tag:'Lien' };
+
         const alk = localStorage.getItem('fav_albert');
         const gek = localStorage.getItem('fav_gemini');
 
-        if (alk || gek) {
-            const prompt = `Analyse ce site et retourne UNIQUEMENT un JSON valide: {"title":"titre court","desc":"description en 1 phrase","tag":"Catégorie en 1 mot"}. Site: ${url}`;
+        if(alk||gek) {
+            const prompt = `Analyse ce site web. Retourne UNIQUEMENT un JSON sur une seule ligne, sans markdown : {"title":"titre du site en français","desc":"description en 1 phrase","tag":"catégorie en 1 mot"}. URL : ${url}`;
             try {
-                let raw = '';
-                if (alk) {
-                    const r = await fetch("https://albert.api.gouv.fr/v1/chat/completions", {
-                        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${alk}`},
-                        body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}]})
+                let raw='';
+                if(alk) {
+                    const r = await fetch('https://albert.api.gouv.fr/v1/chat/completions', {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json','Authorization':'Bearer '+alk},
+                        body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}], max_tokens:200})
                     });
-                    raw = (await r.json()).choices?.[0]?.message?.content || '';
+                    if(r.ok) raw=(await r.json()).choices?.[0]?.message?.content||'';
+                    else toast('Albert: erreur '+r.status);
                 } else {
-                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${gek}`, {
-                        method:'POST', headers:{'Content-Type':'application/json'},
-                        body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+                    // Gemini 2.0 Flash (plus récent)
+                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+gek, {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:200, temperature:0.1}})
                     });
-                    raw = (await r.json()).candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    if(r.ok) raw=(await r.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
+                    else {
+                        // Fallback Gemini 1.5 flash si 2.0 échoue
+                        const r2 = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+gek, {
+                            method:'POST',
+                            headers:{'Content-Type':'application/json'},
+                            body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+                        });
+                        if(r2.ok) raw=(await r2.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
+                    }
                 }
-                const m = raw.match(/\{[\s\S]*?\}/);
-                if (m) data = JSON.parse(m[0]);
-            } catch(err) { console.warn('IA ignorée:', err); }
+                // Extraction JSON robuste
+                const match = raw.match(/\{[^{}]+\}/);
+                if(match) {
+                    const parsed = JSON.parse(match[0]);
+                    if(parsed.title) data = parsed;
+                }
+            } catch(err) { console.warn('IA ignorée:',err.message); }
         }
 
         try {
-            await favRef.add({...data, url, folderId: activeFilter !== 'all' ? activeFilter : null, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-            input.value = '';
-            toast('✅ Favori ajouté et synchronisé !');
+            await favRef.add({
+                ...data, url,
+                folderId: (activeFilter!=='all'&&activeFilter!=='none') ? activeFilter : null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            input.value='';
+            toast('✅ Favori ajouté !');
         } catch(err) {
-            toast('❌ Erreur Firebase: ' + err.code);
+            toast('❌ Firebase: '+err.code);
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-wand-sparkles"></i> Analyser & Ajouter';
+            btn.disabled=false;
+            btn.innerHTML='<i class="fas fa-wand-sparkles"></i> Analyser &amp; Ajouter';
         }
     }
 
     // Init badge IA
-    if (localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini'))
-        document.getElementById('ai-dot').className = 'ai-dot on';
+    if(localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini'))
+        document.getElementById('ai-dot').className='ai-dot on';
 </script>
 </body>
 </html>
