@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.0</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.1</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -427,19 +427,19 @@
         try {
             // Tester Albert en PRIORITÉ (Fonctionne en EU, gratuit)
             if(alk) {
-                res.textContent='⏳ Connexion à Albert en cours... (Test de 3 relais sécurisés)...';
+                res.textContent='⏳ Test de connexion Albert en cours (5 relais)...';
                 try {
                     const r = await fetchAlbert(alk, 'Réponds juste: OK', 5);
                     if(r.ok) {
                         res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='✅ [v2.0] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
+                        res.textContent='✅ [v2.1] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
                     } else {
                         res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='❌ [v2.0] Albert a refusé la clé (Erreur '+r.status+')';
+                        res.textContent='❌ [v2.1] Albert a refusé la clé (Erreur '+r.status+')';
                     }
                 } catch(err) {
                     res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px;line-height:1.5';
-                    res.innerHTML='⚠️ Impossible de joindre Albert même avec les 3 relais (Blocage serveur Forge ou API).<br>Erreur technique : ' + err.message;
+                    res.innerHTML='⚠️ Impossible de joindre Albert même avec 5 relais (La Forge bloque la sortie).<br>Erreur technique : ' + err.message;
                 }
                 return;
             }
@@ -472,11 +472,14 @@
 
     // ── MOTEUR MULTI-RELAIS ALBERT ────────────────────────────────────
     async function fetchAlbert(key, promptText, tokens=300) {
-        // Liste de 3 moyens techniques pour contourner les blocages réseau de la Forge et les pannes :
+        // Liste INTÉGRALE des proxys depuis albert_test.html pour garantir un passage CSP
+        const baseEndpoint = "https://albert.api.gouv.fr/v1/chat/completions";
         const endpoints = [
+            { id: "Proxy Codetabs", url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(baseEndpoint)}` },
+            { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` },
             { id: "Direct (Education)", url: "https://api.albert.education.fr/v1/chat/completions" },
-            { id: "Direct (Gouv)", url: "https://albert.api.gouv.fr/v1/chat/completions" },
-            { id: "Proxy Secours", url: "https://thingproxy.freeboard.io/fetch/https://albert.api.gouv.fr/v1/chat/completions" }
+            { id: "Direct (Gouv)", url: baseEndpoint },
+            { id: "Proxy Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${baseEndpoint}` }
         ];
         
         const bodyStr = JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:promptText}], max_tokens:tokens});
@@ -490,23 +493,18 @@
                     body: bodyStr
                 });
                 
-                // Si la clé est explicitement refusée, on arrête (pas la peine d'essayer d'autres proxys)
                 if(response.status === 401 || response.status === 403) {
                     return { ok: false, status: response.status, methodUsed: ep.id };
                 }
 
-                // Si c'est un succès
                 if(response.ok) {
                     const data = await response.json();
                     return { ok: true, text: data.choices?.[0]?.message?.content || '', methodUsed: ep.id };
                 }
-                
-                // Si c'est une autre erreur (503, 530 de proxy, etc.), le catch continue avec le relais suivant.
                 throw new Error("HTTP " + response.status);
             } catch(e) {
-                // Erreur CORS ou Serveur : on passe au proxy suivant de la liste
                 lastError = e;
-                continue;
+                continue; // On essaye le proxy suivant
             }
         }
         throw lastError;
