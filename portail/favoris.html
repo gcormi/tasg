@@ -75,10 +75,10 @@
 
         /* COULEURS DOSSIERS */
         .color-picker { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
-        .cir { width:26px; height:26px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:.2s; }
-        .cir:hover { transform:scale(1.15); }
-        .cir.selected { border-color:#1e293b; transform:scale(1.2); box-shadow:0 0 0 2px white, 0 0 0 4px var(--c); }
-        .folder-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .cir { width:28px; height:28px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:.2s; outline:3px solid transparent; outline-offset:2px; }
+        .cir:hover { transform:scale(1.12); }
+        .cir.selected { outline-color:#1e293b; transform:scale(1.15); }
+        .folder-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; display:inline-block; }
 
         .overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:.3s; }
         .overlay.open { opacity:1; visibility:visible; }
@@ -104,7 +104,10 @@
         <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
         <div class="app-icon"><i class="fas fa-bookmark"></i></div>
         <div>
-            <div class="app-title">Favoris IA</div>
+            <div style="display:flex; align-items:center; gap:8px">
+                <div class="app-title">Favoris IA</div>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v1.5</span>
+            </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
     </div>
@@ -174,14 +177,14 @@
         <input type="text" id="folder-name-in" class="m-input" placeholder="ex: Pédagogie, IA, Veille...">
         <span class="m-label">Couleur</span>
         <div class="color-picker" id="color-picker">
-            <div class="cir selected" data-color="#6366f1" style="background:#6366f1; --c:#6366f1"></div>
-            <div class="cir" data-color="#8b5cf6" style="background:#8b5cf6; --c:#8b5cf6"></div>
-            <div class="cir" data-color="#ec4899" style="background:#ec4899; --c:#ec4899"></div>
-            <div class="cir" data-color="#ef4444" style="background:#ef4444; --c:#ef4444"></div>
-            <div class="cir" data-color="#f59e0b" style="background:#f59e0b; --c:#f59e0b"></div>
-            <div class="cir" data-color="#22c55e" style="background:#22c55e; --c:#22c55e"></div>
-            <div class="cir" data-color="#06b6d4" style="background:#06b6d4; --c:#06b6d4"></div>
-            <div class="cir" data-color="#64748b" style="background:#64748b; --c:#64748b"></div>
+            <div class="cir selected" data-color="#6366f1" style="background:#6366f1"></div>
+            <div class="cir" data-color="#8b5cf6" style="background:#8b5cf6"></div>
+            <div class="cir" data-color="#ec4899" style="background:#ec4899"></div>
+            <div class="cir" data-color="#ef4444" style="background:#ef4444"></div>
+            <div class="cir" data-color="#f59e0b" style="background:#f59e0b"></div>
+            <div class="cir" data-color="#22c55e" style="background:#22c55e"></div>
+            <div class="cir" data-color="#06b6d4" style="background:#06b6d4"></div>
+            <div class="cir" data-color="#64748b" style="background:#64748b"></div>
         </div>
         <button class="m-btn m-btn-primary" onclick="saveFolder()">Créer le dossier</button>
         <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Annuler</button>
@@ -337,11 +340,17 @@
     // ── COULEUR PICKER ────────────────────────────────────────────────
     document.querySelectorAll('.cir').forEach(c => {
         c.addEventListener('click', ()=>{
-            document.querySelectorAll('.cir').forEach(x=>x.classList.remove('selected'));
+            document.querySelectorAll('.cir').forEach(x=>{
+                x.classList.remove('selected');
+                x.style.outlineColor = 'transparent';
+            });
             c.classList.add('selected');
+            c.style.outlineColor = '#1e293b';
             selectedColor = c.dataset.color;
         });
     });
+    // Init outline du cercle sélectionné par défaut
+    document.querySelector('.cir.selected').style.outlineColor = '#1e293b';
 
     // ── DOSSIERS ─────────────────────────────────────────────────────
     function openFolderModal() {
