@@ -149,7 +149,6 @@
         </div>
     </div>
 
-    <!-- MODAL: NOUVEAU DOSSIER -->
     <div class="modal-overlay" id="modal-folder">
         <div class="modal-box">
             <h3 class="modal-title">Nouveau dossier</h3>
@@ -164,7 +163,6 @@
     <div class="toast" id="toast"><span>Message</span></div>
 
     <script>
-        // Fonctions Globales (définies en premier pour éviter "is not defined")
         window.closeModals = () => {
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
         };
@@ -211,7 +209,7 @@
             const t = document.getElementById('toast');
             t.querySelector('span').textContent = msg;
             t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
+            setTimeout(() => t.classList.remove('show'), 4000);
         }
 
         function setSyncStatus(state, msg) {
@@ -222,7 +220,6 @@
             }
         }
 
-        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
             authDomain: "portail-postits.firebaseapp.com",
@@ -232,7 +229,6 @@
             appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
         };
         const appId = 'favoris-app';
-        const sessionUid = "f2659e26b5b7efa7d8099b64d60a7f68c7797c735cc2f2807923129f397a21a1"; // Session Gilles historique
 
         let bookmarks = [];
         let folders = [];
@@ -242,38 +238,36 @@
         try {
             firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
+            const auth = firebase.auth();
 
-            // On utilise directement l'UID historique pour retrouver les liens
-            const uid = sessionUid;
-            bookmarksRef = db.collection('artifacts').doc(appId).collection('users').doc(uid).collection('bookmarks');
-            foldersRef = db.collection('artifacts').doc(appId).collection('users').doc(uid).collection('folders');
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    setSyncStatus('saved', 'Connecté');
+                    const uid = user.uid;
+                    bookmarksRef = db.collection('artifacts').doc(appId).collection('users').doc(uid).collection('bookmarks');
+                    foldersRef = db.collection('artifacts').doc(appId).collection('users').doc(uid).collection('folders');
+                    loadData();
+                } else {
+                    setSyncStatus('saving', 'Connexion...');
+                    auth.signInAnonymously();
+                }
+            });
 
-            // Chargement Data
-            const loadData = () => {
+            function loadData() {
                 bookmarksRef.orderBy('createdAt', 'desc').onSnapshot(snap => {
                     bookmarks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderUI();
-                    setSyncStatus('saved', 'Session Gilles Active');
                 }, err => {
-                    console.error(err);
-                    setSyncStatus('error', 'Erreur de lecture');
+                    if(err.code === 'permission-denied') showToast("Non autorisé (Rules Firebase)", true);
                 });
 
                 foldersRef.orderBy('createdAt', 'asc').onSnapshot(snap => {
                     folders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderUI();
                 });
-            };
+            }
 
-            loadData();
-
-            // Login silencieux (optionnel car on force l'UID pour le chemin Firestore)
-            firebase.auth().signInAnonymously().catch(e => console.warn("Auth Anonyme échouée, on continue via UID forcé."));
-
-        } catch (e) {
-            console.error("Firebase Init Error:", e);
-            setSyncStatus('error', 'Erreur Init');
-        }
+        } catch (e) { console.error(e); }
 
         window.saveLocalFolder = async () => {
             const name = document.getElementById('input-folder-name').value.trim();
@@ -291,7 +285,6 @@
         };
 
         function renderUI() {
-            // Folders
             const fContainer = document.getElementById('folders-container');
             const tags = new Set(folders.map(f => f.name));
             bookmarks.forEach(b => { if(b.tag && b.tag !== 'Non classé') tags.add(b.tag); });
@@ -303,7 +296,6 @@
             });
             fContainer.innerHTML = fHtml;
 
-            // Bookmarks
             const grid = document.getElementById('bookmarks-grid');
             const filtered = currentFilter === 'Tous' ? bookmarks : bookmarks.filter(b => b.tag === currentFilter || (currentFilter==='Non classé' && !b.tag));
             
@@ -313,7 +305,7 @@
                 grid.innerHTML = filtered.map(b => `
                     <div class="bookmark-card">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start">
-                            <h3 class="card-title">${(b.title || 'Lien sans titre').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</h3>
+                            <h3 class="card-title">${(b.title || 'Sans titre').replace(/</g,'&lt;')}</h3>
                             <span class="card-tag">${b.tag || 'Non classé'}</span>
                         </div>
                         <p class="card-summary">${(b.summary || '').substring(0,120)}...</p>
@@ -346,7 +338,8 @@
                 input.value = '';
                 showToast("Lien ajouté !");
             } catch(err) {
-                showToast("Erreur d'ajout");
+                showToast("Erreur Firestore: " + err.message);
+                console.error(err);
             } finally {
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic"></i> Analyser';
             }
@@ -364,21 +357,34 @@
                 let res, data;
                 if(engine === 'albert') {
                     res = await fetch("https://albert.api.gouv.fr/v1/chat/completions", {
-                        method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+                        method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key.trim()}` },
                         body: JSON.stringify({ model: "openai/gpt-oss-120b", messages: [{role:"user", content: prompt}] })
                     });
+                    if(!res.ok) {
+                        const err = await res.json();
+                        throw new Error("Albert Error: " + (err.error?.message || res.status));
+                    }
                     const json = await res.json();
-                    data = JSON.parse(json.choices[0].message.content.replace(/```json|```/g, '').trim());
+                    const content = json.choices[0].message.content;
+                    data = JSON.parse(content.replace(/```json|```/g, '').trim());
                 } else {
-                    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key.trim()}`, {
                         method: "POST", headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                     });
+                    if(!res.ok) {
+                        const err = await res.json();
+                        throw new Error("Gemini Error: " + (err.error?.message || res.status));
+                    }
                     const json = await res.json();
-                    data = JSON.parse(json.candidates[0].content.parts[0].text);
+                    const text = json.candidates[0].content.parts[0].text;
+                    data = JSON.parse(text.replace(/```json|```/g, '').trim());
                 }
                 return data;
-            } catch(e) { return { title: url, category: "Non classé" }; }
+            } catch(e) { 
+                showToast("IA Error: " + e.message);
+                return { title: url, category: "Non classé" }; 
+            }
         }
 
         updateAIStatusUI();
