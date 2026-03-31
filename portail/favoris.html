@@ -389,12 +389,25 @@
         if(!url) return;
 
         btn.disabled=true;
-        btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Analyse...';
+        btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Lecture du site...';
 
-        // Fallback sans IA : domaine du site
+        // ── ÉTAPE 1 : Extraction automatique via Microlink (gratuit, sans clé) ──
         let hostname='';
         try { hostname = new URL(url).hostname.replace('www.',''); } catch(e){}
-        let data = { title: hostname||url, desc:'Lien ajouté depuis '+hostname, tag:'Lien' };
+        let data = { title: hostname||url, desc:'', tag:'Lien' };
+
+        try {
+            const ml = await fetch('https://api.microlink.io/?url=' + encodeURIComponent(url));
+            const mj = await ml.json();
+            if(mj.status==='success' && mj.data) {
+                data.title = mj.data.title || data.title;
+                data.desc  = mj.data.description || '';
+                // Catégorie basée sur le domaine par défaut
+                data.tag   = 'Site web';
+            }
+        } catch(e) { console.warn('Microlink ignoré:', e.message); }
+
+        btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Analyse IA...';
 
         const alk = localStorage.getItem('fav_albert');
         const gek = localStorage.getItem('fav_gemini');
