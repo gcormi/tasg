@@ -106,7 +106,7 @@
         <div>
             <div style="display:flex; align-items:center; gap:8px">
                 <div class="app-title">Favoris IA</div>
-                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.1</span>
+                <span style="font-size:.6rem; font-weight:800; background:#f1f5f9; color:#94a3b8; padding:2px 8px; border-radius:20px; letter-spacing:.05em">v2.2</span>
             </div>
             <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
@@ -432,14 +432,14 @@
                     const r = await fetchAlbert(alk, 'Réponds juste: OK', 5);
                     if(r.ok) {
                         res.style.cssText='display:block;background:#f0fdf4;color:#16a34a;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='✅ [v2.1] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
+                        res.textContent='✅ [v2.2] Connexion Albert réussie ! (Via ' + r.methodUsed + ')';
                     } else {
                         res.style.cssText='display:block;background:#fef2f2;color:#ef4444;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px';
-                        res.textContent='❌ [v2.1] Albert a refusé la clé (Erreur '+r.status+')';
+                        res.textContent='❌ [v2.2] Albert a refusé la clé (Erreur '+r.status+')';
                     }
                 } catch(err) {
-                    res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.78rem;margin-bottom:14px;line-height:1.5';
-                    res.innerHTML='⚠️ Impossible de joindre Albert même avec 5 relais (La Forge bloque la sortie).<br>Erreur technique : ' + err.message;
+                    res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.7rem;margin-bottom:14px;line-height:1.4;white-space:pre-wrap;overflow-x:auto';
+                    res.innerHTML='⚠️ <b>Impossible de joindre Albert (Forge). Rapport :</b>\n' + err.message;
                 }
                 return;
             }
@@ -473,17 +473,19 @@
     // ── MOTEUR MULTI-RELAIS ALBERT ────────────────────────────────────
     async function fetchAlbert(key, promptText, tokens=300) {
         // Liste INTÉGRALE des proxys depuis albert_test.html pour garantir un passage CSP
+        let logs = [];
         const baseEndpoint = "https://albert.api.gouv.fr/v1/chat/completions";
+        
+        // Ordre : proxy codetabs (rapide, contourne CORS), corsproxy, API directes
         const endpoints = [
             { id: "Proxy Codetabs", url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(baseEndpoint)}` },
             { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` },
-            { id: "Direct (Education)", url: "https://api.albert.education.fr/v1/chat/completions" },
-            { id: "Direct (Gouv)", url: baseEndpoint },
-            { id: "Proxy Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${baseEndpoint}` }
+            { id: "API Gouv", url: baseEndpoint },
+            { id: "API Educ", url: "https://api.albert.education.fr/v1/chat/completions" },
+            { id: "Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${baseEndpoint}` }
         ];
         
         const bodyStr = JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:promptText}], max_tokens:tokens});
-        let lastError = new Error("Tous les relais ont échoué");
 
         for(let ep of endpoints) {
             try {
@@ -501,13 +503,16 @@
                     const data = await response.json();
                     return { ok: true, text: data.choices?.[0]?.message?.content || '', methodUsed: ep.id };
                 }
-                throw new Error("HTTP " + response.status);
+                
+                logs.push(`- ${ep.id} : HTTP ${response.status}`);
             } catch(e) {
-                lastError = e;
+                logs.push(`- ${ep.id} : ${e.message}`);
                 continue; // On essaye le proxy suivant
             }
         }
-        throw lastError;
+        
+        // Si RIEN n'a marché, on renvoie le rapport complet
+        throw new Error(logs.join('\n'));
     }
 
     // ── AJOUT ─────────────────────────────────────────────────────────
