@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Post-its (application existante - OK)
+    match /postits/{doc} {
+      allow read, write: if true;
+    }
+
+    // Favoris IA (nouveau - débloquer)
+    match /favoris/{doc} {
+      allow read, write: if true;
+    }
+    match /favoris_folders/{doc} {
+      allow read, write: if true;
+    }
+
+    // Hub liens personnalisés (application existante - OK)
+    match /customHubLinks/{doc} {
+      allow read, write: if true;
+    }
+
+    // Artifacts (utilisé par d'autres apps)
+    match /artifacts/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

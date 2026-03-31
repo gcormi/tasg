@@ -5,226 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Favoris IA | Portail</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Patrick+Hand&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- MÊME SDK QUE POSTITS.HTML - VERSION COMPAT, PAS D'AUTH -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Même SDK que postits.html, sans auth -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-
-        /* === HEADER === */
-        header {
-            flex-shrink: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.07); padding: 12px 20px;
-            display: flex; justify-content: space-between; align-items: center; gap: 12px;
-            z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn {
-            width: 38px; height: 38px; background: white; border: 1.5px solid #e2e8f0;
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            text-decoration: none; color: #6366f1; transition: all 0.2s;
-        }
-        .back-btn:hover { background: #f5f3ff; border-color: #6366f1; }
-        .app-icon {
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(99,102,241,0.3);
-        }
-        .app-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem; color: #0f172a; }
-        .sync-line { display: flex; align-items: center; font-size: 0.7rem; color: #94a3b8; font-weight: 600; margin-top: 1px; }
-        .sync-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; background: #fbbf24; }
-        .sync-dot.online  { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-        .sync-dot.offline { background: #ef4444; }
-        @keyframes blink { 50% { opacity: 0.3; } }
-        .sync-dot.syncing { animation: blink 0.8s infinite; }
-
-        .header-right { display: flex; align-items: center; gap: 10px; }
-        .ai-btn {
-            display: flex; align-items: center; gap: 8px;
-            background: white; border: 1.5px solid #e2e8f0;
-            border-radius: 10px; padding: 8px 14px;
-            font-size: 0.82rem; font-weight: 700; color: #64748b;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .ai-btn:hover { border-color: #6366f1; color: #6366f1; }
+        header { flex-shrink: 0; background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); z-index: 100; }
+        .h-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { width: 36px; height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6366f1; text-decoration: none; transition:.2s; }
+        .back-btn:hover { background: #eef2ff; }
+        .app-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg,#6366f1,#8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(99,102,241,.3); }
+        .app-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #0f172a; }
+        .sync-line { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 600; color: #94a3b8; margin-top: 2px; }
+        .sdot { width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; }
+        .sdot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .sdot.error { background: #ef4444; }
+        .h-right { display: flex; gap: 10px; }
+        .btn-icon { display: flex; align-items: center; gap: 7px; padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: .82rem; font-weight: 700; color: #64748b; cursor: pointer; transition:.2s; }
+        .btn-icon:hover { border-color: #6366f1; color: #6366f1; }
         .ai-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
-        .ai-dot.configured { background: #22c55e; }
+        .ai-dot.on { background: #22c55e; }
 
-        /* === LAYOUT === */
-        .main-layout { flex: 1; display: flex; overflow: hidden; }
+        .layout { flex:1; display:flex; overflow:hidden; }
+        .sidebar { width: 220px; background: white; border-right: 1px solid #e2e8f0; padding: 18px 14px; display: flex; flex-direction: column; overflow-y: auto; }
+        .sb-title { font-size:.65rem; font-weight:800; text-transform:uppercase; color:#cbd5e1; letter-spacing:.1em; padding: 4px 8px 12px; }
+        .sb-btn { width:100%; padding:9px 12px; border-radius:10px; border:none; background:none; text-align:left; font-size:.82rem; font-weight:600; color:#64748b; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.18s; margin-bottom:2px; }
+        .sb-btn:hover { background:#f8fafc; color:#6366f1; }
+        .sb-btn.active { background:#eef2ff; color:#6366f1; }
+        .sb-count { margin-left:auto; background:#f1f5f9; color:#94a3b8; font-size:.65rem; font-weight:800; padding:2px 7px; border-radius:20px; }
 
-        .sidebar {
-            width: 220px; background: white; border-right: 1px solid #e2e8f0;
-            padding: 20px 16px; display: flex; flex-direction: column; overflow-y: auto;
-        }
-        .sidebar-title { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #cbd5e1; letter-spacing: 0.1em; margin-bottom: 12px; }
-        .folder-btn {
-            width: 100%; padding: 9px 12px; border-radius: 10px; border: none; background: none;
-            text-align: left; font-size: 0.83rem; font-weight: 600; color: #64748b;
-            cursor: pointer; display: flex; align-items: center; gap: 9px; transition: all 0.2s; margin-bottom: 2px;
-        }
-        .folder-btn:hover { background: #f8fafc; color: #6366f1; }
-        .folder-btn.active { background: #eef2ff; color: #6366f1; }
-        .badge { margin-left: auto; background: #f1f5f9; color: #94a3b8; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 20px; }
+        .content { flex:1; padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:20px; }
+        .add-bar { background:white; padding:8px; border-radius:16px; display:flex; gap:8px; border:1.5px solid #e2e8f0; box-shadow:0 4px 16px rgba(0,0,0,.04); }
+        .add-bar input { flex:1; border:none; outline:none; padding:10px 18px; font-size:.9rem; font-family:inherit; }
+        .btn-add { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; border-radius:11px; padding:10px 22px; font-weight:750; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.2s; font-family:inherit; }
+        .btn-add:hover { transform:translateY(-1px); }
+        .btn-add:disabled { opacity:.6; cursor:wait; }
 
-        /* === CONTENT === */
-        .content { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:18px; }
+        .card { background:white; border-radius:18px; padding:18px; border:1.5px solid #f1f5f9; display:flex; flex-direction:column; gap:10px; transition:.25s; animation:pop .3s ease; }
+        @keyframes pop { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+        .card:hover { border-color:#6366f1; box-shadow:0 8px 28px -8px rgba(99,102,241,.12); transform:translateY(-2px); }
+        .c-head { display:flex; justify-content:space-between; align-items:flex-start; }
+        .c-tag { font-size:.62rem; font-weight:800; text-transform:uppercase; background:#eef2ff; color:#6366f1; padding:3px 9px; border-radius:20px; }
+        .c-del { background:none; border:none; color:#e2e8f0; cursor:pointer; transition:.2s; font-size:.9rem; }
+        .c-del:hover { color:#ef4444; }
+        .c-title { font-family:'Outfit',sans-serif; font-weight:750; font-size:.98rem; color:#1e293b; line-height:1.3; }
+        .c-desc { font-size:.78rem; color:#64748b; line-height:1.55; flex:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+        .c-foot { padding-top:12px; border-top:1px solid #f8fafc; display:flex; align-items:center; justify-content:space-between; }
+        .c-link { font-size:.8rem; font-weight:700; color:#6366f1; text-decoration:none; display:flex; align-items:center; gap:5px; }
+        .c-link:hover { text-decoration:underline; }
+        .c-date { font-size:.65rem; color:#cbd5e1; }
+        .empty { text-align:center; padding:80px 20px; color:#94a3b8; grid-column:1/-1; }
+        .empty .ei { font-size:4rem; opacity:.2; margin-bottom:16px; }
+        .empty h2 { font-family:'Outfit',sans-serif; font-size:1.1rem; margin-bottom:8px; color:#64748b; }
 
-        .add-box {
-            background: white; padding: 8px; border-radius: 16px; display: flex; gap: 8px;
-            border: 1.5px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        }
-        .url-input {
-            flex: 1; border: none; padding: 11px 18px; outline: none;
-            font-size: 0.9rem; font-family: inherit;
-        }
-        .btn-add {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none;
-            padding: 10px 22px; border-radius: 11px; font-weight: 750; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
-        }
-        .btn-add:hover { transform: translateY(-1px); }
-        .btn-add:disabled { opacity: 0.6; cursor: wait; }
+        .overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:.3s; }
+        .overlay.open { opacity:1; visibility:visible; }
+        .modal-box { background:white; border-radius:22px; padding:28px; width:380px; max-width:90%; transform:scale(.95); transition:transform .3s; box-shadow:0 25px 60px rgba(0,0,0,.18); }
+        .overlay.open .modal-box { transform:scale(1); }
+        .m-title { font-family:'Outfit',sans-serif; font-weight:800; font-size:1.1rem; margin-bottom:20px; }
+        .m-label { font-size:.7rem; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:6px; }
+        .m-input { width:100%; padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:11px; outline:none; margin-bottom:16px; font-family:inherit; font-size:.9rem; transition:.2s; }
+        .m-input:focus { border-color:#6366f1; }
+        .m-btn { width:100%; padding:12px; border:none; border-radius:12px; font-weight:750; cursor:pointer; font-family:inherit; transition:.2s; }
+        .m-btn-primary { background:#6366f1; color:white; }
+        .m-btn-primary:hover { background:#4f46e5; }
+        .m-btn-ghost { background:none; color:#94a3b8; margin-top:8px; }
 
-        /* === CARDS === */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
-
-        .card {
-            background: white; border-radius: 18px; padding: 18px;
-            border: 1.5px solid #f1f5f9; transition: all 0.3s;
-            display: flex; flex-direction: column; animation: popIn 0.3s ease forwards;
-        }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .card:hover { border-color: #6366f1; box-shadow: 0 8px 24px -8px rgba(99,102,241,0.15); transform: translateY(-2px); }
-
-        .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-        .card-tag { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; background: #eef2ff; color: #6366f1; padding: 3px 9px; border-radius: 20px; }
-        .card-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; transition: color 0.2s; padding: 2px; }
-        .card-delete:hover { color: #ef4444; }
-
-        .card-title { font-family: 'Outfit', sans-serif; font-weight: 750; font-size: 0.98rem; margin-bottom: 8px; line-height: 1.3; color: #1e293b; }
-        .card-desc { font-size: 0.78rem; color: #64748b; line-height: 1.5; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-link { margin-top: 14px; padding-top: 12px; border-top: 1px solid #f8fafc; display: flex; align-items: center; }
-        .card-link a { font-size: 0.8rem; font-weight: 700; color: #6366f1; text-decoration: none; display: flex; align-items: center; gap: 5px; }
-        .card-link a:hover { text-decoration: underline; }
-
-        /* === VIDE === */
-        .empty-state { text-align: center; padding: 80px 20px; color: #94a3b8; }
-        .empty-state .icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.3; }
-        .empty-state h2 { font-family: 'Outfit', sans-serif; font-size: 1.2rem; margin-bottom: 8px; }
-
-        /* === MODAL === */
-        .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; }
-        .modal.active { opacity: 1; visibility: visible; }
-        .modal-box { background: white; border-radius: 22px; padding: 28px; width: 380px; max-width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.15); transform: scale(0.95); transition: transform 0.3s; }
-        .modal.active .modal-box { transform: scale(1); }
-        .modal-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; display: block; margin-bottom: 6px; }
-        .modal-input { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; outline: none; margin-bottom: 16px; font-family: inherit; font-size: 0.9rem; }
-        .modal-input:focus { border-color: #6366f1; }
-        .btn-primary { width: 100%; padding: 12px; background: #6366f1; color: white; border: none; border-radius: 12px; font-weight: 750; cursor: pointer; }
-        .btn-ghost { width: 100%; padding: 10px; background: none; border: none; color: #94a3b8; cursor: pointer; margin-top: 8px; font-size: 0.85rem; }
-
-        /* === TOAST === */
-        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 40px; font-size: 0.85rem; font-weight: 600; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:.85rem; font-weight:600; opacity:0; transition:.3s; pointer-events:none; z-index:9999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(-10px); }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-left">
+    <div class="h-left">
         <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
         <div class="app-icon"><i class="fas fa-bookmark"></i></div>
         <div>
             <div class="app-title">Favoris IA</div>
-            <div class="sync-line">
-                <div class="sync-dot syncing" id="sync-dot"></div>
-                <span id="sync-label">Connexion...</span>
-            </div>
+            <div class="sync-line"><div class="sdot" id="sdot"></div><span id="slabel">Connexion...</span></div>
         </div>
     </div>
-    <div class="header-right">
-        <button class="ai-btn" onclick="openAI()">
-            <i class="fas fa-robot"></i> Paramètres IA
-            <div class="ai-dot" id="ai-dot"></div>
-        </button>
+    <div class="h-right">
+        <button class="btn-icon" onclick="openAI()"><i class="fas fa-robot"></i> IA <div class="ai-dot" id="ai-dot"></div></button>
+        <button class="btn-icon" onclick="document.getElementById('overlay-folder').classList.add('open')"><i class="fas fa-folder-plus"></i> Dossier</button>
     </div>
 </header>
 
-<div class="main-layout">
+<div class="layout">
     <aside class="sidebar">
-        <div class="sidebar-title">Collections</div>
-        <button class="folder-btn active" id="btn-all" onclick="setFilter('all', this)">
-            <i class="fas fa-layer-group"></i> Tout voir
-            <span class="badge" id="badge-all">0</span>
-        </button>
-        <button class="folder-btn" id="btn-none" onclick="setFilter('none', this)">
-            <i class="fas fa-inbox"></i> Non classés
-        </button>
-        <div id="folders-list" style="margin-top:16px; border-top:1px solid #f1f5f9; padding-top:16px">
-            <div class="sidebar-title">Dossiers</div>
-            <button class="folder-btn" style="color:#94a3b8; font-style:italic" onclick="openFolderModal()">
-                <i class="fas fa-plus"></i> Nouveau dossier
-            </button>
+        <div class="sb-title">Ma Collection</div>
+        <button class="sb-btn active" onclick="filterBy('all',this)"><i class="fas fa-layer-group"></i> Tout voir <span class="sb-count" id="total-count">0</span></button>
+        <button class="sb-btn" onclick="filterBy('none',this)"><i class="fas fa-inbox"></i> Non classés</button>
+        <div style="border-top:1px solid #f1f5f9; margin:12px 0; padding-top:12px">
+            <div class="sb-title">Dossiers</div>
+            <div id="folder-list"></div>
+            <button class="sb-btn" style="color:#94a3b8; font-style:italic" onclick="document.getElementById('overlay-folder').classList.add('open')"><i class="fas fa-plus"></i> Nouveau dossier</button>
         </div>
     </aside>
 
     <main class="content">
-        <form class="add-box" onsubmit="handleAdd(event)">
-            <input type="url" id="url-in" class="url-input" placeholder="Collez l'URL d'un article, site ou ressource...">
-            <button type="submit" class="btn-add" id="btn-add">
-                <i class="fas fa-wand-sparkles"></i> Analyser & Ajouter
-            </button>
+        <form class="add-bar" onsubmit="handleAdd(event)">
+            <input type="url" id="url-field" placeholder="Collez l'URL d'un article ou site web..." required>
+            <button type="submit" class="btn-add" id="btn-submit"><i class="fas fa-wand-sparkles"></i> Analyser & Ajouter</button>
         </form>
-
-        <div class="cards-grid" id="cards-grid">
-            <div class="empty-state" style="grid-column:1/-1">
-                <div class="icon"><i class="fas fa-bookmark"></i></div>
-                <div class="sync-dot syncing" style="width:12px;height:12px;margin:0 auto 10px"></div>
-                <p style="font-size:0.85rem">Chargement de vos favoris...</p>
-            </div>
-        </div>
+        <div class="grid" id="grid"></div>
     </main>
 </div>
 
-<!-- Modal AI -->
-<div class="modal" id="modal-ai">
+<div class="overlay" id="overlay-ai">
     <div class="modal-box">
-        <h3 style="font-family:'Outfit',sans-serif; font-weight:800; margin-bottom:20px">Paramètres IA</h3>
-        <span class="modal-label">Clé Albert AI (gouv.fr)</span>
-        <input type="password" id="key-albert" class="modal-input" placeholder="Bearer key...">
-        <span class="modal-label">Clé Gemini (Google)</span>
-        <input type="password" id="key-gemini" class="modal-input" placeholder="AIza...">
-        <button class="btn-primary" onclick="saveAI()">Enregistrer</button>
-        <button class="btn-ghost" onclick="closeModal()">Fermer</button>
+        <div class="m-title">🤖 Paramètres IA</div>
+        <span class="m-label">Clé Albert AI (gouv.fr)</span>
+        <input type="password" id="k-albert" class="m-input" placeholder="Bearer key...">
+        <span class="m-label">Clé Google Gemini</span>
+        <input type="password" id="k-gemini" class="m-input" placeholder="AIza...">
+        <button class="m-btn m-btn-primary" onclick="saveAI()">Enregistrer</button>
+        <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Fermer</button>
     </div>
 </div>
 
-<!-- Modal Dossier -->
-<div class="modal" id="modal-folder">
+<div class="overlay" id="overlay-folder">
     <div class="modal-box">
-        <h3 style="font-family:'Outfit',sans-serif; font-weight:800; margin-bottom:20px">Nouveau dossier</h3>
-        <span class="modal-label">Nom</span>
-        <input type="text" id="folder-name-in" class="modal-input" placeholder="ex: Pédagogie, Inclusion...">
-        <button class="btn-primary" onclick="saveFolder()">Créer le dossier</button>
-        <button class="btn-ghost" onclick="closeModal()">Annuler</button>
+        <div class="m-title">📁 Nouveau dossier</div>
+        <span class="m-label">Nom du dossier</span>
+        <input type="text" id="folder-name-in" class="m-input" placeholder="ex: Pédagogie, Inclusion, IA...">
+        <button class="m-btn m-btn-primary" onclick="saveFolder()">Créer</button>
+        <button class="m-btn m-btn-ghost" onclick="closeOverlay()">Annuler</button>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-    // =============================================
-    // FIREBASE - MÊME CONFIG ET MÊME MÉTHODE QUE POSTITS.HTML
-    // Pas d'authentification, collection à la racine
-    // =============================================
+    // MÊME CONFIG ET MÊME APPROCHE QUE POSTITS.HTML
     const firebaseConfig = {
         apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
         authDomain: "portail-postits.firebaseapp.com",
@@ -234,225 +152,185 @@
         appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
     };
 
-    // Initialisation directe, sans auth — identique à postits.html
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const favRef = db.collection('favoris');
+    const fldRef = db.collection('favoris_folders');
 
-    // Collections RACINES (même niveau que 'postits')
-    const favoritesRef   = db.collection('favoris');
-    const foldersRef_db  = db.collection('favoris_folders');
+    let allFavs = [], allFolders = [], activeFilter = 'all';
 
-    // =============================================
-    // ÉTAT LOCAL
-    // =============================================
-    let allFavoris = [];
-    let allFolders = [];
-    let currentFilter = 'all';
-
-    // =============================================
-    // STATUT
-    // =============================================
-    function setSync(state, msg) {
-        const dot = document.getElementById('sync-dot');
-        const lbl = document.getElementById('sync-label');
-        dot.className = 'sync-dot ' + state;
-        lbl.textContent = msg;
+    function setSync(cls, msg) {
+        document.getElementById('sdot').className = 'sdot ' + cls;
+        document.getElementById('slabel').textContent = msg;
     }
 
-    function showToast(msg) {
+    function toast(msg) {
         const t = document.getElementById('toast');
         t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // =============================================
-    // ÉCOUTE TEMPS RÉEL (comme postits.html)
-    // =============================================
-    favoritesRef.onSnapshot(snapshot => {
-        allFavoris = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        setSync('online', 'Synchronisé');
+    // ÉCOUTE TEMPS RÉEL (identique à postits.html)
+    favRef.onSnapshot(snap => {
+        allFavs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        setSync('online', 'Synchronisé en temps réel');
         renderCards();
-        updateBadge();
     }, err => {
-        console.error('Firestore favoris error:', err.code, err.message);
-        setSync('offline', 'Erreur : ' + err.code);
+        console.error(err);
+        setSync('error', 'Erreur: ' + err.code);
     });
 
-    foldersRef_db.orderBy('name').onSnapshot(snapshot => {
-        allFolders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    fldRef.orderBy('name').onSnapshot(snap => {
+        allFolders = snap.docs.map(d => ({id: d.id, ...d.data()}));
         renderFolders();
-    }, err => {
-        console.warn('Dossiers non chargés:', err.code);
-    });
+    }, () => {});
 
-    // =============================================
-    // RENDU CARTES
-    // =============================================
+    function renderFolders() {
+        document.getElementById('folder-list').innerHTML = allFolders.map(f => `
+            <div style="display:flex; align-items:center; gap:4px">
+                <button class="sb-btn ${activeFilter === f.id ? 'active' : ''}" style="flex:1" onclick="filterByFolder('${f.id}')">
+                    <i class="fas fa-folder"></i> ${f.name}
+                </button>
+                <button onclick="delFolder('${f.id}')" title="Supprimer" style="flex-shrink:0; border:none; background:none; color:#fca5a5; cursor:pointer; padding:4px 6px; border-radius:6px; transition:.2s" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#fca5a5'">
+                    <i class="fas fa-trash" style="font-size:.7rem"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
     function renderCards() {
-        const grid = document.getElementById('cards-grid');
-        let data = allFavoris;
-        if (currentFilter === 'none') data = allFavoris.filter(f => !f.folderId);
-        else if (currentFilter !== 'all') data = allFavoris.filter(f => f.folderId === currentFilter);
+        const grid = document.getElementById('grid');
+        document.getElementById('total-count').textContent = allFavs.length;
+        let data = [...allFavs].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+        if (activeFilter === 'none') data = data.filter(f => !f.folderId);
+        else if (activeFilter !== 'all') data = data.filter(f => f.folderId === activeFilter);
 
-        if (data.length === 0) {
-            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-                <div class="icon"><i class="fas fa-bookmark"></i></div>
-                <h2>Aucun favori ici</h2>
-                <p style="font-size:0.85rem">Collez une URL ci-dessus pour commencer.</p>
-            </div>`;
+        if (!data.length) {
+            grid.innerHTML = `<div class="empty"><div class="ei"><i class="fas fa-bookmark"></i></div>
+                <h2>Aucun favori ici</h2><p style="font-size:.85rem">Collez une URL ci-dessus pour commencer.</p></div>`;
             return;
         }
-
         grid.innerHTML = data.map(f => `
             <div class="card">
-                <div class="card-header">
-                    <span class="card-tag">${f.tag || 'Lien'}</span>
-                    <button class="card-delete" onclick="deleteFav('${f.id}')"><i class="fas fa-times"></i></button>
+                <div class="c-head">
+                    <span class="c-tag">${f.tag||'Lien'}</span>
+                    <button class="c-del" onclick="delFav('${f.id}')"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="card-title">${(f.title || f.url).substring(0, 60)}</div>
-                <div class="card-desc">${f.desc || ''}</div>
-                <div class="card-link">
-                    <a href="${f.url}" target="_blank" rel="noopener">Consulter <i class="fas fa-arrow-up-right-from-square"></i></a>
+                <div class="c-title">${f.title||f.url}</div>
+                <div class="c-desc">${f.desc||''}</div>
+                <div class="c-foot">
+                    <a href="${f.url}" target="_blank" rel="noopener" class="c-link">Consulter <i class="fas fa-arrow-up-right-from-square"></i></a>
                 </div>
             </div>
         `).join('');
     }
 
-    function renderFolders() {
-        const list = document.getElementById('folders-list');
-        const folderBtns = allFolders.map(f => `
-            <button class="folder-btn ${currentFilter === f.id ? 'active' : ''}" onclick="setFilter('${f.id}', this)">
-                <i class="fas fa-folder"></i> ${f.name}
-            </button>
-        `).join('');
-        list.innerHTML = `
-            <div class="sidebar-title">Dossiers</div>
-            ${folderBtns}
-            <button class="folder-btn" style="color:#94a3b8; font-style:italic" onclick="openFolderModal()">
-                <i class="fas fa-plus"></i> Nouveau dossier
-            </button>
-        `;
-    }
-
-    function updateBadge() {
-        document.getElementById('badge-all').textContent = allFavoris.length;
-    }
-
-    // =============================================
-    // FILTRAGE
-    // =============================================
-    function setFilter(id, el) {
-        currentFilter = id;
-        document.querySelectorAll('.folder-btn').forEach(b => b.classList.remove('active'));
+    function filterBy(id, el) {
+        activeFilter = id;
+        document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
         if (el) el.classList.add('active');
         renderCards();
     }
 
-    // =============================================
-    // AJOUT
-    // =============================================
+    // Filtrage depuis les dossiers dynamiques (re-render la sidebar)
+    function filterByFolder(id) {
+        activeFilter = id;
+        renderFolders();   // rerendre pour mettre à jour les classes active
+        renderCards();
+    }
+
+    async function delFav(id) {
+        if (!confirm('Supprimer ce favori ?')) return;
+        await favRef.doc(id).delete();
+        toast('Supprimé');
+    }
+
+    async function delFolder(id) {
+        if (!confirm('Supprimer ce dossier ? Les favoris resteront non classés.')) return;
+        // Détacher les favoris de ce dossier
+        const concerned = allFavs.filter(f => f.folderId === id);
+        await Promise.all(concerned.map(f => favRef.doc(f.id).update({folderId: null})));
+        await fldRef.doc(id).delete();
+        if (activeFilter === id) filterBy('all', document.querySelector('.sb-btn'));
+        toast('Dossier supprimé');
+    }
+
+    async function saveFolder() {
+        const name = document.getElementById('folder-name-in').value.trim();
+        if (!name) return;
+        await fldRef.add({name, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+        document.getElementById('folder-name-in').value = '';
+        closeOverlay(); toast('Dossier créé !');
+    }
+
+    function openAI() {
+        document.getElementById('k-albert').value = localStorage.getItem('fav_albert')||'';
+        document.getElementById('k-gemini').value = localStorage.getItem('fav_gemini')||'';
+        document.getElementById('overlay-ai').classList.add('open');
+    }
+    function saveAI() {
+        localStorage.setItem('fav_albert', document.getElementById('k-albert').value.trim());
+        localStorage.setItem('fav_gemini', document.getElementById('k-gemini').value.trim());
+        const has = localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini');
+        document.getElementById('ai-dot').className = 'ai-dot' + (has ? ' on' : '');
+        closeOverlay(); toast('Clés IA sauvegardées ✅');
+    }
+    function closeOverlay() { document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open')); }
+
     async function handleAdd(e) {
         e.preventDefault();
-        const input = document.getElementById('url-in');
-        const btn   = document.getElementById('btn-add');
-        const url   = input.value.trim();
+        const input = document.getElementById('url-field');
+        const btn = document.getElementById('btn-submit');
+        const url = input.value.trim();
         if (!url) return;
 
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse...';
-        setSync('syncing', 'Enregistrement...');
 
-        let data = { title: url, desc: '', tag: 'Autre' };
-
-        // Tentative d'analyse IA si clés configurées
+        // Extraction basique du titre et domaine sans IA
+        let hostname = '';
+        try { hostname = new URL(url).hostname.replace('www.',''); } catch(e) {}
+        let data = {title: hostname || url, desc: 'Lien enregistré depuis ' + hostname, tag: 'Lien'};
         const alk = localStorage.getItem('fav_albert');
         const gek = localStorage.getItem('fav_gemini');
+
         if (alk || gek) {
-            const prompt = `Analyse ce site et retourne un JSON: {"title":"titre court","desc":"description en 1 phrase","tag":"Catégorie en 1 mot"}. Site: ${url}`;
+            const prompt = `Analyse ce site et retourne UNIQUEMENT un JSON valide: {"title":"titre court","desc":"description en 1 phrase","tag":"Catégorie en 1 mot"}. Site: ${url}`;
             try {
+                let raw = '';
                 if (alk) {
                     const r = await fetch("https://albert.api.gouv.fr/v1/chat/completions", {
                         method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${alk}`},
                         body: JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:prompt}]})
                     });
-                    const j = await r.json();
-                    data = JSON.parse(j.choices[0].message.content.replace(/```json|```/g,'').trim());
+                    raw = (await r.json()).choices?.[0]?.message?.content || '';
                 } else {
                     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${gek}`, {
                         method:'POST', headers:{'Content-Type':'application/json'},
                         body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
                     });
-                    const j = await r.json();
-                    data = JSON.parse(j.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim());
+                    raw = (await r.json()).candidates?.[0]?.content?.parts?.[0]?.text || '';
                 }
-            } catch(aiErr) { console.warn('IA ignorée:', aiErr); }
+                const m = raw.match(/\{[\s\S]*?\}/);
+                if (m) data = JSON.parse(m[0]);
+            } catch(err) { console.warn('IA ignorée:', err); }
         }
 
         try {
-            await favoritesRef.add({
-                ...data, url,
-                folderId: (currentFilter !== 'all') ? currentFilter : null,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            await favRef.add({...data, url, folderId: activeFilter !== 'all' ? activeFilter : null, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
             input.value = '';
-            showToast('✅ Favori ajouté !');
-        } catch(dbErr) {
-            console.error('Erreur Firestore add:', dbErr.code, dbErr.message);
-            showToast('❌ Erreur Firebase : ' + dbErr.code);
-            setSync('offline', 'Erreur Firebase');
+            toast('✅ Favori ajouté et synchronisé !');
+        } catch(err) {
+            toast('❌ Erreur Firebase: ' + err.code);
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-wand-sparkles"></i> Analyser & Ajouter';
         }
     }
 
-    // =============================================
-    // SUPPRESSION
-    // =============================================
-    async function deleteFav(id) {
-        if (!confirm('Supprimer ce favori ?')) return;
-        await favoritesRef.doc(id).delete();
-        showToast('Supprimé');
-    }
-
-    // =============================================
-    // DOSSIERS
-    // =============================================
-    function openFolderModal() { document.getElementById('modal-folder').classList.add('active'); }
-
-    async function saveFolder() {
-        const name = document.getElementById('folder-name-in').value.trim();
-        if (!name) return;
-        await foldersRef_db.add({ name, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        document.getElementById('folder-name-in').value = '';
-        closeModal();
-        showToast('Dossier créé !');
-    }
-
-    // =============================================
-    // CONFIGURATION IA
-    // =============================================
-    function openAI() {
-        document.getElementById('modal-ai').classList.add('active');
-        document.getElementById('key-albert').value = localStorage.getItem('fav_albert') || '';
-        document.getElementById('key-gemini').value = localStorage.getItem('fav_gemini') || '';
-    }
-
-    function saveAI() {
-        localStorage.setItem('fav_albert', document.getElementById('key-albert').value.trim());
-        localStorage.setItem('fav_gemini', document.getElementById('key-gemini').value.trim());
-        document.getElementById('ai-dot').className = 'ai-dot' + (document.getElementById('key-albert').value || document.getElementById('key-gemini').value ? ' configured' : '');
-        closeModal();
-        showToast('Clés IA enregistrées !');
-    }
-
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
-
-    // Init du dot IA
-    if (localStorage.getItem('fav_albert') || localStorage.getItem('fav_gemini')) {
-        document.getElementById('ai-dot').className = 'ai-dot configured';
-    }
+    // Init badge IA
+    if (localStorage.getItem('fav_albert')||localStorage.getItem('fav_gemini'))
+        document.getElementById('ai-dot').className = 'ai-dot on';
 </script>
-
 </body>
 </html>
