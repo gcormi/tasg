@@ -1189,6 +1189,275 @@
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
+
+        /* ===================== DRAWER FAVORIS (RIGHT) ===================== */
+        .drawer-right {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 380px;
+            max-width: 90vw;
+            height: 100%;
+            background: var(--bg-primary);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .drawer-right.active {
+            right: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 950;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #fav-drawer-toggle {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            padding: 24px 10px;
+            border-radius: 20px 0 0 20px;
+            cursor: pointer;
+            z-index: 900;
+            box-shadow: -4px 0 15px rgba(79, 70, 229, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: none;
+        }
+
+        #fav-drawer-toggle:hover {
+            padding-right: 15px;
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+            box-shadow: -6px 0 20px rgba(79, 70, 229, 0.4);
+        }
+
+        #fav-drawer-toggle i {
+            writing-mode: horizontal-tb;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .drawer-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .drawer-close-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-close-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .drawer-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
+
+        .fav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .fav-link-item:hover {
+            transform: translateX(-5px);
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .fav-link-icon-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .fav-link-item:hover .fav-link-icon-container {
+            transform: scale(1.1);
+        }
+
+        .fav-link-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fav-link-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fav-link-url {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.6;
+        }
+
+        .fav-link-badge {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+
+        .fav-add-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 2px dashed var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        html.dark-mode .fav-add-btn {
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .fav-add-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-style: solid;
+        }
+
+        .fav-link-delete {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%) scale(0.8);
+            opacity: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: #ffe4e6;
+            color: #e11d48;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .fav-link-item:hover .fav-link-delete {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .fav-link-delete:hover {
+            background: #fb7185;
+            color: white;
+        }
+
+        @media (max-width: 640px) {
+            #fav-drawer-toggle {
+                padding: 16px 8px;
+                font-size: 0.6rem;
+            }
+            .drawer-right {
+                width: 100%;
+            }
+        }
     </style>
     <script>
         // Check unlock status immediately to prevent flash
@@ -1199,7 +1468,6 @@
             }
         })();
     </script>
-    </style>
 </head>
 
 <body class="text-slate-700 antialiased flex flex-col min-h-screen">
@@ -2704,7 +2972,14 @@
         });
 
         // ====== SIDEBAR HUB SCRIPT & CUSTOM LINKS (Firebase) ======
-        const defaultHubLinks = [
+        const internalTools = [
+            { titre: "Post-its", url: "postits.html", icone: "fas fa-sticky-note", couleurIco: "text-yellow-500", fondIco: "bg-yellow-50 dark:bg-yellow-900/30", badge: "Live" },
+            { titre: "Bloc-note", url: "blocnote.html", icone: "fas fa-book-open", couleurIco: "text-indigo-500", fondIco: "bg-indigo-50 dark:bg-indigo-900/30", badge: "Live" },
+            { titre: "Favoris IA", url: "favoris.html", icone: "fas fa-bookmark", couleurIco: "text-purple-500", fondIco: "bg-purple-50 dark:bg-purple-900/30", badge: "Nouv." },
+            { titre: "Écran Classe", url: "classe.html", icone: "fas fa-chalkboard-teacher", couleurIco: "text-emerald-500", fondIco: "bg-emerald-50 dark:bg-emerald-900/30" }
+        ];
+
+        const externalFavorites = [
             { titre: "Léia by Néo", url: "https://ent.leia.corsica/", icone: "fas fa-graduation-cap", couleurIco: "text-amber-500", fondIco: "bg-amber-50 dark:bg-amber-900/30", badge: "Académie" },
             { titre: "Nuage (Apps.edu)", url: "https://nuage.apps.education.fr/", icone: "fas fa-cloud", couleurIco: "text-sky-500", fondIco: "bg-sky-50 dark:bg-sky-900/30" },
             { titre: "Webmail Acad.", url: "https://messagerie.ac-corse.fr/", icone: "fas fa-envelope", couleurIco: "text-violet-500", fondIco: "bg-violet-50 dark:bg-violet-900/30", badge: "Pro" },
@@ -2712,17 +2987,12 @@
             { titre: "Gmail", url: "https://mail.google.com/", icone: "fab fa-google", couleurIco: "text-rose-500", fondIco: "bg-rose-50 dark:bg-rose-900/30", badge: "Perso" },
             { titre: "Google Agenda", url: "https://calendar.google.com/", icone: "fas fa-calendar-alt", couleurIco: "text-blue-500", fondIco: "bg-blue-50 dark:bg-blue-900/30" },
             { titre: "Gemini AI", url: "https://gemini.google.com/", icone: "fas fa-wand-magic-sparkles", couleurIco: "text-indigo-500", fondIco: "bg-indigo-50 dark:bg-indigo-900/30" },
-            { titre: "NotebookLM", url: "https://notebooklm.google.com/", icone: "fas fa-book-open-reader", couleurIco: "text-blue-600", fondIco: "bg-blue-50 dark:bg-blue-900/30" },
-            { titre: "Post-its", url: "postits.html", icone: "fas fa-sticky-note", couleurIco: "text-yellow-500", fondIco: "bg-yellow-50 dark:bg-yellow-900/30", badge: "Live" },
-            { titre: "Bloc-note", url: "blocnote.html", icone: "fas fa-book-open", couleurIco: "text-indigo-500", fondIco: "bg-indigo-50 dark:bg-indigo-900/30", badge: "Live" },
-            { titre: "Favoris IA", url: "favoris.html", icone: "fas fa-bookmark", couleurIco: "text-purple-500", fondIco: "bg-purple-50 dark:bg-purple-900/30", badge: "Nouv." },
-            { titre: "Écran Classe", url: "classe.html", icone: "fas fa-chalkboard-teacher", couleurIco: "text-emerald-500", fondIco: "bg-emerald-50 dark:bg-emerald-900/30" }
+            { titre: "NotebookLM", url: "https://notebooklm.google.com/", icone: "fas fa-book-open-reader", couleurIco: "text-blue-600", fondIco: "bg-blue-50 dark:bg-blue-900/30" }
         ];
 
         // Init Firebase (même base que les post-its)
         let hubDb;
         try {
-            // Check if already initialized
             hubDb = firebase.app().firestore();
         } catch(e) {
             firebase.initializeApp({
@@ -2737,41 +3007,81 @@
         }
         const customLinksRef = hubDb.collection('customHubLinks');
 
-        // Render sidebar (appelé à chaque mise à jour Firebase en temps réel)
-        function renderSidebarLinks(customLinks) {
+        // Render sidebar (seulement les outils internes)
+        function renderSidebarLinks() {
             const container = document.getElementById('sidebar-hub-links');
             if(!container) return;
             container.innerHTML = '';
 
-            const allLinks = [
-                ...defaultHubLinks.map(l => ({ ...l, isDefault: true })),
+            internalTools.forEach(link => {
+                const item = document.createElement('a');
+                item.href = link.url;
+                item.className = "group relative flex items-center justify-between p-2.5 rounded-xl hover:bg-indigo-50 transition-all dark:hover:bg-slate-800/50 border border-transparent hover:border-indigo-100";
+
+                const badgeHtml = link.badge
+                    ? `<span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider bg-indigo-50 text-indigo-500 dark:bg-slate-700 dark:text-slate-400 border border-indigo-100 dark:border-slate-600">${link.badge}</span>`
+                    : '';
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden min-w-0 pr-1">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm flex-shrink-0 transition-all group-hover:scale-110 group-hover:shadow-md ${link.fondIco || 'bg-slate-100 dark:bg-slate-700'} ${link.couleurIco || 'text-slate-600'}">
+                            <i class="${link.icone || 'fas fa-link'}"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${link.titre}</span>
+                        ${badgeHtml}
+                    </div>
+                    <i class="fas fa-chevron-right text-[9px] text-slate-300 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1"></i>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Render favorites drawer (favoris par défaut + liens perso Firebase)
+        function renderDrawerLinks(customLinks) {
+            const container = document.getElementById('drawer-links-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const allFavorites = [
+                ...externalFavorites.map(l => ({ ...l, isDefault: true })),
                 ...customLinks.map(l => ({ ...l, isDefault: false }))
             ];
 
-            allLinks.forEach(link => {
+            if (allFavorites.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 px-4">
+                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                        <i class="fas fa-star text-2xl"></i>
+                    </div>
+                    <p class="text-slate-400 text-sm font-medium">Aucun favori enregistré.</p>
+                </div>`;
+                return;
+            }
+
+            allFavorites.forEach(link => {
                 const item = document.createElement('a');
                 item.href = link.url;
                 item.target = "_blank";
                 item.rel = "noopener";
-                item.className = "group relative flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50";
+                item.className = "fav-link-item group";
 
                 const badgeHtml = link.badge
-                    ? `<span class="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 border border-slate-200 dark:border-slate-600 hidden 2xl:block">${link.badge}</span>`
+                    ? `<span class="fav-link-badge">${link.badge}</span>`
                     : '';
 
-                const rightHtml = !link.isDefault
-                    ? `<button class="opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 rounded flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 flex-shrink-0" title="Supprimer ce lien" onclick="event.preventDefault(); event.stopPropagation(); deleteCustomHubLink('${link.id}')"><i class="fas fa-trash text-xs"></i></button>`
-                    : `<i class="fas fa-external-link-alt text-[9px] text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pr-1 flex-shrink-0"></i>`;
+                const deleteBtn = !link.isDefault
+                    ? `<button class="fav-link-delete" title="Supprimer ce favori" onclick="event.preventDefault(); event.stopPropagation(); deleteCustomHubLink('${link.id}')"><i class="fas fa-trash-alt text-[10px]"></i></button>`
+                    : '';
 
                 item.innerHTML = `
-                    <div class="flex items-center gap-3 overflow-hidden min-w-0 pr-1">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 transition-transform group-hover:scale-110 ${link.fondIco || 'bg-slate-100 dark:bg-slate-700'} ${link.couleurIco || 'text-slate-600'}">
-                            <i class="${link.icone || 'fas fa-link'}"></i>
-                        </div>
-                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${link.titre}</span>
-                        ${badgeHtml}
+                    <div class="fav-link-icon-container ${link.fondIco || 'bg-slate-100 dark:bg-slate-800'} ${link.couleurIco || 'text-slate-600'}">
+                        <i class="${link.icone || 'fas fa-link'}"></i>
                     </div>
-                    ${rightHtml}
+                    <div class="fav-link-info">
+                        <span class="fav-link-title">${link.titre}</span>
+                        <span class="fav-link-url">${link.url.replace('https://', '').replace('www.', '').split('/')[0]}</span>
+                    </div>
+                    ${badgeHtml}
+                    ${deleteBtn}
                 `;
                 container.appendChild(item);
             });
@@ -2780,37 +3090,74 @@
         // Listener temps réel Firebase sur customHubLinks
         customLinksRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
             const customLinks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            renderSidebarLinks(customLinks);
+            renderSidebarLinks();
+            renderDrawerLinks(customLinks);
         }, err => {
             console.warn('Firebase sidebar error:', err);
-            renderSidebarLinks([]); // Fallback: show defaults only
+            renderSidebarLinks();
+            renderDrawerLinks([]);
         });
 
         // Suppression d'un lien personnalisé
         window.deleteCustomHubLink = async function(id) {
-            if(!confirm('Supprimer ce lien de votre Hub ?')) return;
+            if(!confirm('Supprimer ce lien de vos favoris ?')) return;
             try {
                 await customLinksRef.doc(id).delete();
-                showToast('Lien supprimé.');
+                showToast('Favori supprimé.');
             } catch(e) {
                 showToast('Erreur lors de la suppression.');
             }
         };
 
-        // Modal Handlers
+        // Drawer Handlers
+        const favDrawer = document.getElementById('fav-drawer');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        const drawerToggle = document.getElementById('fav-drawer-toggle');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawerAddBtn = document.getElementById('drawer-add-link');
+
+        function openDrawer() {
+            favDrawer.classList.add('active');
+            drawerOverlay.classList.add('active');
+            drawerToggle.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            favDrawer.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+            drawerToggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        drawerToggle?.addEventListener('click', openDrawer);
+        drawerClose?.addEventListener('click', closeDrawer);
+        drawerOverlay?.addEventListener('click', closeDrawer);
+
+        // Escape to close drawer
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && favDrawer.classList.contains('active')) {
+                closeDrawer();
+            }
+        });
+
+        // Modal Handlers (Lien personnalisé)
         const customLinkModal = document.getElementById('custom-link-modal');
         function openCustomLinkModal() {
             document.getElementById('custom-link-name').value = '';
             document.getElementById('custom-link-url').value = '';
             customLinkModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            // document.body.style.overflow = 'hidden'; // Déjà géré si drawer ouvert
             setTimeout(() => document.getElementById('custom-link-name').focus(), 100);
         }
         function closeCustomLinkModal() {
             customLinkModal.classList.remove('active');
-            document.body.style.overflow = '';
+            if (!favDrawer.classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
         }
 
+        drawerAddBtn?.addEventListener('click', openCustomLinkModal);
         document.getElementById('add-custom-link-btn')?.addEventListener('click', openCustomLinkModal);
         document.getElementById('modal-close-custom')?.addEventListener('click', closeCustomLinkModal);
         document.getElementById('cancel-custom-link')?.addEventListener('click', closeCustomLinkModal);
@@ -2845,6 +3192,32 @@
             }
         });
     </script>
+
+    <!-- Mes Favoris Drawer (Right) -->
+    <div id="drawer-overlay" class="drawer-overlay" aria-hidden="true"></div>
+    <div id="fav-drawer" class="drawer-right" role="dialog" aria-labelledby="drawer-title">
+        <div class="drawer-header">
+            <h2 id="drawer-title">Mes Favoris</h2>
+            <button id="drawer-close" class="drawer-close-btn" aria-label="Fermer le menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="drawer-content" id="drawer-links-container">
+            <!-- Rempli par JS -->
+        </div>
+        <div class="drawer-footer">
+            <button id="drawer-add-link" class="fav-add-btn">
+                <i class="fas fa-plus"></i>
+                <span>Ajouter un favori</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toggle Button for Drawer -->
+    <button id="fav-drawer-toggle" aria-label="Ouvrir mes favoris" aria-expanded="false" aria-controls="fav-drawer">
+        <i class="fas fa-star"></i>
+        <span>Mes Liens</span>
+    </button>
 
 </body>
 </html>
