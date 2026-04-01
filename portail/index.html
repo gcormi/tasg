@@ -1632,7 +1632,7 @@
             </p>
             <button onclick="window.login()" class="login-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20">
-                <span>Déverrouiller avec mon compte Google (V2.9.1 - LIGHT-ON)</span>
+                <span>Déverrouiller avec mon compte Google (V2.9.5 - THE-GRID)</span>
             </button>
             <div class="mt-8 pt-8 border-t border-slate-100">
                 <p class="text-xs text-slate-400 font-medium">Session sécurisée par Firebase Auth & Push Mobile</p>
@@ -1899,7 +1899,7 @@
         </div>
 
         <!-- Stats Section (Design "Glass Deluxe") -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 fade-in-up">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
             <div class="bg-white/40 backdrop-blur-md border border-white/60 rounded-3xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div class="text-4xl font-black text-indigo-600 mb-2"><span class="counter">16</span></div>
                 <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Outils Disponibles</div>
@@ -1915,7 +1915,7 @@
         </div>
 
         <!-- Search & Filter Section -->
-        <section class="mb-12 fade-in-up">
+        <section class="mb-12">
             <div class="mb-8">
                 <div class="search-container mb-6">
                     <i class="fas fa-search search-icon" aria-hidden="true"></i>
@@ -1959,7 +1959,7 @@
             <div class="cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 <!-- 1. Assistant de Conception -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper"
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full stagger-1 card-wrapper"
                          data-category="ia"
                          data-name="Assistant Conception Pédagogique IA Cours Séquences"
                          aria-label="Assistant de Conception">
@@ -2754,46 +2754,7 @@
             firebase.auth().signInWithRedirect(provider);
         };
 
-        // 3. Surveillance PRIORITAIRE de l'accès
-        firebase.auth().onAuthStateChanged(user => {
-            const authOverlay = document.getElementById('auth-overlay');
-            const profileSection = document.getElementById('user-profile-section');
-            if (user) {
-                console.log("ACCÈS VALITÉ :", user.displayName);
-                currentUser = user;
-                localStorage.setItem('portal_logged_in', 'true');
-                if(authOverlay) {
-                    authOverlay.classList.remove('active');
-                    authOverlay.style.display = 'none';
-                }
-                if(profileSection) profileSection.classList.remove('hidden');
-                
-                // Mise à jour des noms partout
-                const nameDisplay = document.getElementById('user-name');
-                const portalName = document.getElementById('portal-user-name');
-                if(nameDisplay) nameDisplay.textContent = user.displayName;
-                if(portalName) portalName.textContent = user.displayName.split(' ')[0]; // On garde juste le prénom en haut pour le style
-                
-                const photoDisplay = document.getElementById('user-photo');
-                if(photoDisplay) photoDisplay.src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
-                
-                // FORCER L'AFFICHAGE DES OUTILS
-                if(typeof applyFiltersAndSearch === 'function') {
-                    console.log("Déclenchement affichage grille outils...");
-                    applyFiltersAndSearch();
-                }
-                
-                if(typeof startHubSync === 'function') startHubSync();
-            } else {
-                currentUser = null;
-                localStorage.removeItem('portal_logged_in');
-                setTimeout(() => {
-                    if (!firebase.auth().currentUser && authOverlay) {
-                        authOverlay.classList.add('active');
-                    }
-                }, 1500);
-            }
-        });
+        // Supprimé d'ici pour être déplacé en bas
 
         // 3b. Capture du retour de Google
         firebase.auth().getRedirectResult().then(result => {
@@ -2986,6 +2947,8 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
                     observer.unobserve(entry.target);
                 }
             });
@@ -3018,6 +2981,7 @@
             });
 
             noResults.style.display = visible === 0 ? 'block' : 'none';
+            console.log("OUTILS VISIBLES :", visible, "/", cardWrappers.length);
         }
 
         filterPills.forEach(pill => {
@@ -3556,6 +3520,43 @@
                 }, false);
             });
         }, 1500);
+
+        // 3. Surveillance de l'accès (DÉPLACÉ ICI POUR LE SCOPE)
+        firebase.auth().onAuthStateChanged(user => {
+            const authOverlay = document.getElementById('auth-overlay');
+            const profileSection = document.getElementById('user-profile-section');
+            if (user) {
+                console.log("ACCÈS VALITÉ :", user.displayName);
+                currentUser = user;
+                localStorage.setItem('portal_logged_in', 'true');
+                if(authOverlay) {
+                    authOverlay.classList.remove('active');
+                    authOverlay.style.display = 'none';
+                }
+                if(profileSection) profileSection.classList.remove('hidden');
+                
+                const nameDisplay = document.getElementById('user-name');
+                const portalName = document.getElementById('portal-user-name');
+                if(nameDisplay) nameDisplay.textContent = user.displayName;
+                if(portalName) portalName.textContent = user.displayName.split(' ')[0];
+                
+                const photoDisplay = document.getElementById('user-photo');
+                if(photoDisplay) photoDisplay.src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
+                
+                if(typeof applyFiltersAndSearch === 'function') {
+                    applyFiltersAndSearch();
+                }
+                if(typeof startHubSync === 'function') startHubSync();
+            } else {
+                currentUser = null;
+                localStorage.removeItem('portal_logged_in');
+                setTimeout(() => {
+                    if (!firebase.auth().currentUser && authOverlay) {
+                        authOverlay.classList.add('active');
+                    }
+                }, 1000);
+            }
+        });
 
 
     </script>
