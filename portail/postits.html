@@ -563,6 +563,7 @@
         }, err => {
             console.error(err);
             setSyncStatus('offline');
+            document.getElementById('sync-status').textContent = 'Erreur: ' + err.code;
         });
 
         // ====== RENDER BOARD ======

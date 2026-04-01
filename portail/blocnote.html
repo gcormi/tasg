@@ -491,7 +491,7 @@
             selectNote(notes[0]?.id || null);
         }
     }, err => {
-        setSyncStatus('error', 'Erreur Firebase');
+        setSyncStatus('error', 'Erreur: ' + err.code);
         console.error(err);
     });
 
