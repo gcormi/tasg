@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <script>
-        if (localStorage.getItem('portal_unlocked') !== 'true') {
-            window.location.href = 'index.html';
-        }
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post-its | Portail Éducatif</title>
@@ -350,11 +352,51 @@
             pointer-events: none; opacity: 0; transition: opacity 0.5s;
             white-space: nowrap; z-index: 100;
         }
-        .drag-hint.visible { opacity: 1; }
+        /* ===== AUTH OVERLAY (Glassmorphism) ===== */
+        .auth-overlay {
+            position: fixed; inset: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 1; visibility: visible;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .auth-overlay.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transform: scale(1.1);
+        }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2.5rem; border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            text-align: center; max-width: 400px; width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .login-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white; padding: 1rem 2rem; border-radius: 1rem;
+            font-weight: 700; display: flex; align-items: center; gap: 0.75rem;
+            margin: 1.5rem auto 0; transition: all 0.3s; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4); }
     </style>
 </head>
 
-<body>
+    <!-- Overlay de Sécurité Google -->
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 mb-2">Accès Sécurisé</h2>
+            <p class="text-slate-500 mb-8 font-medium">Veuillez vous identifier avec votre compte Google pour accéder à vos post-its.</p>
+            <button onclick="window.login()" class="login-btn">
+                <i class="fab fa-google"></i> Se connecter avec Google
+            </button>
+        </div>
+    </div>
 
     <!-- HEADER -->
     <header>
@@ -445,7 +487,6 @@
 
     <!-- SCRIPT -->
     <script>
-        // ====== FIREBASE ======
         const firebaseConfig = {
             apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
             authDomain: "portail-postits.firebaseapp.com",
@@ -454,9 +495,25 @@
             messagingSenderId: "494625342197",
             appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
         };
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
         const postitsRef = db.collection('postits');
+
+        window.login = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch(alert);
+        };
+
+        firebase.auth().onAuthStateChanged(user => {
+            const overlay = document.getElementById('auth-overlay');
+            if (user) {
+                overlay.classList.add('hidden');
+            } else {
+                overlay.classList.remove('hidden');
+            }
+        });
 
         // ====== STATE ======
         let selectedColor = 'pi-yellow';
