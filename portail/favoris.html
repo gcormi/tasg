@@ -631,7 +631,7 @@
                     }
                 } catch(err) {
                     res.style.cssText='display:block;background:#fffbeb;color:#92400e;padding:10px 14px;border-radius:10px;font-size:.7rem;margin-bottom:14px;line-height:1.4;white-space:pre-wrap;overflow-x:auto';
-                    res.innerHTML='⚠️ <b>Impossible de joindre Albert (Forge). Rapport :</b>\n' + err.message;
+                    res.innerHTML='⚠️ <b>Impossible de joindre Albert (Forge) [V3.9.5]. Rapport :</b>\n' + err.message;
                 }
                 return;
             }
@@ -690,13 +690,14 @@
         // URL de PING officiel (etalab)
         const baseEndpoint = "https://albert.api.etalab.gouv.fr/v1/chat/completions";
         
-        // Ordre : proxy Officiel Educ, API Etalab directe, API Educ, codetabs, corsproxy
+        // Ordre : Proxys publics (plus robustes en premier), puis proxys spécialisés
         const endpoints = [
+            { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` },
+            { id: "Proxy Codetabs", url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(baseEndpoint)}` },
+            { id: "Proxy Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${baseEndpoint}` },
             { id: "Proxy Educ-AI", url: "https://proxy.educ-ai.fr/v1/chat/completions" },
             { id: "API Etalab Direct", url: baseEndpoint },
-            { id: "API Educ Direct", url: "https://api.albert.education.fr/v1/chat/completions" },
-            { id: "Proxy Codetabs", url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(baseEndpoint)}` },
-            { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` }
+            { id: "API Educ Direct", url: "https://api.albert.education.fr/v1/chat/completions" }
         ];
         
         const bodyStr = JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:promptText}], max_tokens:tokens});

@@ -2,12 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Post-its (application existante - OK)
+    // Post-its & Bloc-note (OK)
     match /postits/{doc} {
       allow read, write: if true;
     }
+    match /blocnotes/{doc} {
+      allow read, write: if true;
+    }
 
-    // Favoris IA (nouveau - débloquer)
+    // Favoris IA
     match /favoris/{doc} {
       allow read, write: if true;
     }
