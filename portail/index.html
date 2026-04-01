@@ -1543,6 +1543,110 @@
                 bottom: 0;
             }
         }
+        /* ===================== PREMIUM MODERN STYLES V3.9 ===================== */
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(14px) saturate(190%);
+            -webkit-backdrop-filter: blur(14px) saturate(190%);
+        }
+
+        html.dark-mode .glass-morphism {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(14px) saturate(150%);
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-12px) rotate(1deg); }
+            66% { transform: translateY(-6px) rotate(-1deg); }
+        }
+
+        .animate-float {
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .stagger-1 { animation-delay: 0s; }
+        .stagger-2 { animation-delay: 1.5s; }
+        .stagger-3 { animation-delay: 3s; }
+
+        .hero-gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            font-weight: 800;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 30px -10px rgba(79, 70, 229, 0.5);
+        }
+
+        .cta-secondary {
+            background: white;
+            color: #475569;
+            font-weight: 700;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1.5px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .cta-secondary:hover {
+            background: #f8fafc;
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        /* Philosophy Modal New Styles */
+        .philo-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-top: 30px;
+        }
+        @media (min-width: 640px) {
+            .philo-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .philo-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        .philo-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 12px 24px -10px rgba(79, 70, 229, 0.15);
+        }
+        .philo-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         // Check unlock status immediately to prevent flash
@@ -1724,82 +1828,104 @@
         <!-- MAIN CONTENT -->
         <main id="main-content" class="flex-grow min-w-0 w-full lg:w-[calc(100%-18rem)] xl:w-[calc(100%-20rem)] lg:pt-0">
 
-        <!-- ===== HERO ===== -->
-        <div class="mb-16 fade-in-up relative">
+        <!-- Hero Section -->
+        <div class="flex flex-col lg:flex-row items-center gap-12 mb-20 relative">
+            <!-- Floating Decorative Elements (RIGHT) -->
+            <div class="hidden lg:block lg:w-1/3 relative h-64">
+                <div class="absolute -top-10 -right-4 w-64 h-64 bg-indigo-200/30 rounded-full blur-3xl animate-pulse"></div>
+                
+                <!-- Card IA -->
+                <div class="float-badge glass-morphism border border-white/50 rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-4 animate-float stagger-1 absolute top-0 -right-6 z-10 w-60">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-microchip text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-indigo-500 font-black uppercase tracking-widest leading-none mb-1">IA Générative</div>
+                        <div class="text-sm font-extrabold text-slate-800">Conception pédagogique</div>
+                    </div>
+                </div>
 
-            <!-- Floating badges (décoratif) -->
-            <div class="hidden lg:flex absolute right-0 top-0 flex-col gap-4 items-end pointer-events-none" aria-hidden="true">
-                <div class="float-badge bg-white/80 border border-indigo-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
-                    <div class="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
-                        <i class="fas fa-microchip text-sm"></i>
+                <!-- Card Accessibilité -->
+                <div class="float-badge glass-morphism border border-white/50 rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-4 animate-float stagger-2 absolute top-24 -left-10 z-20 w-60">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-universal-access text-lg"></i>
                     </div>
                     <div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">IA Générative</div>
-                        <div class="text-xs font-bold text-slate-800">Conception pédagogique</div>
+                        <div class="text-[10px] text-emerald-600 font-black uppercase tracking-widest leading-none mb-1">Accessibilité</div>
+                        <div class="text-sm font-extrabold text-slate-800">DYS / TDAH / Inclusion</div>
                     </div>
                 </div>
-                <div class="float-badge bg-white/80 border border-emerald-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
-                    <div class="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
-                        <i class="fas fa-universal-access text-sm"></i>
+
+                <!-- Card Gamification -->
+                <div class="float-badge glass-morphism border border-white/50 rounded-2xl px-5 py-4 shadow-2xl flex items-center gap-4 animate-float stagger-3 absolute top-48 -right-2 z-10 w-60">
+                    <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-gamepad text-lg"></i>
                     </div>
                     <div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Accessibilité</div>
-                        <div class="text-xs font-bold text-slate-800">DYS / TDAH / Inclusion</div>
-                    </div>
-                </div>
-                <div class="float-badge bg-white/80 border border-amber-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
-                    <div class="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
-                        <i class="fas fa-gamepad text-sm"></i>
-                    </div>
-                    <div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Gamification</div>
-                        <div class="text-xs font-bold text-slate-800">Jeux & Escape games</div>
+                        <div class="text-[10px] text-amber-600 font-black uppercase tracking-widest leading-none mb-1">Gamification</div>
+                        <div class="text-sm font-extrabold text-slate-800">Jeux & Escape games</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Content -->
-            <div class="max-w-3xl">
-                <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 rounded-full px-4 py-2 mb-6">
-                    <span class="w-2 h-2 bg-indigo-600 rounded-full"></span>
-                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Bienvenue sur le portail</span>
+            <!-- Content (LEFT) -->
+            <div class="max-w-3xl lg:w-2/3">
+                <div class="inline-flex items-center gap-2 bg-indigo-50/80 backdrop-blur-sm border border-indigo-100 rounded-full px-5 py-2.5 mb-8 animate-fade-in shadow-sm">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
+                    </span>
+                    <span class="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em]">Bienvenue sur le portail v3.9.0</span>
                 </div>
 
-                <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-tight tracking-tight">
-                    Votre Écosystème de Travail <span class="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">Augmenté</span>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-8 leading-[1.1] tracking-tight">
+                    Votre Écosystème de Travail <span class="text-indigo-600 relative inline-block">
+                        Augmenté
+                        <svg class="absolute -bottom-2 left-0 w-full h-3 text-indigo-200/60" viewBox="0 0 100 10" preserveAspectRatio="none">
+                            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </span>
                 </h1>
 
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                    Optimisez votre quotidien avec un portail centralisé et évolutif. Des outils <strong>d'intelligence artificielle</strong> aux <strong>utilitaires système</strong>, regroupez vos indispensables et vos raccourcis personnels en un seul endroit pour une efficacité maximale au quotidien.
+                <p class="text-xl text-slate-600 mb-10 leading-relaxed font-medium">
+                    Optimisez votre quotidien avec un portail centralisé et évolutif. Des outils <strong>d'intelligence artificielle</strong> aux <strong>utilitaires système</strong>, regroupez vos indispensables et vos raccourcis en un seul endroit pour une efficacité maximale.
                 </p>
 
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button class="cta-primary">
-                        <i class="fas fa-sparkles" aria-hidden="true"></i>
+                <div class="flex flex-col sm:flex-row gap-5">
+                    <button class="cta-primary h-14 px-8 text-base shadow-indigo-200 shadow-xl transition-all hover:-translate-y-1">
+                        <i class="fas fa-sparkles mr-2" aria-hidden="true"></i>
                         <span>Explorer les outils</span>
                     </button>
-                    <button id="hero-philosophy-btn" class="cta-secondary">
-                        <i class="fas fa-book-open" aria-hidden="true"></i>
+                    <button id="hero-philosophy-btn" class="cta-secondary h-14 px-8 text-base transition-all hover:-translate-y-1 border-slate-200 hover:border-indigo-400">
+                        <i class="fas fa-book-open mr-2" aria-hidden="true"></i>
                         <span>Découvrir la philosophie</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Stats Section -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 fade-in-up">
-            <div class="stat-card rounded-2xl p-8 text-center">
-                <div class="text-3xl font-extrabold text-indigo-600 mb-2"><span class="counter">16</span></div>
-                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Outils Disponibles</div>
-
+        <!-- Stats Section (GLASSED) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 fade-in-up">
+            <div class="glass-morphism rounded-3xl p-8 border border-white/50 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
+                <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-cube text-xl"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-900 mb-1"><span class="counter">16</span></div>
+                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Outils Disponibles</div>
             </div>
-            <div class="stat-card rounded-2xl p-8 text-center">
-                <div class="text-3xl font-extrabold text-emerald-600 mb-2"><span class="counter">100</span>%</div>
-                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Gratuit & Libre</div>
+            <div class="glass-morphism rounded-3xl p-8 border border-white/50 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
+                <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-shield-check text-xl"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-900 mb-1"><span class="counter">100</span>%</div>
+                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Gratuit & Libre</div>
             </div>
-            <div class="stat-card rounded-2xl p-8 text-center">
-                <div class="text-3xl font-extrabold text-amber-600 mb-2"><span class="counter">6</span></div>
-                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Piliers Philosophiques</div>
+            <div class="glass-morphism rounded-3xl p-8 border border-white/50 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group">
+                <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-lightbulb text-xl"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-900 mb-1"><span class="counter">6</span></div>
+                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Piliers Philosophiques</div>
             </div>
         </div>
 
@@ -2468,162 +2594,84 @@
     <!-- Toast -->
     <div id="toast" role="status" aria-live="polite"></div>
 
-    <!-- ============================== MODAL: PHILOSOPHIE DU PROJET ============================== -->
+    <!-- ============================== MODAL: PHILOSOPHIE DU PROJET V3.9 ============================== -->
     <div id="philosophy-modal" class="modal-overlay">
-        <div class="modal-content">
-            <!-- Modal Header -->
+        <div class="modal-content !max-w-4xl">
             <div class="modal-header">
                 <div class="modal-header-content">
-                    <h2>Philosophie du Projet</h2>
-                    <p>Vision d'une suite d'outils au service de l'enseignant</p>
+                    <div class="flex items-center gap-4 mb-2">
+                        <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-brain text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-slate-900 leading-tight">Vision & Philosophie</h2>
+                            <p class="text-indigo-600 font-bold uppercase tracking-widest text-[10px]">Architecture de l'Ingénierie Pédagogique Augmentée</p>
+                        </div>
+                    </div>
                 </div>
-                <button class="modal-close-btn" aria-label="Fermer la modale" id="modal-close">
+                <!-- Synchronized ID for JS: modal-close -->
+                <button class="modal-close" id="modal-close" aria-label="Fermer le modal">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <!-- Modal Body -->
-            <div class="modal-body">
-                <div class="modal-vision-box">
-                    <strong>Vision centrale :</strong> Démocratiser l'accès à des ressources pédagogiques de qualité professionnelle en mettant l'intelligence artificielle au service de l'enseignant, sans jamais le remplacer. L'IA n'est pas le pédagogue : <em>elle est l'assistant qui prépare le terrain, l'enseignant reste l'architecte</em>.
+            <div class="modal-body py-8 px-2">
+                <div class="prose prose-slate max-w-none mb-10">
+                    <p class="text-xl text-slate-600 leading-relaxed font-medium">Ce portail n'est pas qu'une simple liste d'outils. C'est un <strong>écosystème modulaire</strong> conçu pour libérer l'enseignant des tâches répétitives et amplifier son expertise pédagogique.</p>
                 </div>
 
-                <h3><i class="fas fa-lightbulb"></i> Genèse & Contexte</h3>
-                <p>L'Assistant Pédagogique Moderne est né d'une observation terrain : les enseignants manquent de temps pour créer des supports pédagogiques variés, adaptés et esthétiquement engageants. Face à l'émergence des IA génératives, il devenait urgent de concevoir une <strong>interface de médiation</strong> entre ces outils puissants mais complexes et les besoins concrets de l'enseignant.</p>
-                <p>Plutôt que de se perdre dans des prompts mal structurés ou de produire du contenu générique, cette suite d'outils propose une <strong>ingénierie pédagogique encapsulée</strong> : chaque générateur intègre les bonnes pratiques didactiques, les référentiels officiels (programmes de l'Éducation Nationale) et une exigence de qualité alignée sur celle d'un éditeur scolaire.</p>
+                <div class="philo-grid">
+                    <!-- Pilier 1: IA Éthique -->
+                    <div class="philo-card">
+                        <div class="philo-icon bg-indigo-100 text-indigo-600">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">IA au Service de l'Expert</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">L'Intelligence Artificielle n'est pas une fin en soi, mais un levier. Nos outils sont conçus pour générer des brouillons de haute qualité que vous seul pouvez finaliser par votre regard pédagogique.</p>
+                    </div>
 
-                <h3><i class="fas fa-columns"></i> Les Six Piliers Philosophiques</h3>
+                    <!-- Pilier 2: Inclusion DYS/TDAH -->
+                    <div class="philo-card">
+                        <div class="philo-icon bg-emerald-100 text-emerald-600">
+                            <i class="fas fa-zebra"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Inclusion & Accessibilité</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Chaque ressource doit être accessible. Sous l'emblème du <strong>Zèbre</strong>, nous portons une attention particulière aux élèves DYS, TDAH et HP pour une école véritablement inclusive.</p>
+                    </div>
 
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🎯</div>
-                    <div class="modal-pillar-content">
-                        <strong>L'enseignant au centre</strong>
-                        <p>L'outil ne génère jamais de contenu "clé en main" sans validation humaine. Il produit des prompts structurés ou des bases de travail que l'enseignant enrichit, adapte et valide.</p>
+                    <!-- Pilier 3: Outils Libres -->
+                    <div class="philo-card">
+                        <div class="philo-icon bg-amber-100 text-amber-600">
+                            <i class="fas fa-unlock-keyhole"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Biens Communs Numériques</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Liberté, Gratuité, Partage. Basés sur des standards ouverts (HTML/JS), nos outils respectent la souveraineté de vos données et de vos contenus personnels.</p>
+                    </div>
+
+                    <!-- Pilier 4: Interconnectivité -->
+                    <div class="philo-card">
+                        <div class="philo-icon bg-blue-100 text-blue-600">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Écosystème Fluide</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">De la prise de notes à la conception de cours, nos outils communiquent entre eux. C'est la force d'un hub unique pour un workflow sans couture du cours à l'évaluation.</p>
                     </div>
                 </div>
 
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">⚡</div>
-                    <div class="modal-pillar-content">
-                        <strong>Gain de temps, pas de qualité perdue</strong>
-                        <p>L'automatisation vise les tâches chronophages (structuration, mise en page, diversité de formats), libérant du temps pour la personnalisation et l'innovation pédagogique.</p>
+                <div class="mt-12 p-6 bg-slate-50 rounded-3xl border border-slate-200">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white text-xs font-bold">GC</div>
+                        <div>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Le mot du créateur</p>
+                            <p class="text-sm text-slate-700 font-medium italic">"L'informatique doit être une extension de votre esprit, jamais un obstacle. Créons ensemble une école augmentée, plus juste et plus efficace."</p>
+                        </div>
                     </div>
                 </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🔄</div>
-                    <div class="modal-pillar-content">
-                        <strong>Flexibilité & Diversité</strong>
-                        <p>Un même contenu peut être décliné en cours DOCX, page HTML interactive, exercice Moodle XML, infographie visuelle ou jeu pédagogique, selon le besoin et le public.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🌐</div>
-                    <div class="modal-pillar-content">
-                        <strong>Compatibilité ENT</strong>
-                        <p>Intégration facilitée avec les Environnements Numériques de Travail : exports prêts à l'emploi pour outils de création assistée (PNG), Tests Moodle (XML), ou pages HTML interactives.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🎨</div>
-                    <div class="modal-pillar-content">
-                        <strong>Esthétique & Engagement</strong>
-                        <p>Refus des interfaces austères. Chaque générateur embarque des principes de design moderne (palettes de couleurs, typographie soignée, animations CSS) pour produire des supports qui donnent envie.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">📚</div>
-                    <div class="modal-pillar-content">
-                        <strong>Rigueur Pédagogique</strong>
-                        <p>Alignement strict sur les programmes officiels, intégration du Socle Commun, structuration par compétences. L'IA est guidée pour produire des contenus conformes aux exigences institutionnelles.</p>
-                    </div>
-                </div>
-
-                <h3><i class="fas fa-sitemap"></i> Architecture de l'Écosystème</h3>
-                <p>L'application se décompose en <strong>six familles fonctionnelles complémentaires</strong> :</p>
-
-                <div class="modal-pillar">
-                    <div class="modal-modal-pillar-icon">📖</div>
-                    <div class="modal-pillar-content">
-                        <strong>A. Générateurs de Cours Disciplinaires</strong>
-                        <p>Sciences (Technologie, SVT, Physique-Chimie, Mathématiques), Sciences Humaines (Histoire, Géographie, EMC), Langues & Arts (Français, Anglais, Espagnol, Italien, LCC, Arts Plastiques, Éducation Musicale), Lycée (SNT, SES)</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🛠️</div>
-                    <div class="modal-pillar-content">
-                        <strong>B. Boîte à Outils (Édition & Conversion)</strong>
-                        <p>Éditeur visuel HTML (WYSIWYG), Amélioration de design HTML via prompt, Amélioration de textes DOCX via IA, Convertisseur HTML → PDF</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🎮</div>
-                    <div class="modal-pillar-content">
-                        <strong>C. Activités Interactives & Ludiques</strong>
-                        <p>Générateurs de parcours d'activités multi-onglets, Escape Games / Scénarios à choix, Ateliers cognitifs (Memory, Mots Croisés, Mots Mêlés, Association)</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">✏️</div>
-                    <div class="modal-pillar-content">
-                        <strong>D. Exercices & Évaluations</strong>
-                        <p>Exercices visuels (PNG pour Création Assistée Léia), Exercices auto-corrigés (XML Moodle), Infographies pédagogiques (Accroche, Résumé, Synthèse)</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">&#129427;</div>
-                    <div class="modal-pillar-content">
-                        <strong>E. Inclusion &amp; Accessibilit&eacute; TAS</strong>
-                        <p>Deux outils d&eacute;di&eacute;s aux &eacute;l&egrave;ves pr&eacute;sentant des Troubles des Apprentissages Sp&eacute;cifiques (DYS, TDAH, dyspraxie&hellip;) : <strong>Adaptation Inclusive</strong> pour reformater n&rsquo;importe quelle ressource p&eacute;dagogique, et <strong>Lecteur Adaptatif</strong> pour une lecture bionique, audio et &eacute;pur&eacute;e. Le z&egrave;bre &#129427;, symbole des profils neuroatypiques, rappelle qu&rsquo;aucun &eacute;l&egrave;ve ne se ressemble &mdash; et qu&rsquo;aucun ne doit &ecirc;tre laiss&eacute; de c&ocirc;t&eacute;.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">☁️</div>
-                    <div class="modal-pillar-content">
-                        <strong>F. Veille & Organisation</strong>
-                        <p>Outils de veille pédagogique garantis "Zéro Distraction" (Veille Pro, YouTube EduSync) et d'accès centralisé aux espaces académiques et assistants de nouvelle génération (Hub Personnel & IA).</p>
-                    </div>
-                </div>
-
-                <h3><i class="fas fa-cogs"></i> Principes de Conception Technique</h3>
-                <p><strong>Autonomie & Légèreté :</strong> Tous les outils fonctionnent côté client (HTML/CSS/JavaScript), sans serveur backend. L'enseignant garde la main sur ses données, rien n'est envoyé à un serveur tiers (hors appel IA si mode API activé).</p>
-                <p><strong>Transparence & Modifiabilité des Prompts :</strong> L'application ne "cache" jamais ce qu'elle envoie à l'IA. Le prompt généré est toujours visible, modifiable et pédagogique : il explicite les exigences (structure, format, compétences visées). <em>Toutes les informations et prompts sont facilement modifiables et améliorables</em> selon les besoins spécifiques de chaque enseignant.</p>
-                <p><strong>Modularité :</strong> Chaque outil est une page HTML autonome et réutilisable. Un enseignant peut adapter ou dupliquer un générateur pour ses besoins spécifiques sans dépendances complexes.</p>
-
-                <h3><i class="fas fa-heart"></i> Posture Éthique & Pédagogique</h3>
-                <p><strong>L'IA comme co-pilote, jamais comme pilote :</strong> Les outils n'encouragent pas la délégation aveugle à l'IA, mais une collaboration consciente. L'enseignant doit :</p>
-                <ul>
-                    <li>Paramétrer ses besoins (niveau, thème, objets d'étude, plan imposé)</li>
-                    <li>Vérifier systématiquement les contenus générés (mention explicite dans le footer de chaque page)</li>
-                    <li>Adapter le contenu à sa classe, son contexte, ses élèves</li>
-                </ul>
-                <p><strong>Accompagnement à la maîtrise des outils numériques :</strong> En affichant les prompts et en expliquant les mécanismes (structure d'un cours, critères d'un bon exercice), l'application forme implicitement l'enseignant à l'ingénierie pédagogique et à l'usage raisonné de l'IA.</p>
-
-                <h3><i class="fas fa-globe"></i> Modèle Économique & Accessibilité</h3>
-                <p>L'application est diffusée sous <strong>licence Creative Commons BY-NC-ND 4.0</strong> : gratuite pour un usage non commercial, l'auteur doit être crédité, et aucune modification n'est autorisée. Ce choix affirme une volonté de <strong>démocratisation</strong> : tout enseignant, quelle que soit son académie ou son établissement, peut bénéficier de ces outils.</p>
-                <p>Le mode <strong>API optionnel</strong> (connexion Gemini ou OpenRouter) permet une automatisation complète, mais l'application reste pleinement fonctionnelle en mode "générateur de prompts" : l'enseignant copie le prompt produit et l'utilise dans l'IA de son choix (gratuite ou payante).</p>
-
-                <h3><i class="fas fa-rocket"></i> Conclusion : Vers une Pédagogie Augmentée</h3>
-                <p>L'Assistant Pédagogique Moderne ne cherche pas à "remplacer" le travail de l'enseignant, mais à le <strong>réorienter</strong> : moins de temps sur la mise en forme, plus de temps sur la personnalisation, l'accompagnement et l'innovation. En structurant l'usage de l'IA par des cadres pédagogiques rigoureux, il transforme un outil généraliste en un <strong>partenaire d'expertise disciplinaire</strong>.</p>
-                <p>La philosophie sous-jacente est celle d'une <strong>pédagogie augmentée</strong> : l'humain (enseignant et élève) reste au cœur, la machine sert d'amplificateur de créativité et de productivité, jamais de substitut à la réflexion et au lien humain.</p>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="modal-footer">
-                <div class="modal-footer-text">
-                    © 2026 Gilles Cormi · Licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="modal-footer-link">CC BY-NC-ND 4.0</a>
-                </div>
-                <button id="modal-close-footer" class="philosophy-btn text-xs">
-                    <i class="fas fa-check" aria-hidden="true"></i>
-                    Fermer
+            <div class="modal-footer pt-6 border-t border-slate-100">
+                <button class="cta-primary w-full h-12" id="modal-close-footer">
+                    J'adhère à la vision
                 </button>
             </div>
         </div>
