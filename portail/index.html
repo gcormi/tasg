@@ -1366,21 +1366,18 @@
             font-weight: 500;
         }
 
-        /* Version Badge */
+        /* Version Badge - Discrete Placement */
         .version-badge {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            background: #4f46e5; /* Retour à l'indigo premium */
-            color: #ffffff;
-            font-size: 8px;
+            margin-top: auto;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 9px;
             font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 6px;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            z-index: 10;
-            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            border-top: 1px solid rgba(226, 232, 240, 0.5);
+            width: 100%;
         }
 
 
@@ -1831,15 +1828,14 @@
         <!-- SIDEBAR HUB -->
         <aside class="w-full lg:w-64 xl:w-72 flex-shrink-0 lg:sticky lg:top-24 card-soft rounded-3xl p-5 border border-slate-200 shadow-xl z-20" style="max-height: calc(100vh - 7rem); overflow-y: auto; scrollbar-width: thin;">
             
-            <!-- NOUVEAU BOUTON MES LIENS -->
+            <!-- BOUTON MES LIENS (ÉPURÉ) -->
             <button id="sidebar-fav-toggle" class="sidebar-fav-btn" aria-label="Ouvrir mes favoris" onclick="window.openDrawer ? window.openDrawer() : console.error('openDrawer non défini')">
-                <div class="version-badge">V3.9.0</div>
                 <div class="sidebar-fav-btn-icon">
                     <i class="fas fa-star"></i>
                 </div>
                 <div class="sidebar-fav-btn-text">
                     <span class="sidebar-fav-btn-title">Mes Liens</span>
-                    <span class="sidebar-fav-btn-subtitle">Cliquez ici pour ouvrir</span>
+                    <span class="sidebar-fav-btn-subtitle">Favoris & Raccourcis</span>
                 </div>
             </button>
 
@@ -1857,6 +1853,8 @@
                 <!-- Rempli par JavaScript -->
             </div>
 
+            <div class="version-badge">Version 3.9.0 Stable</div>
+
             <!-- Ajouter un lien perso -->
             <button id="add-custom-link-btn" class="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-indigo-200 text-indigo-500 hover:bg-indigo-50 hover:border-indigo-300 transition-colors text-xs font-bold uppercase tracking-wide">
                 <i class="fas fa-plus"></i> Ajouter un lien
@@ -1866,49 +1864,15 @@
         <!-- MAIN CONTENT -->
         <main id="main-content" class="flex-grow min-w-0 w-full lg:w-[calc(100%-18rem)] xl:w-[calc(100%-20rem)] lg:pt-0">
 
-        <!-- Hero Section -->
-        <div class="flex flex-col lg:flex-row items-center gap-12 mb-20 relative">
-            <!-- Background Glows -->
-            <div class="hero-glow w-96 h-96 -top-20 -left-20"></div>
-            <div class="hero-glow w-80 h-80 bottom-0 right-0 bg-indigo-200/5"></div>
-
+        <!-- Hero Section (ÉPURÉ & MINIMALISTE) -->
+        <div class="flex flex-col lg:flex-row items-center gap-16 mb-24 relative overflow-hidden px-2">
+            
             <!-- Content (LEFT) -->
-            <div class="hidden lg:flex lg:w-5/12 flex-col justify-center gap-8 relative min-h-[400px]">
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/30 rounded-full blur-[120px] animate-pulse"></div>
-                
-                <!-- Card IA -->
-                <div class="float-badge glass-morphism border border-white/50 rounded-3xl px-6 py-5 shadow-xl flex items-center gap-4 animate-float stagger-1 self-end translate-x-4 z-10 w-72">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
-                        <i class="fas fa-microchip text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-[0.15em] leading-none mb-1.5">IA Générative</div>
-                        <div class="text-sm font-black text-slate-800">Conception intuitive</div>
-                    </div>
+            <div class="max-w-4xl lg:w-3/5 z-20">
+                <div class="inline-flex items-center gap-3 bg-indigo-50/50 backdrop-blur-sm border border-indigo-100/50 rounded-full px-5 py-2.5 mb-10 shadow-sm">
+                    <i class="fas fa-zebra text-indigo-600 text-sm"></i>
+                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Innovation & Inclusion Éducative</span>
                 </div>
-
-                <!-- Card Accessibilité -->
-                <div class="float-badge glass-morphism border border-white/50 rounded-3xl px-6 py-5 shadow-xl flex items-center gap-4 animate-float stagger-2 self-start -translate-x-6 z-20 w-72">
-                    <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-100">
-                        <i class="fas fa-zebra text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-emerald-600 font-extrabold uppercase tracking-[0.15em] leading-none mb-1.5">Éducation Inclusive</div>
-                        <div class="text-sm font-black text-slate-800">DYS / TDAH / HP</div>
-                    </div>
-                </div>
-
-                <!-- Card Gamification -->
-                <div class="float-badge glass-morphism border border-white/50 rounded-3xl px-6 py-5 shadow-xl flex items-center gap-4 animate-float stagger-3 self-end translate-x-8 z-10 w-72">
-                    <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-100">
-                        <i class="fas fa-gamepad text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-amber-600 font-extrabold uppercase tracking-[0.15em] leading-none mb-1.5">Gamification</div>
-                        <div class="text-sm font-black text-slate-800">Escape games HTML</div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Content (LEFT) -->
             <div class="max-w-3xl lg:w-2/3">
