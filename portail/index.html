@@ -2564,10 +2564,8 @@
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
-    <button id="back-to-top" aria-label="Retour en haut de page" title="Retour en haut">
-        <i class="fas fa-arrow-up text-sm" aria-hidden="true"></i>
-    </button>
+    <!-- Toast Notification System -->
+    <div id="toast" class="toast" role="alert" aria-live="true"></div>
 
     <!-- Toast -->
     <div id="toast" role="status" aria-live="polite"></div>
@@ -2972,12 +2970,16 @@
             searchInput.focus();
         });
 
-        // ====== TOAST HELPER ======
+        // ====== TOAST HELPER (Robust for debug) ======
         function showToast(message) {
             const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2800);
+            if (toast) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2800);
+            } else {
+                console.log("NOTIF:", message);
+            }
         }
 
         // ====== COUNTER ANIMATION ======
@@ -3377,14 +3379,15 @@
                 showToast('Erreur Firebase : ' + e.message);
             }
         });
-        // ====== TRANSIT ZONE LOGIC ======
+        // ====== TRANSIT ZONE ENGINE (REBUILT FOR STABILITY) ======
         window.openTransitModal = function() {
             if (!firebase.auth().currentUser) {
-                alert("Veuillez vous connecter pour utiliser la zone de transit.");
+                alert("Session expirée ou non détectée. Veuillez vous reconnecter.");
                 return;
             }
-            const modal = document.getElementById('transit-modal');
+            const modal = document.getElementById('TRANSIT_UI_MODAL');
             if(modal) {
+                modal.style.display = 'flex';
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
                 refreshTransitLists();
@@ -3392,8 +3395,12 @@
         };
 
         window.closeTransitModal = function() {
-            document.getElementById('transit-modal')?.classList.remove('active');
-            document.body.style.overflow = '';
+            const modal = document.getElementById('TRANSIT_UI_MODAL');
+            if(modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
         };
 
         window.handleTransitManualUpload = function(files, zone) {
@@ -3487,7 +3494,14 @@
                         container.appendChild(div);
                     }
                 } catch (err) {
-                    container.innerHTML = '<div class="text-[10px] text-red-400">Erreur cloud</div>';
+                    console.error("Storage List Error:", err);
+                    container.innerHTML = `<div class="text-[10px] text-red-500 font-bold p-4 bg-red-50 rounded-2xl border border-red-100">
+                        Accès Bloqué par Firebase Rules<br>
+                        (Consultez les instructions dans le chat)
+                    </div>`;
+                    if (err.code === 'storage/unauthorized') {
+                        console.warn("Veuillez mettre à jour vos Storage Rules dans Firebase Console !");
+                    }
                 }
             }
         }
@@ -3515,14 +3529,11 @@
             });
         }, 1500);
 
-        console.log('--- Hub Script Loaded (V2.8 - Secure) ---');
+
     </script>
 
-        </div>
-    </div>
-
-    <!-- ============================== MODAL: TRANSIT ZONE ============================== -->
-    <div id="transit-modal" class="transit-modal" onclick="window.closeTransitModal()">
+    <!-- ============================== MODAL: TRANSIT ZONE (V2) ============================== -->
+    <div id="TRANSIT_UI_MODAL" class="transit-modal" onclick="window.closeTransitModal()">
         <div class="transit-card" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -3531,28 +3542,28 @@
                         <i class="fas fa-random"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900 tracking-tighter">Zone de Transit</h2>
-                        <p class="text-slate-500 font-medium text-xs">Transférez vos fichiers entre vos différents postes de travail.</p>
+                        <h2 class="text-2xl font-black text-slate-900 tracking-tighter uppercase">Transit Zone</h2>
+                        <p class="text-slate-500 font-medium text-xs">Zone tampon sécurisée entre vos ordinateurs.</p>
                     </div>
                 </div>
-                <button onclick="window.closeTransitModal()" class="w-10 h-10 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center text-lg border border-slate-100">
-                    <i class="fas fa-times"></i>
+                <button onclick="window.closeTransitModal()" class="w-12 h-12 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center text-2xl border border-slate-100 group">
+                    <i class="fas fa-times group-hover:rotate-90 transition-transform"></i>
                 </button>
             </div>
             
             <!-- Content -->
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-10 overflow-y-auto">
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-10 overflow-y-auto min-h-[400px]">
                 <!-- Zone DRIVE -->
                 <div class="flex flex-col">
                     <h3 class="font-black text-slate-800 uppercase tracking-widest text-[11px] mb-4 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Transit DRIVE
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Dossier DRIVE
                     </h3>
-                    <div id="drop-drive" class="drop-zone rounded-3xl flex flex-col items-center justify-center p-10 mb-6 cursor-pointer border-indigo-200" onclick="document.getElementById('input-drive').click()">
-                        <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4 transition-transform group-hover:scale-110">
-                            <i class="fas fa-file-export text-2xl"></i>
+                    <div id="drop-drive" class="drop-zone rounded-3xl flex flex-col items-center justify-center p-10 mb-6 cursor-pointer border-indigo-200 hover:bg-indigo-50/30 transition-all" onclick="document.getElementById('input-drive').click()">
+                        <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 mb-4 shadow-sm">
+                            <i class="fas fa-file-arrow-up text-2xl"></i>
                         </div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Glisser ou Cliquer</p>
-                        <input type="file" id="input-drive" class="hidden" multiple onchange="handleTransitManualUpload(this.files, 'drive')">
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Déposer ou Cliquer</p>
+                        <input type="file" id="input-drive" class="hidden" multiple onchange="window.handleTransitManualUpload(this.files, 'drive')">
                     </div>
                     <div id="files-drive-container" class="space-y-2"></div>
                 </div>
@@ -3560,26 +3571,25 @@
                 <!-- Zone NUAGE -->
                 <div class="flex flex-col">
                     <h3 class="font-black text-slate-800 uppercase tracking-widest text-[11px] mb-4 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Transit NUAGE
+                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Dossier NUAGE
                     </h3>
-                    <div id="drop-nuage" class="drop-zone rounded-3xl flex flex-col items-center justify-center p-10 mb-6 cursor-pointer border-orange-200" onclick="document.getElementById('input-nuage').click()">
-                        <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mb-4">
-                            <i class="fas fa-cloud-upload-alt text-2xl"></i>
+                    <div id="drop-nuage" class="drop-zone rounded-3xl flex flex-col items-center justify-center p-10 mb-6 cursor-pointer border-orange-200 hover:bg-orange-50/30 transition-all" onclick="document.getElementById('input-nuage').click()">
+                        <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 mb-4 shadow-sm">
+                            <i class="fas fa-cloud-arrow-up text-2xl"></i>
                         </div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Glisser ou Cliquer</p>
-                        <input type="file" id="input-nuage" class="hidden" multiple onchange="handleTransitManualUpload(this.files, 'nuage')">
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Déposer ou Cliquer</p>
+                        <input type="file" id="input-nuage" class="hidden" multiple onchange="window.handleTransitManualUpload(this.files, 'nuage')">
                     </div>
                     <div id="files-nuage-container" class="space-y-2"></div>
                 </div>
             </div>
 
-            <!-- Footer Info -->
+            <!-- Footer -->
             <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                <div class="flex items-center gap-6">
-                    <span class="flex items-center gap-2"><i class="fas fa-hdd"></i> 5 Go Transit Zone</span>
-                    <span class="flex items-center gap-2 text-emerald-600"><i class="fas fa-lock"></i> SSL Sécurisé Google</span>
+                <div class="flex items-center gap-4">
+                    <span class="flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-slate-200"><i class="fas fa-microchip text-indigo-500"></i> Firebase Storage active</span>
                 </div>
-                <div class="text-indigo-600">Gilles Ecosystem · V2.8</div>
+                <div class="text-indigo-600">Sync Ecosystem · G.C.</div>
             </div>
         </div>
     </div>
