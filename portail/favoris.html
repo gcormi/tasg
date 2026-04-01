@@ -9,6 +9,34 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
+            authDomain: "portail-postits.firebaseapp.com",
+            projectId: "portail-postits",
+            storageBucket: "portail-postits.firebasestorage.app",
+            messagingSenderId: "494625342197",
+            appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+        window.login = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch(err => {
+                if(err.code === 'auth/popup-blocked') firebase.auth().signInWithRedirect(provider);
+                else alert("Google Auth Fail: " + err.message);
+            });
+        };
+
+        firebase.auth().onAuthStateChanged(user => {
+            const overlay = document.getElementById('auth-overlay');
+            if (user) {
+                if(overlay) overlay.style.display = 'none';
+            } else {
+                if(overlay) overlay.style.display = 'flex';
+            }
+        });
+    </script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -248,41 +276,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    // ── FIREBASE (Initialisation Rigoureuse V3.8) ─────────────
-    const firebaseConfig = {
-        apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
-        authDomain: "portail-postits.firebaseapp.com",
-        projectId: "portail-postits",
-        storageBucket: "portail-postits.firebasestorage.app",
-        messagingSenderId: "494625342197",
-        appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    window.login = function() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).catch(err => {
-            // Fallback si popup bloquée (Rigueur V3.8)
-            if(err.code === 'auth/popup-blocked') {
-                firebase.auth().signInWithRedirect(provider);
-            } else {
-                alert("Erreur Google Auth: " + err.message);
-            }
-        });
-    };
-
-    firebase.auth().onAuthStateChanged(user => {
-        const overlay = document.getElementById('auth-overlay');
-        if (user) {
-            overlay.style.display = 'none';
-        } else {
-            overlay.style.display = 'flex';
-        }
-    });
-
+    // ── FIREBASE DATABASE (V3.8.1) ─────────────
     const db     = firebase.firestore();
     const favRef = db.collection('favoris');
     const fldRef = db.collection('favoris_folders');

@@ -13,10 +13,51 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK (pour liens personnalisés + post-its) -->
+    <!-- Firebase SDK & AUTH (Initialisation Prioritaire V3.8.1) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
+            authDomain: "portail-postits.firebaseapp.com",
+            projectId: "portail-postits",
+            storageBucket: "portail-postits.firebasestorage.app",
+            messagingSenderId: "494625342197",
+            appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+        window.login = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch(err => {
+                if(err.code === 'auth/popup-blocked') firebase.auth().signInWithRedirect(provider);
+                else alert("Google Auth Fail: " + err.message);
+            });
+        };
+
+        window.logout = function() {
+            if(confirm('Voulez-vous vous déconnecter du portail ?')) {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = window.location.pathname;
+                }).catch(err => alert("Logout error: " + err.message));
+            }
+        };
+
+        firebase.auth().onAuthStateChanged(user => {
+            const overlay = document.getElementById('auth-overlay');
+            if (user) {
+                if(overlay) overlay.style.display = 'none';
+                document.body.style.overflow = '';
+                const pName = document.getElementById('portal-user-name');
+                if(pName && user.displayName) pName.textContent = user.displayName.split(' ')[0];
+                if(typeof renderSidebarLinks === 'function') renderSidebarLinks();
+            } else {
+                if(overlay) overlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    </script>
 
     <style>
         :root {
@@ -2590,58 +2631,9 @@
 
     <!-- ============================== SCRIPTS (RIGUEUR V3.8) ============================== -->
     <script>
-        // --- 1. CONFIGURATION & AUTHENTIFICATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
-            authDomain: "portail-postits.firebaseapp.com",
-            projectId: "portail-postits",
-            storageBucket: "portail-postits.firebasestorage.app",
-            messagingSenderId: "494625342197",
-            appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
-        };
-
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-        } catch (e) { 
-            console.error("Firebase Init Error:", e); 
-        }
-
+        // --- 1. CONFIGURATION & DATABASE ---
         const hubDb = firebase.firestore();
         const customLinksRef = hubDb.collection('customHubLinks');
-
-        window.login = function() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).catch(err => {
-                if(err.code === 'auth/popup-blocked') firebase.auth().signInWithRedirect(provider);
-                else alert("Erreur Google Auth: " + err.message);
-            });
-        };
-
-        window.logout = function() {
-            if(confirm('Voulez-vous vraiment vous déconnecter du portail ?')) {
-                firebase.auth().signOut().then(() => {
-                    window.location.reload();
-                }).catch(err => {
-                    console.error("Logout Error:", err);
-                });
-            }
-        };
-
-        firebase.auth().onAuthStateChanged(user => {
-            const overlay = document.getElementById('auth-overlay');
-            if (user) {
-                if(overlay) overlay.style.display = 'none';
-                document.body.style.overflow = '';
-                const portalName = document.getElementById('portal-user-name');
-                if(portalName && user.displayName) portalName.textContent = user.displayName.split(' ')[0];
-                if(typeof renderSidebarLinks === 'function') renderSidebarLinks();
-            } else {
-                if(overlay) overlay.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-        });
 
         // ====== ACCESSIBILITY SETTINGS MANAGEMENT ======
         const STORAGE_KEY_DARK_MODE = 'accessibility-dark-mode';
