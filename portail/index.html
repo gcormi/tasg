@@ -1616,6 +1616,13 @@
 <body class="text-slate-700 antialiased flex flex-col min-h-screen">
     <!-- ECRAN DE VERROUILLAGE SÉCURISÉ V2.6 -->
     <div id="auth-overlay" class="auth-overlay active">
+        <script>
+            // Failsafe instantané : si déjà loggé, on cache tout avant le rendu
+            if (localStorage.getItem('portal_logged_in') === 'true') {
+                document.getElementById('auth-overlay').classList.remove('active');
+                document.getElementById('auth-overlay').style.display = 'none';
+            }
+        </script>
         <div class="auth-card">
             <div class="w-20 h-20 bg-indigo-600 rounded-3xl mx-auto mb-8 flex items-center justify-center text-white text-3xl shadow-xl shadow-indigo-100">
                 <i class="fas fa-shield-halved"></i>
@@ -1624,9 +1631,9 @@
             <p class="text-slate-500 mb-10 leading-relaxed">
                 Veuillez vous connecter avec votre compte pour accéder à votre écosystème de travail augmenté.
             </p>
-            <button onclick="console.log('Login request...'); window.login()" class="login-btn">
+            <button onclick="window.login()" class="login-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20">
-                <span>Déverrouiller avec mon compte Google (V2.8.1 - FIX)</span>
+                <span>Déverrouiller avec mon compte Google (V2.8.5 - FINAL)</span>
             </button>
             <div class="mt-8 pt-8 border-t border-slate-100">
                 <p class="text-xs text-slate-400 font-medium">Session sécurisée par Firebase Auth & Push Mobile</p>
@@ -2753,7 +2760,8 @@
             const authOverlay = document.getElementById('auth-overlay');
             const profileSection = document.getElementById('user-profile-section');
             if (user) {
-                currentUser = user; // Crucial pour le Hub et Transit
+                currentUser = user;
+                localStorage.setItem('portal_logged_in', 'true');
                 if(authOverlay) {
                     authOverlay.classList.remove('active');
                     authOverlay.style.display = 'none';
@@ -2762,7 +2770,19 @@
                 document.getElementById('user-name').textContent = user.displayName;
                 document.getElementById('user-photo').src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
                 if(typeof startHubSync === 'function') startHubSync();
+            } else {
+                localStorage.removeItem('portal_logged_in');
             }
+        });
+
+        // 3b. Capture du retour de Google
+        firebase.auth().getRedirectResult().then(result => {
+             if (result.user) {
+                 console.log("Retour Google valdié.");
+                 document.getElementById('auth-overlay')?.classList.remove('active');
+             }
+        }).catch(err => {
+             if(err.code !== 'auth/no-recent-auth-operation') console.error("Redirect Result Error:", err.message);
         });
 
         // 4. Suite du chargement (Accessibilité, UI...)
