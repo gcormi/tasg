@@ -415,15 +415,26 @@
 
     window.login = function() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).catch(alert);
+        firebase.auth().signInWithPopup(provider).catch(err => {
+            if(err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+               firebase.auth().signInWithRedirect(provider);
+            } else {
+               alert("Erreur d'authentification : " + err.message);
+            }
+        });
     };
 
+    // Delay overlay to allow background session restoration
     firebase.auth().onAuthStateChanged(user => {
         const overlay = document.getElementById('auth-overlay');
         if (user) {
             overlay.classList.add('hidden');
         } else {
-            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                if (!firebase.auth().currentUser) {
+                    overlay.classList.remove('hidden');
+                }
+            }, 800);
         }
     });
 
