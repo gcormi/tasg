@@ -3007,7 +3007,24 @@
             }
         });
 
-        // ====== AUTHENTIFICATION ET HUB (V2.6) ======
+        // ====== AUTHENTIFICATION ET HUB (V2.6 - REPARÉ) ======
+        
+        // Démarrage immédiat de Firebase
+        try {
+            firebase.initializeApp({
+                apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
+                authDomain: "portail-postits.firebaseapp.com",
+                projectId: "portail-postits",
+                storageBucket: "portail-postits.firebasestorage.app",
+                messagingSenderId: "494625342197",
+                appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
+            });
+        } catch (e) {
+            // Déjà initialisé ou erreur mineure
+        }
+
+        const hubDb = firebase.firestore();
+        let customLinksRef = null;
         let currentUser = null;
         const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -3036,9 +3053,8 @@
                 document.getElementById('user-name').textContent = user.displayName;
                 document.getElementById('user-photo').src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
                 
-                // Charger le hub personnalisé à la connexion
-                if (!hubDb) initializeHub();
-                else startHubSync();
+                // Synchroniser le hub personnalisé à la connexion
+                startHubSync();
             } else {
                 currentUser = null;
                 authOverlay.classList.add('active');
@@ -3066,25 +3082,9 @@
             { titre: "NotebookLM", url: "https://notebooklm.google.com/", icone: "fas fa-book-open-reader", couleurIco: "text-blue-600", fondIco: "bg-blue-50 dark:bg-blue-900/30" }
         ];
 
-        // Init Firebase (même base que les post-its)
-        let hubDb, customLinksRef;
+        // Init Hub initialement géré par initializeApp au dessus
 
-        function initializeHub() {
-            try {
-                hubDb = firebase.app().firestore();
-            } catch(e) {
-                firebase.initializeApp({
-                    apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
-                    authDomain: "portail-postits.firebaseapp.com",
-                    projectId: "portail-postits",
-                    storageBucket: "portail-postits.firebasestorage.app",
-                    messagingSenderId: "494625342197",
-                    appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
-                });
-                hubDb = firebase.firestore();
-            }
-            startHubSync();
-        }
+        // Init Hub initialement géré par initializeApp au dessus
 
         function startHubSync() {
             if(!currentUser) return;
