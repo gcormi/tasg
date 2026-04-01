@@ -1864,13 +1864,13 @@
         <!-- MAIN CONTENT -->
         <main id="main-content" class="flex-grow min-w-0 w-full lg:w-[calc(100%-18rem)] xl:w-[calc(100%-20rem)] lg:pt-0">
 
-        <!-- Hero Section (MODERNE & DESIGN PRO) -->
-        <div class="flex flex-col lg:flex-row items-center gap-12 mb-24 relative overflow-visible">
+        <!-- Hero Section (FINAL & DESIGN PRO) -->
+        <div class="flex flex-col lg:flex-row items-start gap-12 mb-28 relative overflow-visible">
             
-            <!-- Hero Content (Left) -->
-            <div class="w-full lg:w-7/12 z-20">
+            <!-- Hero Content (LEFT - Text & Buttons) -->
+            <div class="w-full lg:w-7/12 z-20 pt-8">
                 <!-- Badge Bienvenue -->
-                <div class="inline-flex items-center gap-2 bg-indigo-50/80 backdrop-blur-sm border border-indigo-100 rounded-full px-5 py-2.5 mb-8 animate-fade-in shadow-sm">
+                <div class="inline-flex items-center gap-2 bg-indigo-50/80 backdrop-blur-sm border border-indigo-100 rounded-full px-5 py-2.5 mb-10 animate-fade-in shadow-sm">
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
@@ -1906,39 +1906,63 @@
                 </div>
             </div>
 
-            <!-- Hero Design Elements (Right) -->
-            <div class="w-full lg:w-5/12 flex flex-col gap-6 relative min-h-[400px] justify-center mt-12 lg:mt-0">
+            <!-- Hero Design Elements (RIGHT - Expanded Cards List) -->
+            <div class="w-full lg:w-5/12 flex flex-col gap-5 relative min-h-[500px] items-end justify-start mt-12 lg:mt-0">
                  <!-- Background Glow -->
-                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-100/40 rounded-full blur-[100px]"></div>
+                 <div class="absolute top-[40%] right-[-10%] w-96 h-96 bg-indigo-100/40 rounded-full blur-[100px] pointer-events-none"></div>
 
-                 <!-- Staggered Cards (DESIGN PROPRE) -->
-                 <div class="glass-morphism rounded-3xl p-5 border border-white/50 shadow-xl flex items-center gap-4 hover:translate-x-2 transition-transform self-end w-72 animate-float stagger-1">
+                 <!-- IA Card -->
+                 <div class="glass-morphism rounded-3xl p-4 border border-white/60 shadow-xl flex items-center gap-4 hover:-translate-x-2 transition-transform w-[280px] animate-float stagger-1">
                     <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
-                        <i class="fas fa-microchip text-xl"></i>
+                        <i class="fas fa-microchip text-sm"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-[0.15em] leading-none mb-1.5">IA Générative</div>
-                        <div class="text-sm font-black text-slate-800 uppercase tracking-tight">Conception intuitive</div>
+                        <div class="text-[9px] text-indigo-500 font-extrabold uppercase tracking-widest leading-none mb-1">IA Générative</div>
+                        <div class="text-sm font-black text-slate-800">Conception intuitive</div>
                     </div>
                  </div>
 
-                 <div class="glass-morphism rounded-3xl p-5 border border-white/50 shadow-xl flex items-center gap-4 hover:-translate-x-2 transition-transform self-start w-72 translate-x-4 animate-float stagger-2">
+                 <!-- Organization Card -->
+                 <div class="glass-morphism rounded-3xl p-4 border border-white/60 shadow-xl flex items-center gap-4 hover:-translate-x-2 transition-transform w-[280px] translate-x-[-15px] animate-float stagger-2">
+                    <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+                        <i class="fas fa-clock text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-blue-500 font-extrabold uppercase tracking-widest leading-none mb-1">Organisation</div>
+                        <div class="text-sm font-black text-slate-800">Workflow agiles</div>
+                    </div>
+                 </div>
+
+                 <!-- Disability/Zebra Card -->
+                 <div class="glass-morphism rounded-3xl p-4 border border-white/60 shadow-xl flex items-center gap-4 hover:-translate-x-2 transition-transform w-[280px] translate-x-[-30px] animate-float stagger-3">
                     <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-100">
-                        <i class="fas fa-zebra text-xl"></i>
+                        <i class="fas fa-zebra text-sm"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] text-emerald-600 font-extrabold uppercase tracking-[0.15em] leading-none mb-1.5">Éducation Inclusive</div>
-                        <div class="text-sm font-black text-slate-800 uppercase tracking-tight">DYS / TDAH / HP</div>
+                        <div class="text-[9px] text-emerald-600 font-extrabold uppercase tracking-widest leading-none mb-1">Inclusion DYS</div>
+                        <div class="text-sm font-black text-slate-800">Accessibilité universelle</div>
                     </div>
                  </div>
 
-                 <div class="glass-morphism rounded-3xl p-5 border border-white/50 shadow-xl flex items-center gap-4 hover:translate-x-2 transition-transform self-end w-72 animate-float stagger-3">
+                 <!-- Gamification Card -->
+                 <div class="glass-morphism rounded-3xl p-4 border border-white/60 shadow-xl flex items-center gap-4 hover:-translate-x-2 transition-transform w-[280px] translate-x-[-15px] animate-float stagger-1">
                     <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-100">
-                        <i class="fas fa-gamepad text-xl"></i>
+                        <i class="fas fa-gamepad text-sm"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] text-amber-600 font-extrabold uppercase tracking-[0.15em] leading-none mb-1.5">Gamification</div>
-                        <div class="text-sm font-black text-slate-800 uppercase tracking-tight">Escape games HTML</div>
+                        <div class="text-[9px] text-amber-600 font-extrabold uppercase tracking-widest leading-none mb-1">Gamification</div>
+                        <div class="text-sm font-black text-slate-800">Engager par le jeu</div>
+                    </div>
+                 </div>
+
+                 <!-- Open Source Card -->
+                 <div class="glass-morphism rounded-3xl p-4 border border-white/60 shadow-xl flex items-center gap-4 hover:-translate-x-2 transition-transform w-[280px] animate-float stagger-2">
+                    <div class="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-100">
+                        <i class="fas fa-unlock-keyhole text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-rose-500 font-extrabold uppercase tracking-widest leading-none mb-1">Biens Communs</div>
+                        <div class="text-sm font-black text-slate-800">Souveraineté & Partage</div>
                     </div>
                  </div>
             </div>
