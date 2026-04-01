@@ -2568,8 +2568,6 @@
     <!-- Toast Notification System -->
     <div id="toast" class="toast" role="alert" aria-live="true"></div>
 
-    <!-- Toast -->
-    <div id="toast" role="status" aria-live="polite"></div>
 
     <!-- ============================== MODAL: PHILOSOPHIE DU PROJET ============================== -->
     <div id="philosophy-modal" class="modal-overlay">
@@ -3277,16 +3275,7 @@
             });
         }
 
-        // Listener temps réel Firebase sur customHubLinks
-        customLinksRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
-            const customLinks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            renderSidebarLinks();
-            renderDrawerLinks(customLinks);
-        }, err => {
-            console.warn('Firebase sidebar error:', err);
-            renderSidebarLinks();
-            renderDrawerLinks([]);
-        });
+        
 
         // Suppression d'un lien personnalisé
         window.deleteCustomHubLink = async function(id) {
