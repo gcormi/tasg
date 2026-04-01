@@ -1210,6 +1210,7 @@
         .fav-modal-overlay.active {
             opacity: 1;
             visibility: visible;
+            z-index: 20000;
         }
 
         .fav-modal-container {
@@ -3060,6 +3061,41 @@
 
         // ====== AUTHENTIFICATION ET HUB (V2.6 - REPARÉ) ======
         
+        // Définition immédiate des fonctions globales pour les boutons de la sidebar
+        window.openDrawer = function() {
+            console.log("Appel de openDrawer...");
+            const drawer = document.getElementById('fav-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (drawer && overlay) {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                overlay.style.visibility = 'visible';
+                overlay.style.opacity = '1';
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error("Éléments du tiroir introuvables au clic");
+            }
+        };
+
+        window.closeDrawer = function() {
+            document.getElementById('fav-drawer')?.classList.remove('active');
+            const overlay = document.getElementById('drawer-overlay');
+            if(overlay) {
+                overlay.classList.remove('active');
+                overlay.style.visibility = 'hidden';
+                overlay.style.opacity = '0';
+            }
+            document.body.style.overflow = '';
+        };
+
+        window.login = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch(error => {
+                console.error("Login failed:", error);
+                alert("Erreur de connexion : " + error.message);
+            });
+        };
+        
         // Démarrage immédiat de Firebase
         try {
             firebase.initializeApp({
@@ -3077,14 +3113,6 @@
         const hubDb = firebase.firestore();
         let customLinksRef = null;
         let currentUser = null;
-        const provider = new firebase.auth.GoogleAuthProvider();
-
-        window.login = function() {
-            firebase.auth().signInWithPopup(provider).catch(error => {
-                console.error("Login failed:", error);
-                alert("Erreur de connexion : " + error.message);
-            });
-        };
 
         window.logout = function() {
             if(confirm('Souhaitez-vous vous déconnecter de votre session ?')) {
@@ -3258,18 +3286,7 @@
             }
         };
 
-        // Drawer / Modal Handlers globals to be accessible from onclick
-        window.openDrawer = function() {
-            const drawer = document.getElementById('fav-drawer');
-            const overlay = document.getElementById('drawer-overlay');
-            if (drawer && overlay) {
-                drawer.classList.add('active');
-                overlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            } else {
-                console.error("Éléments modale introuvables");
-            }
-        };
+        // Handlers déjà définis en haut du script
 
         window.closeDrawer = function() {
             document.getElementById('fav-drawer')?.classList.remove('active');
