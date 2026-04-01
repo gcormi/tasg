@@ -17,6 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
     <style>
         :root {
@@ -1387,7 +1388,36 @@
             flex: 1;
             overflow-y: auto;
             padding: 24px;
-            scrollbar-width: thin;
+            /* === TRANSIT MODAL === */
+        .transit-modal {
+            position: fixed; inset: 0; z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            padding: 1.5rem; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px);
+        }
+        .transit-modal.active { display: flex; animation: modalIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        .drop-zone {
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s;
+            background: #f8fafc;
+            min-height: 200px;
+        }
+        .drop-zone.dragover {
+            border-color: #6366f1;
+            background: #eef2ff;
+            transform: scale(1.02);
+        }
+        .transit-file-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.5rem 0.75rem; background: white;
+            border-radius: 0.75rem; border: 1px solid #f1f5f9;
+            margin-bottom: 0.5rem; font-size: 0.75rem; font-weight: 600;
+        }
+        .transit-file-item:hover { border-color: #e2e8f0; }
+
+        /* Existing scrollbar logic */
+        ::-webkit-scrollbar { width: 8px; }
         }
 
         .drawer-footer {
@@ -3332,9 +3362,194 @@
                 showToast('Erreur Firebase : ' + e.message);
             }
         });
-        console.log('--- Hub Script Loaded (V2.6 - Secure) ---');
+        // ====== TRANSIT ZONE LOGIC ======
+        window.openTransitModal = function() {
+            if (!firebase.auth().currentUser) {
+                alert("Veuillez vous connecter pour utiliser la zone de transit.");
+                return;
+            }
+            const modal = document.getElementById('transit-modal');
+            if(modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                refreshTransitLists();
+            }
+        };
+
+        window.closeTransitModal = function() {
+            document.getElementById('transit-modal')?.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        // Initialize Drop Zones
+        function initTransitDropZones() {
+            const zones = ['drive', 'nuage'];
+            zones.forEach(zone => {
+                const el = document.getElementById(`drop-${zone}`);
+                if (!el) return;
+
+                el.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    el.classList.add('dragover');
+                });
+                el.addEventListener('dragleave', () => {
+                    el.classList.remove('dragover');
+                });
+                el.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    el.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    handleTransitUpload(files, zone);
+                });
+            });
+        }
+
+        async function handleTransitUpload(files, zone) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            for (let file of files) {
+                const storageRef = firebase.storage().ref(`transit/${user.uid}/${zone}/${file.name}`);
+                showToast(`Envoi de ${file.name}...`);
+                
+                try {
+                    await storageRef.put(file);
+                    showToast(`✅ ${file.name} ajouté !`, "success");
+                    refreshTransitLists();
+                } catch (err) {
+                    console.error(err);
+                    showToast(`❌ Erreur : ${file.name}`, "error");
+                }
+            }
+        }
+
+        async function refreshTransitLists() {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            const zones = ['drive', 'nuage'];
+            
+            for (let zone of zones) {
+                const container = document.getElementById(`files-${zone}-container`);
+                if (!container) continue;
+                
+                container.innerHTML = '<div class="text-[10px] text-slate-400 animate-pulse">Lecture...</div>';
+                
+                try {
+                    const storageRef = firebase.storage().ref(`transit/${user.uid}/${zone}`);
+                    const res = await storageRef.listAll();
+                    
+                    container.innerHTML = '';
+                    if (res.items.length === 0) {
+                        container.innerHTML = '<div class="text-[10px] text-slate-300 italic py-4 border-2 border-dashed border-slate-50 rounded-2xl text-center">Zone vide</div>';
+                        continue;
+                    }
+
+                    for (const item of res.items) {
+                        const url = await item.getDownloadURL();
+                        const div = document.createElement('div');
+                        div.className = 'transit-file-item group';
+                        div.innerHTML = `
+                            <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <div class="truncate text-slate-700">${item.name}</div>
+                            </div>
+                            <div class="flex gap-1">
+                                <a href="${url}" download="${item.name}" target="_blank" class="p-2 hover:text-emerald-600 transition-colors" title="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <button onclick="deleteTransitFile('${user.uid}', '${zone}', '${item.name}')" class="p-2 hover:text-red-500 transition-colors" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    }
+                } catch (err) {
+                    container.innerHTML = '<div class="text-[10px] text-red-400">Erreur cloud</div>';
+                }
+            }
+        }
+
+        window.deleteTransitFile = async function(uid, zone, name) {
+            if (!confirm(`Retirer ${name} du transit ?`)) return;
+            try {
+                await firebase.storage().ref(`transit/${uid}/${zone}/${name}`).delete();
+                showToast("Dépôt retiré.");
+                refreshTransitLists();
+            } catch (err) {
+                showToast("Erreur suppression", "error");
+            }
+        };
+
+        // Init on startup
+        setTimeout(initTransitDropZones, 1500);
+
+        console.log('--- Hub Script Loaded (V2.8 - Secure) ---');
     </script>
 
+        </div>
+    </div>
+
+    <!-- ============================== MODAL: TRANSIT ZONE ============================== -->
+    <div id="transit-modal" class="transit-modal" onclick="window.closeTransitModal()">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                        <i class="fas fa-random text-indigo-600"></i>
+                        Zone de Transit <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-2xl text-xs font-black ml-2 uppercase">V2.8</span>
+                    </h2>
+                    <p class="text-slate-500 font-medium text-sm mt-1">Votre zone tampon cross-PC sécurisée.</p>
+                </div>
+                <button onclick="window.closeTransitModal()" class="w-12 h-12 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-10 grid grid-cols-1 md:grid-cols-2 gap-10 overflow-y-auto">
+                <!-- Zone DRIVE -->
+                <div class="flex flex-col h-full">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">D</div>
+                        <h3 class="font-black text-slate-800 uppercase tracking-widest text-sm">Zone Transit DRIVE</h3>
+                    </div>
+                    <div id="drop-drive" class="drop-zone rounded-[2rem] flex flex-col items-center justify-center p-8 mb-6 cursor-pointer">
+                        <i class="fas fa-file-export text-4xl text-slate-300 mb-4 pointer-events-none"></i>
+                        <p class="text-xs font-bold text-slate-500 text-center uppercase tracking-wide pointer-events-none">Drop to DRIVE</p>
+                    </div>
+                    <div class="flex-grow">
+                        <div id="files-drive-container" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Zone NUAGE -->
+                <div class="flex flex-col h-full">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">N</div>
+                        <h3 class="font-black text-slate-800 uppercase tracking-widest text-sm">Zone Transit NUAGE</h3>
+                    </div>
+                    <div id="drop-nuage" class="drop-zone rounded-[2rem] flex flex-col items-center justify-center p-8 mb-6 cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 mb-4 pointer-events-none"></i>
+                        <p class="text-xs font-bold text-slate-500 text-center uppercase tracking-wide pointer-events-none">Drop to NUAGE</p>
+                    </div>
+                    <div class="flex-grow">
+                        <div id="files-nuage-container" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-bold uppercase tracking-widest">
+                <div class="flex items-center gap-6">
+                    <span><i class="fas fa-hdd mr-2"></i> 5 Go Transit</span>
+                </div>
+                <div>Écosystème Gilles · V2.8</div>
+            </div>
         </div>
     </div>
 
