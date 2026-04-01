@@ -2748,7 +2748,24 @@
             firebase.auth().signInWithRedirect(provider);
         };
 
-        // 3. Suite du chargement (Accessibilité, UI...)
+        // 3. Surveillance PRIORITAIRE de l'accès
+        firebase.auth().onAuthStateChanged(user => {
+            const authOverlay = document.getElementById('auth-overlay');
+            const profileSection = document.getElementById('user-profile-section');
+            if (user) {
+                currentUser = user; // Crucial pour le Hub et Transit
+                if(authOverlay) {
+                    authOverlay.classList.remove('active');
+                    authOverlay.style.display = 'none';
+                }
+                if(profileSection) profileSection.classList.remove('hidden');
+                document.getElementById('user-name').textContent = user.displayName;
+                document.getElementById('user-photo').src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
+                if(typeof startHubSync === 'function') startHubSync();
+            }
+        });
+
+        // 4. Suite du chargement (Accessibilité, UI...)
         const STORAGE_KEY_DARK_MODE = 'accessibility-dark-mode';
         const STORAGE_KEY_DYSLEXIA = 'accessibility-dyslexia';
         const STORAGE_KEY_TEXT_SIZE = 'accessibility-text-size';
@@ -3131,27 +3148,7 @@
             }
         };
 
-        // Monitoring de l'auth
-        firebase.auth().onAuthStateChanged(user => {
-            const authOverlay = document.getElementById('auth-overlay');
-            const profileSection = document.getElementById('user-profile-section');
-            
-            if (user) {
-                currentUser = user;
-                authOverlay.classList.remove('active');
-                profileSection.classList.remove('hidden');
-                document.getElementById('user-name').textContent = user.displayName;
-                document.getElementById('user-photo').src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
-                
-                // Synchroniser le hub personnalisé à la connexion
-                startHubSync();
-            } else {
-                currentUser = null;
-                authOverlay.classList.add('active');
-                profileSection.classList.add('hidden');
-            }
-        });
-
+ 
         // ====== SIDEBAR HUB SCRIPT & CUSTOM LINKS (Firebase) ======
         const internalTools = [
             { titre: "Post-its", url: "postits.html", icone: "fas fa-sticky-note", couleurIco: "text-yellow-500", fondIco: "bg-yellow-50 dark:bg-yellow-900/30", badge: "Live" },
