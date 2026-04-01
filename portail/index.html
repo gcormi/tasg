@@ -1629,7 +1629,7 @@
             </p>
             <button onclick="window.login()" class="login-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20">
-                <span>Accéder au Portail (V3.3 - REPAIR COMPLETE)</span>
+                <span>Accéder au Portail (V3.4 - LOGIN PRIORITY)</span>
             </button>
             <div class="mt-8 pt-8 border-t border-slate-100">
                 <p class="text-xs text-slate-400 font-medium">Session sécurisée par Firebase Auth & Push Mobile</p>
@@ -1672,7 +1672,7 @@
                         <i class="fas fa-graduation-cap text-lg" aria-hidden="true"></i>
                     </div>
                     <div>
-                        <span class="block font-extrabold text-base leading-none text-slate-900 tracking-tight">Espace de Travail Augmenté de <span id="portal-user-name" class="text-indigo-600">Gilles</span> <span class="ml-2 px-1.5 py-0.5 bg-indigo-600 text-white text-[8px] rounded font-black tracking-widest uppercase">V3.3</span></span>
+                        <span class="block font-extrabold text-base leading-none text-slate-900 tracking-tight">Espace de Travail Augmenté de <span id="portal-user-name" class="text-indigo-600">Gilles</span> <span class="ml-2 px-1.5 py-0.5 bg-indigo-600 text-white text-[8px] rounded font-black tracking-widest uppercase">V3.4</span></span>
                         <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 block">Maîtrise du Workflow & IA Générative</span>
                     </div>
                 </a>
@@ -1787,7 +1787,7 @@
                 <div class="flex-grow text-left">
                     <div class="flex items-center justify-between">
                         <span class="sidebar-fav-btn-title">Mes Liens</span>
-                        <span class="text-[9px] font-black bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-md">V3.3</span>
+                        <span class="text-[9px] font-black bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-md">V3.4</span>
                     </div>
                     <span class="sidebar-fav-btn-subtitle">Cliquez ici pour ouvrir</span>
                 </div>
@@ -2744,7 +2744,7 @@
 
     <!-- ============================== SCRIPTS ============================== -->
     <script>
-        // 1. Démarrage PRIORITAIRE de Firebase
+        // --- 1. CONFIGURATION & AUTHENTIFICATION PRIORITAIRE ---
         try {
             firebase.initializeApp({
                 apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
@@ -2754,36 +2754,45 @@
                 messagingSenderId: "494625342197",
                 appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
             });
-        } catch (e) { console.warn("Firebase init:", e); }
+            console.log("Firebase Initialisé - V3.4");
+        } catch (e) { console.error("Firebase init crash:", e); }
 
-        // 2. Branchement immédiat du bouton de login
+        // Branchement immédiat des fonctions globales
         window.login = function() {
+            console.log("Tentative de connexion Google...");
             const provider = new firebase.auth.GoogleAuthProvider();
-            // Retour à la méthode POPUP d'origine (Confirmé fonctionnelle)
             firebase.auth().signInWithPopup(provider).then(result => {
-                console.log("Connexion réussie via Popup");
-                document.getElementById('auth-overlay').classList.remove('active');
+                console.log("Connexion réussie !");
+                document.getElementById('auth-overlay').style.display = 'none';
             }).catch(err => {
-                console.error("Erreur Connexion Popup:", err.message);
-                // Si popup bloquée, on tente redirect en dernier recours
-                if(err.code === 'auth/popup-blocked') {
-                    firebase.auth().signInWithRedirect(provider);
-                }
+                console.error("Erreur Popup:", err.message);
+                if(err.code === 'auth/popup-blocked') firebase.auth().signInWithRedirect(provider);
             });
         };
 
-        // Supprimé d'ici pour être déplacé en bas
-
-        // 3b. Capture du retour de Google
-        firebase.auth().getRedirectResult().then(result => {
-             if (result.user) {
-                 console.log("Retour Google valdié.");
-                 document.getElementById('auth-overlay')?.classList.remove('active');
-             }
-        }).catch(err => {
-             if(err.code !== 'auth/no-recent-auth-operation') console.error("Redirect Result Error:", err.message);
+        firebase.auth().onAuthStateChanged(user => {
+            const authOverlay = document.getElementById('auth-overlay');
+            const nameDisplay = document.getElementById('user-name');
+            const portalName = document.getElementById('portal-user-name');
+            
+            if (user) {
+                console.log("Utilisateur détecté :", user.displayName);
+                if(authOverlay) {
+                    authOverlay.classList.remove('active');
+                    authOverlay.style.display = 'none';
+                }
+                if(nameDisplay) nameDisplay.textContent = user.displayName || "Gilles";
+                if(portalName) portalName.textContent = (user.displayName || "Gilles").split(' ')[0];
+                if(typeof startHubSync === 'function') startHubSync();
+            } else {
+                if(authOverlay) {
+                    authOverlay.classList.add('active');
+                    authOverlay.style.display = 'flex';
+                }
+            }
         });
 
+        // --- 2. LOGIQUE UI ET ACCESSIBILITÉ ---
         // 4. Suite du chargement (Accessibilité, UI...)
         const STORAGE_KEY_DARK_MODE = 'accessibility-dark-mode';
         const STORAGE_KEY_DYSLEXIA = 'accessibility-dyslexia';
