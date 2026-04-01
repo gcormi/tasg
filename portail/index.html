@@ -1754,14 +1754,14 @@
         <aside class="w-full lg:w-64 xl:w-72 flex-shrink-0 lg:sticky lg:top-24 card-soft rounded-3xl p-5 border border-slate-200 shadow-xl z-20" style="max-height: calc(100vh - 7rem); overflow-y: auto; scrollbar-width: thin;">
             
             <!-- NOUVEAU BOUTON MES LIENS -->
-            <button id="sidebar-fav-toggle" class="sidebar-fav-btn" aria-label="Ouvrir mes favoris" aria-expanded="false" aria-controls="fav-drawer">
-                <div class="version-badge">V2.1</div>
+            <button id="sidebar-fav-toggle" class="sidebar-fav-btn" aria-label="Ouvrir mes favoris" onclick="window.openDrawer ? window.openDrawer() : console.error('openDrawer non défini')">
+                <div class="version-badge">V2.2</div>
                 <div class="sidebar-fav-btn-icon">
                     <i class="fas fa-star"></i>
                 </div>
                 <div class="sidebar-fav-btn-text">
                     <span class="sidebar-fav-btn-title">Mes Liens</span>
-                    <span class="sidebar-fav-btn-subtitle">Favoris personnels</span>
+                    <span class="sidebar-fav-btn-subtitle">Cliquez ici pour ouvrir</span>
                 </div>
             </button>
 
@@ -2693,35 +2693,6 @@
         </div>
     </div>
 
-    <!-- ============================== MODAL: AJOUTER LIEN PERSO ============================== -->
-    <div id="custom-link-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <div class="modal-header-content">
-                    <h2 class="text-xl">Ajouter un raccourci</h2>
-                    <p>Au Hub personnel de gauche</p>
-                </div>
-                <button class="modal-close-btn" aria-label="Fermer la modale" id="modal-close-custom">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="modal-body p-6">
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Nom du raccourci (*)</label>
-                    <input type="text" id="custom-link-name" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none" placeholder="Ex: Mon Drive Pro">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Adresse / URL (*)</label>
-                    <input type="url" id="custom-link-url" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none" placeholder="https://...">
-                </div>
-                <div class="flex justify-end gap-3 mt-4">
-                    <button id="cancel-custom-link" class="px-5 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">Annuler</button>
-                    <button id="save-custom-link" class="px-5 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all">Enregistrer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ============================== SCRIPTS ============================== -->
     <script>
         // ====== ACCESSIBILITY SETTINGS MANAGEMENT ======
@@ -3198,26 +3169,29 @@
             }
         };
 
-        // Drawer Handlers
-        const favDrawer = document.getElementById('fav-drawer');
-        const drawerOverlay = document.getElementById('drawer-overlay');
+        // Drawer / Modal Handlers globals to be accessible from onclick
+        window.openDrawer = function() {
+            const drawer = document.getElementById('fav-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (drawer && overlay) {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error("Éléments modale introuvables");
+            }
+        };
+
+        window.closeDrawer = function() {
+            document.getElementById('fav-drawer')?.classList.remove('active');
+            document.getElementById('drawer-overlay')?.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
         const drawerToggle = document.getElementById('sidebar-fav-toggle');
         const drawerClose = document.getElementById('drawer-close');
+        const drawerOverlay = document.getElementById('drawer-overlay');
         const drawerAddBtn = document.getElementById('drawer-add-link');
-
-        function openDrawer() {
-            favDrawer.classList.add('active');
-            drawerOverlay.classList.add('active');
-            drawerToggle.setAttribute('aria-expanded', 'true');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeDrawer() {
-            favDrawer.classList.remove('active');
-            drawerOverlay.classList.remove('active');
-            drawerToggle.setAttribute('aria-expanded', 'false');
-            document.body.style.overflow = '';
-        }
 
         drawerToggle?.addEventListener('click', openDrawer);
         drawerClose?.addEventListener('click', closeDrawer);
@@ -3231,20 +3205,23 @@
         });
 
         // Modal Handlers (Lien personnalisé)
-        const customLinkModal = document.getElementById('custom-link-modal');
-        function openCustomLinkModal() {
-            document.getElementById('custom-link-name').value = '';
-            document.getElementById('custom-link-url').value = '';
-            customLinkModal.classList.add('active');
-            // document.body.style.overflow = 'hidden'; // Déjà géré si drawer ouvert
-            setTimeout(() => document.getElementById('custom-link-name').focus(), 100);
-        }
-        function closeCustomLinkModal() {
-            customLinkModal.classList.remove('active');
-            if (!favDrawer.classList.contains('active')) {
+        window.openCustomLinkModal = function() {
+            const modal = document.getElementById('custom-link-modal');
+            if(modal) {
+                document.getElementById('custom-link-name').value = '';
+                document.getElementById('custom-link-url').value = '';
+                modal.classList.add('active');
+                setTimeout(() => document.getElementById('custom-link-name').focus(), 100);
+            }
+        };
+
+        window.closeCustomLinkModal = function() {
+            document.getElementById('custom-link-modal')?.classList.remove('active');
+            const drawer = document.getElementById('fav-drawer');
+            if (!drawer || !drawer.classList.contains('active')) {
                 document.body.style.overflow = '';
             }
-        }
+        };
 
         drawerAddBtn?.addEventListener('click', openCustomLinkModal);
         document.getElementById('add-custom-link-btn')?.addEventListener('click', openCustomLinkModal);
@@ -3305,11 +3282,11 @@
     </div>
 
     <!-- Modal Ajouter un lien -->
-    <div id="custom-link-modal" class="custom-link-modal-overlay" onclick="closeCustomLinkModal()">
+    <div id="custom-link-modal" class="custom-link-modal-overlay" onclick="window.closeCustomLinkModal()">
         <div class="custom-link-modal-content" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-extrabold text-slate-800">Ajouter un favori</h3>
-                <button id="modal-close-custom" class="text-slate-400 hover:text-red-500 transition-colors">
+                <button id="modal-close-custom" onclick="window.closeCustomLinkModal()" class="text-slate-400 hover:text-red-500 transition-colors">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
