@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portail d'Ingénierie Pédagogique - Suite d'outils IA au service de l'enseignant. Accessible et inclusif.">
-    <title>Portail de l'Ingénierie Pédagogique (V3.8.1) | Ressources & Innovation</title>
+    <title>Portail de l'Ingénierie Pédagogique (V3.9.0) | Ressources & Innovation</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK & AUTH (Initialisation Prioritaire V3.8.1) -->
+    <!-- Firebase SDK & AUTH (Initialisation Prioritaire V3.9.0) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1795,7 +1795,7 @@
             
             <!-- NOUVEAU BOUTON MES LIENS -->
             <button id="sidebar-fav-toggle" class="sidebar-fav-btn" aria-label="Ouvrir mes favoris" onclick="window.openDrawer ? window.openDrawer() : console.error('openDrawer non défini')">
-                <div class="version-badge">V3.8.1</div>
+                <div class="version-badge">V3.9.0</div>
                 <div class="sidebar-fav-btn-icon">
                     <i class="fas fa-star"></i>
                 </div>
@@ -2677,7 +2677,7 @@
         </div>
     </div>
 
-    <!-- ============================== SCRIPTS (RIGUEUR V3.8) ============================== -->
+    <!-- ============================== SCRIPTS (RIGUEUR V3.9) ============================== -->
     <script>
         // --- 1. CONFIGURATION & DATABASE ---
         const hubDb = firebase.firestore();
@@ -3039,7 +3039,7 @@
             { titre: "NotebookLM", url: "https://notebooklm.google.com/", icone: "fas fa-book-open-reader", couleurIco: "text-blue-600", fondIco: "bg-blue-50 dark:bg-blue-900/30" }
         ];
 
-        // (Firebase init already handled at the top in V3.8)
+        // (Firebase init already handled at the top in V3.9)
 
         // Render sidebar (seulement les outils internes)
         function renderSidebarLinks() {
@@ -3232,7 +3232,7 @@
                 showToast('Erreur Firebase : ' + e.message);
             }
         });
-        console.log('--- Portal Hub Script Loaded (V3.8) ---');
+        console.log('--- Portal Hub Script Loaded (V3.9) ---');
     </script>
 
     <!-- Mes Favoris Modal (Small Center Modal) -->
