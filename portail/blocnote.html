@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script>
-        // La suite est gérée par Firebase Auth ci-dessous
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bloc-note | Portail Éducatif</title>
@@ -17,9 +13,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase -->
+    <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -327,17 +324,23 @@
     </style>
 </head>
 <body>
-    <!-- Overlay de Sécurité Google -->
+    <!-- Overlay de Sécurité Google (V3.9.1 Hardened) -->
     <div id="auth-overlay" class="auth-overlay">
-        <div class="auth-card">
-            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
-                <i class="fas fa-lock"></i>
+        <div class="auth-card" id="auth-card">
+            <div id="auth-loading" class="mb-6">
+                <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
+                <p class="text-slate-500 mt-4 font-bold text-sm">Vérification de session...</p>
             </div>
-            <h2 class="text-2xl font-black text-slate-900 mb-2">Accès Sécurisé</h2>
-            <p class="text-slate-500 mb-8 font-medium">Veuillez vous identifier avec votre compte Google pour accéder à votre bloc-note.</p>
-            <button onclick="window.login()" class="login-btn">
-                <i class="fab fa-google"></i> Se connecter avec Google
-            </button>
+            <div id="auth-content" class="hidden">
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-900 mb-2">Accès Sécurisé</h2>
+                <p class="text-slate-500 mb-8 font-medium">Veuillez vous identifier avec votre compte Google pour accéder à votre bloc-note.</p>
+                <button onclick="window.login()" class="login-btn">
+                    <i class="fab fa-google"></i> Se connecter avec Google
+                </button>
+            </div>
         </div>
     </div>
 
@@ -424,17 +427,25 @@
         });
     };
 
-    // Delay overlay to allow background session restoration
+    // Initialize Firebase UI properly
     firebase.auth().onAuthStateChanged(user => {
         const overlay = document.getElementById('auth-overlay');
+        const loading = document.getElementById('auth-loading');
+        const content = document.getElementById('auth-content');
+
         if (user) {
             overlay.classList.add('hidden');
+            console.log("[Auth] Session reconnue");
         } else {
+            console.log("[Auth] Session absente, attente de restauration...");
+            // Wait 2.5 seconds to see if session is shared from portal automatically
             setTimeout(() => {
                 if (!firebase.auth().currentUser) {
-                    overlay.classList.remove('hidden');
+                    loading.classList.add('hidden');
+                    content.classList.remove('hidden');
+                    console.log("[Auth] Session introuvable, affichage du bouton de connexion");
                 }
-            }, 800);
+            }, 2500);
         }
     });
 
