@@ -2762,8 +2762,17 @@
         // 2. Branchement immédiat du bouton de login
         window.login = function() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            // Utilisation de Redirect (Blindé contre les blocages de fenêtres)
-            firebase.auth().signInWithRedirect(provider);
+            // Retour à la méthode POPUP d'origine (Confirmé fonctionnelle)
+            firebase.auth().signInWithPopup(provider).then(result => {
+                console.log("Connexion réussie via Popup");
+                document.getElementById('auth-overlay').classList.remove('active');
+            }).catch(err => {
+                console.error("Erreur Connexion Popup:", err.message);
+                // Si popup bloquée, on tente redirect en dernier recours
+                if(err.code === 'auth/popup-blocked') {
+                    firebase.auth().signInWithRedirect(provider);
+                }
+            });
         };
 
         // Supprimé d'ici pour être déplacé en bas
@@ -3558,11 +3567,11 @@
                 
                 const nameDisplay = document.getElementById('user-name');
                 const portalName = document.getElementById('portal-user-name');
-                if(nameDisplay) nameDisplay.textContent = user.displayName;
-                if(portalName) portalName.textContent = user.displayName.split(' ')[0];
-                
                 const photoDisplay = document.getElementById('user-photo');
-                if(photoDisplay) photoDisplay.src = user.photoURL || 'https://ui-avatars.com/api/?name='+user.displayName;
+                
+                if(nameDisplay) nameDisplay.textContent = user.displayName || "Gilles";
+                if(portalName) portalName.textContent = (user.displayName || "Gilles").split(' ')[0];
+                if(photoDisplay) photoDisplay.src = user.photoURL || 'https://ui-avatars.com/api/?name=Gilles';
                 
                 if(typeof applyFiltersAndSearch === 'function') {
                     applyFiltersAndSearch();
