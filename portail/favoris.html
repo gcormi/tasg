@@ -665,18 +665,22 @@
     // ── MOTEUR MULTI-RELAIS ALBERT ET SUPPORT WORKER ──────────────────
     async function fetchAlbert(keyOrUrl, promptText, tokens=300) {
         
-        // 1. SI C'EST UN WORKER CLOUDFLARE (Solution ultime anti-CORS de la Forge)
+        // 1. SI C'EST UN WORKER CLOUDFLARE (Solution ultime anti-CORS)
         if(keyOrUrl.startsWith('http://') || keyOrUrl.startsWith('https://')) {
             try {
                 const response = await fetch(keyOrUrl, {
                     method: 'POST',
+                    mode: 'cors',
+                    credentials: 'omit',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: promptText, model: 'openai/gpt-oss-120b', temperature: 0.7 })
+                    body: JSON.stringify({ message: promptText, model: 'openai/gpt-oss-120b', temperature: 0.7, max_tokens: tokens })
                 });
                 if(response.ok) {
                     const data = await response.json();
                     if(data.error) throw new Error(data.error);
-                    return { ok: true, text: data.choices?.[0]?.message?.content || '', methodUsed: 'Worker Cloudflare' };
+                    // Supporte à la fois le format OpenAI et le format simplifié
+                    const text = data.choices?.[0]?.message?.content || data.response || data.text || '';
+                    return { ok: true, text, methodUsed: 'Worker Cloudflare' };
                 }
                 return { ok: false, status: response.status, methodUsed: 'Worker Cloudflare' };
             } catch(e) {
@@ -684,28 +688,33 @@
             }
         }
 
-        // 2. SINON C'EST UNE CLÉ DIRECTE (On essaye les proxys officiels et communautaires)
+        // 2. SINON C'EST UNE CLÉ DIRECTE sk-...
+        // L'API publique Étalab (albert.api.etalab.gouv.fr) supporte CORS depuis le navigateur.
+        // La Forge MEN (api.albert.apps.education.fr) BLOQUE les appels navigateur (CSP/CORS).
         let logs = [];
         
-        // URL de PING officiel (etalab)
-        const baseEndpoint = "https://albert.api.etalab.gouv.fr/v1/chat/completions";
+        const etalabEndpoint  = "https://albert.api.etalab.gouv.fr/v1/chat/completions";
+        const model = 'openai/gpt-oss-120b';
         
-        // Ordre : Proxys publics (plus robustes en premier), puis proxys spécialisés
         const endpoints = [
-            { id: "Proxy Corsproxy", url: `https://corsproxy.io/?${encodeURIComponent(baseEndpoint)}` },
-            { id: "Proxy Codetabs", url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(baseEndpoint)}` },
-            { id: "Proxy Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${baseEndpoint}` },
-            { id: "Proxy Educ-AI", url: "https://proxy.educ-ai.fr/v1/chat/completions" },
-            { id: "API Etalab Direct", url: baseEndpoint },
-            { id: "API Educ Direct", url: "https://api.albert.education.fr/v1/chat/completions" }
+            // Étalab direct en PREMIER : supporte CORS, clé albert.api.gouv.fr valide ici
+            { id: "Albert Étalab Direct", url: etalabEndpoint },
+            // Proxys CORS publics en fallback (utile si réseau d'école filtre Étalab)
+            { id: "Proxy Corsproxy",  url: `https://corsproxy.io/?url=${encodeURIComponent(etalabEndpoint)}` },
+            { id: "Proxy Thingproxy", url: `https://thingproxy.freeboard.io/fetch/${etalabEndpoint}` },
+            { id: "Proxy Codetabs",   url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(etalabEndpoint)}` },
+            // Forge MEN (BLOQUÉE navigateur — en dernier recours, échouera en CORS)
+            { id: "Forge MEN (CORS bloqué)", url: "https://api.albert.apps.education.fr/v1/chat/completions" }
         ];
         
-        const bodyStr = JSON.stringify({model:'openai/gpt-oss-120b', messages:[{role:'user',content:promptText}], max_tokens:tokens});
+        const bodyStr = JSON.stringify({model, messages:[{role:'user',content:promptText}], max_tokens:tokens});
 
         for(let ep of endpoints) {
             try {
                 const response = await fetch(ep.url, {
                     method: 'POST',
+                    mode: 'cors',
+                    credentials: 'omit',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + keyOrUrl },
                     body: bodyStr
                 });
@@ -722,12 +731,15 @@
                 logs.push(`- ${ep.id} : HTTP ${response.status}`);
             } catch(e) {
                 logs.push(`- ${ep.id} : ${e.message}`);
-                continue; // On essaye le proxy suivant
+                continue;
             }
         }
         
-        // Si RIEN n'a marché, on renvoie un message expliquant qu'il faut utiliser le Worker
-        logs.push(`\n👉 SOLUTION : La Forge bloque tous les relais.\nVous devez utiliser l'URL de votre Worker Cloudflare à la place de la clé 'sk-...'.`);
+        // Rien n'a marché → guider l'utilisateur
+        const isForgeKey = keyOrUrl.startsWith('sk-');
+        logs.push(isForgeKey
+            ? `\n👉 Votre clé 'sk-...' semble être une clé Forge MEN (non compatible navigateur).\n   ➡ Utilisez une clé obtenue sur https://albert.api.gouv.fr (API Étalab publique)\n   ➡ Ou collez l'URL de votre Worker Cloudflare à la place de la clé.`
+            : `\n👉 Vérifiez que votre clé est valide sur https://albert.api.gouv.fr\n   ➡ Ou utilisez l'URL de votre Worker Cloudflare.`);
         throw new Error(logs.join('\n'));
     }
 
