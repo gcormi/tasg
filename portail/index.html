@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portail d'Ingénierie Pédagogique - Suite d'outils IA au service de l'enseignant. Accessible et inclusif.">
-    <title>Portail de l'Ingénierie Pédagogique (V4.0.2) | Ressources & Innovation</title>
+    <title>Portail de l'Ingénierie Pédagogique | Ressources & Innovation</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,63 +13,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK & AUTH -->
+    <!-- Firebase SDK (pour liens personnalisés + post-its) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script>
-        // Déverrouillage immédiat pour le mode local (localhost, 127.0.0.1, file ou hostname vide)
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || !window.location.hostname) {
-            document.documentElement.classList.add('portal-unlocked');
-            localStorage.setItem('portal_unlocked', 'true');
-        }
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
-            authDomain: "portail-postits.firebaseapp.com",
-            projectId: "portail-postits",
-            storageBucket: "portail-postits.firebasestorage.app",
-            messagingSenderId: "494625342197",
-            appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
-        window.login = function() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).catch(err => {
-                if(err.code === 'auth/popup-blocked') firebase.auth().signInWithRedirect(provider);
-                else alert("Google Auth Fail: " + err.message);
-            });
-        };
-
-        window.logout = function() {
-            if(confirm('Voulez-vous vous déconnecter du portail ?')) {
-                firebase.auth().signOut().then(() => {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.reload();
-                }).catch(error => {
-                    console.error("[Auth] Erreur déconnexion:", error);
-                    window.location.reload();
-                });
-            }
-        };
-
-        firebase.auth().onAuthStateChanged(user => {
-            const overlay = document.getElementById('auth-overlay');
-            // Mode bypass pour le développement local
-            const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:');
-            
-            if (user || isLocal) {
-                if(overlay) overlay.style.display = 'none';
-                document.body.style.overflow = '';
-                localStorage.setItem('portal_unlocked', 'true');
-            } else {
-                if(overlay) overlay.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-        });
-    </script>
 
     <style>
         :root {
@@ -80,6 +26,7 @@
             --text-scale: 1;
         }
 
+        /* ===================== DARK MODE VARIABLES ===================== */
         html.dark-mode {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
@@ -98,36 +45,292 @@
             --border-color: #e2e8f0;
         }
 
+        /* ===================== DYSLEXIA MODE ===================== */
         html.dyslexia-mode {
+            font-family: 'OpenDyslexic', sans-serif !important;
+            letter-spacing: 0.05em;
+            line-height: 1.8;
+        }
+
+        html.dyslexia-mode h1, 
+        html.dyslexia-mode h2, 
+        html.dyslexia-mode h3, 
+        html.dyslexia-mode h4 {
             font-family: 'OpenDyslexic', sans-serif !important;
         }
 
+        html.dyslexia-mode body {
+            background-color: #fef3e2 !important;
+        }
+
+        html.dyslexia-mode.dark-mode body {
+            background-color: #1a1410 !important;
+        }
+
+        /* ===================== SCROLL PROGRESS BAR ===================== */
         #scroll-progress {
             position: fixed;
-            top: 0; left: 0; height: 3px;
+            top: 0;
+            left: 0;
+            height: 3px;
             background: linear-gradient(to right, #4f46e5, #0ea5e9, #f59e0b);
             z-index: 9999;
             transition: width 0.1s linear;
+            border-radius: 0 2px 2px 0;
         }
 
+        /* ===================== BODY & BACKGROUND ===================== */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-secondary);
             color: var(--text-primary);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        html.dark-mode body {
+            background-image: none;
+        }
+
+        .bg-decor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .decor-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+        }
+
+        html.dark-mode .decor-circle {
+            opacity: 0.1;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
+
+        /* ===================== GLASS HEADER ===================== */
         .glass-header {
             background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             z-index: 100;
+            transition: background-color 0.3s ease;
         }
 
         html.dark-mode .glass-header {
             background: rgba(15, 23, 42, 0.82);
         }
 
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            color: var(--text-secondary);
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+        .nav-link:hover { color: var(--primary); }
+        .nav-link.active { color: var(--primary); }
+        .nav-link.active::after { width: 100%; }
+
+        /* ===================== MOBILE MENU ===================== */
+        #mobile-menu {
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.open { max-height: 500px; }
+
+        /* ===================== SKIP TO CONTENT (Accessibilité) ===================== */
+        .skip-link {
+            position: absolute;
+            top: -40px; left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            z-index: 9999;
+            border-radius: 0 0 8px 0;
+            transition: top 0.2s;
+            font-weight: 700;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* ===================== ACCESSIBILITY TOOLBAR ===================== */
+        .accessibility-toolbar {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .accessibility-toggle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+        }
+
+        .accessibility-toggle:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        .accessibility-menu {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 280px;
+            animation: slideUp 0.3s ease;
+        }
+
+        html.dark-mode .accessibility-menu {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .accessibility-menu.active {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .accessibility-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        html.dark-mode .accessibility-control {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+
+        .accessibility-control:hover {
+            background: var(--primary-light);
+        }
+
+        .accessibility-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .accessibility-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .accessibility-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        html.dark-mode .accessibility-btn {
+            background: var(--bg-secondary);
+        }
+
+        .accessibility-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .accessibility-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .accessibility-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .accessibility-toggle-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .accessibility-toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ===================== CARDS ===================== */
         .card-soft {
             background: rgba(255, 255, 255, 0.72);
             backdrop-filter: blur(16px);
@@ -135,29 +338,52 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.06);
             transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            color: var(--text-primary);
         }
 
         html.dark-mode .card-soft {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.3);
         }
 
         .card-soft:hover {
             transform: translateY(-8px);
             box-shadow: 0 24px 48px -12px rgba(79, 70, 229, 0.15);
+            border-color: rgba(79, 70, 229, 0.2);
+            background: rgba(255, 255, 255, 0.95);
         }
 
+        html.dark-mode .card-soft:hover {
+            box-shadow: 0 24px 48px -12px rgba(79, 70, 229, 0.3);
+        }
+
+        .card-soft:focus-within {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Card hidden for filter */
+        .card-wrapper.hidden-filter {
+            display: none !important;
+        }
+
+        /* ===================== CATEGORY PILL ===================== */
         .category-pill {
             font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.06em;
             padding: 5px 12px;
             border-radius: 20px;
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            backdrop-filter: blur(4px);
         }
 
+        /* ===================== KEYWORD TAGS ===================== */
         .keyword-tag {
             font-size: 0.6rem;
             font-weight: 600;
@@ -165,13 +391,24 @@
             background: rgba(241, 245, 249, 0.6);
             padding: 3px 10px;
             border-radius: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.4);
+            white-space: nowrap;
+            transition: all 0.3s ease;
         }
 
         html.dark-mode .keyword-tag {
             color: var(--text-secondary);
             background: var(--bg-tertiary);
+            border-color: var(--border-color);
         }
 
+        .card-soft:hover .keyword-tag {
+            background: white;
+            border-color: rgba(79, 70, 229, 0.15);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        /* ===================== BADGE NOUVEAU ===================== */
         .badge-new {
             position: absolute;
             top: 14px; right: 14px;
@@ -180,20 +417,855 @@
             font-size: 0.55rem;
             font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: 0.08em;
             padding: 3px 9px;
             border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); }
+            50% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6); }
         }
 
+        /* ===================== ANIMATIONS ===================== */
         .fade-in-up {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         .fade-in-up.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
+        .stagger-1 { transition-delay: 0.05s; }
+        .stagger-2 { transition-delay: 0.10s; }
+        .stagger-3 { transition-delay: 0.15s; }
+        .stagger-4 { transition-delay: 0.20s; }
+        .stagger-5 { transition-delay: 0.25s; }
+        .stagger-6 { transition-delay: 0.30s; }
+        .stagger-7 { transition-delay: 0.35s; }
+        .stagger-8 { transition-delay: 0.40s; }
+        .stagger-9 { transition-delay: 0.45s; }
+        .stagger-10 { transition-delay: 0.50s; }
+        .stagger-11 { transition-delay: 0.55s; }
+
+        /* ===================== HERO FLOATING BADGES ===================== */
+        .float-badge {
+            animation: float 4s ease-in-out infinite;
+            backdrop-filter: blur(12px);
+        }
+        .float-badge:nth-child(2) { animation-delay: 0.8s; }
+        .float-badge:nth-child(3) { animation-delay: 1.6s; }
+        .float-badge:nth-child(4) { animation-delay: 2.4s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===================== STATS ===================== */
+        .stat-card {
+            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        html.dark-mode .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px -8px rgba(79,70,229,0.12);
+        }
+
+        /* ===================== SEARCH BAR ===================== */
+        .search-container {
+            position: relative;
+        }
+        .search-container input {
+            width: 100%;
+            padding: 12px 20px 12px 48px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255,255,255,0.9);
+            font-size: calc(0.875rem * var(--text-scale));
+            font-weight: 500;
+            color: #334155;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        html.dark-mode .search-container input {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .search-container input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: white;
+        }
+
+        html.dark-mode .search-container input:focus {
+            background: var(--bg-secondary);
+        }
+
+        .search-container .search-icon {
+            position: absolute;
+            left: 16px; top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .search-container .clear-btn {
+            position: absolute;
+            right: 12px; top: 50%;
+            transform: translateY(-50%);
+            background: #e2e8f0;
+            border: none;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.65rem;
+            color: #64748b;
+            transition: background 0.2s;
+        }
+
+        html.dark-mode .search-container .clear-btn {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .search-container .clear-btn:hover { background: #cbd5e1; }
+        .search-container input:not(:placeholder-shown) ~ .clear-btn { display: flex; }
+
+        /* ===================== FILTER PILLS ===================== */
+        .filter-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+            color: #64748b;
+            border-color: rgba(226,232,240,0.8);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        html.dark-mode .filter-pill {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+        }
+
+        .filter-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        html.dark-mode .filter-pill:hover {
+            background: rgba(79, 70, 229, 0.2);
+        }
+
+        .filter-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+
+        .filter-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+        .filter-pill.active .filter-count { background: rgba(255,255,255,0.25); }
+
+        /* No results */
+        #no-results {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        /* ===================== BACK TO TOP ===================== */
+        #back-to-top {
+            position: fixed;
+            bottom: 32px; right: 32px;
+            width: 48px; height: 48px;
+            background: white;
+            border: 1.5px solid rgba(226,232,240,0.8);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            z-index: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            color: #4f46e5;
+        }
+
+        html.dark-mode #back-to-top {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--primary);
+        }
+
+        #back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #back-to-top:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 12px 32px rgba(79,70,229,0.3);
+            transform: translateY(-4px);
+        }
+
+        /* ===================== SECTION HEADER ===================== */
+        .section-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            border-radius: 20px;
+            padding: 2px 10px;
+            margin-left: 10px;
+        }
+
+        /* ===================== HERO CTA BUTTON ===================== */
+        .cta-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: calc(0.875rem * var(--text-scale));
+            box-shadow: 0 8px 24px rgba(79,70,229,0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(79,70,229,0.4);
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+        }
+        .cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: white;
+            color: #4f46e5;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: calc(0.875rem * var(--text-scale));
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1.5px solid rgba(79,70,229,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        html.dark-mode .cta-secondary {
+            background: var(--bg-secondary);
+            color: var(--primary);
+            border-color: var(--border-color);
+        }
+
+        .cta-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79,70,229,0.12);
+            border-color: rgba(79,70,229,0.3);
+        }
+
+        /* ===================== CARD CTA BUTTONS ===================== */
+        .card-cta-small {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: calc(0.75rem * var(--text-scale));
+            transition: all 0.3s ease;
+            border: 1.5px solid transparent;
+        }
+        .card-cta-small i { transition: transform 0.3s ease; }
+        .card-cta-small:hover i { transform: translateX(4px); }
+
+        /* ===================== FOCUS STYLES (Accessibilité) ===================== */
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        /* ===================== MODAL STYLES ===================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 1001;
+            color: var(--text-primary);
+        }
+
+        html.dark-mode .modal-content {
+            background: var(--bg-secondary);
+        }
+
+        .modal-overlay.active .modal-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            padding: 32px 32px 24px;
+            border-radius: 24px 24px 0 0;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .modal-header-content {
+            flex: 1;
+        }
+
+        .modal-header h2 {
+            font-size: calc(1.875rem * var(--text-scale));
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-header p {
+            font-size: 0.875rem;
+            opacity: 0.95;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 32px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: calc(0.95rem * var(--text-scale));
+        }
+
+        .modal-body h3 {
+            font-size: calc(1.25rem * var(--text-scale));
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 24px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body h3 i {
+            color: #4f46e5;
+            font-size: 1.1rem;
+        }
+
+        .modal-body p {
+            margin: 12px 0;
+            font-size: calc(0.95rem * var(--text-scale));
+            color: var(--text-secondary);
+        }
+
+        .modal-body ul {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .modal-body li {
+            margin: 8px 0;
+            color: var(--text-secondary);
+            font-size: calc(0.95rem * var(--text-scale));
+        }
+
+        .modal-body strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .modal-vision-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border-left: 4px solid #4f46e5;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        html.dark-mode .modal-vision-box {
+            background: rgba(79, 70, 229, 0.15);
+        }
+
+        .modal-pillar {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-pillar-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-pillar-content {
+            flex: 1;
+        }
+
+        .modal-pillar-content strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: calc(0.95rem * var(--text-scale));
+        }
+
+        .modal-pillar-content p {
+            margin: 0;
+            font-size: calc(0.875rem * var(--text-scale));
+            color: var(--text-secondary);
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            background: var(--bg-tertiary);
+            padding: 20px 32px;
+            border-radius: 0 0 24px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .modal-footer-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .modal-footer-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .modal-footer-link:hover {
+            color: #4338ca;
+            text-decoration: underline;
+        }
+
+        /* Scrollbar styling for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Philosophy button styling */
+        .philosophy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: calc(0.875rem * var(--text-scale));
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .philosophy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+        }
+
+        .philosophy-btn i {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-header {
+                padding: 24px 20px 16px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-footer {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .accessibility-toolbar {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            #back-to-top {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+
+        /* ===================== LOCK SCREEN ===================== */
+        #lock-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        html.dark-mode #lock-screen {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        #lock-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(1.05);
+        }
+
+        .lock-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 48px;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            animation: lock-card-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        html.dark-mode .lock-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        @keyframes lock-card-pop {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .lock-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            color: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 24px;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .lock-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .lock-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .lock-input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        #portal-password-input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 16px;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.2em;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        #portal-password-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .lock-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        }
+
+        .lock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .lock-btn i { font-size: 0.8rem; }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* ===================== MODAL FAVORIS (CENTER) ===================== */
+        .fav-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fav-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .fav-modal-container {
+            width: 440px;
+            max-width: 95vw;
+            background: var(--bg-primary);
+            border-radius: 28px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .fav-modal-overlay.active .fav-modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modal "Ajouter un lien" */
+        .custom-link-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .custom-link-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-link-modal-content {
+            width: 400px;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .custom-link-modal-overlay.active .custom-link-modal-content {
+            transform: scale(1);
+        }
+
+        /* Sidebar Favoris Button */
         .sidebar-fav-btn {
             width: 100%;
             display: flex;
@@ -203,135 +1275,668 @@
             background: linear-gradient(135deg, #6366f1, #4f46e5);
             color: white;
             border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
-        .cta-primary {
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-            color: white;
-            padding: 14px 28px;
-            border-radius: 18px;
-            font-weight: 800;
-            display: inline-flex;
+        .sidebar-fav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+        }
+
+        .sidebar-fav-btn-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.1rem;
+            backdrop-filter: blur(4px);
         }
 
-        .card-cta-small {
-            width: 100%;
-            display: inline-flex;
+        .sidebar-fav-btn-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .sidebar-fav-btn-title {
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-fav-btn-subtitle {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        /* Version Badge */
+        .version-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.8);
+            pointer-events: none;
+        }
+
+
+        .drawer-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
         }
 
-        .hidden-filter { display: none !important; }
+        .drawer-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .drawer-header h2 i {
+            color: var(--primary);
+        }
+
+        .drawer-close-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-close-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            scrollbar-width: thin;
+        }
+
+        .drawer-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
+
+        .fav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .fav-link-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.2);
+        }
+
+        .fav-link-icon-container {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .fav-link-item:hover .fav-link-icon-container {
+            transform: scale(1.1);
+        }
+
+        .fav-link-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fav-link-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 1px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fav-link-url {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.6;
+        }
+
+        .fav-link-badge {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            margin-left: auto;
+        }
+
+        .fav-add-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 2px dashed var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        html.dark-mode .fav-add-btn {
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .fav-add-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-style: solid;
+        }
+
+        .fav-link-delete {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%) scale(0.8);
+            opacity: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: #ffe4e6;
+            color: #e11d48;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .fav-link-item:hover .fav-link-delete {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .fav-link-delete:hover {
+            background: #fb7185;
+            color: white;
+        }
+
+        @media (max-width: 640px) {
+            .fav-modal-container {
+                width: 100%;
+                border-radius: 24px 24px 0 0;
+                position: absolute;
+                bottom: 0;
+            }
+        }
         
         /* Force le déblocage en local */
-        html.portal-unlocked #auth-overlay { display: none !important; }
+        html.portal-unlocked #lock-screen { display: none !important; }
         html.portal-unlocked body { overflow: auto !important; }
     </style>
+    <script>
+        // Check unlock status immediately to prevent flash
+        (function() {
+            const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || !window.location.hostname);
+            const unlocked = localStorage.getItem('portal_unlocked') === 'true' || isLocal;
+            if (unlocked) {
+                document.documentElement.classList.add('portal-unlocked');
+                localStorage.setItem('portal_unlocked', 'true');
+            }
+        })();
+    </script>
 </head>
 
 <body class="text-slate-700 antialiased flex flex-col min-h-screen">
 
-    <!-- Auth Overlay -->
-    <div id="auth-overlay" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-xl" style="display:none;">
-        <div class="bg-white p-12 rounded-[2rem] shadow-2xl text-center max-w-md w-full border border-white/50">
-            <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-6 shadow-lg">
+    <!-- Screen Lock Overlay -->
+    <div id="lock-screen" aria-modal="true" role="dialog">
+        <div class="lock-card">
+            <div class="lock-icon">
                 <i class="fas fa-lock"></i>
             </div>
-            <h1 class="text-2xl font-black text-slate-900 mb-2 uppercase">Espace Sécurisé</h1>
-            <p class="text-slate-500 mb-8">Connectez-vous avec votre compte Google pour accéder au portail.</p>
-            <button onclick="window.login()" class="w-full py-4 bg-white border-2 border-slate-100 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-slate-50 transition-all">
-                <i class="fab fa-google text-indigo-600"></i> Se connecter avec Google
-            </button>
+            <h1 class="lock-title">Accès Protégé</h1>
+            <p class="lock-subtitle">Veuillez entrer le mot de passe pour accéder au Portail de l'Ingénierie Pédagogique.</p>
+            
+            <form id="lock-form" onsubmit="return false;">
+                <div class="lock-input-group">
+                    <input type="password" id="portal-password-input" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+                <button type="submit" id="unlock-button" class="lock-btn">
+                    Accéder au portail
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </form>
+            
+            <p id="lock-error" class="text-xs text-rose-500 font-bold mt-4 opacity-0 transition-opacity">Mot de passe incorrect. Réessayez.</p>
         </div>
     </div>
 
+    <script>
+        // Logic for unlocking the portal
+        const VALID_PASSWORD = "Brigitte*1963";
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const lockScreen = document.getElementById('lock-screen');
+            const passwordInput = document.getElementById('portal-password-input');
+            const lockForm = document.getElementById('lock-form');
+            const lockError = document.getElementById('lock-error');
+
+            // If already unlocked via localStorage or local dev, hide lock screen immediately
+            const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:' || !location.hostname);
+            if (localStorage.getItem('portal_unlocked') === 'true' || isLocal) {
+                lockScreen.classList.add('hidden');
+                document.body.style.overflow = '';
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
+
+            function handleUnlock() {
+                const entered = passwordInput.value;
+                if (entered === VALID_PASSWORD) {
+                    localStorage.setItem('portal_unlocked', 'true');
+                    lockScreen.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    
+                    // Small toast success
+                    if (typeof showToast === 'function') {
+                        showToast('Bonjour Brigitte ! Portail déverrouillé.');
+                    }
+                } else {
+                    // Password failed
+                    const card = document.querySelector('.lock-card');
+                    card.classList.add('shake');
+                    lockError.classList.remove('opacity-0');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    
+                    setTimeout(() => {
+                        card.classList.remove('shake');
+                    }, 500);
+                }
+            }
+
+            lockForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleUnlock();
+            });
+
+            // Focus on input automatically
+            if (!lockScreen.classList.contains('hidden')) {
+                passwordInput.focus();
+            }
+
+            // Logout/Lock Logic
+            const logoutBtns = [document.getElementById('logout-portal-btn')];
+            logoutBtns.forEach(btn => {
+                btn?.addEventListener('click', () => {
+                    if (confirm('Voulez-vous verrouiller l\'accès au portail ?')) {
+                        localStorage.removeItem('portal_unlocked');
+                        location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Skip to content (Accessibilité) -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+    <!-- Scroll Progress Bar -->
     <div id="scroll-progress" style="width: 0%"></div>
 
-    <!-- Header -->
-    <header class="sticky top-0 glass-header border-b border-slate-100 shadow-sm" role="banner">
-        <div class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center gap-4 group">
-                <div class="w-11 h-11 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg ring-4 ring-white transition-transform group-hover:scale-105">
-                    <i class="fas fa-graduation-cap text-lg"></i>
-                </div>
-                <div>
-                    <span class="block font-black text-base text-slate-900 leading-none">Portail Ingénierie Pédagogique</span>
-                    <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1 block tracking-tighter">Innovation & Numérique</span>
-                </div>
-            </a>
-            <nav class="hidden md:flex items-center gap-8">
-                <button onclick="window.logout()" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all">
-                    <i class="fas fa-power-off"></i>
+    <!-- Background Decor -->
+    <div class="bg-decor" aria-hidden="true">
+        <div class="decor-circle bg-indigo-200 w-[700px] h-[700px] -top-96 -left-64"></div>
+        <div class="decor-circle bg-sky-100 w-[600px] h-[600px] bottom-0 -right-64"></div>
+        <div class="decor-circle bg-violet-100 w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+    </div>
+
+    <!-- ============================== HEADER ============================== -->
+    <header class="sticky top-0 glass-header border-b border-slate-100/60 shadow-sm" role="banner">
+        <div class="container mx-auto max-w-7xl px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-4 group" aria-label="Portail de l'Ingénierie Pédagogique - Accueil">
+                    <div class="w-11 h-11 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100 ring-4 ring-white group-hover:scale-105 transition-transform">
+                        <i class="fas fa-graduation-cap text-lg" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <span class="block font-extrabold text-base leading-none text-slate-900 tracking-tight">Portail de l'Ingénierie Pédagogique</span>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 block">Innovation & Biens Communs Numériques</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center gap-8" aria-label="Navigation principale">
+                    <a href="#" class="nav-link active text-xs font-bold text-indigo-600 uppercase tracking-wide" aria-current="page">Hub de Solutions</a>
+                    <button id="philosophy-nav-btn" class="philosophy-btn text-xs">
+                        <i class="fas fa-book-open" aria-hidden="true"></i>
+                        Philosophie
+                    </button>
+                    <!-- Logout/Lock Button -->
+                    <button id="logout-portal-btn" title="Verrouiller le portail" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100">
+                        <i class="fas fa-power-off text-sm"></i>
+                    </button>
+                </nav>
+
+                <!-- Mobile Hamburger -->
+                <button id="hamburger" class="md:hidden flex flex-col gap-[5px] p-2 rounded-xl hover:bg-slate-100 transition-colors" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
                 </button>
-            </nav>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" role="navigation" aria-label="Menu mobile">
+                <nav class="pt-4 pb-2 flex flex-col gap-1 border-t border-slate-100/80 mt-3">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wide text-indigo-600 bg-indigo-50">
+                        <i class="fas fa-home w-4 text-center" aria-hidden="true"></i> Hub de Solutions
+                    </a>
+                    <button id="philosophy-mobile-btn" class="philosophy-btn w-full justify-center text-xs">
+                        <i class="fas fa-book-open" aria-hidden="true"></i> Philosophie du Projet
+                    </button>
+                    <a href="mailto:gilles@gcormi.fr" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wide text-slate-600 hover:bg-slate-50 transition-colors">
+                        <i class="fas fa-envelope w-4 text-center" aria-hidden="true"></i> Contact
+                    </a>
+                </nav>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content Grid -->
-    <div class="container mx-auto max-w-[96rem] px-6 py-10 flex flex-col lg:flex-row gap-8 items-start flex-grow">
-        
-        <!-- Sidebar -->
-        <aside class="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-24 card-soft rounded-3xl p-6 border border-slate-200">
-            <button class="sidebar-fav-btn shadow-lg shadow-indigo-200">
-                <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center"><i class="fas fa-star"></i></div>
-                <div class="text-left ml-1"><span class="block font-black text-xs uppercase">Mes Favoris</span><span class="text-[9px] opacity-80 font-bold">ACCÈS RAPIDE</span></div>
-            </button>
-            <div id="sidebar-hub-links" class="flex flex-col gap-1 mt-4">
-                <!-- Rempli par script -->
+    <!-- ============================== ACCESSIBILITY TOOLBAR ============================== -->
+    <div class="accessibility-toolbar" role="region" aria-label="Barre d'accessibilité">
+        <button id="accessibility-toggle" class="accessibility-toggle" aria-label="Ouvrir les options d'accessibilité" aria-expanded="false" aria-controls="accessibility-menu" title="Options d'accessibilité (Alt + A)">
+            <i class="fas fa-universal-access" aria-hidden="true"></i>
+        </button>
+        <div id="accessibility-menu" class="accessibility-menu" role="menu">
+            <div class="accessibility-control">
+                <span class="accessibility-label">Thème sombre</span>
+                <button id="dark-mode-toggle" class="accessibility-toggle-btn" aria-label="Basculer le thème sombre" aria-pressed="false">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span id="dark-mode-status">Désactivé</span>
+                </button>
             </div>
-            <div class="mt-8 pt-6 border-t border-slate-100 text-[9px] font-bold text-slate-400 uppercase text-center tracking-widest">Version 4.0.2 Stable</div>
+
+            <div class="accessibility-control">
+                <span class="accessibility-label">Mode dyslexie</span>
+                <button id="dyslexia-toggle" class="accessibility-toggle-btn" aria-label="Basculer le mode dyslexie" aria-pressed="false">
+                    <i class="fas fa-font" aria-hidden="true"></i>
+                    <span id="dyslexia-status">Désactivé</span>
+                </button>
+            </div>
+
+            <div class="accessibility-control">
+                <span class="accessibility-label">Taille du texte</span>
+                <div class="accessibility-buttons">
+                    <button id="text-size-decrease" class="accessibility-btn" aria-label="Diminuer la taille du texte">−</button>
+                    <span id="text-size-display" class="accessibility-btn" style="cursor: default; border: none; background: none;">100%</span>
+                    <button id="text-size-increase" class="accessibility-btn" aria-label="Augmenter la taille du texte">+</button>
+                    <button id="text-size-reset" class="accessibility-btn" aria-label="Réinitialiser la taille du texte" title="Réinitialiser">↻</button>
+                </div>
+            </div>
+
+            <button id="accessibility-reset" class="accessibility-toggle-btn" aria-label="Réinitialiser tous les paramètres d'accessibilité">
+                <i class="fas fa-redo" aria-hidden="true"></i>
+                <span>Réinitialiser tout</span>
+            </button>
+
+            <a href="#accessibility-help" class="accessibility-toggle-btn" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+                <span>Aide</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ============================== LAYOUT AVEC SIDEBAR ============================== -->
+    <div class="container mx-auto max-w-[96rem] px-4 md:px-6 py-6 md:py-10 flex flex-col lg:flex-row gap-6 lg:gap-8 items-start flex-grow">
+        
+        <!-- SIDEBAR HUB -->
+        <aside class="w-full lg:w-64 xl:w-72 flex-shrink-0 lg:sticky lg:top-24 card-soft rounded-3xl p-5 border border-slate-200 shadow-xl z-20" style="max-height: calc(100vh - 7rem); overflow-y: auto; scrollbar-width: thin;">
+            
+            <!-- NOUVEAU BOUTON MES LIENS -->
+            <button id="sidebar-fav-toggle" class="sidebar-fav-btn" aria-label="Ouvrir mes favoris" onclick="window.openDrawer ? window.openDrawer() : console.error('openDrawer non défini')">
+                <div class="version-badge">V2.5</div>
+                <div class="sidebar-fav-btn-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="sidebar-fav-btn-text">
+                    <span class="sidebar-fav-btn-title">Mes Liens</span>
+                    <span class="sidebar-fav-btn-subtitle">Cliquez ici pour ouvrir</span>
+                </div>
+            </button>
+
+            <div class="flex items-center gap-3 mb-6 px-1">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-indigo-200">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h2 class="font-display font-bold text-slate-900 text-base leading-tight">Hub Personnel</h2>
+                    <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold block">Raccourcis rapides</span>
+                </div>
+            </div>
+            
+            <div class="flex flex-col gap-1.5" id="sidebar-hub-links">
+                <!-- Rempli par JavaScript -->
+            </div>
+
+            <!-- Ajouter un lien perso -->
+            <button id="add-custom-link-btn" class="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-indigo-200 text-indigo-500 hover:bg-indigo-50 hover:border-indigo-300 transition-colors text-xs font-bold uppercase tracking-wide">
+                <i class="fas fa-plus"></i> Ajouter un lien
+            </button>
         </aside>
 
-        <!-- Hub -->
-        <main id="main-content" class="flex-grow w-full">
-            
-            <div class="mb-16">
-                <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 rounded-full px-4 py-2 mb-8">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span></span>
-                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Post-it Sync & Cloud</span>
+        <!-- MAIN CONTENT -->
+        <main id="main-content" class="flex-grow min-w-0 w-full lg:w-[calc(100%-18rem)] xl:w-[calc(100%-20rem)] lg:pt-0">
+
+        <!-- ===== HERO ===== -->
+        <div class="mb-16 fade-in-up relative">
+
+            <!-- Floating badges (décoratif) -->
+            <div class="hidden lg:flex absolute right-0 top-0 flex-col gap-4 items-end pointer-events-none" aria-hidden="true">
+                <div class="float-badge bg-white/80 border border-indigo-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
+                    <div class="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-microchip text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">IA Générative</div>
+                        <div class="text-xs font-bold text-slate-800">Conception pédagogique</div>
+                    </div>
                 </div>
-                <h1 class="text-5xl md:text-7xl font-black text-slate-900 mb-6 leading-tight tracking-tighter">Votre Hub de <span class="text-indigo-600">Productivité</span></h1>
-                <p class="text-xl text-slate-500 max-w-2xl leading-relaxed">Centralisez vos outils d'intelligence artificielle, vos utilitaires multimédias et vos raccourcis personnels.</p>
+                <div class="float-badge bg-white/80 border border-emerald-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
+                    <div class="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+                        <i class="fas fa-universal-access text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Accessibilité</div>
+                        <div class="text-xs font-bold text-slate-800">DYS / TDAH / Inclusion</div>
+                    </div>
+                </div>
+                <div class="float-badge bg-white/80 border border-amber-100 rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-3">
+                    <div class="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
+                        <i class="fas fa-gamepad text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Gamification</div>
+                        <div class="text-xs font-bold text-slate-800">Jeux & Escape games</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Search -->
-            <div class="mb-12">
-                <div class="relative max-w-xl mb-8 group">
-                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-indigo-600"></i>
-                    <input type="text" id="search-input" placeholder="Rechercher un outil (ex: Editeur, IA, Video)..." class="w-full pl-14 pr-6 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:border-indigo-600 outline-none transition-all shadow-sm">
+            <!-- Content -->
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 rounded-full px-4 py-2 mb-6">
+                    <span class="w-2 h-2 bg-indigo-600 rounded-full"></span>
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Bienvenue sur le portail</span>
+                </div>
+
+                <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-tight tracking-tight">
+                    Votre Écosystème de Travail <span class="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">Augmenté</span>
+                </h1>
+
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    Optimisez votre quotidien avec un portail centralisé et évolutif. Des outils <strong>d'intelligence artificielle</strong> aux <strong>utilitaires système</strong>, regroupez vos indispensables et vos raccourcis personnels en un seul endroit pour une efficacité maximale au quotidien.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="cta-primary">
+                        <i class="fas fa-sparkles" aria-hidden="true"></i>
+                        <span>Explorer les outils</span>
+                    </button>
+                    <button id="hero-philosophy-btn" class="cta-secondary">
+                        <i class="fas fa-book-open" aria-hidden="true"></i>
+                        <span>Découvrir la philosophie</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 fade-in-up">
+            <div class="stat-card rounded-2xl p-8 text-center">
+                <div class="text-3xl font-extrabold text-indigo-600 mb-2"><span class="counter">16</span></div>
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Outils Disponibles</div>
+
+            </div>
+            <div class="stat-card rounded-2xl p-8 text-center">
+                <div class="text-3xl font-extrabold text-emerald-600 mb-2"><span class="counter">100</span>%</div>
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Gratuit & Libre</div>
+            </div>
+            <div class="stat-card rounded-2xl p-8 text-center">
+                <div class="text-3xl font-extrabold text-amber-600 mb-2"><span class="counter">6</span></div>
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-wide">Piliers Philosophiques</div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Section -->
+        <section class="mb-12 fade-in-up">
+            <div class="mb-8">
+                <div class="search-container mb-6">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text" id="search-input" placeholder="Rechercher un outil..." aria-label="Rechercher un outil">
+                    <button class="clear-btn" id="clear-search" aria-label="Effacer la recherche"></button>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-pill active" data-filter="all">
+                        <i class="fas fa-th-large text-xs" aria-hidden="true"></i>
+                        Tous les outils
+                    </button>
+                    <button class="filter-pill" data-filter="ia">
+                        <i class="fas fa-microchip text-xs" aria-hidden="true"></i>
+                        IA & Génération
+                    </button>
+                    <button class="filter-pill" data-filter="creation">
+                        <i class="fas fa-palette text-xs" aria-hidden="true"></i>
+                        Création
+                    </button>
+                    <button class="filter-pill" data-filter="inclusion">
+                        <i class="fas fa-universal-access text-xs" aria-hidden="true"></i>
+                        Accessibilité
+                    </button>
+                    <button class="filter-pill" data-filter="jeu">
+                        <i class="fas fa-gamepad text-xs" aria-hidden="true"></i>
+                        Jeux & Ludification
+                    </button>
+                    <button class="filter-pill" data-filter="orga">
+                        <i class="fas fa-folder-tree text-xs" aria-hidden="true"></i>
+                        Organisation
+                    </button>
+                    <button class="filter-pill" data-filter="export">
+                        <i class="fas fa-download text-xs" aria-hidden="true"></i>
+                        Export & LMS
+                    </button>
                 </div>
             </div>
 
-            <!-- CARDS GRID -->
-            <div class="cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="tools-grid">
-                
+            <!-- Cards Grid -->
+            <div class="cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
                 <!-- CARTE APPLICATION: EDITEURHTML -->
-                <article class="card-soft rounded-3xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper" 
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper" 
                          data-category="creation,multimedia" 
-                         data-name="EDITEURHTML HTML Studio Multimedia Pro Markdown Vidéo YouTube">
-                    <span class="badge-new">Studio Pro</span>
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl shadow-inner">
-                            <i class="fas fa-file-code"></i>
+                         data-name="EDITEURHTML Studio Creation Web HTML CSS Markdown"
+                         aria-label="EditeurHTML Studio">
+                    <span class="badge-new bg-indigo-500">Studio Pro</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                            <i class="fas fa-file-code" aria-hidden="true"></i>
                         </div>
-                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100/50">
-                            <i class="fas fa-photo-video text-[10px]"></i> Multimédia
+                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100/60">
+                            <i class="fas fa-laptop-code text-[9px]" aria-hidden="true"></i> Multimedia
                         </span>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900 mb-3 uppercase tracking-tight">EditeurHTML</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed flex-grow">
-                        Solution complète de création web : éditeur visuel bidirectionnel, conversion Markdown, gestion d'images, intégration vidéo YouTube et export en archive ZIP.
+                    <h3 class="text-base font-bold text-slate-900 mb-3 uppercase tracking-tight">EditeurHTML</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">
+                        Solution complète de création web : éditeur visuel bidirectionnel, conversion Markdown, gestion d'images et export ZIP.
                     </p>
-                    <div class="flex flex-wrap gap-2 mb-8">
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">HTML/CSS</span>
                         <span class="keyword-tag">Markdown</span>
                         <span class="keyword-tag">YouTube</span>
@@ -344,22 +1949,22 @@
                 </article>
 
                 <!-- CARTE APPLICATION: YOUTUBE EDUSYNC -->
-                <article class="card-soft rounded-3xl p-8 flex flex-col h-full fade-in-up stagger-2 card-wrapper" 
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-2 card-wrapper" 
                          data-category="multimedia,veille" 
                          data-name="YOUTUBE EDUSYNC Vidéo Veille Pédagogique Sans Distraction">
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center text-rose-600 text-xl shadow-inner">
-                            <i class="fab fa-youtube"></i>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-lg">
+                            <i class="fab fa-youtube" aria-hidden="true"></i>
                         </div>
-                        <span class="category-pill bg-rose-50 text-rose-600 border border-rose-100/50">
-                            <i class="fas fa-tv text-[10px]"></i> Focus Vidéo
+                        <span class="category-pill bg-rose-50 text-rose-600 border border-rose-100/60">
+                            <i class="fas fa-tv text-[9px]" aria-hidden="true"></i> Focus Vidéo
                         </span>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900 mb-3 uppercase tracking-tight">YouTube EduSync</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed flex-grow">
+                    <h3 class="text-base font-bold text-slate-900 mb-3 uppercase tracking-tight">YouTube EduSync</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">
                         Accédez à vos abonnements YouTube dans un environnement sain, sans algorithmes de recommandation ni distractions.
                     </p>
-                    <div class="flex flex-wrap gap-2 mb-8">
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">YouTube</span>
                         <span class="keyword-tag">Veille</span>
                         <span class="keyword-tag">Focus</span>
@@ -372,22 +1977,22 @@
                 </article>
 
                 <!-- CARTE APPLICATION: VEILLE STRATÉGIQUE -->
-                <article class="card-soft rounded-3xl p-8 flex flex-col h-full fade-in-up stagger-3 card-wrapper" 
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-3 card-wrapper" 
                          data-category="veille,orga" 
                          data-name="VEILLE STRATÉGIQUE Flux RSS Centre de Veille Information">
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center text-sky-600 text-xl shadow-inner">
-                            <i class="fas fa-satellite-dish"></i>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-lg">
+                            <i class="fas fa-satellite-dish" aria-hidden="true"></i>
                         </div>
-                        <span class="category-pill bg-sky-50 text-sky-600 border border-sky-100/50">
-                            <i class="fas fa-rss text-[10px]"></i> Information
+                        <span class="category-pill bg-sky-50 text-sky-600 border border-sky-100/60">
+                            <i class="fas fa-rss text-[9px]" aria-hidden="true"></i> Information
                         </span>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900 mb-3 uppercase tracking-tight">Centre de Veille</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed flex-grow">
+                    <h3 class="text-base font-bold text-slate-900 mb-3 uppercase tracking-tight">Centre de Veille</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">
                         Agrégateur de flux RSS et gestionnaire de sources pour votre veille pédagogique et technologique.
                     </p>
-                    <div class="flex flex-wrap gap-2 mb-8">
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">RSS</span>
                         <span class="keyword-tag">Curation</span>
                         <span class="keyword-tag">Audit</span>
@@ -400,22 +2005,22 @@
                 </article>
 
                 <!-- CARTE APPLICATION: TABLEAU DE CLASSE -->
-                <article class="card-soft rounded-3xl p-8 flex flex-col h-full fade-in-up stagger-4 card-wrapper" 
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-4 card-wrapper" 
                          data-category="creation,orga" 
                          data-name="TABLEAU DE BORD DE CLASSE Gestion Météo Timer Citations">
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl shadow-inner">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">
+                            <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
                         </div>
-                        <span class="category-pill bg-emerald-50 text-emerald-600 border border-emerald-100/50">
-                            <i class="fas fa-school text-[10px]"></i> Classe
+                        <span class="category-pill bg-emerald-50 text-emerald-600 border border-emerald-100/60">
+                            <i class="fas fa-school text-[9px]" aria-hidden="true"></i> Classe
                         </span>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900 mb-3 uppercase tracking-tight">Tableau de Classe</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed flex-grow">
+                    <h3 class="text-base font-bold text-slate-900 mb-3 uppercase tracking-tight">Tableau de Classe</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">
                         Tableau de bord interactif pour la classe : météo, timer, niveau sonore, date et citations inspirantes.
                     </p>
-                    <div class="flex flex-wrap gap-2 mb-8">
+                    <div class="flex flex-wrap gap-1.5 mb-5">
                         <span class="keyword-tag">Gestion</span>
                         <span class="keyword-tag">Timer</span>
                         <span class="keyword-tag">Météo</span>
@@ -427,116 +2032,1408 @@
                     </a>
                 </article>
 
-                <!-- 1. Assistant de Conception (IA) -->
-                <article class="card-soft rounded-3xl p-8 flex flex-col h-full fade-in-up stagger-2 card-wrapper" data-category="ia" data-name="Assistant IA Conception">
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center text-violet-600 text-xl"><i class="fas fa-microchip"></i></div>
-                        <span class="category-pill bg-violet-50 text-violet-600 border border-violet-100/50">Intelligence Artificielle</span>
+                <!-- 1. Assistant de Conception -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper"
+                         data-category="ia"
+                         data-name="Assistant Conception Pédagogique IA Cours Séquences"
+                         aria-label="Assistant de Conception">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                            <i class="fas fa-microchip" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100/60">
+                            <i class="fas fa-wand-magic-sparkles text-[9px]" aria-hidden="true"></i> IA Générative
+                        </span>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900 mb-3 uppercase tracking-tight">Assistant IA</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed flex-grow">Générez des séquences et des activités pédagogiques structurées avec l'aide de l'IA.</p>
-                    <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank" class="card-cta-small bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition-all">
-                        <span class="font-bold">Accéder</span>
-                        <i class="fas fa-chevron-right"></i>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Assistant de Conception</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Concevez des cours complets avec l'IA. Structuration pédagogique, génération de séquences et activités adaptées à votre niveau et discipline.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">IA Générative</span>
+                        <span class="keyword-tag">Conception</span>
+                        <span class="keyword-tag">Pédagogie</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank" rel="noopener"
+                       class="card-cta-small bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-500 hover:text-white hover:border-indigo-500">
+                        <span>Lancer l'assistant</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
-                <!-- Post-its Sync -->
-                <article class="card-soft rounded-3xl p-8 flex flex-col h-full fade-in-up stagger-3 card-wrapper" data-category="orga" data-name="Post-its Sync">
-                    <div class="flex items-start justify-between mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 text-xl"><i class="fas fa-sticky-note"></i></div>
-                        <span class="category-pill bg-amber-50 text-amber-600 border border-amber-100/50">Organisation</span>
+                <!-- 2. Master Technologie -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-2 card-wrapper"
+                         data-category="ia,creation"
+                         data-name="Master Technologie Cours Complet Ressources Pédagogiques"
+                         aria-label="Master Technologie">
+                    <span class="badge-new">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-lg">
+                            <i class="fas fa-laptop-code" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-blue-50 text-blue-600 border border-blue-100/60">
+                            <i class="fas fa-graduation-cap text-[9px]" aria-hidden="true"></i> Disciplinaire
+                        </span>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900 mb-3 uppercase tracking-tight">Tableau Post-its</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed flex-grow">Brainstorming synchronisé en temps réel sur tous vos écrans via Firestore.</p>
-                    <a href="postits.html" class="card-cta-small bg-amber-500 text-white hover:bg-amber-600 transition-all">
-                        <span class="font-bold uppercase tracking-widest">Ouvrir</span>
-                        <i class="fas fa-play"></i>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Master Technologie</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Cours complets de technologie du collège au lycée. Ressources structurées, activités prêtes à l'emploi et évaluations alignées aux programmes.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Technologie</span>
+                        <span class="keyword-tag">Collège/Lycée</span>
+                        <span class="keyword-tag">Complet</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/technologie_master.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-500 hover:text-white hover:border-blue-500">
+                        <span>Accéder au cours</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                     </a>
                 </article>
 
+                <!-- 3. Adaptation Inclusive -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-3 card-wrapper"
+                         data-category="inclusion"
+                         data-name="Adaptation Inclusive DYS TDAH Accessibilité Ressources"
+                         aria-label="Adaptation Inclusive">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-lg">
+                            <i class="fas fa-universal-access" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-emerald-50 text-emerald-600 border border-emerald-100/60">
+                            <i class="fas fa-heart text-[9px]" aria-hidden="true"></i> Inclusion
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Adaptation Inclusive</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Adaptez vos ressources pour les élèves DYS, TDAH et en situation de handicap. Mise en page accessible, polices adaptées, formats inclusifs.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">DYS</span>
+                        <span class="keyword-tag">TDAH</span>
+                        <span class="keyword-tag">Accessibilité</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank" rel="noopener"
+                       class="card-cta-small bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-500 hover:text-white hover:border-emerald-500">
+                        <span>Adapter vos ressources</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 4. Post-its (Nouveau) -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-4 card-wrapper"
+                         data-category="orga"
+                         data-name="Post-its Brainstorming Organisation Notes"
+                         aria-label="Post-its Interactifs">
+                    <span class="badge-new bg-amber-500">Live Sync</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-lg">
+                            <i class="fas fa-sticky-note" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-amber-50 text-amber-600 border border-amber-100/60">
+                            <i class="fas fa-layer-group text-[9px]" aria-hidden="true"></i> Organisation
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Tableau de Post-its</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Brainstorming & Organisation - Collez, déplacez et organisez vos idées sur un tableau infini synchronisé en temps réel sur tous vos appareils.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Temps réel</span>
+                        <span class="keyword-tag">Brainstorm</span>
+                        <span class="keyword-tag">Organisation</span>
+                    </div>
+                    <a href="postits.html"
+                       class="card-cta-small bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-500 hover:text-white hover:border-amber-500">
+                        <span>Ouvrir le tableau</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 5. Bloc-note (Nouveau) -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-5 card-wrapper"
+                         data-category="orga,creation"
+                         data-name="Bloc-note Notes Onglets Captures"
+                         aria-label="Bloc-note Enrichi">
+                    <span class="badge-new bg-indigo-500">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
+                            <i class="fas fa-book-open" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100/60">
+                            <i class="fas fa-edit text-[9px]" aria-hidden="true"></i> Prise de notes
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Bloc-note Enrichi</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Prise de notes & Documentation - Un carnet numérique avec onglets, texte mis en forme et insertion rapide de captures d'écran via Ctrl+V.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Onglets</span>
+                        <span class="keyword-tag">Captures TV</span>
+                        <span class="keyword-tag">Sync Cloud</span>
+                    </div>
+                    <a href="blocnote.html"
+                       class="card-cta-small bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-500 hover:text-white hover:border-indigo-500">
+                        <span>Lancer le carnet</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- Favoris IA (Nouveau) -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-5 card-wrapper"
+                         data-category="orga,ia"
+                         data-name="Favoris IA Marque-pages Veille Cloud AI"
+                         aria-label="Favoris IA">
+                    <span class="badge-new text-purple-600 bg-purple-100 border-purple-200">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-lg">
+                            <i class="fas fa-bookmark" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-purple-50 text-purple-600 border border-purple-100/60">
+                            <i class="fas fa-microchip text-[9px]" aria-hidden="true"></i> IA & Orga
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Favoris IA</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Sauvegardez vos liens web. L'IA génère automatiquement un résumé de la page cible. Interface en glisser-déposer.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Signets</span>
+                        <span class="keyword-tag">IA</span>
+                        <span class="keyword-tag">Sync Cloud</span>
+                    </div>
+                    <a href="favoris.html"
+                       class="card-cta-small bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-600 hover:text-white hover:border-purple-600">
+                        <span>Gérer mes favoris</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 6. Éditeur HTML Visuel -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-6 card-wrapper"
+                         data-category="creation"
+                         data-name="Éditeur HTML Visuel WYSIWYG Mise en Page Design"
+                         aria-label="Éditeur HTML Visuel">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-pink-600 text-lg">
+                            <i class="fas fa-code" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-pink-50 text-pink-600 border border-pink-100/60">
+                            <i class="fas fa-pen-fancy text-[9px]" aria-hidden="true"></i> Édition
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Éditeur HTML Visuel</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Créez des pages HTML sans coder. Interface WYSIWYG intuitive avec templates professionnels et composants réutilisables.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">HTML</span>
+                        <span class="keyword-tag">WYSIWYG</span>
+                        <span class="keyword-tag">Design</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/Atelier-web.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-pink-50 text-pink-700 border-pink-100 hover:bg-pink-500 hover:text-white hover:border-pink-500">
+                        <span>Ouvrir l'éditeur</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 5. Générateur d'Exercices Visuels -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-5 card-wrapper"
+                         data-category="creation,ia"
+                         data-name="Générateur Exercices Visuels PNG Images Évaluation"
+                         aria-label="Générateur d'Exercices Visuels">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-lg">
+                            <i class="fas fa-image" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-red-50 text-red-600 border border-red-100/60">
+                            <i class="fas fa-star text-[9px]" aria-hidden="true"></i> Exercices
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Générateur d'Exercices Visuels</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Créez des exercices visuels au format PNG. Idéal pour Création Assistée Léia, impression ou intégration dans vos supports.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Exercices</span>
+                        <span class="keyword-tag">PNG</span>
+                        <span class="keyword-tag">Visuels</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/exercices.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-red-50 text-red-700 border-red-100 hover:bg-red-500 hover:text-white hover:border-red-500">
+                        <span>Générer des exercices</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 6. LudoTech Engine -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-6 card-wrapper"
+                         data-category="jeu,ia"
+                         data-name="LudoTech Engine Pédagogie Jeu Ludification Interactif"
+                         aria-label="LudoTech Engine">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-lg">
+                            <i class="fas fa-dice" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-amber-50 text-amber-600 border border-amber-100/60">
+                            <i class="fas fa-gamepad text-[9px]" aria-hidden="true"></i> Ludification
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">LudoTech Engine</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">La pédagogie par le jeu. Transformez vos contenus en parcours ludiques interactifs. Génère des mécaniques de jeux de l'oie numériques personnalisées.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Ludification</span>
+                        <span class="keyword-tag">Jeux</span>
+                        <span class="keyword-tag">Interactif</span>
+                        <span class="keyword-tag">Engagement</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-500 hover:text-white hover:border-amber-500">
+                        <span>Créer un jeu</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 7. Lecteur Adaptatif -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-7 card-wrapper"
+                         data-category="inclusion"
+                         data-name="Lecteur Adaptatif Léger Lecture Bionique Audio Focus Inclusion"
+                         aria-label="Lecteur Adaptatif">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-lg">
+                            <i class="fas fa-book-reader" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-sky-50 text-sky-600 border border-sky-100/60">
+                            <i class="fas fa-eye text-[9px]" aria-hidden="true"></i> Accessibilité Rapide
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Lecteur Adaptatif <span class="text-sky-500 text-xs font-bold">(Léger)</span></h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Accompagnement à la lecture fluide. Propose une interface épurée avec lecture bionique, synthèse vocale et aides visuelles à la concentration.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Lecture Bionique</span>
+                        <span class="keyword-tag">Audio</span>
+                        <span class="keyword-tag">Focus</span>
+                        <span class="keyword-tag">Inclusion</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/lecturefacile/lecturefacile.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-sky-50 text-sky-700 border-sky-100 hover:bg-sky-500 hover:text-white hover:border-sky-500">
+                        <span>Lancer le lecteur</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 8. Studio d'Illustration IA -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-8 card-wrapper"
+                         data-category="ia,creation"
+                         data-name="Studio Illustration Pro Images IA Cohérence Style Batch Prompts"
+                         aria-label="Studio d'Illustration Pro">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-lg">
+                            <i class="fas fa-paint-brush" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-purple-50 text-purple-600 border border-purple-100/60">
+                            <i class="fas fa-image text-[9px]" aria-hidden="true"></i> Visuels IA
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Studio d'Illustration Pro</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Planifiez et générez l'intégralité des visuels de votre cours en un lot. Assure une cohérence stylistique professionnelle pour vos documents.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Images IA</span>
+                        <span class="keyword-tag">Cohérence Style</span>
+                        <span class="keyword-tag">Batch Prompts</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/illustrateur_ia.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-500 hover:text-white hover:border-purple-500">
+                        <span>Créer des visuels</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 9. Générateur Serious Games -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-9 card-wrapper"
+                         data-category="jeu,ia"
+                         data-name="Générateur Serious Games Escape Game Scénario IA HTML Autonome"
+                         aria-label="Générateur Serious Games">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-lg">
+                            <i class="fas fa-puzzle-piece" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-orange-50 text-orange-600 border border-orange-100/60">
+                            <i class="fas fa-star text-[9px]" aria-hidden="true"></i> Évaluation Ludique
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Générateur Serious Games</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Transformez vos cours en escape games interactifs. Générateur de prompts complexes pour créer des activités HTML autonomes et captivantes.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Escape Game</span>
+                        <span class="keyword-tag">Scénario IA</span>
+                        <span class="keyword-tag">HTML Autonome</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/escapegame.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-orange-50 text-orange-700 border-orange-100 hover:bg-orange-500 hover:text-white hover:border-orange-500">
+                        <span>Générer un jeu</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 10. SCORM Lab -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-10 card-wrapper"
+                         data-category="export"
+                         data-name="SCORM Lab Activités Moodle Éléa LMS Standard"
+                         aria-label="SCORM Lab & Activités">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 text-lg">
+                            <i class="fas fa-layer-group" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-slate-100 text-slate-500 border border-slate-200/60">
+                            <i class="fas fa-flask text-[9px]" aria-hidden="true"></i> Lab / LMS
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">SCORM Lab & Activités</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Exportation de contenus au format standard SCORM pour Moodle ou Éléa. Création d'activités interactives structurées pour votre LMS.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">SCORM</span>
+                        <span class="keyword-tag">Moodle/Éléa</span>
+                        <span class="keyword-tag">LMS</span>
+                        <span class="keyword-tag">Standard</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateuractivite/generateuract.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-600 hover:text-white hover:border-slate-600">
+                        <span>Zone de Test</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 11. Assistant de Diffusion -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-11 card-wrapper"
+                         data-category="diffusion"
+                         data-name="Assistant Diffusion LinkedIn Valorisation Réseaux Pro"
+                         aria-label="Assistant de Diffusion">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 text-lg">
+                            <i class="fab fa-linkedin" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-slate-100 text-slate-500 border border-slate-200/60">
+                            <i class="fas fa-bullhorn text-[9px]" aria-hidden="true"></i> Diffusion
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Assistant de Diffusion</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Valorisez vos travaux. Rédigez des publications impactantes pour les réseaux professionnels basées sur vos réalisations pédagogiques.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">LinkedIn</span>
+                        <span class="keyword-tag">Valorisation</span>
+                        <span class="keyword-tag">Réseaux Pro</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/linkedIn/Linkedin.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-slate-100 text-slate-600 border-slate-200 hover:bg-[#0077b5] hover:text-white hover:border-[#0077b5]">
+                        <span>Lancer</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 12. EduSlide -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-11 card-wrapper"
+                         data-category="ia,creation"
+                         data-name="EduSlide Générateur Prompt Premium Présentations Pédagogiques NotebookLM"
+                         aria-label="EduSlide">
+                    <span class="badge-new">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-lg">
+                            <i class="fas fa-desktop" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-fuchsia-50 text-fuchsia-600 border border-fuchsia-100/60">
+                            <i class="fas fa-magic text-[9px]" aria-hidden="true"></i> Présentations IA
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">EduSlide</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Générateur de prompts premium pour créer des présentations pédagogiques mémorables avec l'IA. Configurez, colorisez et transformez vos documents via NotebookLM.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Présentations</span>
+                        <span class="keyword-tag">Slides IA</span>
+                        <span class="keyword-tag">NotebookLM</span>
+                    </div>
+                    <a href="https://eduslide-be7117.forge.apps.education.fr/eduslide.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100 hover:bg-fuchsia-500 hover:text-white hover:border-fuchsia-500">
+                        <span>Créer des slides</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 13. Générateur de Jeux -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-11 card-wrapper"
+                         data-category="jeu,ia"
+                         data-name="Super Générateur de Jeux Pédagogiques HTML Prompt Parcours"
+                         aria-label="Générateur de Jeux">
+                    <span class="badge-new">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-lg">
+                            <i class="fas fa-cubes" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-violet-50 text-violet-600 border border-violet-100/60">
+                            <i class="fas fa-gamepad text-[9px]" aria-hidden="true"></i> Ludification IA
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Générateur de Jeux</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Générez un super-prompt pour créer instantanément des parcours de mini-jeux interactifs en HTML (Memory, Mots croisés, Intrus...) à partir de vos textes.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Gamification</span>
+                        <span class="keyword-tag">Mini-jeux</span>
+                        <span class="keyword-tag">Parcours</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateurjeux.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-violet-50 text-violet-700 border-violet-100 hover:bg-violet-500 hover:text-white hover:border-violet-500">
+                        <span>Créer un parcours</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 14. Générateur d'Activités -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-11 card-wrapper"
+                         data-category="creation,ia"
+                         data-name="Générateur d'Activités Pédagogiques HTML QCM Synthèse"
+                         aria-label="Générateur d'Activités">
+                    <span class="badge-new">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-lg">
+                            <i class="fas fa-tasks" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-rose-50 text-rose-600 border border-rose-100/60">
+                            <i class="fas fa-list-check text-[9px]" aria-hidden="true"></i> Évaluation IA
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Générateur d'Activités</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Générez un fichier HTML autonome contenant des activités d'évaluation formative interactives (QCM, séquençage, textes à trous) avec système de score.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">HTML Autonome</span>
+                        <span class="keyword-tag">Évaluation</span>
+                        <span class="keyword-tag">QCM</span>
+                    </div>
+                    <a href="https://gcormi.forge.apps.education.fr/frojet/generateuractivit%C3%A9s.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-rose-50 text-rose-700 border-rose-100 hover:bg-rose-500 hover:text-white hover:border-rose-500">
+                        <span>Créer des activités</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 15. Veille & Organisation -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-12 card-wrapper"
+                         data-category="orga"
+                         data-name="Veille Stratégique Pro RSS Favoris Cloud"
+                         aria-label="Veille Stratégique">
+                    <span class="badge-new">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-lg">
+                            <i class="fas fa-satellite-dish" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-cyan-50 text-cyan-600 border border-cyan-100/60">
+                            <i class="fas fa-folder-tree text-[9px]" aria-hidden="true"></i> Organisation
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Veille Stratégique Pro</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Outil de veille pédagogique et technologique. Synchronisation cloud sécurisée, flux RSS en direct et gestion centralisée des favoris.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Flux RSS</span>
+                        <span class="keyword-tag">Favoris</span>
+                        <span class="keyword-tag">Cloud</span>
+                    </div>
+                    <a href="veille.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-cyan-50 text-cyan-700 border-cyan-100 hover:bg-cyan-500 hover:text-white hover:border-cyan-500">
+                        <span>Ouvrir l'outil</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- 16. YouTube EduSync -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-12 card-wrapper"
+                         data-category="orga"
+                         data-name="YouTube EduSync Vidéos Favoris Zéro Distraction"
+                         aria-label="YouTube EduSync">
+                    <span class="badge-new bg-red-100 text-red-600 border-red-200">Nouveau</span>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-lg shadow-sm">
+                            <i class="fab fa-youtube" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-cyan-50 text-cyan-600 border border-cyan-100/60">
+                            <i class="fas fa-folder-tree text-[9px]" aria-hidden="true"></i> Organisation
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">YouTube EduSync</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Votre veille vidéo personnelle. Lisez immédiatement les publications éducatives de vos propres abonnements YouTube sans les recommandations parasites de l'algorithme.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">YouTube API</span>
+                        <span class="keyword-tag bg-emerald-50 text-emerald-600 border-emerald-100">Zéro Distraction</span>
+                    </div>
+                    <a href="youtube_veille.html" target="_blank" rel="noopener"
+                       class="card-cta-small bg-red-50 text-red-700 border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600">
+                        <span>Ouvrir l'outil</span>
+                        <i class="fas fa-play text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+
+
+            </div><!-- end cards-grid -->
+
+            <!-- No results message -->
+            <div id="no-results" class="text-center py-20">
+                <i class="fas fa-search text-5xl text-slate-300 mb-4 block" aria-hidden="true"></i>
+                <p class="text-slate-500 font-medium">Aucun outil ne correspond à votre recherche.</p>
             </div>
 
-            <div id="no-results" class="text-center py-20 hidden">
-                <i class="fas fa-search text-5xl text-slate-200 mb-4 block"></i>
-                <p class="text-slate-400 font-bold uppercase tracking-widest">Aucun résultat</p>
-            </div>
+        </section>
 
-        </main>
+    </main>
     </div>
 
-    <footer class="mt-20 border-t border-slate-100 bg-white">
-        <div class="container mx-auto max-w-7xl px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white text-xs font-black">IP</div>
-                <span class="text-sm font-black text-slate-900 uppercase tracking-tighter">Ingénierie Pédagogique</span>
+    <!-- ============================== FOOTER ============================== -->
+    <footer class="footer-gradient border-t border-slate-100 mt-20">
+        <div class="container mx-auto max-w-7xl px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center text-white">
+                            <i class="fas fa-graduation-cap text-sm" aria-hidden="true"></i>
+                        </div>
+                        <span class="font-extrabold text-slate-900">Portail IA</span>
+                    </div>
+                    <p class="text-sm text-slate-500 leading-relaxed">Ingénierie pédagogique augmentée pour les enseignants. Suite d'outils libres et gratuits.</p>
+                </div>
+
+                <!-- Ressources -->
+                <div>
+                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-5">Ressources</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <button id="footer-philosophy-btn" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-book-open text-xs text-slate-300" aria-hidden="true"></i> Philosophie du Projet
+                            </button>
+                        </li>
+                        <li>
+                            <a href="mailto:gilles@gcormi.fr" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-envelope text-xs text-slate-300" aria-hidden="true"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Outils vedettes -->
+                <div>
+                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-5">Outils phares</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/assistant-test/" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-microchip text-xs text-indigo-300" aria-hidden="true"></i> Assistant de Conception
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/frojet/technologie_master.html" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-laptop-code text-xs text-blue-300" aria-hidden="true"></i> Master Technologie
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/tas/" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-universal-access text-xs text-emerald-300" aria-hidden="true"></i> Adaptation Inclusive
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://gcormi.forge.apps.education.fr/frojet/LudoTech/ludotech.html" target="_blank" rel="noopener" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                <i class="fas fa-dice text-xs text-amber-300" aria-hidden="true"></i> LudoTech Engine
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">© 2026 Gilles Cormi · Libre & Gratuit</div>
+
+            <!-- Bottom footer -->
+            <div class="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400">
+                <div class="text-xs font-bold tracking-tight">
+                    © 2026 Gilles Cormi · Ingénierie Pédagogique
+                </div>
+                <div class="text-[10px] font-bold uppercase tracking-widest">
+                    Sous licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="hover:text-indigo-500 transition-colors underline decoration-dotted">CC BY-NC-ND 4.0</a>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <button id="back-to-top" aria-label="Retour en haut de page" title="Retour en haut">
+        <i class="fas fa-arrow-up text-sm" aria-hidden="true"></i>
+    </button>
+
+    <!-- Toast -->
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ============================== MODAL: PHILOSOPHIE DU PROJET ============================== -->
+    <div id="philosophy-modal" class="modal-overlay">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <h2>Philosophie du Projet</h2>
+                    <p>Vision d'une suite d'outils au service de l'enseignant</p>
+                </div>
+                <button class="modal-close-btn" aria-label="Fermer la modale" id="modal-close">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="modal-vision-box">
+                    <strong>Vision centrale :</strong> Démocratiser l'accès à des ressources pédagogiques de qualité professionnelle en mettant l'intelligence artificielle au service de l'enseignant, sans jamais le remplacer. L'IA n'est pas le pédagogue : <em>elle est l'assistant qui prépare le terrain, l'enseignant reste l'architecte</em>.
+                </div>
+
+                <h3><i class="fas fa-lightbulb"></i> Genèse & Contexte</h3>
+                <p>L'Assistant Pédagogique Moderne est né d'une observation terrain : les enseignants manquent de temps pour créer des supports pédagogiques variés, adaptés et esthétiquement engageants. Face à l'émergence des IA génératives, il devenait urgent de concevoir une <strong>interface de médiation</strong> entre ces outils puissants mais complexes et les besoins concrets de l'enseignant.</p>
+                <p>Plutôt que de se perdre dans des prompts mal structurés ou de produire du contenu générique, cette suite d'outils propose une <strong>ingénierie pédagogique encapsulée</strong> : chaque générateur intègre les bonnes pratiques didactiques, les référentiels officiels (programmes de l'Éducation Nationale) et une exigence de qualité alignée sur celle d'un éditeur scolaire.</p>
+
+                <h3><i class="fas fa-columns"></i> Les Six Piliers Philosophiques</h3>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🎯</div>
+                    <div class="modal-pillar-content">
+                        <strong>L'enseignant au centre</strong>
+                        <p>L'outil ne génère jamais de contenu "clé en main" sans validation humaine. Il produit des prompts structurés ou des bases de travail que l'enseignant enrichit, adapte et valide.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">⚡</div>
+                    <div class="modal-pillar-content">
+                        <strong>Gain de temps, pas de qualité perdue</strong>
+                        <p>L'automatisation vise les tâches chronophages (structuration, mise en page, diversité de formats), libérant du temps pour la personnalisation et l'innovation pédagogique.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🔄</div>
+                    <div class="modal-pillar-content">
+                        <strong>Flexibilité & Diversité</strong>
+                        <p>Un même contenu peut être décliné en cours DOCX, page HTML interactive, exercice Moodle XML, infographie visuelle ou jeu pédagogique, selon le besoin et le public.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🌐</div>
+                    <div class="modal-pillar-content">
+                        <strong>Compatibilité ENT</strong>
+                        <p>Intégration facilitée avec les Environnements Numériques de Travail : exports prêts à l'emploi pour outils de création assistée (PNG), Tests Moodle (XML), ou pages HTML interactives.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🎨</div>
+                    <div class="modal-pillar-content">
+                        <strong>Esthétique & Engagement</strong>
+                        <p>Refus des interfaces austères. Chaque générateur embarque des principes de design moderne (palettes de couleurs, typographie soignée, animations CSS) pour produire des supports qui donnent envie.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">📚</div>
+                    <div class="modal-pillar-content">
+                        <strong>Rigueur Pédagogique</strong>
+                        <p>Alignement strict sur les programmes officiels, intégration du Socle Commun, structuration par compétences. L'IA est guidée pour produire des contenus conformes aux exigences institutionnelles.</p>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-sitemap"></i> Architecture de l'Écosystème</h3>
+                <p>L'application se décompose en <strong>six familles fonctionnelles complémentaires</strong> :</p>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">📖</div>
+                    <div class="modal-pillar-content">
+                        <strong>A. Générateurs de Cours Disciplinaires</strong>
+                        <p>Sciences (Technologie, SVT, Physique-Chimie, Mathématiques), Sciences Humaines (Histoire, Géographie, EMC), Langues & Arts (Français, Anglais, Espagnol, Italien, LCC, Arts Plastiques, Éducation Musicale), Lycée (SNT, SES)</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🛠️</div>
+                    <div class="modal-pillar-content">
+                        <strong>B. Boîte à Outils (Édition & Conversion)</strong>
+                        <p>Éditeur visuel HTML (WYSIWYG), Amélioration de design HTML via prompt, Amélioration de textes DOCX via IA, Convertisseur HTML → PDF</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">🎮</div>
+                    <div class="modal-pillar-content">
+                        <strong>C. Activités Interactives & Ludiques</strong>
+                        <p>Générateurs de parcours d'activités multi-onglets, Escape Games / Scénarios à choix, Ateliers cognitifs (Memory, Mots Croisés, Mots Mêlés, Association)</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">✏️</div>
+                    <div class="modal-pillar-content">
+                        <strong>D. Exercices & Évaluations</strong>
+                        <p>Exercices visuels (PNG pour Création Assistée Léia), Exercices auto-corrigés (XML Moodle), Infographies pédagogiques (Accroche, Résumé, Synthèse)</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">&#129427;</div>
+                    <div class="modal-pillar-content">
+                        <strong>E. Inclusion &amp; Accessibilit&eacute; TAS</strong>
+                        <p>Deux outils d&eacute;di&eacute;s aux &eacute;l&egrave;ves pr&eacute;sentant des Troubles des Apprentissages Sp&eacute;cifiques (DYS, TDAH, dyspraxie&hellip;) : <strong>Adaptation Inclusive</strong> pour reformater n&rsquo;importe quelle ressource p&eacute;dagogique, et <strong>Lecteur Adaptatif</strong> pour une lecture bionique, audio et &eacute;pur&eacute;e. Le z&egrave;bre &#129427;, symbole des profils neuroatypiques, rappelle qu&rsquo;aucun &eacute;l&egrave;ve ne se ressemble &mdash; et qu&rsquo;aucun ne doit &ecirc;tre laiss&eacute; de c&ocirc;t&eacute;.</p>
+                    </div>
+                </div>
+
+                <div class="modal-pillar">
+                    <div class="modal-pillar-icon">☁️</div>
+                    <div class="modal-pillar-content">
+                        <strong>F. Veille & Organisation</strong>
+                        <p>Outils de veille pédagogique garantis "Zéro Distraction" (Veille Pro, YouTube EduSync) et d'accès centralisé aux espaces académiques et assistants de nouvelle génération (Hub Personnel & IA).</p>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-cogs"></i> Principes de Conception Technique</h3>
+                <p><strong>Autonomie & Légèreté :</strong> Tous les outils fonctionnent côté client (HTML/CSS/JavaScript), sans serveur backend. L'enseignant garde la main sur ses données, rien n'est envoyé à un serveur tiers (hors appel IA si mode API activé).</p>
+                <p><strong>Transparence & Modifiabilité des Prompts :</strong> L'application ne "cache" jamais ce qu'elle envoie à l'IA. Le prompt généré est toujours visible, modifiable et pédagogique : il explicite les exigences (structure, format, compétences visées). <em>Toutes les informations et prompts sont facilement modifiables et améliorables</em> selon les besoins spécifiques de chaque enseignant.</p>
+                <p><strong>Modularité :</strong> Chaque outil est une page HTML autonome et réutilisable. Un enseignant peut adapter ou dupliquer un générateur pour ses besoins spécifiques sans dépendances complexes.</p>
+
+                <h3><i class="fas fa-heart"></i> Posture Éthique & Pédagogique</h3>
+                <p><strong>L'IA comme co-pilote, jamais comme pilote :</strong> Les outils n'encouragent pas la délégation aveugle à l'IA, mais une collaboration consciente. L'enseignant doit :</p>
+                <ul>
+                    <li>Paramétrer ses besoins (niveau, thème, objets d'étude, plan imposé)</li>
+                    <li>Vérifier systématiquement les contenus générés (mention explicite dans le footer de chaque page)</li>
+                    <li>Adapter le contenu à sa classe, son contexte, ses élèves</li>
+                </ul>
+                <p><strong>Accompagnement à la maîtrise des outils numériques :</strong> En affichant les prompts et en expliquant les mécanismes (structure d'un cours, critères d'un bon exercice), l'application forme implicitement l'enseignant à l'ingénierie pédagogique et à l'usage raisonné de l'IA.</p>
+
+                <h3><i class="fas fa-globe"></i> Modèle Économique & Accessibilité</h3>
+                <p>L'application est diffusée sous <strong>licence Creative Commons BY-NC-ND 4.0</strong> : gratuite pour un usage non commercial, l'auteur doit être crédité, et aucune modification n'est autorisée. Ce choix affirme une volonté de <strong>démocratisation</strong> : tout enseignant, quelle que soit son académie ou son établissement, peut bénéficier de ces outils.</p>
+                <p>Le mode <strong>API optionnel</strong> (connexion Gemini ou OpenRouter) permet une automatisation complète, mais l'application reste pleinement fonctionnelle en mode "générateur de prompts" : l'enseignant copie le prompt produit et l'utilise dans l'IA de son choix (gratuite ou payante).</p>
+
+                <h3><i class="fas fa-rocket"></i> Conclusion : Vers une Pédagogie Augmentée</h3>
+                <p>L'Assistant Pédagogique Moderne ne cherche pas à "remplacer" le travail de l'enseignant, mais à le <strong>réorienter</strong> : moins de temps sur la mise en forme, plus de temps sur la personnalisation, l'accompagnement et l'innovation. En structurant l'usage de l'IA par des cadres pédagogiques rigoureux, il transforme un outil généraliste en un <strong>partenaire d'expertise disciplinaire</strong>.</p>
+                <p>La philosophie sous-jacente est celle d'une <strong>pédagogie augmentée</strong> : l'humain (enseignant et élève) reste au cœur, la machine sert d'amplificateur de créativité et de productivité, jamais de substitut à la réflexion et au lien humain.</p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <div class="modal-footer-text">
+                    © 2026 Gilles Cormi · Licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="modal-footer-link">CC BY-NC-ND 4.0</a>
+                </div>
+                <button id="modal-close-footer" class="philosophy-btn text-xs">
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================== SCRIPTS ============================== -->
     <script>
+        // ====== ACCESSIBILITY SETTINGS MANAGEMENT ======
+        const STORAGE_KEY_DARK_MODE = 'accessibility-dark-mode';
+        const STORAGE_KEY_DYSLEXIA = 'accessibility-dyslexia';
+        const STORAGE_KEY_TEXT_SIZE = 'accessibility-text-size';
+
+        // Initialize accessibility settings from localStorage
+        function initializeAccessibility() {
+            const darkMode = localStorage.getItem(STORAGE_KEY_DARK_MODE) === 'true';
+            const dyslexia = localStorage.getItem(STORAGE_KEY_DYSLEXIA) === 'true';
+            const textSize = parseInt(localStorage.getItem(STORAGE_KEY_TEXT_SIZE)) || 100;
+
+            if (darkMode) toggleDarkMode(true);
+            if (dyslexia) toggleDyslexia(true);
+            setTextSize(textSize);
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode(enable) {
+            const html = document.documentElement;
+            const toggle = document.getElementById('dark-mode-toggle');
+            const status = document.getElementById('dark-mode-status');
+
+            if (enable) {
+                html.classList.add('dark-mode');
+                localStorage.setItem(STORAGE_KEY_DARK_MODE, 'true');
+                toggle.classList.add('active');
+                toggle.setAttribute('aria-pressed', 'true');
+                status.textContent = 'Activé';
+            } else {
+                html.classList.remove('dark-mode');
+                localStorage.setItem(STORAGE_KEY_DARK_MODE, 'false');
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-pressed', 'false');
+                status.textContent = 'Désactivé';
+            }
+        }
+
+        // Dyslexia Mode Toggle
+        function toggleDyslexia(enable) {
+            const html = document.documentElement;
+            const toggle = document.getElementById('dyslexia-toggle');
+            const status = document.getElementById('dyslexia-status');
+
+            if (enable) {
+                html.classList.add('dyslexia-mode');
+                localStorage.setItem(STORAGE_KEY_DYSLEXIA, 'true');
+                toggle.classList.add('active');
+                toggle.setAttribute('aria-pressed', 'true');
+                status.textContent = 'Activé';
+            } else {
+                html.classList.remove('dyslexia-mode');
+                localStorage.setItem(STORAGE_KEY_DYSLEXIA, 'false');
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-pressed', 'false');
+                status.textContent = 'Désactivé';
+            }
+        }
+
+        // Text Size Control
+        function setTextSize(percentage) {
+            const html = document.documentElement;
+            const display = document.getElementById('text-size-display');
+            const scale = percentage / 100;
+
+            html.style.setProperty('--text-scale', scale);
+            display.textContent = percentage + '%';
+            localStorage.setItem(STORAGE_KEY_TEXT_SIZE, percentage);
+        }
+
+        // Event Listeners for Accessibility Controls
+        document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            toggleDarkMode(!isDarkMode);
+        });
+
+        document.getElementById('dyslexia-toggle').addEventListener('click', function() {
+            const isDyslexia = document.documentElement.classList.contains('dyslexia-mode');
+            toggleDyslexia(!isDyslexia);
+        });
+
+        document.getElementById('text-size-decrease').addEventListener('click', function() {
+            const current = parseInt(localStorage.getItem(STORAGE_KEY_TEXT_SIZE)) || 100;
+            if (current > 80) setTextSize(current - 10);
+        });
+
+        document.getElementById('text-size-increase').addEventListener('click', function() {
+            const current = parseInt(localStorage.getItem(STORAGE_KEY_TEXT_SIZE)) || 100;
+            if (current < 200) setTextSize(current + 10);
+        });
+
+        document.getElementById('text-size-reset').addEventListener('click', function() {
+            setTextSize(100);
+        });
+
+        document.getElementById('accessibility-reset').addEventListener('click', function() {
+            localStorage.removeItem(STORAGE_KEY_DARK_MODE);
+            localStorage.removeItem(STORAGE_KEY_DYSLEXIA);
+            localStorage.removeItem(STORAGE_KEY_TEXT_SIZE);
+            location.reload();
+        });
+
+        // Accessibility Toolbar Toggle
+        const accessibilityToggle = document.getElementById('accessibility-toggle');
+        const accessibilityMenu = document.getElementById('accessibility-menu');
+
+        accessibilityToggle.addEventListener('click', function() {
+            const isOpen = accessibilityMenu.classList.toggle('active');
+            accessibilityToggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Close accessibility menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.accessibility-toolbar')) {
+                accessibilityMenu.classList.remove('active');
+                accessibilityToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Keyboard shortcut: Alt + A to open accessibility menu
+        document.addEventListener('keydown', function(e) {
+            if (e.altKey && e.key === 'a') {
+                e.preventDefault();
+                accessibilityToggle.click();
+            }
+        });
+
+        // Initialize accessibility on page load
+        initializeAccessibility();
+
+        // ====== SCROLL PROGRESS BAR ======
+        const progressBar = document.getElementById('scroll-progress');
+        function updateProgress() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            progressBar.style.width = pct + '%';
+        }
+
+        // ====== BACK TO TOP ======
+        const backToTop = document.getElementById('back-to-top');
+        function updateBackToTop() {
+            if (window.scrollY > 400) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        }
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ====== SCROLL LISTENER ======
+        window.addEventListener('scroll', () => {
+            updateProgress();
+            updateBackToTop();
+        }, { passive: true });
+
+        // ====== HAMBURGER MENU ======
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        hamburger.addEventListener('click', () => {
+            const isOpen = hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open', isOpen);
+            hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Close mobile menu on resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // ====== SCROLL-TRIGGERED ANIMATIONS (IntersectionObserver) ======
+        const fadeEls = document.querySelectorAll('.fade-in-up');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-        document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+        fadeEls.forEach(el => observer.observe(el));
 
-        // Search Logic
-        const searchInput = document.getElementById('search-input');
-        const cards = document.querySelectorAll('.card-wrapper');
+        // ====== FILTER PILLS ======
+        const filterPills = document.querySelectorAll('.filter-pill');
+        const cardWrappers = document.querySelectorAll('.card-wrapper');
         const noResults = document.getElementById('no-results');
+        let currentFilter = 'all';
+        let currentSearch = '';
 
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            let hasResults = false;
-            cards.forEach(card => {
-                const content = card.getAttribute('data-name').toLowerCase();
-                if (content.includes(term)) {
+        function applyFiltersAndSearch() {
+            let visible = 0;
+            cardWrappers.forEach(card => {
+                const categories = card.getAttribute('data-category') || '';
+                const name = (card.getAttribute('data-name') || '') + ' ' + (card.querySelector('h3, h4')?.textContent || '') + ' ' + (card.querySelector('p')?.textContent || '');
+                
+                const matchesFilter = currentFilter === 'all' || categories.includes(currentFilter);
+                const matchesSearch = currentSearch === '' || name.toLowerCase().includes(currentSearch.toLowerCase());
+
+                if (matchesFilter && matchesSearch) {
                     card.classList.remove('hidden-filter');
-                    hasResults = true;
+                    visible++;
                 } else {
                     card.classList.add('hidden-filter');
                 }
             });
-            noResults.classList.toggle('hidden', hasResults);
-        });
 
-        // Sidebar Links
-        const sidebarLinks = [
-            { titre: "EditeurHTML", url: "editeurhtml.html", icone: "fas fa-file-code", color: "text-indigo-600", badge: "Studio" },
-            { titre: "YouTube Sync", url: "youtube_veille.html", icone: "fab fa-youtube", color: "text-rose-500" },
-            { titre: "Veille Pro", url: "veille.html", icone: "fas fa-rss", color: "text-sky-500" },
-            { titre: "Tableau Classe", url: "classe.html", icone: "fas fa-chalkboard", color: "text-emerald-500" },
-            { titre: "Post-its", url: "postits.html", icone: "fas fa-sticky-note", color: "text-yellow-500" },
-            { titre: "Bloc-note", url: "blocnote.html", icone: "fas fa-book-open", color: "text-indigo-500" },
-            { titre: "Favoris IA", url: "favoris.html", icone: "fas fa-bookmark", color: "text-purple-500" }
-        ];
-
-        function renderSidebar() {
-            const container = document.getElementById('sidebar-hub-links');
-            container.innerHTML = sidebarLinks.map(link => `
-                <a href="${link.url}" class="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 group">
-                    <div class="flex items-center gap-3">
-                        <i class="${link.icone} ${link.color} text-sm"></i>
-                        <span class="text-xs font-bold text-slate-700">${link.titre}</span>
-                    </div>
-                    ${link.badge ? `<span class="text-[8px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full uppercase">${link.badge}</span>` : ''}
-                </a>
-            `).join('');
+            noResults.style.display = visible === 0 ? 'block' : 'none';
         }
 
-        window.onload = () => {
-            renderSidebar();
-            window.addEventListener('scroll', () => {
-                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                const scrolled = (winScroll / height) * 100;
-                document.getElementById("scroll-progress").style.width = scrolled + "%";
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                filterPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentFilter = pill.getAttribute('data-filter');
+                applyFiltersAndSearch();
             });
+        });
+
+        // ====== SEARCH BAR ======
+        const searchInput = document.getElementById('search-input');
+        const clearSearch = document.getElementById('clear-search');
+
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            applyFiltersAndSearch();
+        });
+
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            currentSearch = '';
+            applyFiltersAndSearch();
+            searchInput.focus();
+        });
+
+        // ====== TOAST HELPER ======
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // ====== COUNTER ANIMATION ======
+        function animateCounter(el, target, suffix = '') {
+            let start = 0;
+            const duration = 1200;
+            const step = (timestamp) => {
+                if (!start) start = timestamp;
+                const progress = Math.min((timestamp - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(eased * target);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = target + suffix;
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Animate stat counters when visible
+        const statCards = document.querySelectorAll('.stat-card');
+        let countersAnimated = false;
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !countersAnimated) {
+                    countersAnimated = true;
+                    const counters = entry.target.parentElement.querySelectorAll('.counter');
+                    counters.forEach(c => {
+                        const text = c.textContent.trim();
+                        if (text === '100%') { c.textContent = '0%'; animateCounter(c, 100, '%'); }
+                        else if (!isNaN(parseInt(text))) { animateCounter(c, parseInt(text), ''); }
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        if (statCards[0]) statObserver.observe(statCards[0]);
+
+        // ====== KEYBOARD SUPPORT FOR FILTER PILLS ======
+        filterPills.forEach(pill => {
+            pill.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    pill.click();
+                }
+            });
+        });
+
+        // ====== MODAL: PHILOSOPHIE DU PROJET ======
+        const philosophyModal = document.getElementById('philosophy-modal');
+        const philosophyNavBtn = document.getElementById('philosophy-nav-btn');
+        const philosophyMobileBtn = document.getElementById('philosophy-mobile-btn');
+        const heroPhilosophyBtn = document.getElementById('hero-philosophy-btn');
+        const footerPhilosophyBtn = document.getElementById('footer-philosophy-btn');
+        const modalCloseBtn = document.getElementById('modal-close');
+        const modalCloseFooterBtn = document.getElementById('modal-close-footer');
+
+        function openPhilosophyModal() {
+            philosophyModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhilosophyModal() {
+            philosophyModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Open modal from various buttons
+        philosophyNavBtn?.addEventListener('click', openPhilosophyModal);
+        philosophyMobileBtn?.addEventListener('click', openPhilosophyModal);
+        heroPhilosophyBtn?.addEventListener('click', openPhilosophyModal);
+        footerPhilosophyBtn?.addEventListener('click', openPhilosophyModal);
+
+        // Close modal
+        modalCloseBtn?.addEventListener('click', closePhilosophyModal);
+        modalCloseFooterBtn?.addEventListener('click', closePhilosophyModal);
+
+        // Close modal when clicking on overlay
+        philosophyModal?.addEventListener('click', (e) => {
+            if (e.target === philosophyModal) {
+                closePhilosophyModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && philosophyModal.classList.contains('active')) {
+                closePhilosophyModal();
+            }
+        });
+
+        // ====== SIDEBAR HUB SCRIPT & CUSTOM LINKS (Firebase) ======
+        const internalTools = [
+            { titre: "EditeurHTML", url: "editeurhtml.html", icone: "fas fa-file-code", couleurIco: "text-indigo-600", fondIco: "bg-indigo-50 dark:bg-indigo-900/30", badge: "Studio" },
+            { titre: "YouTube Sync", url: "youtube_veille.html", icone: "fab fa-youtube", couleurIco: "text-rose-500", fondIco: "bg-rose-50 dark:bg-rose-900/30" },
+            { titre: "Veille Pro", url: "veille.html", icone: "fas fa-rss", couleurIco: "text-sky-500", fondIco: "bg-sky-50 dark:bg-sky-900/30" },
+            { titre: "Tableau Classe", url: "classe.html", icone: "fas fa-chalkboard", couleurIco: "text-emerald-500", fondIco: "bg-emerald-50 dark:bg-emerald-900/30" },
+            { titre: "Post-its", url: "postits.html", icone: "fas fa-sticky-note", couleurIco: "text-yellow-500", fondIco: "bg-yellow-50 dark:bg-yellow-900/30", badge: "Live" },
+            { titre: "Bloc-note", url: "blocnote.html", icone: "fas fa-book-open", couleurIco: "text-indigo-500", fondIco: "bg-indigo-50 dark:bg-indigo-900/30", badge: "Live" },
+            { titre: "Favoris IA", url: "favoris.html", icone: "fas fa-bookmark", couleurIco: "text-purple-500", fondIco: "bg-purple-50 dark:bg-purple-900/30", badge: "Nouv." },
+            { titre: "Capture", url: "ms-screenclip:", icone: "fas fa-camera-retro", couleurIco: "text-rose-500", fondIco: "bg-rose-50 dark:bg-rose-900/30", badge: "Win" }
+        ];
+
+        const externalFavorites = [
+            { titre: "Léia by Néo", url: "https://ent.leia.corsica/", icone: "fas fa-graduation-cap", couleurIco: "text-amber-500", fondIco: "bg-amber-50 dark:bg-amber-900/30", badge: "Académie" },
+            { titre: "Nuage (Apps.edu)", url: "https://nuage.apps.education.fr/", icone: "fas fa-cloud", couleurIco: "text-sky-500", fondIco: "bg-sky-50 dark:bg-sky-900/30" },
+            { titre: "Webmail Acad.", url: "https://messagerie.ac-corse.fr/", icone: "fas fa-envelope", couleurIco: "text-violet-500", fondIco: "bg-violet-50 dark:bg-violet-900/30", badge: "Pro" },
+            { titre: "Google Drive", url: "https://drive.google.com/", icone: "fab fa-google-drive", couleurIco: "text-emerald-500", fondIco: "bg-emerald-50 dark:bg-emerald-900/30" },
+            { titre: "Gmail", url: "https://mail.google.com/", icone: "fab fa-google", couleurIco: "text-rose-500", fondIco: "bg-rose-50 dark:bg-rose-900/30", badge: "Perso" },
+            { titre: "Google Agenda", url: "https://calendar.google.com/", icone: "fas fa-calendar-alt", couleurIco: "text-blue-500", fondIco: "bg-blue-50 dark:bg-blue-900/30" },
+            { titre: "Gemini AI", url: "https://gemini.google.com/", icone: "fas fa-wand-magic-sparkles", couleurIco: "text-indigo-500", fondIco: "bg-indigo-50 dark:bg-indigo-900/30" },
+            { titre: "NotebookLM", url: "https://notebooklm.google.com/", icone: "fas fa-book-open-reader", couleurIco: "text-blue-600", fondIco: "bg-blue-50 dark:bg-blue-900/30" }
+        ];
+
+        // Init Firebase (même base que les post-its)
+        let hubDb;
+        try {
+            hubDb = firebase.app().firestore();
+        } catch(e) {
+            firebase.initializeApp({
+                apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
+                authDomain: "portail-postits.firebaseapp.com",
+                projectId: "portail-postits",
+                storageBucket: "portail-postits.firebasestorage.app",
+                messagingSenderId: "494625342197",
+                appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
+            });
+            hubDb = firebase.firestore();
+        }
+        const customLinksRef = hubDb.collection('customHubLinks');
+
+        // Render sidebar (seulement les outils internes)
+        function renderSidebarLinks() {
+            const container = document.getElementById('sidebar-hub-links');
+            if(!container) return;
+            container.innerHTML = '';
+
+            internalTools.forEach(link => {
+                const item = document.createElement('a');
+                item.href = link.url;
+                item.className = "group relative flex items-center justify-between p-2.5 rounded-xl hover:bg-indigo-50 transition-all dark:hover:bg-slate-800/50 border border-transparent hover:border-indigo-100";
+
+                const badgeHtml = link.badge
+                    ? `<span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider bg-indigo-50 text-indigo-500 dark:bg-slate-700 dark:text-slate-400 border border-indigo-100 dark:border-slate-600">${link.badge}</span>`
+                    : '';
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden min-w-0 pr-1">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm flex-shrink-0 transition-all group-hover:scale-110 group-hover:shadow-md ${link.fondIco || 'bg-slate-100 dark:bg-slate-700'} ${link.couleurIco || 'text-slate-600'}">
+                            <i class="${link.icone || 'fas fa-link'}"></i>
+                        </div>
+                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${link.titre}</span>
+                        ${badgeHtml}
+                    </div>
+                    <i class="fas fa-chevron-right text-[9px] text-slate-300 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1"></i>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Render favorites drawer (favoris par défaut + liens perso Firebase)
+        function renderDrawerLinks(customLinks) {
+            const container = document.getElementById('drawer-links-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const allFavorites = [
+                ...externalFavorites.map(l => ({ ...l, isDefault: true })),
+                ...customLinks.map(l => ({ ...l, isDefault: false }))
+            ];
+
+            if (allFavorites.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 px-4">
+                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                        <i class="fas fa-star text-2xl"></i>
+                    </div>
+                    <p class="text-slate-400 text-sm font-medium">Aucun favori enregistré.</p>
+                </div>`;
+                return;
+            }
+
+            allFavorites.forEach(link => {
+                const item = document.createElement('a');
+                item.href = link.url;
+                item.target = "_blank";
+                item.rel = "noopener";
+                item.className = "fav-link-item group";
+
+                const badgeHtml = link.badge
+                    ? `<span class="fav-link-badge">${link.badge}</span>`
+                    : '';
+
+                const deleteBtn = !link.isDefault
+                    ? `<button class="fav-link-delete" title="Supprimer ce favori" onclick="event.preventDefault(); event.stopPropagation(); deleteCustomHubLink('${link.id}')"><i class="fas fa-trash-alt text-[10px]"></i></button>`
+                    : '';
+
+                item.innerHTML = `
+                    <div class="fav-link-icon-container ${link.fondIco || 'bg-slate-100 dark:bg-slate-800'} ${link.couleurIco || 'text-slate-600'}">
+                        <i class="${link.icone || 'fas fa-link'}"></i>
+                    </div>
+                    <div class="fav-link-info">
+                        <span class="fav-link-title">${link.titre}</span>
+                        <span class="fav-link-url">${link.url.replace('https://', '').replace('www.', '').split('/')[0]}</span>
+                    </div>
+                    ${badgeHtml}
+                    ${deleteBtn}
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Listener temps réel Firebase sur customHubLinks
+        customLinksRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
+            const customLinks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderSidebarLinks();
+            renderDrawerLinks(customLinks);
+        }, err => {
+            console.warn('Firebase sidebar error:', err);
+            renderSidebarLinks();
+            renderDrawerLinks([]);
+        });
+
+        // Suppression d'un lien personnalisé
+        window.deleteCustomHubLink = async function(id) {
+            if(!confirm('Supprimer ce lien de vos favoris ?')) return;
+            try {
+                await customLinksRef.doc(id).delete();
+                showToast('Favori supprimé.');
+            } catch(e) {
+                showToast('Erreur lors de la suppression.');
+            }
         };
+
+        // Drawer / Modal Handlers globals to be accessible from onclick
+        window.openDrawer = function() {
+            const drawer = document.getElementById('fav-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (drawer && overlay) {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error("Éléments modale introuvables");
+            }
+        };
+
+        window.closeDrawer = function() {
+            document.getElementById('fav-drawer')?.classList.remove('active');
+            document.getElementById('drawer-overlay')?.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        const drawerToggle = document.getElementById('sidebar-fav-toggle');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        const drawerAddBtn = document.getElementById('drawer-add-link');
+
+        drawerToggle?.addEventListener('click', openDrawer);
+        drawerClose?.addEventListener('click', closeDrawer);
+        drawerOverlay?.addEventListener('click', closeDrawer);
+
+        // Escape to close drawer
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && favDrawer.classList.contains('active')) {
+                closeDrawer();
+            }
+        });
+
+        // Modal Handlers (Lien personnalisé)
+        window.openCustomLinkModal = function() {
+            const modal = document.getElementById('custom-link-modal');
+            if(modal) {
+                document.getElementById('custom-link-name').value = '';
+                document.getElementById('custom-link-url').value = '';
+                modal.classList.add('active');
+                setTimeout(() => document.getElementById('custom-link-name').focus(), 100);
+            }
+        };
+
+        window.closeCustomLinkModal = function() {
+            document.getElementById('custom-link-modal')?.classList.remove('active');
+            const drawer = document.getElementById('fav-drawer');
+            if (!drawer || !drawer.classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
+        };
+
+        drawerAddBtn?.addEventListener('click', openCustomLinkModal);
+        document.getElementById('add-custom-link-btn')?.addEventListener('click', openCustomLinkModal);
+        document.getElementById('modal-close-custom')?.addEventListener('click', closeCustomLinkModal);
+        document.getElementById('cancel-custom-link')?.addEventListener('click', closeCustomLinkModal);
+
+        document.getElementById('save-custom-link')?.addEventListener('click', async () => {
+            const name = document.getElementById('custom-link-name').value.trim();
+            const url  = document.getElementById('custom-link-url').value.trim();
+
+            if(!name || !url) {
+                showToast('Veuillez remplir le nom et le lien.');
+                return;
+            }
+
+            let finalUrl = url;
+            if(!url.startsWith('http://') && !url.startsWith('https://')) {
+                finalUrl = 'https://' + url;
+            }
+
+            try {
+                await customLinksRef.add({
+                    titre: name,
+                    url: finalUrl,
+                    icone: 'fas fa-link',
+                    couleurIco: 'text-indigo-500',
+                    fondIco: 'bg-indigo-50 dark:bg-indigo-900/30',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeCustomLinkModal();
+                showToast('Lien ajouté et synchronisé !');
+            } catch(e) {
+                showToast('Erreur Firebase : ' + e.message);
+            }
+        });
+        console.log('--- Hub Script Loaded (V2.1) ---');
     </script>
+
+    <!-- Mes Favoris Modal (Small Center Modal) -->
+    <div id="drawer-overlay" class="fav-modal-overlay" aria-hidden="true" onclick="window.closeDrawer()">
+        <div id="fav-drawer" class="fav-modal-container" role="dialog" aria-labelledby="drawer-title" onclick="event.stopPropagation()">
+            <div class="drawer-header">
+                <h2 id="drawer-title"><i class="fas fa-star"></i> Mes Favoris</h2>
+                <button id="drawer-close" class="drawer-close-btn" aria-label="Fermer le menu" onclick="window.closeDrawer()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="drawer-content" id="drawer-links-container">
+                <!-- Rempli par JS -->
+            </div>
+            <div class="drawer-footer">
+                <button id="drawer-add-link" class="fav-add-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Ajouter un favori</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter un lien -->
+    <div id="custom-link-modal" class="custom-link-modal-overlay" onclick="window.closeCustomLinkModal()">
+        <div class="custom-link-modal-content" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-extrabold text-slate-800">Ajouter un favori</h3>
+                <button id="modal-close-custom" onclick="window.closeCustomLinkModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Nom du lien (ex: ENT)</label>
+                    <input type="text" id="custom-link-name" placeholder="Mon super outil..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 ml-1">Adresse URL</label>
+                    <input type="text" id="custom-link-url" placeholder="https://..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow text-slate-800">
+                </div>
+            </div>
+
+            <div class="flex gap-4 mt-8">
+                <button id="cancel-custom-link" class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">Annuler</button>
+                <button id="save-custom-link" class="flex-2 py-3 px-8 font-extrabold bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all">
+                    Enregistrer le favori
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
