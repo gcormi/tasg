@@ -143,9 +143,10 @@
                 <button id="btn-refresh" title="Actualiser les flux" class="text-xs font-bold bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">
                     <i class="fas fa-sync-alt"></i> Actualiser
                 </button>
-                <div id="sync-indicator" class="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold ring-1 ring-emerald-500/20">
-                    <i class="fas fa-cloud"></i> Synchro Gilles
+                <div id="sync-indicator" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold ring-1 ring-slate-200/50">
+                    <i class="fas fa-user-circle"></i> Mode Invité
                 </div>
+                <button id="admin-login-btn" onclick="window.loginGoogle()" class="text-[10px] font-bold text-indigo-600 hover:underline ml-2">Connexion Admin</button>
             </div>
         </div>
     </header>
@@ -342,7 +343,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         // --- CONFIGURATION ---
@@ -401,60 +402,52 @@
             } catch(e) { console.error("Repair failed:", e); }
         })();
 
+        window.loginGoogle = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).catch(err => alert(err.message));
+        };
+
         async function initAuth() {
             if (!isCloudEnabled) return;
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (tokenError) {
-                        await signInAnonymously(auth);
-                    }
-                } else { 
-                    await signInAnonymously(auth); 
-                }
-            } catch (error) {
-                console.warn("Avertissement Firebase :", error.code);
-                
-                let errorMessage = "Erreur de connexion Cloud. Mode local activé.";
-                if (error.code === 'auth/configuration-not-found' || error.code === 'auth/unauthorized-domain' || (error.message && error.message.includes('configuration-not-found'))) {
-                    errorMessage = "⏳ Déploiement Firebase en cours. Si vous venez d'activer le mode 'Anonyme', veuillez patienter 5 minutes. Mode local activé.";
-                }
-
-                document.getElementById('status-text').textContent = errorMessage;
-                document.getElementById('local-status-msg').className = "mb-8 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-xs flex items-center gap-3";
-                
-                isCloudEnabled = false;
-                loadLocalData();
-                fetchAllFeeds();
-            }
             
             onAuthStateChanged(auth, async (user) => {
-                // TENTATIVE DE RÉCUPÉRATION MULTI-CANAUX
-                // 1. On essaie d'abord l'ID de la session Gilles (6463) qui contenait "pix"
-                const gillesUid = "f2659e26b5b7efa7d8099b64d60a7f68c7797c735cc2f2807923129f397a21a1";
-                // 2. On garde l'ID de Brigitte en secours au cas où
-                const brigitteUid = "433fd96c388bd0afb30d982603f049c51b3148f21f27217cecadfcbc77b08827";
-                
-                // On active la session Gilles par défaut pour retrouver "pix" et ses 7 liens
-                currentUser = { uid: gillesUid };
-                listenToData(gillesUid);
-                
-                // Si rien ne vient après 2 secondes, on vérifie si Brigitte a des données
-                setTimeout(() => {
-                    if (folders.length <= 1 && sources.length === 0) {
-                        console.log("Essai secours session Brigitte...");
-                        listenToData(brigitteUid);
-                    }
-                }, 2000);
+                const indicator = document.getElementById('sync-indicator');
+                const loginBtn = document.getElementById('admin-login-btn');
 
                 if (user) {
-                    document.getElementById('sync-indicator').innerHTML = '<i class="fas fa-cloud"></i> Synchro Gilles Active';
+                    currentUser = user;
+                    
+                    if (user.isAnonymous) {
+                        const token = sessionStorage.getItem('guest_token') || new URLSearchParams(window.location.search).get('invit');
+                        if (!token) {
+                            alert("Accès refusé : Identifiez-vous ou utilisez un lien d'invitation.");
+                            window.location.href = "index.html";
+                            return;
+                        }
+                        indicator.innerHTML = '<i class="fas fa-user-secret"></i> Espace Invité';
+                        indicator.className = "flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold ring-1 ring-blue-500/20";
+                        loginBtn.style.display = 'inline';
+                    } else {
+                        indicator.innerHTML = '<i class="fas fa-check-circle"></i> Session Admin (' + (user.displayName || 'Gilles') + ')';
+                        indicator.className = "flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold ring-1 ring-emerald-500/20";
+                        loginBtn.style.display = 'none';
+                    }
+
+                    listenToData(user.uid);
+                } else {
+                    const token = sessionStorage.getItem('guest_token') || new URLSearchParams(window.location.search).get('invit');
+                    if (token) {
+                        signInAnonymously(auth);
+                    } else {
+                        document.getElementById('status-text').textContent = "Veuillez vous connecter pour accéder à votre veille.";
+                    }
                 }
             });
             loadLocalData();
             fetchAllFeeds();
         }
+
+        initAuth();
 
         // --- UI FUNCTIONS ---
         // (Moved to non-module script above for immediate availability)
