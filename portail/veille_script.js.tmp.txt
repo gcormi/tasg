@@ -1,0 +1,81 @@
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDocs, query, limit } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // --- CONFIGURATION ---
+        let db = null, auth = null, appId = 'default';
+        let isCloudEnabled = false;
+
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                isCloudEnabled = true;
+                document.getElementById('status-text').textContent = "Cloud Activé : Synchronisation opérationnelle.";
+            } else {
+                document.getElementById('status-text').textContent = "Mode Local activé.";
+            }
+        } catch (e) {
+            console.warn("Erreur config Firebase:", e);
+        }
+
+        let currentUser = null;
+        let folders = [], sources = [];
+        let activeFolderInModal = null;
+
+        const BASE_SOURCES = [
+            { id: 'b1', name: "Ludomag", url: "https://www.ludomag.com/feed/", category: "Innovation", icon: "fa-newspaper" },
+            { id: 'b2', name: "Outils TICE", url: "https://outilstice.com/feed/", category: "Outils", icon: "fa-tools" },
+            { id: 'b3', name: "S'CAPE", url: "https://scape.enepe.fr/spip.php?page=backend", category: "Ludo", icon: "fa-puzzle-piece" }
+        ];
+
+        window.loginGoogle = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).catch(err => alert(err.message));
+        };
+
+        async function initAuth() {
+            if (!isCloudEnabled) return;
+            
+            onAuthStateChanged(auth, async (user) => {
+                const indicator = document.getElementById('sync-indicator');
+                const loginBtn = document.getElementById('admin-login-btn');
+
+                if (user) {
+                    currentUser = user;
+                    
+                    if (user.isAnonymous) {
+                        const token = sessionStorage.getItem('guest_token') || new URLSearchParams(window.location.search).get('invit');
+                        if (!token) {
+                            alert("Accès refusé : Identifiez-vous ou utilisez un lien d'invitation.");
+                            window.location.href = "index.html";
+                            return;
+                        }
+                        indicator.innerHTML = '<i class="fas fa-user-secret"></i> Espace Invité';
+                        indicator.className = "flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold ring-1 ring-blue-500/20";
+                        loginBtn.style.display = 'inline';
+                    } else {
+                        indicator.innerHTML = '<i class="fas fa-check-circle"></i> Session Admin (' + (user.displayName || 'Gilles') + ')';
+                        indicator.className = "flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold ring-1 ring-emerald-500/20";
+                        loginBtn.style.display = 'none';
+                    }
+
+                    listenToData(user.uid);
+                } else {
+                    const token = sessionStorage.getItem('guest_token') || new URLSearchParams(window.location.search).get('invit');
+                    if (token) {
+                        signInAnonymously(auth);
+                    } else {
+                        document.getElementById('status-text').textContent = "Veuillez vous connecter pour accéder à votre veille.";
+                    }
+                }
+            });
+            loadLocalData();
+            fetchAllFeeds();
+        }
+        
+        initAuth();
