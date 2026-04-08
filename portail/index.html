@@ -3445,63 +3445,170 @@
 
             <div class="space-y-4 mb-6">
                 <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nom de l'invité</label>
+                    <input type="text" id="share-guest-name" placeholder="Ex: Jean Dupont, Collègue-A..." class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-slate-700 outline-none focus:border-indigo-500 transition-colors">
+                </div>
+
+                <div>
                     <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Durée de l'accès (en jours)</label>
                     <div class="relative">
                         <input type="number" id="share-days" value="7" min="1" max="90" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-slate-700 outline-none focus:border-indigo-500 transition-colors">
                         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Jours</span>
                     </div>
                 </div>
-
-                <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                    <p class="text-xs text-indigo-700 leading-relaxed">
-                        <i class="fas fa-info-circle mr-1"></i> 
-                        Cette action va générer une version <strong>invitée</strong> de votre portail. Vos données personnelles resteront masquées.
-                    </p>
-                </div>
             </div>
 
-            <div id="share-local-info" class="mb-6 hidden">
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Instructions</label>
-                <div class="p-4 bg-slate-900 rounded-xl font-mono text-[11px] text-emerald-400 border border-slate-800">
-                    npx firebase-tools hosting:channel:deploy guest --expires <span id="cmd-days">7</span>d
-                </div>
-            </div>
-
-            <button onclick="generateShareLink()" class="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2">
-                <i class="fas fa-magic"></i>
-                <span>Créer le lien</span>
+            <button onclick="createNewInvitation()" id="gen-btn" class="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 mb-8">
+                <i class="fas fa-plus-circle"></i>
+                <span>Générer un nouveau lien</span>
             </button>
+
+            <!-- Liste des invitations actives -->
+            <div class="border-t border-slate-100 pt-6">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4">Invitations Actives</label>
+                <div id="invitation-list" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                    <!-- Rempli par JS -->
+                    <p class="text-center text-xs text-slate-400 italic py-4">Aucune invitation active</p>
+                </div>
+            </div>
             
-            <p id="share-hint" class="text-center text-[10px] text-slate-400 mt-4">
-                Note : Nécessite l'ouverture du script <strong>PARTAGER_MON_PORTAIL.bat</strong> sur votre PC.
+            <p class="text-center text-[10px] text-slate-300 mt-6 italic">
+                Mode Management - Vos données sont isolées.
             </p>
         </div>
     </div>
 
     <script>
-        // Gestion Modal Partage
-        const shareBtn = document.getElementById('share-access-btn');
-        const shareModal = document.getElementById('share-modal');
-        const shareDaysInput = document.getElementById('share-days');
+        // --- GESTION DES INVITATIONS ---
+        const db = firebase.firestore();
+        const invitationsRef = db.collection('invitations');
 
-        if(shareBtn) {
-            shareBtn.addEventListener('click', () => {
-                shareModal.classList.add('active');
-                if(location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-                    document.getElementById('share-local-info').classList.remove('hidden');
+        // Ouvrir la modale
+        document.getElementById('share-access-btn').addEventListener('click', () => {
+            document.getElementById('share-modal').classList.add('active');
+            loadInvitations();
+        });
+
+        // Créer une invitation
+        async function createNewInvitation() {
+            const name = document.getElementById('share-guest-name').value.trim();
+            const days = parseInt(document.getElementById('share-days').value) || 7;
+            const btn = document.getElementById('gen-btn');
+
+            if(!name) return alert("Veuillez donner un nom à l'invité.");
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération...';
+
+            const token = Math.random().toString(36).substring(2, 10).toUpperCase();
+            const expiry = new Date();
+            expiry.setDate(expiry.getDate() + days);
+
+            try {
+                await invitationsRef.add({
+                    name: name,
+                    token: token,
+                    expiresAt: firebase.firestore.Timestamp.fromDate(expiry),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('share-guest-name').value = '';
+                loadInvitations();
+            } catch(e) {
+                alert("Erreur: " + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus-circle"></i> Générer un nouveau lien';
+            }
+        }
+
+        // Charger et afficher la liste
+        function loadInvitations() {
+            const listEl = document.getElementById('invitation-list');
+            
+            invitationsRef.orderBy('createdAt', 'desc').onSnapshot(snap => {
+                if(snap.empty) {
+                    listEl.innerHTML = '<p class="text-center text-xs text-slate-400 italic py-4">Aucune invitation active</p>';
+                    return;
                 }
+
+                listEl.innerHTML = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const expiresAt = data.expiresAt.toDate();
+                    const now = new Date();
+                    const isExpired = expiresAt < now;
+                    const fullLink = `${window.location.origin}${window.location.pathname}?invit=${data.token}`;
+
+                    const item = document.createElement('div');
+                    item.className = "p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between";
+                    item.innerHTML = `
+                        <div class="min-w-0 flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-slate-700 text-xs truncate">${data.name}</span>
+                                ${isExpired ? '<span class="text-[8px] bg-red-100 text-red-500 px-1.5 py-0.5 rounded-md font-black uppercase">Expiré</span>' : ''}
+                            </div>
+                            <div class="text-[9px] text-slate-400 mt-0.5 flex items-center gap-1">
+                                <i class="fas fa-clock"></i> Expire le ${expiresAt.toLocaleDateString()}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyLink('${fullLink}')" class="w-7 h-7 bg-white border border-slate-200 rounded-lg text-indigo-500 hover:border-indigo-500 transition-colors flex items-center justify-center text-[10px]" title="Copier le lien">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button onclick="revokeInvitation('${doc.id}')" class="w-7 h-7 bg-white border border-slate-200 rounded-lg text-red-400 hover:border-red-500 hover:text-red-500 transition-colors flex items-center justify-center text-[10px]" title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    listEl.appendChild(item);
+                });
             });
         }
 
-        shareDaysInput.addEventListener('input', (e) => {
-            document.getElementById('cmd-days').textContent = e.target.value;
-        });
-
-        function generateShareLink() {
-            const days = shareDaysInput.value;
-            alert("Veuillez maintenant lancer le fichier 'PARTAGER_MON_PORTAIL.bat' dans votre dossier projet et taper '" + days + "' jours.\n\nLe script se chargera du reste !");
-            shareModal.classList.remove('active');
+        function copyLink(link) {
+            navigator.clipboard.writeText(link);
+            alert("Lien copié dans le presse-papier ! Envoyez-le à votre invité.");
         }
+
+        async function revokeInvitation(id) {
+            if(!confirm("Supprimer cet accès définitivement ?")) return;
+            await invitationsRef.doc(id).delete();
+        }
+
+        // --- VERIFICATION INVITATION ENTREE ---
+        async function checkIncomingInvitation() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('invit');
+
+            if (token) {
+                // On enregistre le token pour qu'il suive l'utilisateur s'il navigue
+                sessionStorage.setItem('guest_token', token);
+                
+                const snap = await invitationsRef.where('token', '==', token).get();
+                if (snap.empty) {
+                    alert("Ce code d'accès est invalide.");
+                    window.location.href = window.location.pathname; // Retire le param
+                    return;
+                }
+
+                const data = snap.docs[0].data();
+                if (data.expiresAt.toDate() < new Date()) {
+                    alert("Ce code d'accès a expiré.");
+                    window.location.href = window.location.pathname;
+                    return;
+                }
+
+                // Tout est ok -> on s'assure d'être en mode ANONYME si on n'est pas loggué Google
+                firebase.auth().onAuthStateChanged(user => {
+                    if (!user) {
+                        firebase.auth().signInAnonymously();
+                    }
+                });
+            }
+        }
+        
+        checkIncomingInvitation();
+
     </script>
 </body>
 </html>

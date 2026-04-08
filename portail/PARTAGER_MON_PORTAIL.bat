@@ -2,18 +2,19 @@
 title Generateur de Lien Invite - Portail Post-its
 color 0B
 echo ===================================================
-echo    GENERATEUR DE LIEN INVITE (TEMPORAIRE)
+echo    GENERATEUR DE LIEN INVITE (PERSONNALISE)
 echo ===================================================
 echo.
-set /p jours="Pendant combien de jours l'acces doit-il etre valide ? (ex: 7) : "
+set /p nom="Nom de l'invite (ex: ecole, ami, test) : "
+set /p jours="Durée de validité en jours (ex: 7) : "
 
 echo.
-echo [1/2] Preparation du lien de partage...
+echo [1/2] Creation du canal de partage : %nom%...
 echo ---------------------------------------------------
-cmd /c "npx firebase-tools@latest hosting:channel:deploy invite-%random% --expires %jours%d --project portail-postits"
+cmd /c "npx firebase-tools@latest hosting:channel:deploy %nom% --expires %jours%d --project portail-postits"
 echo ---------------------------------------------------
 echo.
-echo Termine ! Le lien ci-dessus est utilisable par vos invites.
+echo Termine ! Le lien ci-dessus est reserve pour : %nom%
 echo Il expirera automatiquement dans %jours% jours.
 echo.
 pause

@@ -442,8 +442,25 @@
         firebase.auth().signInAnonymously().catch(err => alert(err.message));
     };
 
-    function startApp(user) {
+    async function startApp(user) {
         const overlay = document.getElementById('auth-overlay');
+
+        // --- VERIFICATION TOKEN INVITE ---
+        if (user.isAnonymous) {
+            const token = sessionStorage.getItem('guest_token');
+            if (!token) {
+                alert("Accès refusé : Aucun jeton d'invitation trouvé.");
+                window.location.href = "index.html";
+                return;
+            }
+            const snap = await db.collection('invitations').where('token', '==', token).get();
+            if (snap.empty || snap.docs[0].data().expiresAt.toDate() < new Date()) {
+                alert("Votre accès invité a été révoqué ou a expiré.");
+                window.location.href = "index.html";
+                return;
+            }
+        }
+
         overlay.classList.add('hidden');
 
         // Isolation des données

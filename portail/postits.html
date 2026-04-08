@@ -526,14 +526,27 @@
             });
         };
 
-        function startApp(user) {
+        async function startApp(user) {
             const overlay = document.getElementById('auth-overlay');
-            overlay.classList.add('hidden');
-
-            // Badge invité
+            
+            // --- VERIFICATION TOKEN INVITE ---
             if (user.isAnonymous) {
+                const token = sessionStorage.getItem('guest_token');
+                if (!token) {
+                    alert("Accès refusé : Aucun jeton d'invitation trouvé.");
+                    window.location.href = "index.html";
+                    return;
+                }
+                const snap = await db.collection('invitations').where('token', '==', token).get();
+                if (snap.empty || snap.docs[0].data().expiresAt.toDate() < new Date()) {
+                    alert("Votre accès invité a été révoqué ou a expiré.");
+                    window.location.href = "index.html";
+                    return;
+                }
                 document.getElementById('guest-badge').style.display = 'inline';
             }
+
+            overlay.classList.add('hidden');
 
             // Collection scopée par utilisateur : chaque user voit UNIQUEMENT ses données
             postitsRef = db.collection('users').doc(user.uid).collection('postits');

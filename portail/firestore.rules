@@ -34,6 +34,12 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
 
+    // Invitations (Gestion des accès invités)
+    match /invitations/{doc} {
+      allow read: if true; // Tout le monde peut vérifier si son code est valide
+      allow write: if request.auth != null; // Seul toi (identifié) peux créer/supprimer des invitations
+    }
+
     // Artifacts
     match /artifacts/{document=**} {
       allow read, write: if request.auth != null;
