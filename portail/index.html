@@ -1812,6 +1812,10 @@
                     <a href="mailto:gilles@gcormi.fr" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wide text-slate-600 hover:bg-slate-50 transition-colors">
                         <i class="fas fa-envelope w-4 text-center" aria-hidden="true"></i> Contact
                     </a>
+                    <!-- Mobile Guide Button -->
+                    <button id="smart-guide-mobile-btn" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wide text-amber-600 bg-amber-50 mt-2">
+                        <i class="fas fa-lightbulb w-4 text-center"></i> Guide des Outils
+                    </button>
                 </nav>
             </div>
         </div>
@@ -3770,109 +3774,114 @@
         // GESTION DU GUIDE INTELLIGENT (EVOLUTIF)
         // ========================================================================
 
-        // 1. CONFIGURATION DES ACTIONS (AJOUTEZ VOS NOUVEAUTÉS ICI)
-        const guideConfig = [
-            {
-                categorie: "Différencier & Inclure",
-                icone: "fa-universal-access",
-                couleur: "text-emerald-500",
-                actions: [
-                    { label: "Adapter un texte (DYS, niveaux)", outil: "Inclum'IA", url: "https://inclumia.novapeda.eu/" },
-                    { label: "Accompagner la lecture bionique", outil: "Lecteur Adaptatif", url: "https://gcormi.forge.apps.education.fr/frojet/lecturefacile/lecturefacile.html" },
-                    { label: "Générer des dictées adaptées", outil: "DictIA", url: "https://educajou.forge.apps.education.fr/dictia/" }
-                ]
-            },
-            {
-                categorie: "Concevoir & Préparer",
-                icone: "fa-pen-ruler",
-                couleur: "text-indigo-500",
-                actions: [
-                    { label: "Créer une séquence de cours via IA", outil: "NovaPéda", url: "https://novapeda.eu" },
-                    { label: "Générer des mini-jeux (Memory...)", outil: "Gen de Jeux", url: "https://gcormi.forge.apps.education.fr/frojet/generateurjeux.html" },
-                    { label: "Créer des slides pédagogiques", outil: "EduSlide", url: "https://eduslide-be7117.forge.apps.education.fr/eduslide.html" },
-                    { label: "Créer une page web sans coder", outil: "Atelier Web", url: "https://gcormi.forge.apps.education.fr/frojet/Atelier-web.html" }
-                ]
-            },
-            {
-                categorie: "Animer & Collaborer",
-                icone: "fa-users",
-                couleur: "text-rose-500",
-                actions: [
-                    { label: "Gérer le climat de classe (Timer/Son)", outil: "Tableau de Classe", url: "classe.html" },
-                    { label: "Lancer un quiz interactif", outil: "Live Quiz", url: "https://live-quiz.forge.apps.education.fr/index.html" },
-                    { label: "Brainstormer en temps réel", outil: "Post-its", url: "postits.html" },
-                    { label: "Préparer un podcast collaboratif", outil: "Radiopad", url: "https://troadec.forge.apps.education.fr/radiopad/index.html" }
-                ]
-            },
-            {
-                categorie: "Organiser & Suivre",
-                icone: "fa-folder-tree",
-                couleur: "text-amber-500",
-                actions: [
-                    { label: "Faire de la veille (RSS)", outil: "Veille Pro", url: "veille.html" },
-                    { label: "Gérer ses liens favoris", outil: "Favoris IA", url: "favoris.html" },
-                    { label: "Suivre mes abonnés YouTube", outil: "EduSync", url: "youtube_veille.html" },
-                    { label: "Transférer des fichiers lourds", outil: "Dépôt Tampon", url: "https://drive.google.com/drive/folders/17eeEa-OCC9xrbiBzpIDSbbUbyd6yNFw8?usp=drive_link" }
-                ]
-            },
-            {
-                categorie: "Multimédia & Export",
-                icone: "fa-compact-disc",
-                couleur: "text-purple-500",
-                actions: [
-                    { label: "Couture vidéo sans perte (V1)", outil: "Raccord Minute", url: "https://raccord-minute.forge.apps.education.fr/V1/" },
-                    { label: "Générer des paquets SCORM", outil: "SCORM Lab", url: "https://gcormi.forge.apps.education.fr/frojet/generateuractivite/generateuract.html" },
-                    { label: "Générer des visuels par IA", outil: "Studio IA", url: "https://gcormi.forge.apps.education.fr/frojet/illustrateur_ia.html" }
-                ]
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. CONFIGURATION DES ACTIONS (AJOUTEZ VOS NOUVEAUTÉS ICI)
+            const guideConfig = [
+                {
+                    categorie: "Différencier & Inclure",
+                    icone: "fa-universal-access",
+                    couleur: "text-emerald-500",
+                    actions: [
+                        { label: "Adapter un texte (DYS, niveaux)", outil: "Inclum'IA", url: "https://inclumia.novapeda.eu/" },
+                        { label: "Accompagner la lecture bionique", outil: "Lecteur Adaptatif", url: "https://gcormi.forge.apps.education.fr/frojet/lecturefacile/lecturefacile.html" },
+                        { label: "Générer des dictées adaptées", outil: "DictIA", url: "https://educajou.forge.apps.education.fr/dictia/" }
+                    ]
+                },
+                {
+                    categorie: "Concevoir & Préparer",
+                    icone: "fa-pen-ruler",
+                    couleur: "text-indigo-500",
+                    actions: [
+                        { label: "Créer une séquence de cours via IA", outil: "NovaPéda", url: "https://novapeda.eu" },
+                        { label: "Générer des mini-jeux (Memory...)", outil: "Gen de Jeux", url: "https://gcormi.forge.apps.education.fr/frojet/generateurjeux.html" },
+                        { label: "Créer des slides pédagogiques", outil: "EduSlide", url: "https://eduslide-be7117.forge.apps.education.fr/eduslide.html" },
+                        { label: "Créer une page web sans coder", outil: "Atelier Web", url: "https://gcormi.forge.apps.education.fr/frojet/Atelier-web.html" }
+                    ]
+                },
+                {
+                    categorie: "Animer & Collaborer",
+                    icone: "fa-users",
+                    couleur: "text-rose-500",
+                    actions: [
+                        { label: "Gérer le climat de classe (Timer/Son)", outil: "Tableau de Classe", url: "classe.html" },
+                        { label: "Lancer un quiz interactif", outil: "Live Quiz", url: "https://live-quiz.forge.apps.education.fr/index.html" },
+                        { label: "Brainstormer en temps réel", outil: "Post-its", url: "postits.html" },
+                        { label: "Préparer un podcast collaboratif", outil: "Radiopad", url: "https://troadec.forge.apps.education.fr/radiopad/index.html" }
+                    ]
+                },
+                {
+                    categorie: "Organiser & Suivre",
+                    icone: "fa-folder-tree",
+                    couleur: "text-amber-500",
+                    actions: [
+                        { label: "Faire de la veille (RSS)", outil: "Veille Pro", url: "veille.html" },
+                        { label: "Gérer ses liens favoris", outil: "Favoris IA", url: "favoris.html" },
+                        { label: "Suivre mes abonnés YouTube", outil: "EduSync", url: "youtube_veille.html" },
+                        { label: "Transférer des fichiers lourds", outil: "Dépôt Tampon", url: "https://drive.google.com/drive/folders/17eeEa-OCC9xrbiBzpIDSbbUbyd6yNFw8?usp=drive_link" }
+                    ]
+                },
+                {
+                    categorie: "Multimédia & Export",
+                    icone: "fa-compact-disc",
+                    couleur: "text-purple-500",
+                    actions: [
+                        { label: "Couture vidéo sans perte (V1)", outil: "Raccord Minute", url: "https://raccord-minute.forge.apps.education.fr/V1/" },
+                        { label: "Générer des paquets SCORM", outil: "SCORM Lab", url: "https://gcormi.forge.apps.education.fr/frojet/generateuractivite/generateuract.html" },
+                        { label: "Générer des visuels par IA", outil: "Studio IA", url: "https://gcormi.forge.apps.education.fr/frojet/illustrateur_ia.html" }
+                    ]
+                }
+            ];
+
+            // 2. FONCTION DE RENDU
+            function renderSmartGuide() {
+                const container = document.getElementById('guide-container');
+                if(!container) return;
+                container.innerHTML = guideConfig.map(cat => `
+                    <div class="guide-category-card">
+                        <div class="guide-verb-title ${cat.couleur}">
+                            <i class="fas ${cat.icone}"></i>
+                            ${cat.categorie}
+                        </div>
+                        <div class="flex flex-col">
+                            ${cat.actions.map(act => `
+                                <a href="${act.url}" target="_blank" class="guide-action-item">
+                                    <span class="guide-action-text">${act.label}</span>
+                                    <span class="guide-tool-badge">${act.outil}</span>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
             }
-        ];
 
-        // 2. FONCTION DE RENDU
-        function renderSmartGuide() {
-            const container = document.getElementById('guide-container');
-            container.innerHTML = guideConfig.map(cat => `
-                <div class="guide-category-card">
-                    <div class="guide-verb-title ${cat.couleur}">
-                        <i class="fas ${cat.icone}"></i>
-                        ${cat.categorie}
-                    </div>
-                    <div class="flex flex-col">
-                        ${cat.actions.map(act => `
-                            <a href="${act.url}" target="_blank" class="guide-action-item">
-                                <span class="guide-action-text">${act.label}</span>
-                                <span class="guide-tool-badge">${act.outil}</span>
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
+            // 3. LOGIQUE D'OUVERTURE
+            const guideModal = document.getElementById('smart-guide-modal');
+            const guideBtn = document.getElementById('smart-guide-btn');
+            const guideMobileBtn = document.getElementById('smart-guide-mobile-btn');
+            const guideClose = document.getElementById('guide-close');
 
-        // 3. LOGIQUE D'OUVERTURE
-        const guideModal = document.getElementById('smart-guide-modal');
-        const guideBtn = document.getElementById('smart-guide-btn');
-        const guideClose = document.getElementById('guide-close');
-
-        if(guideBtn) {
-            guideBtn.addEventListener('click', () => {
+            const openGuide = () => {
                 renderSmartGuide();
                 guideModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
-            });
-        }
+            };
 
-        if(guideClose) {
-            guideClose.addEventListener('click', () => {
+            const closeGuide = () => {
                 guideModal.classList.remove('active');
                 document.body.style.overflow = '';
-            });
-        }
+            };
 
-        // Fermeture au clic extérieur
-        guideModal.addEventListener('click', (e) => {
-            if (e.target === guideModal) guideClose.click();
+            if(guideBtn) guideBtn.addEventListener('click', openGuide);
+            if(guideMobileBtn) guideMobileBtn.addEventListener('click', openGuide);
+            if(guideClose) guideClose.addEventListener('click', closeGuide);
+
+            // Fermeture au clic extérieur
+            if(guideModal) {
+                guideModal.addEventListener('click', (e) => {
+                    if (e.target === guideModal) closeGuide();
+                });
+            }
         });
-
     </script>
     <!-- ============================== MODAL: GUIDE DES OUTILS (ÉVOLUTIF) ============================== -->
     <div id="smart-guide-modal" class="modal-overlay">
