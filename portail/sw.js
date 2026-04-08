@@ -1,4 +1,4 @@
-const CACHE_NAME = 'portail-ia-v1';
+const CACHE_NAME = 'portail-ia-v2';
 const ASSETS = [
   './index.html',
   './manifest.json',
