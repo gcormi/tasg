@@ -374,22 +374,27 @@
     </style>
 </head>
 
-    <!-- Overlay de Sécurité Google (V3.9.1 Hardened) -->
+    <!-- Overlay de connexion -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-card" id="auth-card">
             <div id="auth-loading" class="mb-6">
                 <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
-                <p class="text-slate-500 mt-4 font-bold text-sm">Vérification de session...</p>
+                <p class="text-slate-500 mt-4 font-bold text-sm" id="auth-loading-msg">Vérification de session...</p>
             </div>
             <div id="auth-content" class="hidden">
                 <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
                     <i class="fas fa-lock"></i>
                 </div>
                 <h2 class="text-2xl font-black text-slate-900 mb-2">Accès Sécurisé</h2>
-                <p class="text-slate-500 mb-8 font-medium">Veuillez vous identifier avec votre compte Google pour accéder à vos post-its.</p>
+                <p class="text-slate-500 mb-4 font-medium">Connectez-vous pour retrouver vos post-its.</p>
                 <button onclick="window.login()" class="login-btn">
                     <i class="fab fa-google"></i> Se connecter avec Google
                 </button>
+                <div style="margin-top:1rem; border-top:1px solid #e2e8f0; padding-top:1rem;">
+                    <button onclick="window.loginAnonymous()" style="background:none;border:none;color:#6366f1;font-weight:700;cursor:pointer;font-size:0.85rem;">
+                        <i class="fas fa-user-secret" style="margin-right:5px;"></i> Continuer en mode invité
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -402,7 +407,7 @@
             </a>
             <div class="app-icon"><i class="fas fa-sticky-note"></i></div>
             <div>
-                <div class="app-title">Mes Post-its</div>
+                <div class="app-title">Mes Post-its <span id="guest-badge" style="display:none;font-size:0.6rem;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:6px;padding:2px 7px;font-weight:700;vertical-align:middle;">👤 Invité</span></div>
                 <div class="sync-line">
                     <span class="sync-dot online" id="sync-dot"></span>
                     <span id="sync-status">Synchronisé en temps réel</span>
@@ -495,13 +500,15 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
-        const postitsRef = db.collection('postits');
+
+        // postitsRef est défini après l'auth (scopé par utilisateur)
+        let postitsRef = null;
+        let unsubscribeSnapshot = null;
 
         window.login = function() {
             const provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider).catch(err => {
                 if(err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
-                    // Fallback redirect if popup is blocked
                     firebase.auth().signInWithRedirect(provider);
                 } else {
                     alert("Erreur d'authentification : " + err.message);
@@ -509,25 +516,77 @@
             });
         };
 
-        // Initialize Firebase UI properly
+        // Connexion anonyme (mode invité)
+        window.loginAnonymous = function() {
+            document.getElementById('auth-content').classList.add('hidden');
+            document.getElementById('auth-loading').classList.remove('hidden');
+            document.getElementById('auth-loading-msg').textContent = 'Connexion en mode invité...';
+            firebase.auth().signInAnonymously().catch(err => {
+                alert("Erreur : " + err.message);
+            });
+        };
+
+        function startApp(user) {
+            const overlay = document.getElementById('auth-overlay');
+            overlay.classList.add('hidden');
+
+            // Badge invité
+            if (user.isAnonymous) {
+                document.getElementById('guest-badge').style.display = 'inline';
+            }
+
+            // Collection scopée par utilisateur : chaque user voit UNIQUEMENT ses données
+            postitsRef = db.collection('users').doc(user.uid).collection('postits');
+
+            // --- MIGRATION AUTOMATIQUE (Temporaire) ---
+            // Si c'est TOI (admin Google), on récupère les anciens post-its globaux
+            if (!user.isAnonymous) {
+                db.collection('postits').get().then(snapshot => {
+                    if (!snapshot.empty) {
+                        console.log("Migration des anciens post-its en cours...");
+                        snapshot.forEach(oldDoc => {
+                            postitsRef.doc(oldDoc.id).set(oldDoc.data(), {merge: true});
+                            // Optionnel: supprimer l'ancien après copie
+                            // db.collection('postits').doc(oldDoc.id).delete();
+                        });
+                    }
+                });
+            }
+            // ------------------------------------------
+
+            // Démarrer l'écoute en temps réel
+            if (unsubscribeSnapshot) unsubscribeSnapshot();
+            unsubscribeSnapshot = postitsRef.onSnapshot(snapshot => {
+                allPostits = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                setSyncStatus('online');
+                renderBoard();
+            }, err => {
+                console.error(err);
+                setSyncStatus('offline');
+                document.getElementById('sync-status').textContent = 'Erreur: ' + err.code;
+            });
+        }
+
         firebase.auth().onAuthStateChanged(user => {
             const overlay = document.getElementById('auth-overlay');
             const loading = document.getElementById('auth-loading');
             const content = document.getElementById('auth-content');
-            
+
             if (user) {
-                overlay.classList.add('hidden');
-                console.log("[Auth] Session reconnue");
+                startApp(user);
             } else {
-                console.log("[Auth] Session absente, attente de restauration...");
-                // Wait 2.5 seconds to see if session is shared from portal automatically
+                // Pas de session : attendre 2s, puis proposer Google ou Invité
+                // (ou connexion anonyme auto si tu préfères)
                 setTimeout(() => {
                     if (!firebase.auth().currentUser) {
-                        loading.classList.add('hidden');
-                        content.classList.remove('hidden');
-                        console.log("[Auth] Session introuvable, affichage du bouton de connexion");
+                        // Connexion anonyme AUTOMATIQUE pour les invités
+                        firebase.auth().signInAnonymously().catch(() => {
+                            // Si échec anonyme, montrer les boutons
+                            loading.classList.add('hidden');
+                            content.classList.remove('hidden');
+                        });
                     }
-                }, 2500); 
+                }, 1500);
             }
         });
 
@@ -555,16 +614,7 @@
             lbl.textContent = state === 'online' ? 'Synchronisé en temps réel' : state === 'syncing' ? 'Synchronisation...' : 'Hors ligne';
         }
 
-        // ====== REAL-TIME LISTENER ======
-        postitsRef.onSnapshot(snapshot => {
-            allPostits = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            setSyncStatus('online');
-            renderBoard();
-        }, err => {
-            console.error(err);
-            setSyncStatus('offline');
-            document.getElementById('sync-status').textContent = 'Erreur: ' + err.code;
-        });
+        // (Le listener temps réel est maintenant démarré dans startApp() après l'auth)
 
         // ====== RENDER BOARD ======
         function renderBoard() {

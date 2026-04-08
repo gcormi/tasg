@@ -324,22 +324,27 @@
     </style>
 </head>
 <body>
-    <!-- Overlay de Sécurité Google (V3.9.1 Hardened) -->
+    <!-- Overlay de connexion -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-card" id="auth-card">
             <div id="auth-loading" class="mb-6">
                 <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
-                <p class="text-slate-500 mt-4 font-bold text-sm">Vérification de session...</p>
+                <p class="text-slate-500 mt-4 font-bold text-sm" id="auth-loading-msg">Vérification de session...</p>
             </div>
             <div id="auth-content" class="hidden">
                 <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
                     <i class="fas fa-lock"></i>
                 </div>
                 <h2 class="text-2xl font-black text-slate-900 mb-2">Accès Sécurisé</h2>
-                <p class="text-slate-500 mb-8 font-medium">Veuillez vous identifier avec votre compte Google pour accéder à votre bloc-note.</p>
+                <p class="text-slate-500 mb-4 font-medium">Connectez-vous pour retrouver votre bloc-notes personnel.</p>
                 <button onclick="window.login()" class="login-btn">
                     <i class="fab fa-google"></i> Se connecter avec Google
                 </button>
+                <div style="margin-top:1rem; border-top:1px solid #e2e8f0; padding-top:1rem;">
+                    <button onclick="window.loginAnonymous()" style="background:none;border:none;color:#6366f1;font-weight:700;cursor:pointer;font-size:0.85rem;">
+                        <i class="fas fa-user-secret" style="margin-right:5px;"></i> Continuer en mode invité
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -414,7 +419,10 @@
     let fbApp;
     try { fbApp = firebase.app(); } catch(e) { fbApp = firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
-    const notesRef = db.collection('blocnotes');
+    
+    // Initialisation scopée
+    let notesRef = null;
+    let unsubscribeNotes = null;
 
     window.login = function() {
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -427,72 +435,58 @@
         });
     };
 
-    // Initialize Firebase UI properly
-    firebase.auth().onAuthStateChanged(user => {
-        const overlay = document.getElementById('auth-overlay');
-        const loading = document.getElementById('auth-loading');
-        const content = document.getElementById('auth-content');
+    window.loginAnonymous = function() {
+        document.getElementById('auth-content').classList.add('hidden');
+        document.getElementById('auth-loading').classList.remove('hidden');
+        document.getElementById('auth-loading-msg').textContent = 'Connexion en mode invité...';
+        firebase.auth().signInAnonymously().catch(err => alert(err.message));
+    };
 
+    function startApp(user) {
+        const overlay = document.getElementById('auth-overlay');
+        overlay.classList.add('hidden');
+
+        // Isolation des données
+        notesRef = db.collection('users').doc(user.uid).collection('blocnotes');
+
+        // --- MIGRATION AUTOMATIQUE ---
+        if (!user.isAnonymous) {
+            db.collection('blocnotes').get().then(snap => {
+                if (!snap.empty) {
+                    snap.forEach(oldDoc => notesRef.doc(oldDoc.id).set(oldDoc.data(), {merge: true}));
+                }
+            });
+        }
+
+        // Écoute temps réel
+        if (unsubscribeNotes) unsubscribeNotes();
+        unsubscribeNotes = notesRef.orderBy('order', 'asc').onSnapshot(snapshot => {
+            notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderTabs();
+            
+            if (!activeId && notes.length > 0) {
+                selectNote(notes[0].id);
+            } else if (activeId && !notes.find(n => n.id === activeId)) {
+                selectNote(notes[0]?.id || null);
+            }
+        }, err => {
+            setSyncStatus('error', 'Erreur: ' + err.code);
+        });
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
         if (user) {
-            overlay.classList.add('hidden');
-            console.log("[Auth] Session reconnue");
+            startApp(user);
         } else {
-            console.log("[Auth] Session absente, attente de restauration...");
-            // Wait 2.5 seconds to see if session is shared from portal automatically
             setTimeout(() => {
                 if (!firebase.auth().currentUser) {
-                    loading.classList.add('hidden');
-                    content.classList.remove('hidden');
-                    console.log("[Auth] Session introuvable, affichage du bouton de connexion");
+                    firebase.auth().signInAnonymously().catch(() => {
+                        document.getElementById('auth-loading').classList.add('hidden');
+                        document.getElementById('auth-content').classList.remove('hidden');
+                    });
                 }
-            }, 2500);
+            }, 1500);
         }
-    });
-
-
-    // ====== CLOUDINARY ======
-    const CLOUD_NAME   = 'dqzli9qul';
-    const UPLOAD_PRESET = 'portail-blocnote';
-
-    // ====== STATE ======
-    let notes = [];        // [{id, title, content, order, createdAt}]
-    let activeId = null;
-    let quill = null;
-    let saveTimer = null;
-    let isLoading = false;
-
-    // ====== SYNC STATUS ======
-    function setSyncStatus(state, msg) {
-        const dot = document.getElementById('sync-dot');
-        const lbl = document.getElementById('sync-label');
-        dot.className = 'sync-dot ' + state;
-        lbl.textContent = msg || (state === 'saved' ? 'Synchronisé' : state === 'saving' ? 'Sauvegarde...' : 'Erreur');
-    }
-
-    // ====== TOAST ======
-    let toastTimer;
-    function showPasteToast(msg) {
-        const t = document.getElementById('paste-toast');
-        document.getElementById('paste-toast-msg').textContent = msg;
-        t.classList.add('show');
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    // ====== REAL-TIME LISTENER ======
-    notesRef.orderBy('order', 'asc').onSnapshot(snapshot => {
-        notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderTabs();
-        
-        // Initial load or if active note was deleted
-        if (!activeId && notes.length > 0) {
-            selectNote(notes[0].id);
-        } else if (activeId && !notes.find(n => n.id === activeId)) {
-            selectNote(notes[0]?.id || null);
-        }
-    }, err => {
-        setSyncStatus('error', 'Erreur: ' + err.code);
-        console.error(err);
     });
 
     // ====== RENDER TABS ======

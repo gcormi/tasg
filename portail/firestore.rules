@@ -2,28 +2,39 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Post-its & Bloc-note (OK)
+    // ====== NOUVELLES COLLECTIONS SCOPÉES PAR UTILISATEUR ======
+    // Chaque utilisateur (y compris anonyme) accède UNIQUEMENT à ses propres données
+    match /users/{userId}/{collection}/{doc} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Sous-collections imbriquées
+    match /users/{userId}/{collection}/{doc}/{sub=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ====== ANCIENNES COLLECTIONS (rétrocompatibilité) ======
+    // Post-its & Bloc-note (ancien format global - accès authentifié uniquement)
     match /postits/{doc} {
-      allow read, write: if true;
+      allow read, write: if request.auth != null;
     }
     match /blocnotes/{doc} {
-      allow read, write: if true;
+      allow read, write: if request.auth != null;
     }
 
     // Favoris IA
     match /favoris/{doc} {
-      allow read, write: if true;
+      allow read, write: if request.auth != null;
     }
     match /favoris_folders/{doc} {
-      allow read, write: if true;
+      allow read, write: if request.auth != null;
     }
 
-    // Hub liens personnalisés (application existante - OK)
+    // Hub liens personnalisés
     match /customHubLinks/{doc} {
-      allow read, write: if true;
+      allow read, write: if request.auth != null;
     }
 
-    // Artifacts (utilisé par d'autres apps)
+    // Artifacts
     match /artifacts/{document=**} {
       allow read, write: if request.auth != null;
     }
