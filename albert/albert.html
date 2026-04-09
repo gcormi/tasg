@@ -94,13 +94,20 @@
                     <input type="password" id="set-key" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs" placeholder="sk-...">
                 </div>
                 <div class="space-y-1">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Modèle</label>
-                    <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white">
-                        <option value="openweight-medium">Albert Moyen (24B)</option>
-                        <option value="openweight-large">Albert Grand (120B)</option>
+                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
+                        Modèle
+                        <button onclick="fetchModels()" class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
+                            <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> Actualiser la liste
+                        </button>
+                    </label>
+                    <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white" onchange="toggleCustomModel()">
+                        <option value="openweight-medium">Albert Moyen (Mistral 24B)</option>
+                        <option value="openweight-large">Albert Grand (GPT-120B)</option>
                         <option value="openweight-small">Albert Rapide (8B)</option>
-                        <option value="custom">Autre modèle...</option>
+                        <option value="openweight-code">Albert Code (Qwen 30B)</option>
+                        <option value="custom">Saisie personnalisée...</option>
                     </select>
+                    <input type="text" id="set-model-custom" class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2" placeholder="Identifiant exact du modèle">
                 </div>
                 <div class="pt-2">
                     <label class="flex items-center gap-3 cursor-pointer group">
@@ -178,11 +185,87 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        function toggleCustomModel() {
+            const select = document.getElementById('set-model');
+            const customInput = document.getElementById('set-model-custom');
+            if (select.value === 'custom') {
+                customInput.classList.remove('hidden');
+            } else {
+                customInput.classList.add('hidden');
+            }
+        }
+
+        async function fetchModels() {
+            if (!apiKey) {
+                alert("Veuillez d'abord saisir votre clé API.");
+                return;
+            }
+            
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-2.5 h-2.5 animate-spin"></i> Chargement...';
+            lucide.createIcons();
+            
+            try {
+                // Utilisation du même tunnel Proxy que pour le Chat
+                const baseModelsUrl = apiUrl.replace('/chat/completions', '/models');
+                const finalUrl = useProxy ? `https://cors-anywhere.herokuapp.com/${baseModelsUrl}` : baseModelsUrl;
+                
+                const response = await fetch(finalUrl, {
+                    headers: { 
+                        'Authorization': `Bearer ${apiKey}`,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) throw new Error("Erreur lors de la récupération");
+                
+                const data = await response.json();
+                const select = document.getElementById('set-model');
+                
+                // On garde les options par défaut et on ajoute les nouvelles
+                const defaults = ['openweight-medium', 'openweight-large', 'openweight-small', 'openweight-code', 'custom'];
+                
+                data.data.forEach(m => {
+                    if (!defaults.includes(m.id)) {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.textContent = m.id;
+                        select.insertBefore(opt, select.lastElementChild);
+                    }
+                });
+                
+                alert(`${data.data.length} modèles trouvés sur Albert ! La liste a été mise à jour.`);
+            } catch (err) {
+                console.error(err);
+                alert("Impossible de lister les modèles. Vérifiez votre clé et l'activation du proxy.");
+            } finally {
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+
         function toggleSettings(show) {
             if(show) {
                 document.getElementById('set-url').value = apiUrl;
                 document.getElementById('set-key').value = apiKey;
-                document.getElementById('set-model').value = modelName;
+                
+                const select = document.getElementById('set-model');
+                let found = false;
+                for (let opt of select.options) {
+                    if (opt.value === modelName) {
+                        select.value = modelName;
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found && modelName) {
+                    select.value = 'custom';
+                    document.getElementById('set-model-custom').value = modelName;
+                }
+                
+                toggleCustomModel();
                 document.getElementById('set-proxy').checked = useProxy;
                 document.getElementById('settings-modal').classList.remove('hidden');
             } else {
@@ -193,7 +276,14 @@
         function saveSettings() {
             apiUrl = document.getElementById('set-url').value;
             apiKey = document.getElementById('set-key').value;
-            modelName = document.getElementById('set-model').value;
+            
+            const select = document.getElementById('set-model');
+            if (select.value === 'custom') {
+                modelName = document.getElementById('set-model-custom').value;
+            } else {
+                modelName = select.value;
+            }
+
             useProxy = document.getElementById('set-proxy').checked;
 
             localStorage.setItem('albert_api_url', apiUrl);
@@ -203,7 +293,7 @@
             
             toggleSettings(false);
             updateStatus();
-            messages.push({ role: 'bot', text: '✅ Paramètres mis à jour avec succès.' });
+            messages.push({ role: 'bot', text: `✅ Configuration mise à jour. Intelligence : ${modelName}` });
             renderMessages();
         }
 
