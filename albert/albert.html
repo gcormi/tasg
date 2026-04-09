@@ -74,19 +74,28 @@
 
           const callAI = async (userPrompt) => {
             const { provider, key, model } = config;
-            if (!key) throw new Error(`Veuillez entrer votre clé API Albert dans les paramètres.`);
+            const cleanKey = key.trim();
+            if (!cleanKey) throw new Error(`Veuillez entrer votre clé API Albert dans les paramètres.`);
 
-            // Configuration selon le kit Albert
-            const endpoint = provider === 'kit-albert' 
+            const isLocal = window.location.protocol === 'file:';
+            
+            // Si on est en local (file://), on passe par un proxy plus permissif
+            // Si on est sur La Forge (http/https), on utilise le proxy éduc officiel
+            let endpoint = provider === 'kit-albert' 
               ? "https://proxy.educ-ai.fr/v1/chat/completions"
               : "https://albert.api.gouv.fr/v1/chat/completions";
+
+            // Tunnel de secours pour le mode local
+            if (isLocal) {
+              endpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
+            }
 
             try {
               const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${key}`
+                  'Authorization': `Bearer ${cleanKey}`
                 },
                 body: JSON.stringify({
                   model: model,
@@ -96,34 +105,23 @@
               });
 
               if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error?.message || `Erreur API: ${response.status}`);
+                const errorText = await response.text();
+                try {
+                  const errorData = JSON.parse(errorText);
+                  throw new Error(errorData.error?.message || `Erreur ${response.status}`);
+                } catch(e) {
+                  throw new Error(`Erreur serveur (${response.status})`);
+                }
               }
 
               const data = await response.json();
               return data.choices?.[0]?.message?.content || "Désolé, je n'ai pas pu générer de réponse.";
 
             } catch (error) {
-              console.error("Erreur appel Albert:", error);
-              
-              // Fallback automatique vers le proxy de secours AllOrigins si le proxy de base échoue
-              if (provider === 'kit-albert') {
-                try {
-                  const fallbackUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(endpoint)}`;
-                  const fallbackRes = await fetch(fallbackUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-                    body: JSON.stringify({ model: model, messages: [{ role: 'user', content: userPrompt }] })
-                  });
-                  if (fallbackRes.ok) {
-                    const data = await fallbackRes.json();
-                    return data.choices?.[0]?.message?.content;
-                  }
-                } catch (fallbackErr) {
-                  console.error("Échec du fallback:", fallbackErr);
-                }
+              console.error("Détails de l'erreur:", error);
+              if (isLocal) {
+                throw new Error("Blocage local détecté. Essayez d'héberger le fichier sur La Forge ou un serveur local.");
               }
-              
               throw error;
             }
           };
