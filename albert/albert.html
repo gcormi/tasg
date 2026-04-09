@@ -76,63 +76,53 @@
             const { provider, key, model } = config;
             if (!key) throw new Error(`Veuillez configurer votre ${provider === 'relais' ? 'URL de Relais' : 'Clé API'}.`);
 
+            // --- LISTE DES CHEMINS POSSIBLES ---
+            const endpoint = "https://albert.api.gouv.fr/v1/chat/completions";
+            let targets = [];
+
             if (provider === 'relais' || key.startsWith('http')) {
+              // On tente le Worker en premier
+              targets.push({ id: 'Worker Personnel', url: key, isRelay: true });
+              // Fallback au cas où le worker est HS (si l'utilisateur a aussi une clé, mais ici on reste sur le flux relais)
+              targets.push({ id: 'Proxy Secours (Corsproxy)', url: `https://corsproxy.io/?${encodeURIComponent(endpoint)}`, isRelay: false });
+            } else {
+              // Mode Direct avec plusieurs Proxys
+              targets.push({ id: 'Albert Direct', url: endpoint });
+              targets.push({ id: 'Tunnel 1 (Corsproxy)', url: `https://corsproxy.io/?${encodeURIComponent(endpoint)}` });
+              targets.push({ id: 'Tunnel 2 (Codetabs)', url: `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(endpoint)}` });
+              targets.push({ id: 'Tunnel 3 (Thingproxy)', url: `https://thingproxy.freeboard.io/fetch/${endpoint}` });
+            }
+
+            let logs = [];
+            for (let target of targets) {
               try {
-                const res = await fetch(key, {
+                const isWorker = target.isRelay;
+                const body = isWorker 
+                  ? JSON.stringify({ message: userPrompt, model: model }) 
+                  : JSON.stringify({ model, messages: [{ role: 'user', content: userPrompt }] });
+
+                const res = await fetch(target.url, {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ message: userPrompt, model: model })
+                  headers: { 
+                    'Content-Type': 'application/json',
+                    ...(isWorker ? {} : { 'Authorization': `Bearer ${key}` }) 
+                  },
+                  body: body
                 });
+
+                if (res.ok) {
+                  const data = await res.json();
+                  return data.choices?.[0]?.message?.content || data.response || data.text || "Réponse vide.";
+                }
                 
-                let data;
-                try {
-                  data = await res.json();
-                } catch (e) {
-                  throw new Error(`Le relais a renvoyé une réponse invalide (${res.status}).`);
-                }
-
-                if (!res.ok) {
-                  let errorMsg = data.error || `Erreur Relais (${res.status})`;
-                  if (data.details) {
-                    errorMsg += `: ${JSON.stringify(data.details, null, 2)}`;
-                  }
-                  throw new Error(errorMsg);
-                }
-                return data.choices?.[0]?.message?.content || data.response || "Réponse vide.";
+                const errText = await res.text().catch(() => "Erreur");
+                logs.push(`${target.id}: HTTP ${res.status}`);
               } catch (e) {
-                throw new Error(`Lien avec le relais échoué : ${e.message}`);
+                logs.push(`${target.id}: ${e.message}`);
+                continue;
               }
             }
-
-            if (provider === 'albert') {
-              const endpoint = "https://albert.api.gouv.fr/v1/chat/completions";
-              const targets = [
-                { id: 'Direct', url: endpoint },
-                { id: 'Proxy', url: `https://corsproxy.io/?${encodeURIComponent(endpoint)}` }
-              ];
-              for (let target of targets) {
-                try {
-                  const res = await fetch(target.url, {
-                    method: 'POST',
-                    headers: { 
-                      'Content-Type': 'application/json', 
-                      'Authorization': `Bearer ${key}` 
-                    },
-                    body: JSON.stringify({ model, messages: [{ role: 'user', content: userPrompt }] })
-                  });
-                  if (res.ok) {
-                    const data = await res.json();
-                    return data.choices?.[0]?.message?.content;
-                  }
-                  const errorData = await res.json().catch(() => ({}));
-                  if (errorData.error) throw new Error(errorData.error.message || errorData.error);
-                } catch (e) { 
-                  if (target.id === 'Proxy') throw e; 
-                  continue; 
-                }
-              }
-              throw new Error("Échec de connexion Albert (vérifiez votre clé ou le filtre réseau).");
-            }
+            throw new Error(`Tous les relais ont échoué :\n${logs.join('\n')}`);
           };
 
           const handleSend = async (e) => {
