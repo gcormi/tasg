@@ -27,9 +27,9 @@
         } = lucide;
 
         const PREDEFINED_MODELS = [
-          { id: 'albert-llama-3-8b', name: 'Albert Llama 3 (Recommandé)' },
-          { id: 'albert-mixtral-8x7b', name: 'Albert Mixtral' },
-          { id: 'all-minilm-l6-v2', name: 'Albert Embeddings' }
+          { id: 'albert-base-1', name: 'Albert Base (Recommandé)' },
+          { id: 'albert-large-1', name: 'Albert Large' },
+          { id: 'albert-small-1', name: 'Albert Small' }
         ];
 
         function App() {
@@ -53,7 +53,7 @@
             const initialProvider = (savedProvider === 'albert' || !savedProvider) ? 'kit-albert' : savedProvider;
             
             const savedKey = localStorage.getItem('albert_config_key') || '';
-            const savedModel = localStorage.getItem('albert_config_model') || 'albert-llama-3-8b';
+            const savedModel = localStorage.getItem('albert_config_model') || 'albert-base-1';
             setConfig({ provider: initialProvider, key: savedKey, model: savedModel });
 
             const params = new URLSearchParams(window.location.search);
@@ -171,7 +171,7 @@
                     <i data-lucide="bot" className="w-6 h-6"></i>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.7</span></h1>
+                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.8</span></h1>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         {config.provider === 'relais' ? 'Relais Google' : (config.provider === 'kit-albert' ? 'Kit Albert (Proxy)' : 'Mode Direct')}
