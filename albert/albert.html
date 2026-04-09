@@ -1,331 +1,295 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, Settings, User, Bot, Loader2, AlertCircle, Save, X, Zap, ShieldCheck, Globe } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Albert - Souverain & Sécurisé</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
 
-const PREDEFINED_MODELS = [
-  { id: 'openai/gpt-oss-120b', name: 'Albert 120B (Souverain - Recommandé)' },
-  { id: 'mistralai/Mistral-Small-3.2-24B-Instruct-2506', name: 'Mistral Small (Équilibré)' },
-  { id: 'meta-llama/Llama-3.1-8B-Instruct', name: 'Llama 3.1 8B (Rapide)' },
-  { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite (Google)' }
-];
+    <script type="text/babel">
+        // Adaptation de Lucide pour le chargement via CDN
+        const { 
+            Send, Settings, User, Bot, Loader2, AlertCircle, 
+            Save, X, Zap, ShieldCheck, Globe 
+        } = lucide;
 
-export default function App() {
-  // États pour le chat
-  const [messages, setMessages] = useState([
-    { role: 'bot', text: 'Bonjour ! Je suis Albert, votre assistant IA souverain. Comment puis-je vous aider aujourd\'hui ?' }
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+        const PREDEFINED_MODELS = [
+          { id: 'openai/gpt-oss-120b', name: 'Albert 120B (Souverain - Recommandé)' },
+          { id: 'mistralai/Mistral-Small-3.2-24B-Instruct-2506', name: 'Mistral Small (Équilibré)' },
+          { id: 'meta-llama/Llama-3.1-8B-Instruct', name: 'Llama 3.1 8B (Rapide)' },
+          { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite (Google)' }
+        ];
 
-  // États pour les paramètres
-  const [showSettings, setShowSettings] = useState(false);
-  const [config, setConfig] = useState({
-    provider: 'albert', // 'albert', 'gemini', 'relais'
-    key: '',           // Clé API ou URL de Relais
-    model: 'openai/gpt-oss-120b'
-  });
-
-  const messagesEndRef = useRef(null);
-
-  // 1. Initialisation : Charger les paramètres et vérifier l'URL
-  useEffect(() => {
-    // Charger le stockage
-    const savedProvider = localStorage.getItem('albert_provider') || 'albert';
-    const savedKey = localStorage.getItem('albert_config_key') || '';
-    const savedModel = localStorage.getItem('albert_config_model') || 'openai/gpt-oss-120b';
-    
-    setConfig({ provider: savedProvider, key: savedKey, model: savedModel });
-
-    // 2. Évolutivité : Vérifier si un prompt est passé en paramètre URL
-    const params = new URLSearchParams(window.location.search);
-    const externalPrompt = params.get('prompt');
-    if (externalPrompt) {
-      const decodedPrompt = decodeURIComponent(externalPrompt);
-      setInput(decodedPrompt);
-      // Optionnel : auto-envoi si désiré, mais mieux vaut laisser l'utilisateur valider
-      // handleSend(null, decodedPrompt); 
-    }
-  }, []);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const saveSettings = () => {
-    localStorage.setItem('albert_provider', config.provider);
-    localStorage.setItem('albert_config_key', config.key);
-    localStorage.setItem('albert_config_model', config.model);
-    setShowSettings(false);
-    
-    setMessages(prev => [...prev, { 
-      role: 'bot', 
-      text: `✅ Paramètres mis à jour. Mode : ${config.provider === 'relais' ? '🛡️ Relais Sécurisé' : '🔑 Connexion Directe'}.` 
-    }]);
-  };
-
-  // ── MOTEUR D'IA ROBUSTE (Inspiré de Favoris IA) ──
-  const callAI = async (userPrompt) => {
-    const { provider, key, model } = config;
-    
-    if (!key) {
-      throw new Error(`Veuillez configurer votre ${provider === 'relais' ? 'URL de Relais' : 'Clé API'} dans les paramètres.`);
-    }
-
-    // A. MODE RELAIS (Le plus sécurisé pour les invités)
-    if (provider === 'relais' || key.startsWith('http')) {
-      const response = await fetch(key, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: userPrompt, 
-          model: model,
-          temperature: 0.7 
-        })
-      });
-      if (!response.ok) throw new Error(`Erreur Relais (${response.status})`);
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content || data.response || data.text || "Réponse vide du relais.";
-    }
-
-    // B. MODE DIRECT ALBERT (Avec gestion des proxys de secours pour La Forge)
-    if (provider === 'albert') {
-      const endpoint = "https://albert.api.gouv.fr/v1/chat/completions";
-      const targets = [
-        { id: 'Direct', url: endpoint },
-        { id: 'Proxy 1', url: `https://corsproxy.io/?${encodeURIComponent(endpoint)}` },
-        { id: 'Proxy 2', url: `https://api.allorigins.win/get?url=${encodeURIComponent(endpoint)}` }
-      ];
-
-      for (let target of targets) {
-        try {
-          const res = await fetch(target.url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-            body: JSON.stringify({ model, messages: [{ role: 'user', content: userPrompt }] })
+        function App() {
+          const [messages, setMessages] = React.useState([
+            { role: 'bot', text: 'Bonjour ! Je suis Albert, votre assistant IA souverain. Comment puis-je vous aider aujourd\'hui ?' }
+          ]);
+          const [input, setInput] = React.useState('');
+          const [isLoading, setIsLoading] = React.useState(false);
+          const [showSettings, setShowSettings] = React.useState(false);
+          const [config, setConfig] = React.useState({
+            provider: 'albert',
+            key: '',
+            model: 'openai/gpt-oss-120b'
           });
-          if (res.ok) {
-            const data = await res.json();
-            // AllOrigins renvoie un format différent
-            const payload = target.id === 'Proxy 2' ? JSON.parse(data.contents) : data;
-            return payload.choices[0].message.content;
-          }
-        } catch (e) { continue; }
-      }
-      throw new Error("Échec de connexion à Albert (tous les relais ont échoué). Vérifiez votre clé ou passez par un Worker.");
-    }
 
-    // C. MODE DIRECT GEMINI
-    if (provider === 'gemini') {
-      const gUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`;
-      const res = await fetch(gUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
-      });
-      if (!res.ok) throw new Error("Erreur Gemini (Peut-être bloqué en UE, utilisez Albert !)");
-      const data = await res.json();
-      return data.candidates[0].content.parts[0].text;
-    }
-  };
+          const messagesEndRef = React.useRef(null);
 
-  const handleSend = async (e, forcedInput = null) => {
-    if (e) e.preventDefault();
-    const messageToSend = forcedInput || input.trim();
-    if (!messageToSend || isLoading) return;
+          React.useEffect(() => {
+            const savedProvider = localStorage.getItem('albert_provider') || 'albert';
+            const savedKey = localStorage.getItem('albert_config_key') || '';
+            const savedModel = localStorage.getItem('albert_config_model') || 'openai/gpt-oss-120b';
+            setConfig({ provider: savedProvider, key: savedKey, model: savedModel });
 
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: messageToSend }]);
-    setIsLoading(true);
+            const params = new URLSearchParams(window.location.search);
+            const externalPrompt = params.get('prompt');
+            if (externalPrompt) setInput(decodeURIComponent(externalPrompt));
+          }, []);
 
-    try {
-      const response = await callAI(messageToSend);
-      setMessages(prev => [...prev, { role: 'bot', text: response }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'error', text: `⚠️ ${error.message}` }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+          React.useEffect(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            if (window.lucide) lucide.createIcons();
+          }, [messages, showSettings, isLoading]);
 
-  return (
-    <div className="flex flex-col h-screen bg-slate-50 font-sans text-slate-800">
-      
-      {/* HEADER AMÉLIORÉ */}
-      <header className="flex-none flex justify-between items-center bg-white shadow-sm px-6 py-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-            <Bot size={24} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`w-2 h-2 rounded-full ${config.key ? 'bg-green-500' : 'bg-red-500'}`}></span>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                {config.provider === 'relais' ? 'Relais Sécurisé Actif' : `Mode Direct : ${config.provider}`}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {config.provider === 'relais' && <ShieldCheck size={18} className="text-blue-500" title="Protection Invités Active" />}
-          <button 
-            onClick={() => setShowSettings(true)}
-            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all"
-            title="Configuration"
-          >
-            <Settings size={22} />
-          </button>
-        </div>
-      </header>
+          const saveSettings = () => {
+            localStorage.setItem('albert_provider', config.provider);
+            localStorage.setItem('albert_config_key', config.key);
+            localStorage.setItem('albert_config_model', config.model);
+            setShowSettings(false);
+            setMessages(prev => [...prev, { role: 'bot', text: `✅ Paramètres mis à jour.` }]);
+          };
 
-      {/* ZONE DE MESSAGES */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar">
-        {messages.map((msg, index) => (
-          <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-            <div className={`flex max-w-[85%] md:max-w-[75%] gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className="flex-none mt-1">
-                {msg.role === 'user' ? (
-                  <div className="w-9 h-9 rounded-xl bg-slate-200 flex items-center justify-center text-slate-600 border border-slate-300 shadow-sm">
-                    <User size={18} />
+          const callAI = async (userPrompt) => {
+            const { provider, key, model } = config;
+            if (!key) throw new Error(`Veuillez configurer votre ${provider === 'relais' ? 'URL de Relais' : 'Clé API'}.`);
+
+            if (provider === 'relais' || key.startsWith('http')) {
+              try {
+                const res = await fetch(key, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ message: userPrompt, model: model })
+                });
+                
+                let data;
+                try {
+                  data = await res.json();
+                } catch (e) {
+                  throw new Error(`Le relais a renvoyé une réponse invalide (${res.status}).`);
+                }
+
+                if (!res.ok) {
+                  let errorMsg = data.error || `Erreur Relais (${res.status})`;
+                  if (data.details) {
+                    errorMsg += `: ${JSON.stringify(data.details, null, 2)}`;
+                  }
+                  throw new Error(errorMsg);
+                }
+                return data.choices?.[0]?.message?.content || data.response || "Réponse vide.";
+              } catch (e) {
+                throw new Error(`Lien avec le relais échoué : ${e.message}`);
+              }
+            }
+
+            if (provider === 'albert') {
+              const endpoint = "https://albert.api.gouv.fr/v1/chat/completions";
+              const targets = [
+                { id: 'Direct', url: endpoint },
+                { id: 'Proxy', url: `https://corsproxy.io/?${encodeURIComponent(endpoint)}` }
+              ];
+              for (let target of targets) {
+                try {
+                  const res = await fetch(target.url, {
+                    method: 'POST',
+                    headers: { 
+                      'Content-Type': 'application/json', 
+                      'Authorization': `Bearer ${key}` 
+                    },
+                    body: JSON.stringify({ model, messages: [{ role: 'user', content: userPrompt }] })
+                  });
+                  if (res.ok) {
+                    const data = await res.json();
+                    return data.choices?.[0]?.message?.content;
+                  }
+                  const errorData = await res.json().catch(() => ({}));
+                  if (errorData.error) throw new Error(errorData.error.message || errorData.error);
+                } catch (e) { 
+                  if (target.id === 'Proxy') throw e; 
+                  continue; 
+                }
+              }
+              throw new Error("Échec de connexion Albert (vérifiez votre clé ou le filtre réseau).");
+            }
+          };
+
+          const handleSend = async (e) => {
+            if (e) e.preventDefault();
+            if (!input.trim() || isLoading) return;
+            const msg = input.trim();
+            setInput('');
+            setMessages(prev => [...prev, { role: 'user', text: msg }]);
+            setIsLoading(true);
+            try {
+              const response = await callAI(msg);
+              setMessages(prev => [...prev, { role: 'bot', text: response }]);
+            } catch (err) {
+              setMessages(prev => [...prev, { role: 'error', text: `⚠️ ${err.message}` }]);
+            } finally {
+              setIsLoading(false);
+            }
+          };
+
+          return (
+            <div className="flex flex-col h-screen bg-slate-50 font-sans text-slate-800">
+              <header className="flex-none flex justify-between items-center bg-white shadow-sm px-6 py-4 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <i data-lucide="bot" className="w-6 h-6"></i>
                   </div>
-                ) : (
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md ${msg.role === 'error' ? 'bg-red-500' : 'bg-blue-600'}`}>
-                    {msg.role === 'error' ? <AlertCircle size={18} /> : <Bot size={18} />}
-                  </div>
-                )}
-              </div>
-              <div className={`px-5 py-3.5 rounded-2xl shadow-sm whitespace-pre-wrap leading-relaxed ${
-                  msg.role === 'user' 
-                    ? 'bg-blue-600 text-white rounded-tr-none' 
-                    : msg.role === 'error'
-                      ? 'bg-red-50 text-red-700 border border-red-100 rounded-tl-none'
-                      : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
-                }`}
-              >
-                {msg.text}
-              </div>
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start animate-pulse">
-             <div className="flex max-w-[70%] gap-4">
-                <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white flex-none shadow-md">
-                  <Bot size={18} />
-                </div>
-                <div className="px-5 py-3.5 rounded-2xl rounded-tl-none bg-white border border-slate-200 shadow-sm flex items-center gap-3 text-slate-500">
-                  <Loader2 size={18} className="animate-spin text-blue-600" />
-                  <span className="text-sm font-medium italic">Albert prépare une réponse...</span>
-                </div>
-             </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </main>
-
-      {/* ZONE DE SAISIE */}
-      <footer className="flex-none bg-white border-t border-slate-200 p-4 md:p-6">
-        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-end gap-3 bg-slate-50 rounded-2xl border border-slate-200 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100 transition-all p-2 shadow-inner">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            placeholder="Posez votre question à Albert..."
-            className="flex-1 max-h-48 min-h-[44px] bg-transparent border-none focus:ring-0 resize-none py-2.5 px-3 text-slate-700 placeholder-slate-400 text-sm md:text-base"
-            rows="1"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || isLoading}
-            className="flex-none p-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-500 transition-all shadow-md active:scale-95"
-          >
-            <Send size={20} />
-          </button>
-        </form>
-      </footer>
-
-      {/* MODAL CONFIGURATION MULTI-IA */}
-      {showSettings && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
-            <div className="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50">
-              <h2 className="text-xl font-bold flex items-center gap-2.5 text-slate-900">
-                <Zap size={22} className="text-yellow-500 fill-yellow-500"/>
-                IA & Sécurité
-              </h2>
-              <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-slate-600 p-1">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {/* Choix du mode */}
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => setConfig({...config, provider: 'relais'})}
-                  className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${config.provider === 'relais' ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-slate-200'}`}
-                >
-                  <ShieldCheck size={24} className={config.provider === 'relais' ? 'text-blue-600' : 'text-slate-400'} />
-                  <span className="text-[10px] font-bold uppercase">Relais Sécurisé</span>
-                </button>
-                <button 
-                  onClick={() => setConfig({...config, provider: 'albert'})}
-                  className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${config.provider === 'albert' ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-slate-200'}`}
-                >
-                  <Bot size={24} className={config.provider === 'albert' ? 'text-blue-600' : 'text-slate-400'} />
-                  <span className="text-[10px] font-bold uppercase">Direct Albert</span>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">Modèle</label>
-                  <select 
-                    value={config.model}
-                    onChange={(e) => setConfig({...config, model: e.target.value})}
-                    className="w-full border border-slate-200 rounded-xl p-3 text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  >
-                    {PREDEFINED_MODELS.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">
-                    {config.provider === 'relais' ? 'URL du Worker (Recommandé)' : 'Clé API Secrète'}
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type={config.provider === 'relais' ? 'text' : 'password'}
-                      value={config.key}
-                      onChange={(e) => setConfig({...config, key: e.target.value})}
-                      className="w-full border border-slate-200 rounded-xl p-3 pr-10 text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
-                      placeholder={config.provider === 'relais' ? 'https://mon-worker.workers.dev' : 'sk-...'}
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      {config.provider === 'relais' ? <Globe size={18} className="text-slate-300" /> : <ShieldCheck size={18} className="text-slate-300" />}
+                  <div>
+                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert</h1>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`w-2 h-2 rounded-full ${config.key ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {config.provider === 'relais' ? 'Relais Sécurisé' : `Mode Direct : ${config.provider}`}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-[10px] text-slate-400 leading-relaxed italic">
-                    {config.provider === 'relais' 
-                      ? "💡 Solution idéale pour vos invités : la clé API reste cachée dans le Worker Cloudflare." 
-                      : "⚠️ Attention : En mode direct, la clé est stockée localement dans ce navigateur."}
-                  </p>
                 </div>
-              </div>
-            </div>
+                <button onClick={() => setShowSettings(true)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all">
+                  <i data-lucide="settings" className="w-6 h-6"></i>
+                </button>
+              </header>
 
-            <div className="p-6 bg-slate-50 flex gap-3">
-              <button 
-                onClick={saveSettings}
-                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-2xl hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition-all active:scale-95"
-              >
-                <Save size={18} />
-                Enregistrer
-              </button>
+              <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar">
+                {messages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex max-w-[85%] gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <div className="mt-1">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${
+                          msg.role === 'user' ? 'bg-slate-200 text-slate-600' : 
+                          msg.role === 'error' ? 'bg-red-100 text-red-600' : 'bg-blue-600 text-white'
+                        }`}>
+                          <i data-lucide={msg.role === 'user' ? "user" : (msg.role === 'error' ? "alert-circle" : "bot")} className="w-5 h-5"></i>
+                        </div>
+                      </div>
+                      <div className={`px-5 py-3 rounded-2xl shadow-sm whitespace-pre-wrap ${
+                        msg.role === 'user' ? 'bg-blue-600 text-white' : 
+                        msg.role === 'error' ? 'bg-red-50 text-red-700 border border-red-200 text-sm font-mono' : 'bg-white border border-slate-200'
+                      }`}>
+                        {msg.text}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="flex gap-4 animate-pulse">
+                      <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white"><i data-lucide="bot" className="w-5 h-5"></i></div>
+                      <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-400 italic">Albert réfléchit...</div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </main>
+
+              <footer className="bg-white border-t p-4">
+                <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-3 p-2 bg-slate-50 rounded-xl border">
+                  <textarea 
+                    value={input} 
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend(e)}
+                    className="flex-1 bg-transparent border-none focus:ring-0 p-2 min-h-[44px] resize-none"
+                    placeholder="Posez votre question..."
+                  />
+                  <button type="submit" disabled={isLoading} className="p-4 bg-blue-600 text-white rounded-xl disabled:bg-slate-300 transition-colors">
+                    <i data-lucide="send" className="w-5 h-5"></i>
+                  </button>
+                </form>
+              </footer>
+
+              {showSettings && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                  <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold">IA & Sécurité</h2>
+                      <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-slate-100 rounded-full"><i data-lucide="x" className="w-6 h-6"></i></button>
+                    </div>
+                    
+                    <div className="space-y-6 overflow-y-auto custom-scrollbar pr-2">
+                      <section>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Mode de connexion</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={() => setConfig({...config, provider: 'relais'})} className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${config.provider === 'relais' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 italic opacity-60'}`}>
+                            <i data-lucide="shield-check" className="w-5 h-5"></i>
+                            <span className="font-bold">Relais</span>
+                          </button>
+                          <button onClick={() => setConfig({...config, provider: 'albert'})} className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${config.provider === 'albert' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 opacity-60'}`}>
+                            <i data-lucide="zap" className="w-5 h-5"></i>
+                            <span className="font-bold">Direct</span>
+                          </button>
+                        </div>
+                      </section>
+
+                      <section>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                          {config.provider === 'relais' ? 'URL du Worker Cloudflare' : 'Clé API Albert'}
+                        </label>
+                        <input 
+                          type="text" 
+                          className="w-full border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 focus:outline-none transition-all font-mono text-sm" 
+                          placeholder={config.provider === 'relais' ? "https://..." : "votre clé ici..."}
+                          value={config.key} 
+                          onChange={e => setConfig({...config, key: e.target.value})} 
+                        />
+                      </section>
+
+                      <section>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Modèle d'IA</label>
+                        <select 
+                          className="w-full border-2 border-slate-100 p-3 rounded-xl focus:border-blue-500 focus:outline-none bg-white font-medium"
+                          value={config.model}
+                          onChange={e => setConfig({...config, model: e.target.value})}
+                        >
+                          {PREDEFINED_MODELS.map(m => (
+                            <option key={m.id} value={m.id}>{m.name}</option>
+                          ))}
+                        </select>
+                        <p className="text-[10px] text-slate-400 mt-2 italic px-1">
+                          Note : Assurez-vous que votre clé a le droit d'utiliser ce modèle.
+                        </p>
+                      </section>
+                    </div>
+
+                    <div className="mt-8 pt-4 border-t flex gap-3">
+                      <button onClick={saveSettings} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="save" className="w-5 h-5"></i>
+                        Enregistrer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
