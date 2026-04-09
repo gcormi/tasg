@@ -166,10 +166,10 @@
                     <i data-lucide="bot" className="w-6 h-6"></i>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.3 (Relais-Fix)</span></h1>
+                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.4</span></h1>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        {config.provider === 'kit-albert' ? 'Kit Albert (Proxy)' : 'Mode Direct'}
+                        {config.provider === 'relais' ? 'Relais Google' : (config.provider === 'kit-albert' ? 'Kit Albert (Proxy)' : 'Mode Direct')}
                       </p>
                     </div>
                   </div>
