@@ -80,28 +80,45 @@
             if (!cleanKey) throw new Error(`Veuillez entrer votre clé API Albert.`);
 
             const isLocal = window.location.protocol === 'file:';
-            let endpoint = provider === 'kit-albert' 
-              ? "https://proxy.educ-ai.fr/v1/chat/completions"
-              : "https://albert.api.etalab.gouv.fr/v1/chat/completions";
+            let endpoint = "";
+            let isRelay = provider === 'relais' || cleanKey.startsWith('http');
 
-            if (isLocal) {
-              endpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
+            if (isRelay) {
+              endpoint = cleanKey; // L'URL de votre Google Script ou Worker
+            } else {
+              endpoint = provider === 'kit-albert' 
+                ? "https://proxy.educ-ai.fr/v1/chat/completions"
+                : "https://albert.api.etalab.gouv.fr/v1/chat/completions";
+              
+              if (isLocal) {
+                endpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
+              }
             }
 
             try {
-              const response = await fetch(endpoint, {
+              const fetchOptions = {
                 method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${cleanKey}`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+                headers: { 'Content-Type': 'application/json' }
+              };
+
+              if (isRelay) {
+                // Format attendu par votre Google Script / Worker
+                fetchOptions.body = JSON.stringify({ 
+                  message: userPrompt, 
+                  model: model,
+                  key: cleanKey // Au cas où le relais en a besoin
+                });
+              } else {
+                fetchOptions.headers['Authorization'] = `Bearer ${cleanKey}`;
+                fetchOptions.body = JSON.stringify({
                   model: model,
                   messages: [{ role: 'user', content: userPrompt }],
                   max_tokens: 1000,
                   temperature: 0.7
-                })
-              });
+                });
+              }
+
+              const response = await fetch(endpoint, fetchOptions);
 
               if (!response.ok) {
                 const body = await response.text();
@@ -142,7 +159,7 @@
                     <i data-lucide="bot" className="w-6 h-6"></i>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.2 (Diagnostic)</span></h1>
+                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.3 (Relais-Fix)</span></h1>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         {config.provider === 'kit-albert' ? 'Kit Albert (Proxy)' : 'Mode Direct'}
@@ -216,21 +233,25 @@
                         <div className="grid grid-cols-2 gap-2">
                           <button onClick={() => setConfig({...config, provider: 'kit-albert'})} className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${config.provider === 'kit-albert' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 opacity-60'}`}>
                             <i data-lucide="shield-check" className="w-5 h-5"></i>
-                            <span className="font-[900]">Kit Albert</span>
+                            <span className="text-[10px] font-bold">Kit Albert</span>
+                          </button>
+                          <button onClick={() => setConfig({...config, provider: 'relais'})} className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${config.provider === 'relais' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 opacity-60'}`}>
+                            <i data-lucide="globe" className="w-5 h-5"></i>
+                            <span className="text-[10px] font-bold">Relais (Google)</span>
                           </button>
                           <button onClick={() => setConfig({...config, provider: 'albert'})} className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${config.provider === 'albert' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 opacity-60'}`}>
                             <i data-lucide="zap" className="w-5 h-5"></i>
-                            <span className="font-[900]">Direct</span>
+                            <span className="text-[10px] font-bold">Direct</span>
                           </button>
                         </div>
                         <p className="text-[10px] text-slate-400 mt-2 italic px-1">
-                          Le mode Kit Albert utilise le proxy educ-ai.fr pour éviter les blocages CORS.
+                          Relais (Google) : utilisez l'URL de votre Google Script comme clé.
                         </p>
                       </section>
 
                       <section>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                          Clé API Albert
+                          {config.provider === 'relais' ? 'URL du Relais Google' : 'Clé API Albert'}
                         </label>
                         <input 
                           type="text" 
