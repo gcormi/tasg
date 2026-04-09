@@ -91,28 +91,34 @@
                 : "https://albert.api.etalab.gouv.fr/v1/chat/completions";
             }
 
-            // EXACT ALIGNMENT WITH api.html
-            const requestBody = isRelay 
-              ? { message: userPrompt, model: model, temperature: 0.7 }
-              : { messages: [{ role: "user", content: userPrompt }], model: model, temperature: 0.7 };
+            // MÉTHODE ULTIME : Paramètres dans l'URL (très efficace avec GAS)
+            let finalEndpoint = endpoint;
+            
+            if (isRelay) {
+              // On construit l'URL avec paramètres pour maximiser la compatibilité
+              const urlWithParams = `${endpoint}${endpoint.includes('?') ? '&' : '?'}message=${encodeURIComponent(userPrompt)}&model=${encodeURIComponent(model)}`;
+              // On passe le TOUT dans le proxy
+              finalEndpoint = `https://corsproxy.io/?${encodeURIComponent(urlWithParams)}`;
+            } else if (isLocal) {
+              finalEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
+            }
 
             const fetchOptions = {
               method: "POST",
-              headers: { 
-                "Content-Type": "application/json"
+              headers: isRelay ? {} : { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${cleanKey}`
               },
-              mode: 'cors',
-              body: JSON.stringify(requestBody)
+              mode: 'cors'
             };
 
+            // On n'ajoute le body que si on n'est pas en mode paramètres URL (pour le mode direct)
             if (!isRelay) {
-              fetchOptions.headers["Authorization"] = `Bearer ${cleanKey}`;
-            }
-
-            // Pas de proxy pour le relais (config api.html), proxy uniquement en local direct
-            let finalEndpoint = endpoint;
-            if (!isRelay && isLocal) {
-              finalEndpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
+              fetchOptions.body = JSON.stringify({
+                model: model,
+                messages: [{ role: "user", content: userPrompt }],
+                temperature: 0.7
+              });
             }
 
             const response = await fetch(finalEndpoint, fetchOptions);
@@ -159,7 +165,7 @@
                     <i data-lucide="bot" className="w-6 h-6"></i>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v6.3</span></h1>
+                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v6.4</span></h1>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         {config.provider === 'relais' ? 'Relais Google' : (config.provider === 'kit-albert' ? 'Kit Albert (Proxy)' : 'Mode Direct')}
