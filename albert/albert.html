@@ -77,23 +77,19 @@
           const callAI = async (userPrompt) => {
             const { provider, key, model } = config;
             const cleanKey = key.trim();
-            if (!cleanKey) throw new Error(`Veuillez entrer votre clé API Albert dans les paramètres.`);
+            if (!cleanKey) throw new Error(`Veuillez entrer votre clé API Albert.`);
 
             const isLocal = window.location.protocol === 'file:';
-            
-            // Si on est en local (file://), on passe par un proxy plus permissif
-            // Si on est sur La Forge (http/https), on utilise le proxy éduc officiel
             let endpoint = provider === 'kit-albert' 
               ? "https://proxy.educ-ai.fr/v1/chat/completions"
-              : "https://albert.api.gouv.fr/v1/chat/completions";
+              : "https://albert.api.etalab.gouv.fr/v1/chat/completions";
 
-            // Tunnel de secours pour le mode local
             if (isLocal) {
               endpoint = `https://corsproxy.io/?${encodeURIComponent(endpoint)}`;
             }
 
             try {
-              const fetchOptions = {
+              const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                   'Authorization': `Bearer ${cleanKey}`,
@@ -102,24 +98,22 @@
                 body: JSON.stringify({
                   model: model,
                   messages: [{ role: 'user', content: userPrompt }],
-                  temperature: 0.7,
-                  max_tokens: 1000
+                  max_tokens: 1000,
+                  temperature: 0.7
                 })
-              };
-
-              const response = await fetch(endpoint, fetchOptions);
+              });
 
               if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`Erreur ${response.status}: ${errorBody || response.statusText}`);
+                const body = await response.text();
+                throw new Error(`Erreur ${response.status}: ${body.substring(0, 100)}`);
               }
 
               const data = await response.json();
-              return data.choices?.[0]?.message?.content || "Réponse vide reçue.";
+              return data.choices?.[0]?.message?.content || "Pas de réponse.";
 
             } catch (error) {
-              console.error("Détails de l'erreur:", error);
-              return `❌ Échec de la connexion.\n\nType: ${error.name}\nMessage: ${error.message}\nCible: ${endpoint.split('?').pop()}`;
+              console.error("Fetch Error:", error);
+              return `❌ ERREUR RÉSEAU\n\nSi vous êtes sur La Forge, vérifiez que votre clé API est valide.\nSi vous êtes en local, le navigateur bloque l'accès.\n\nType: ${error.name}\nCible: ${endpoint.includes('proxy') ? 'Proxy Kit Albert' : 'Direct Albert'}`;
             }
           };
 
@@ -148,7 +142,7 @@
                     <i data-lucide="bot" className="w-6 h-6"></i>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.1 (Kit-Albert-Edition)</span></h1>
+                    <h1 className="text-xl font-bold text-slate-900 leading-none">Chatbot Albert <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shadow-sm font-bold">v5.2 (Diagnostic)</span></h1>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         {config.provider === 'kit-albert' ? 'Kit Albert (Proxy)' : 'Mode Direct'}
