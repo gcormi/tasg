@@ -27,10 +27,9 @@
         } = lucide;
 
         const PREDEFINED_MODELS = [
-          { id: 'AgentPublic/llama3-instruct-8b', name: 'Albert Llama 3 (Kit Officiel - Recommandé)' },
-          { id: 'openai/gpt-oss-120b', name: 'Albert 120B (Souverain)' },
-          { id: 'mistralai/Mistral-Small-3.2-24B-Instruct-2506', name: 'Mistral Small' },
-          { id: 'meta-llama/Llama-3.1-8B-Instruct', name: 'Llama 3.1 8B' }
+          { id: 'albert-llama-3-8b', name: 'Albert Llama 3 (Recommandé)' },
+          { id: 'albert-mixtral-8x7b', name: 'Albert Mixtral' },
+          { id: 'all-minilm-l6-v2', name: 'Albert Embeddings' }
         ];
 
         function App() {
@@ -91,38 +90,33 @@
             }
 
             try {
-              const response = await fetch(endpoint, {
+              const fetchOptions = {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${cleanKey}`
+                  'Authorization': `Bearer ${cleanKey}`,
+                  'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                   model: model,
                   messages: [{ role: 'user', content: userPrompt }],
-                  temperature: 0.7
+                  temperature: 0.7,
+                  max_tokens: 1000
                 })
-              });
+              };
+
+              const response = await fetch(endpoint, fetchOptions);
 
               if (!response.ok) {
-                const errorText = await response.text();
-                try {
-                  const errorData = JSON.parse(errorText);
-                  throw new Error(errorData.error?.message || `Erreur ${response.status}`);
-                } catch(e) {
-                  throw new Error(`Erreur serveur (${response.status})`);
-                }
+                const errorBody = await response.text();
+                throw new Error(`Erreur ${response.status}: ${errorBody || response.statusText}`);
               }
 
               const data = await response.json();
-              return data.choices?.[0]?.message?.content || "Désolé, je n'ai pas pu générer de réponse.";
+              return data.choices?.[0]?.message?.content || "Réponse vide reçue.";
 
             } catch (error) {
               console.error("Détails de l'erreur:", error);
-              if (isLocal) {
-                throw new Error("Blocage local détecté. Essayez d'héberger le fichier sur La Forge ou un serveur local.");
-              }
-              throw error;
+              return `❌ Échec de la connexion.\n\nType: ${error.name}\nMessage: ${error.message}\nCible: ${endpoint.split('?').pop()}`;
             }
           };
 
