@@ -94,21 +94,35 @@
             for (let target of targets) {
               try {
                 const isWorker = target.isRelay;
-                const isAO = target.id.includes('AllOrigins');
+                const isGAS = (target.url && target.url.includes('script.google.com'));
                 
-                const response = await fetch(target.url, {
+                // Pour Google Apps Script, on met tout dans le body car GAS ne voit pas bien les en-têtes Authorization
+                const fetchOptions = {
                   method: 'POST',
-                  headers: { 
-                    'Content-Type': 'application/json',
-                    ...((!isWorker && !isAO) ? { 'Authorization': `Bearer ${key}` } : {}),
-                    // AllOrigins /raw ne gère pas l'Auth en entête, on doit parfois ruser,
-                    // mais tentons d'abord en l'ajoutant classiquement s'il n'est pas utilisé via worker.
-                    ...((isAO && !isWorker) ? { 'Authorization': `Bearer ${key}` } : {})
-                  },
-                  body: isWorker 
+                  mode: 'cors', // Crucial pour La Forge
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // On utilise plain pour éviter les pré-requêtes OPTIONS complexes
+                  body: JSON.stringify({
+                    key: key,
+                    message: userPrompt,
+                    model: model
+                  })
+                };
+
+                // Si c'est Google, on doit suivre les redirections
+                if (isGAS) {
+                  fetchOptions.redirect = 'follow';
+                }
+
+                // Pour les autres cibles (non-GAS)
+                if (!isGAS) {
+                  fetchOptions.headers = { 'Content-Type': 'application/json' };
+                  if (!isWorker) fetchOptions.headers['Authorization'] = `Bearer ${key}`;
+                  fetchOptions.body = isWorker 
                     ? JSON.stringify({ message: userPrompt, model: model }) 
-                    : JSON.stringify({ model, messages: [{ role: 'user', content: userPrompt }] })
-                });
+                    : JSON.stringify({ model, messages: [{ role: 'user', content: userPrompt }] });
+                }
+
+                const response = await fetch(target.url, fetchOptions);
 
                 if (response.ok) {
                   const data = await response.json();
