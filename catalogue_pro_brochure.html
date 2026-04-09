@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votre Écosystème de Travail Augmenté - Portail d'Ingénierie Pédagogique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --accent: #4f46e5;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --bg-soft: #f8fafc;
+            --margin-print: 10mm;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #d1d5db;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            padding: var(--margin-print);
+            margin: 10px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media print {
+            body { background: white; }
+            .a4-page { 
+                margin: 0; 
+                box-shadow: none; 
+                page-break-after: always;
+            }
+        }
+
+        header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-title h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20pt;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 9pt;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 3px 0 0 0;
+        }
+
+        .status-tag {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 7.5pt;
+            font-weight: 700;
+            border: 1px solid #dbeafe;
+        }
+
+        .section-intro {
+            background: var(--bg-soft);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .section-intro h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13pt;
+            margin: 0 0 6px 0;
+            color: var(--primary);
+        }
+
+        .section-intro p {
+            font-size: 9.5pt;
+            margin: 0;
+            text-align: justify;
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11pt;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+            margin: 15px 0 10px 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .card-header i {
+            color: var(--primary);
+            font-size: 11pt;
+            width: 20px;
+            text-align: center;
+        }
+
+        .card-header strong {
+            font-family: 'Outfit', sans-serif;
+            font-size: 10.5pt;
+        }
+
+        .card p {
+            font-size: 8.8pt;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.3;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .tag {
+            font-size: 7pt;
+            font-weight: 700;
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 1px 5px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .tag-ia { background: #f5f3ff; color: #5b21b6; }
+        .tag-forge { background: #f0fdf4; color: #166534; }
+        .tag-standard { background: #fff7ed; color: #9a3412; font-weight: 800; }
+
+        .zebra-box {
+            border: 1px dashed #4f46e5;
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        .pilotage-compact {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .pilotage-item {
+            font-size: 8pt;
+            padding: 6px;
+            background: var(--bg-soft);
+            border-radius: 6px;
+        }
+        .pilotage-item strong { display: block; font-size: 8.5pt; color: var(--text-dark); margin-bottom: 2px; }
+
+        .page-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 7.5pt;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1 : CRÉATION & CONCEPTION -->
+    <div class="a4-page">
+        <header>
+            <div class="logo-title">
+                <h1>Votre Écosystème de Travail Augmenté</h1>
+                <p>Architecte de l'Innovation Pédagogique Digitale</p>
+            </div>
+            <div class="status-tag">Espace en Constante Évolution</div>
+        </header>
+
+        <section class="section-intro">
+            <h2>Rigueur Académique & Puissance Créative</h2>
+            <p>
+                Cet écosystème est un laboratoire de conception experte pour enseignants et formateurs. Chaque production est rigoureusement alignée sur les **programmes officiels (BO)**, le **Socle Commun**, ainsi que les référentiels **CRCN** et **PIX**. Nos disciplines sont intégralement découpées en **séquences par année**, structurées sur ces bases académiques pour garantir une cohérence parfaite de tous les supports générés (cours, activités, jeux).
+            </p>
+        </section>
+
+        <h3><i class="fas fa-microchip"></i> Ingénierie IA & Conception Expertise</h3>
+        <div class="grid">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-brain"></i><strong>Assistant Conception ↔ Valorisation</strong></div>
+                <p>Architecte de cours et scénarios. Génère des séquences structurées par compétences sur la base des référentiels (Cycle/Année). Inclut désormais un module de diffusion experte des travaux.</p>
+                <div class="card-footer"><span class="tag tag-ia">IA Générative</span><span class="tag tag-standard">BO / CRCN / PIX</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-atom"></i><strong>Master Technologie</strong></div>
+                <p>Expertise disciplinaire automatisée. Cours complets, activités guidées et évaluations alignées sur les attendus institutionnels de fin de cycle.</p>
+                <div class="card-footer"><span class="tag">Disciplinaire</span><span class="tag">Socle Commun</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-file-powerpoint"></i><strong>EduSlide Premium</strong></div>
+                <p>Studio de présentation dynamique via IA. Structure vos diapositives avec une cohérence visuelle et pédagogique pour chaque chapitre ou formation.</p>
+                <div class="card-footer"><span class="tag tag-ia">IA Support</span><span class="tag">Multimedia</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-palette"></i><strong>Studio Illustration Pro</strong></div>
+                <p>Génération de lots d'illustrations thématiques cohérentes. Maintenez une identité visuelle forte sur l'ensemble de vos supports de formation.</p>
+                <div class="card-footer"><span class="tag tag-ia">IA Image</span><span class="tag">Esthétique</span></div>
+            </div>
+        </div>
+
+        <h3><i class="fas fa-laptop-code"></i> Studios de Création Web & Communauté</h3>
+        <div class="grid">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-desktop"></i><strong>EditeurHTML Studio Pro</strong></div>
+                <p>L'atelier de création web bidirectionnel : HTML, CSS et conversion Markdown. Gestion d'images intégrée pour une diffusion web immédiate.</p>
+                <div class="card-footer"><span class="tag">Studio Pro</span><span class="tag">Web Design</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-rocket"></i><strong>EduForge Explorer</strong></div>
+                <p>Accédez aux outils "pépites" issus de la communauté : Raccord Minute, Live Quiz, Ressourcerie et Inclum'IA. Le hub des logiciels libres.</p>
+                <div class="card-footer"><span class="tag tag-forge">Forge Apps</span><span class="tag">Utilitaires</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-chart-pie"></i><strong>Infographie & Synthèse</strong></div>
+                <p>Visualisez l'essentiel. Transformez vos bilans de séance en infographies mémorables pour faciliter l'ancrage des connaissances.</p>
+                <div class="card-footer"><span class="tag">Visuel</span><span class="tag">Ancrage</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-pencil-ruler"></i><strong>Générateur d'Exercices Visuels</strong></div>
+                <p>Génération de supports graphiques haute définition pour tous vos supports de cours, fondés sur les bases de l'Assistant de Conception.</p>
+                <div class="card-footer"><span class="tag">Edition</span><span class="tag">Export HD</span></div>
+            </div>
+        </div>
+
+        <h3><i class="fas fa-puzzle-piece"></i> Ludification & Interactivité</h3>
+        <div class="grid" style="flex-grow: 1;">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-ghost"></i><strong>Serious Game Engine</strong></div>
+                <p>Créez des Escape Games narratifs en HTML fondés sur vos séquences. Énigmes, scénarios et validation. Fonctionne sans connexion (Offline-ready).</p>
+                <div class="card-footer"><span class="tag">Ludique</span><span class="tag">Interactif</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-shapes"></i><strong>Atelier de Jeux Cognitifs</strong></div>
+                <p>Génération instantanée de Memory, Mots Croisés et Associations. Vos disciplines transformées en jeux sur la base des programmes annuels.</p>
+                <div class="card-footer"><span class="tag tag-ia">IA Quick</span><span class="tag">Gamification</span></div>
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span>© 2026 Gilles Cormi · Innovation & Ingénierie Pédagogique Augmentée</span>
+            <span>Page 1 sur 2</span>
+        </div>
+    </div>
+
+    <!-- PAGE 2 : INCLUSION & STANDARDS -->
+    <div class="a4-page">
+        <header>
+            <div class="logo-title">
+                <h1>Inclusion & Interopérabilité</h1>
+                <p>Accessibilité Universelle & Standards e-Learning</p>
+            </div>
+            <div class="status-tag">Conformité RGPD & Souveraineté</div>
+        </header>
+
+        <section class="section-intro" style="border-left-color: #10b981; background: #f0fdf4;">
+            <h2>Une École Inclusive par la Technologie (TAS 🦓)</h2>
+            <p>
+                L'accessibilité est au cœur du portail. La gamme <strong>TAS</strong> permet d'adapter instantanément vos ressources pédagogiques pour les élèves <strong>DYS, TDAH et en situation de handicap</strong> sur la base des textes du Socle Commun.
+            </p>
+            <div class="zebra-box">
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <strong style="color: #047857;"><i class="fas fa-universal-access"></i> Adaptation Inclusive</strong>
+                        <p style="font-size: 9pt; margin-top: 5px;">Adaptez vos ressources pour les élèves DYS, TDAH et en situation de handicap. Mise en page accessible, polices adaptées, formats inclusifs.</p>
+                        <div style="margin-top: 5px;"><span class="tag" style="background:#d1fae5; color:#065f46;">Accessibilité DYS / TDAH</span></div>
+                    </div>
+                    <div style="flex: 1;">
+                        <strong style="color: #047857;"><i class="fas fa-book-reader"></i> Lecteur Adaptatif (Léger)</strong>
+                        <p style="font-size: 9pt; margin-top: 5px;">Accompagnement à la lecture fluide : interface épurée, lecture bionique, synthèse vocale et aides visuelles à la concentration.</p>
+                        <div style="margin-top: 5px;"><span class="tag" style="background:#d1fae5; color:#065f46;">Audio / Focus / Bionique</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <h3><i class="fas fa-share-nodes"></i> Standards & Interopérabilité</h3>
+        <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-box-open"></i><strong>Export SCORM</strong></div>
+                <p>Suivi des scores et compétences dans Moodle, Éléa ou Pronote.</p>
+                <div class="card-footer"><span class="tag">LMS Ready</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-file-code"></i><strong>Export XML Moodle</strong></div>
+                <p>Importation directe de banques de questions massives dans Éléa sans ressaisie.</p>
+                <div class="card-footer"><span class="tag">Moodle XML</span></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><i class="fas fa-file-zipper"></i><strong>Diffusion ZIP</strong></div>
+                <p>Fichiers autonomes pour consultation offline sur tablette ou serveur.</p>
+                <div class="card-footer"><span class="tag">Standalone</span></div>
+            </div>
+        </div>
+
+        <h3 style="color: var(--text-light); border-bottom-color: var(--border);"><i class="fas fa-toolbox"></i> Utilitaires de Pilotage & Séance</h3>
+        <div class="pilotage-compact">
+            <div class="pilotage-item">
+                <strong>Tableau de Classe</strong>
+                Timer, météo de classe et sonomètre interactif pour piloter vos séances en direct.
+            </div>
+            <div class="pilotage-item">
+                <strong>Post-its & Notes</strong>
+                Tableau collaboratif Sync Cloud et carnet de bord professionnel avec mise en forme riche.
+            </div>
+            <div class="pilotage-item">
+                <strong>Veille & Curation</strong>
+                Flux RSS éducatifs, YouTube EduSync et Favoris enrichis automatiquement par l'IA.
+            </div>
+        </div>
+
+        <section style="background: var(--bg-soft); padding: 10px; border-radius: 8px; font-size: 8pt; text-align: center; margin-top: 35px; border: 1px solid var(--border);">
+            <i class="fas fa-info-circle"></i> <strong>Souveraineté :</strong> Solution PWA fonctionnant côté client. Données souveraines et conformité RGPD garantie.
+        </section>
+
+        <div class="page-footer">
+            <span>Une création de Gilles Cormi · Expertise BO / Socle Commun / CRCN / PIX</span>
+            <span>Page 2 sur 2</span>
+        </div>
+    </div>
+
+</body>
+</html>
