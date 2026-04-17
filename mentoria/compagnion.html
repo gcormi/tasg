@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Tuteur - Mentoria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root { --indigo-600: #4f46e5; --slate-900: #0f172a; }
+        body { font-family: 'Outfit', sans-serif; }
+        .preview-bg {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+            background-size: 24px 24px;
+        }
+        .slide-in { animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Message Bubbles */
+        .bubble-bot { border-radius: 1.5rem 1.5rem 1.5rem 0.4rem; }
+        .bubble-user { border-radius: 1.5rem 1.5rem 0.4rem 1.5rem; }
+
+        /* Thinking animation */
+        .dot { width: 5px; height: 5px; background: #94a3b8; border-radius: 50%; display: inline-block; animation: wave 1.3s linear infinite; }
+        .dot:nth-child(2) { animation-delay: -1.1s; }
+        .dot:nth-child(3) { animation-delay: -0.9s; }
+        @keyframes wave { 0%, 60%, 100% { transform: initial; } 30% { transform: translateY(-5px); } }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Erreur plein écran */
+        #error-screen { display: none; }
+        #error-screen.visible { display: flex; }
+
+        /* Boutons de réponse rapide */
+        .quick-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border-radius: 999px; font-size: 12px;
+            font-weight: 700; cursor: pointer; transition: all 0.18s;
+            border: 2px solid #e2e8f0; background: white; color: #475569;
+        }
+        .quick-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #eef2ff; transform: translateY(-1px); }
+    </style>
+</head>
+<body class="bg-indigo-900/5 font-sans text-slate-900 overflow-hidden leading-relaxed h-screen w-screen relative"
+      style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 30px 30px;">
+
+<!-- ══════════════════════════════════════
+     ÉCRAN D'ERREUR
+══════════════════════════════════════ -->
+<div id="error-screen" class="fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-xl items-center justify-center p-6">
+    <div class="bg-white rounded-[2rem] p-10 w-full max-w-sm text-center shadow-2xl">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6">
+            <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-black text-slate-900 mb-3">Lien invalide</h2>
+        <p class="text-slate-500 text-sm leading-relaxed mb-6" id="error-message">
+            Ce lien ne contient pas de configuration d'assistant valide.<br>
+            Demandez un nouveau lien à votre professeur.
+        </p>
+        <p class="text-[10px] text-slate-300 font-mono break-all" id="error-detail"></p>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ÉCRAN D'ACCUEIL
+══════════════════════════════════════ -->
+<div id="welcome-screen" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xl flex items-center justify-center p-6 transition-opacity duration-500">
+    <div class="bg-white rounded-[2.5rem] p-10 w-full max-w-sm text-center shadow-2xl relative overflow-hidden slide-in">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 to-emerald-500"></div>
+
+        <div id="bot-avatar-large" class="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner overflow-hidden border border-slate-100 p-1">
+            <img id="vignette-display" class="hidden w-full h-full object-cover rounded-[1.8rem]" alt="Avatar" />
+            <div id="bot-icon-placeholder" class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
+                <i data-lucide="bot" class="w-8 h-8"></i>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-black text-slate-900 mb-2 tracking-tight" id="welcome-title">Chargement...</h2>
+        <p class="text-slate-500 mb-8 font-medium text-xs leading-relaxed" id="welcome-short-desc">Votre assistant personnel se prépare.</p>
+
+        <div class="space-y-4">
+            <div class="text-left px-2">
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Identifiant élève</label>
+                <input
+                    type="text"
+                    id="student-name-input"
+                    placeholder="Ex: DUPONT_Lucas_4B"
+                    class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 mt-2 focus:border-indigo-500 focus:bg-white outline-none transition-all text-center font-black text-base text-slate-900 shadow-sm"
+                >
+            </div>
+
+            <button
+                id="start-btn"
+                onclick="startChat()"
+                class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 text-[11px] uppercase tracking-[0.2em] disabled:opacity-50 mt-2 group"
+                disabled
+            >
+                Entrer <i data-lucide="arrow-right" class="w-3.5 h-3.5 inline-block ml-1 transition-transform group-hover:translate-x-1"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     WIDGET CHAT (DRAGGABLE + RESIZABLE)
+══════════════════════════════════════ -->
+<div id="bot-widget" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[440px] h-[660px] min-w-[300px] min-h-[420px] max-w-[95vw] max-h-[95vh] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border-2 border-slate-200/50 z-50" style="resize: both;">
+
+    <!-- HEADER / POIGNÉE -->
+    <header id="drag-handle" class="flex-none h-20 bg-white/80 backdrop-blur-xl border-b border-slate-100 flex items-center justify-between px-6 z-10 cursor-move group">
+        <div class="flex items-center gap-4 pointer-events-none">
+            <div class="w-12 h-12 bg-slate-50 rounded-[1.2rem] flex items-center justify-center text-indigo-600 shadow-inner overflow-hidden border border-slate-100 p-0.5">
+                <img id="bot-icon-top" class="hidden w-full h-full object-cover rounded-xl" alt="" />
+                <div id="bot-icon-placeholder-top"><i data-lucide="bot" class="w-6 h-6"></i></div>
+            </div>
+            <div>
+                <h1 class="font-black text-slate-900 leading-none text-lg tracking-tight">
+                    <span id="display-bot-name">...</span>
+                </h1>
+                <div class="flex items-center gap-1.5 mt-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest" id="display-subject">Ready</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 hidden sm:block pointer-events-none">
+                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Élève</span>
+                <span class="text-[11px] font-black text-slate-900" id="display-student-name">...</span>
+            </div>
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 group-hover:text-indigo-400 transition-colors pointer-events-none">
+                <i data-lucide="grip-horizontal" class="w-5 h-5"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- ZONE MESSAGES -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6 preview-bg scroll-smooth"></main>
+
+    <!-- LOADING -->
+    <div id="loading-indicator" class="hidden px-6 pb-4">
+        <div class="flex gap-4">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white flex-none shadow-lg">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <div class="px-5 py-3 bubble-bot bg-white border border-slate-100 shadow-sm text-slate-400 font-bold text-[11px] flex items-center gap-3">
+                <div class="flex gap-1 pt-0.5">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                Réflexion...
+            </div>
+        </div>
+    </div>
+
+    <!-- BOUTONS DE RÉPONSE RAPIDE -->
+    <div id="quick-replies" class="hidden px-6 pb-3 flex flex-wrap gap-2"></div>
+
+    <!-- ZONE DE SAISIE -->
+    <footer class="p-4 bg-white/90 backdrop-blur-xl border-t border-slate-100 flex-none rounded-b-[2rem]">
+        <form id="chat-form" class="flex items-end gap-3">
+            <div class="flex-1 bg-slate-50 rounded-[1.5rem] border-2 border-transparent focus-within:border-indigo-500 focus-within:bg-white transition-all p-1.5 flex items-end shadow-inner">
+                <textarea
+                    id="message-input"
+                    placeholder="Tape ton message..."
+                    class="flex-1 max-h-32 min-h-[44px] bg-transparent border-none focus:ring-0 resize-none py-3 px-4 text-slate-700 placeholder-slate-400 text-sm font-bold outline-none hide-scroll"
+                    rows="1"
+                ></textarea>
+            </div>
+            <button
+                type="submit"
+                id="send-button"
+                class="flex-none w-14 h-14 bg-slate-900 text-white rounded-[1.2rem] hover:bg-indigo-600 disabled:opacity-30 disabled:grayscale transition-all flex items-center justify-center shadow-lg shadow-indigo-100/50 group"
+                disabled
+            >
+                <i data-lucide="arrow-up" class="w-6 h-6 transition-transform group-hover:-translate-y-1"></i>
+            </button>
+        </form>
+    </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     LOGIQUE PRINCIPALE — SANS FIREBASE
+══════════════════════════════════════ -->
+<script>
+    lucide.createIcons();
+
+    // ─── 1. DÉCODAGE DE LA CONFIG DEPUIS L'URL (#config=BASE64) ───────────────
+    let botConfig = null;
+
+    function showError(msg, detail = '') {
+        document.getElementById('welcome-screen').classList.add('hidden');
+        document.getElementById('error-message').textContent = msg;
+        document.getElementById('error-detail').textContent = detail;
+        document.getElementById('error-screen').classList.add('visible');
+        lucide.createIcons();
+    }
+
+    (function loadConfig() {
+        const hash = window.location.hash;
+        const prefix = '#config=';
+        if (!hash.startsWith(prefix)) {
+            showError('Ce lien ne contient pas de configuration. Demandez un nouveau lien à votre professeur.');
+            return;
+        }
+        try {
+            const b64 = hash.slice(prefix.length);
+            const json = decodeURIComponent(escape(atob(b64)));
+            botConfig = JSON.parse(json);
+            if (!botConfig || !botConfig.config || !botConfig.config.title) throw new Error('Structure invalide');
+            renderBotAppearance();
+            document.getElementById('start-btn').disabled = false;
+        } catch (e) {
+            showError('Le lien est corrompu ou invalide. Demandez un nouveau lien à votre professeur.', e.message);
+        }
+    })();
+
+    // ─── 2. APPARENCE DU BOT ──────────────────────────────────────────────────
+    function renderBotAppearance() {
+        const cfg = botConfig.config;
+        document.title = (cfg.title || 'Assistant') + ' — Mentoria';
+        document.getElementById('welcome-title').textContent = cfg.title || 'Assistant pédagogique';
+        document.getElementById('welcome-short-desc').textContent = cfg.welcomeMessage || 'Bienvenue dans cette séance !';
+        document.getElementById('display-bot-name').textContent = cfg.name || 'Assistant';
+        document.getElementById('display-subject').textContent = cfg.theme || cfg.title;
+
+        if (botConfig.vignette) {
+            ['vignette-display', 'bot-icon-top'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.src = botConfig.vignette; el.classList.remove('hidden'); }
+            });
+            document.getElementById('bot-icon-placeholder')?.classList.add('hidden');
+            document.getElementById('bot-icon-placeholder-top')?.classList.add('hidden');
+        }
+    }
+
+    // ─── 3. DÉMARRAGE SESSION ─────────────────────────────────────────────────
+    let chatHistory = [];
+    let studentName = '';
+
+    // Activer le bouton "Entrer" dès qu'on tape un identifiant
+    document.getElementById('student-name-input').addEventListener('input', function() {
+        document.getElementById('start-btn').disabled = !this.value.trim();
+    });
+
+    window.startChat = function() {
+        const input = document.getElementById('student-name-input');
+        if (!input.value.trim()) {
+            input.classList.add('border-red-500');
+            setTimeout(() => input.classList.remove('border-red-500'), 1000);
+            return;
+        }
+        studentName = input.value.trim();
+        document.getElementById('display-student-name').textContent = studentName;
+
+        // Masquer l'écran d'accueil
+        const ws = document.getElementById('welcome-screen');
+        ws.style.opacity = '0';
+        ws.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => ws.classList.add('hidden'), 400);
+
+        // Message de bienvenue
+        const welcomeMsg = (botConfig.config.welcomeMessage || 'Bonjour ! Prêt pour la séance ?')
+                           .replace('{name}', studentName);
+        addBotMessage(welcomeMsg);
+
+        // Activer la saisie
+        document.getElementById('message-input').focus();
+        document.getElementById('send-button').disabled = false;
+    };
+
+    // ─── 4. RENDU DES MESSAGES ────────────────────────────────────────────────
+    function addBotMessage(text) {
+        chatHistory.push({ role: 'assistant', content: text });
+        renderMessages();
+    }
+
+    function formatContent(text) {
+        // Échapper le HTML, convertir les sauts de ligne et le gras Markdown
+        return text
+            .replace(/[&<>'\"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]))
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function renderMessages() {
+        const container = document.getElementById('chat-container');
+        container.innerHTML = '';
+        chatHistory.forEach((msg, idx) => {
+            const isUser = msg.role === 'user';
+            const isError = msg.role === 'error';
+            const avatarHtml = (!isUser && !isError && botConfig.vignette)
+                ? `<img src="${botConfig.vignette}" class="w-full h-full object-cover">`
+                : `<i data-lucide="${isUser ? 'user' : (isError ? 'alert-circle' : 'bot')}" class="w-4 h-4"></i>`;
+
+            container.insertAdjacentHTML('beforeend', `
+                <div class="flex ${isUser ? 'justify-end' : 'justify-start'} slide-in" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
+                    <div class="flex max-w-[90%] gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}">
+                        <div class="flex-none pt-1">
+                            <div class="w-8 h-8 rounded-xl ${isUser ? 'bg-white border border-slate-200 text-slate-400' : (isError ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white')} flex items-center justify-center shadow-sm overflow-hidden">
+                                ${avatarHtml}
+                            </div>
+                        </div>
+                        <div class="px-5 py-3.5 shadow-sm text-sm leading-relaxed font-medium
+                            ${isUser
+                                ? 'bg-indigo-600 text-white bubble-user'
+                                : (isError
+                                    ? 'bg-red-50 text-red-700 border border-red-100 bubble-bot'
+                                    : 'bg-white border border-slate-100 text-slate-700 bubble-bot')}">
+                            ${formatContent(msg.content)}
+                        </div>
+                    </div>
+                </div>
+            `);
+        });
+        lucide.createIcons();
+        setTimeout(() => container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }), 50);
+    }
+
+    // ─── 5. ENVOI ET APPEL API ALBERT ─────────────────────────────────────────
+    const msgInput   = document.getElementById('message-input');
+    const sendBtn    = document.getElementById('send-button');
+    const chatForm   = document.getElementById('chat-form');
+    const loadingDiv = document.getElementById('loading-indicator');
+
+    msgInput.addEventListener('input', () => {
+        msgInput.style.height = 'auto';
+        msgInput.style.height = msgInput.scrollHeight + 'px';
+        // Le bouton est géré par la session — on n'active que si la session a démarré
+        if (studentName) sendBtn.disabled = !msgInput.value.trim();
+    });
+
+    msgInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey && msgInput.value.trim()) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    chatForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const text = msgInput.value.trim();
+        if (!text || !studentName) return;
+
+        chatHistory.push({ role: 'user', content: text });
+        msgInput.value = '';
+        msgInput.style.height = 'auto';
+        sendBtn.disabled = true;
+        renderMessages();
+        loadingDiv.classList.remove('hidden');
+
+        // Construction du prompt système
+        const cfg = botConfig.config;
+        const rules = (cfg.pedagogicRules || []).join('\n- ');
+        const strictTheme = cfg.strictTheme ? `\nTHÈME STRICT : ${cfg.strictTheme}\nSi l'élève sort de ce thème, refuse poliment et ramène-le au sujet.` : '';
+
+        const systemPrompt = `
+TU ES : ${cfg.name || 'un tuteur pédagogique'}.
+RÔLE : ${cfg.instructions || 'Aide les élèves à comprendre et progresser.'}
+PUBLIC : ${cfg.targetAge || 'Élèves du secondaire'}.
+THÈME : ${cfg.theme || 'Sujet libre'}.${strictTheme}
+
+RÈGLES PÉDAGOGIQUES (À RESPECTER ABSOLUMENT) :
+- ${rules || 'Sois clair, bienveillant et pédagogique.'}
+- ${cfg.customRules || ''}
+
+IDENTITÉ ÉLÈVE : L'élève qui te parle s'identifie comme "${studentName}". Utilise son prénom si tu l'extrais.
+
+CORPUS DE RÉFÉRENCE (tes seules connaissances pour cette séance) :
+${botConfig.corpus || '(Aucun corpus fourni — utilise tes connaissances générales.)'}
+`.trim();
+
+        const messages = [
+            { role: 'system', content: systemPrompt },
+            ...chatHistory.filter(m => m.role !== 'error').map(m => ({ role: m.role, content: m.content }))
+        ];
+
+        try {
+            const res = await fetch('https://albert.api.etalab.gouv.fr/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${botConfig.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'openweight-medium',
+                    messages,
+                    temperature: 0.7,
+                    max_tokens: 600
+                })
+            });
+
+            if (!res.ok) {
+                const errBody = await res.text();
+                throw new Error(`Albert API ${res.status} : ${errBody.slice(0, 120)}`);
+            }
+
+            const data = await res.json();
+            const reply = data.choices?.[0]?.message?.content;
+            if (!reply) throw new Error('Réponse vide de l\'API.');
+            addBotMessage(reply);
+
+        } catch (err) {
+            console.error('[Mentoria] Erreur API :', err);
+            chatHistory.push({
+                role: 'error',
+                content: `Désolé, une erreur de connexion s'est produite. Réessaie dans un instant.\n\n(${err.message})`
+            });
+            renderMessages();
+        } finally {
+            loadingDiv.classList.add('hidden');
+            sendBtn.disabled = false;
+        }
+    });
+
+    // ─── 6. DRAG & DROP DU WIDGET ─────────────────────────────────────────────
+    const botWidget  = document.getElementById('bot-widget');
+    const dragHandle = document.getElementById('drag-handle');
+    let isDragging = false, startX, startY, initLeft, initTop;
+
+    dragHandle.addEventListener('mousedown', e => {
+        if (e.target.closest('button')) return;
+        isDragging = true;
+        startX = e.clientX; startY = e.clientY;
+        const rect = botWidget.getBoundingClientRect();
+        // Supprimer les classes Tailwind de centrage si toujours présentes
+        if (botWidget.classList.contains('transform')) {
+            botWidget.classList.remove('transform', '-translate-x-1/2', '-translate-y-1/2', 'top-1/2', 'left-1/2');
+            botWidget.style.left = rect.left + 'px';
+            botWidget.style.top  = rect.top  + 'px';
+        }
+        initLeft = rect.left; initTop = rect.top;
+        dragHandle.style.cursor = 'grabbing';
+        document.body.style.userSelect = 'none';
+    });
+
+    window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        botWidget.style.left = (initLeft + e.clientX - startX) + 'px';
+        botWidget.style.top  = (initTop  + e.clientY - startY) + 'px';
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        dragHandle.style.cursor = 'move';
+        document.body.style.userSelect = '';
+    });
+
+</script>
+</body>
+</html>

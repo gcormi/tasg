@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentoria — Studio de Création</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <style>
+        :root {
+            --blue-inst: #1d4ed8; --blue-light: #eff6ff;
+            --border: #d1d5db; --text: #111827; --text-muted: #6b7280; --bg: #f3f4f6;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .collapsible-content { transition: all 0.3s ease; overflow: hidden; }
+        .hidden-section { max-height: 0; opacity: 0; }
+        .open-section { max-height: 3000px; opacity: 1; }
+        .input-field {
+            width: 100%; background: white; border: 1px solid var(--border);
+            border-radius: 6px; padding: 8px 12px; font-size: 13px;
+            font-family: 'Inter', sans-serif; color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+        }
+        .input-field:focus { border-color: var(--blue-inst); box-shadow: 0 0 0 3px rgba(29,78,216,0.12); }
+        .input-field::placeholder { color: #9ca3af; }
+        .label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+        .section-card { background: white; border: 1px solid var(--border); border-radius: 8px; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; }
+        .section-header:hover { background: #f9fafb; }
+        .section-body { padding: 16px; border-top: 1px solid var(--border); }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+        .btn-primary { background: var(--blue-inst); color: white; border-color: #1e3a8a; }
+        .btn-primary:hover { background: #1e40af; }
+        .btn-secondary { background: white; color: var(--text); border-color: var(--border); }
+        .btn-secondary:hover { background: #f9fafb; }
+        .preview-bg { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        @keyframes pulse-soft { 0%,100%{opacity:1}50%{opacity:0.6} }
+        .ai-loading { animation: pulse-soft 2s infinite; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
+        .slide-in { animation: slideIn 0.4s ease-out forwards; }
+        .bot-card { border: 1px solid var(--border); border-radius: 6px; background: white; }
+        .bot-card:hover { border-color: var(--blue-inst); background: var(--blue-light); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+<!-- ═══════════════════════════════════════════
+     ÉCRAN DE DÉMARRAGE — CHOIX DU STOCKAGE
+═══════════════════════════════════════════ -->
+<div id="startup-screen" class="fixed inset-0 z-[200] flex items-center justify-center" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="relative w-full max-w-lg mx-4">
+        <!-- Logo -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-white/10 rounded-3xl mb-4 border border-white/20 overflow-hidden shadow-2xl">
+                <img src="mentoria_hero.png" class="w-full h-full object-cover" alt="Mentoria Logo">
+            </div>
+            <h1 class="text-3xl font-bold text-white tracking-tight">Mentoria</h1>
+            <p class="text-blue-200 text-sm mt-1">Studio de création d'assistants pédagogiques souverains</p>
+        </div>
+        <!-- Card -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-900 text-base">Où sont stockés vos bots ?</h2>
+                <p class="text-gray-500 text-xs mt-1">Choisissez votre mode. Vos données ne quittent jamais votre contrôle.</p>
+            </div>
+            <!-- Option Nuage -->
+            <div class="p-5 border-b border-gray-100">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-none mt-0.5">
+                        <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900 text-sm">☁️ Nuage — apps.education.fr</p>
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Accédez à vos bots depuis n'importe quel PC. Collez le lien de votre dossier Nuage partagé.</p>
+                        <div class="flex gap-2">
+                            <input id="nuage-link-input" type="text" placeholder="https://nuage.apps.education.fr/s/..." class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono">
+                            <button onclick="connectNuage()" class="px-4 py-2 bg-blue-700 text-white text-xs font-semibold rounded-lg hover:bg-blue-800 transition-colors whitespace-nowrap">Connexion</button>
+                        </div>
+                        <p class="text-[10px] text-blue-600 mt-2 cursor-pointer hover:underline" onclick="document.getElementById('nuage-help').classList.toggle('hidden')">▶ Comment obtenir ce lien ?</p>
+                        <div id="nuage-help" class="hidden mt-2 p-3 bg-blue-50 rounded-lg text-[10px] text-blue-800 leading-relaxed shadow-inner">
+                            <div class="flex gap-3 mb-2">
+                                <img src="data_sovereignty.png" class="w-12 h-12 rounded bg-white p-1 border border-blue-100 shadow-sm" alt="Diagramme souveraineté">
+                                <div class="flex-1">
+                                    1. Allez sur <strong>nuage.apps.education.fr</strong><br>
+                                    2. Créez un dossier <strong>Mentoria</strong><br>
+                                    3. Clic droit → <strong>Partager</strong> → activez <strong>"Autoriser l'édition"</strong>
+                                </div>
+                            </div>
+                            4. Copiez le lien de partage et collez-le ici. Vos données restent sur le cloud français.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Option USB -->
+            <div class="p-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-none mt-0.5">
+                        <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900 text-sm">💾 Clé USB / Dossier local</p>
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Vos bots dans un dossier sur votre clé ou disque. Fonctionne sans internet.</p>
+                        <button onclick="connectFolder()" class="w-full py-2 border-2 border-dashed border-green-300 text-green-700 text-xs font-semibold rounded-lg hover:bg-green-50 hover:border-green-400 transition-all">
+                            📁 Choisir mon dossier Mentoria...
+                        </button>
+                        <p class="text-[10px] text-gray-400 mt-1.5">⚠️ Nécessite Chrome ou Edge</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="text-center text-blue-200 text-[10px] mt-4">🔒 Aucune donnée transmise à Google ou tiers — Conforme RGPD — Éducation Nationale</p>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="status-toast" class="hidden fixed top-5 right-5 z-[100] max-w-xs w-full bg-white shadow-lg rounded-lg p-4 border border-gray-200 border-l-4 border-l-blue-700">
+    <div class="flex gap-3 items-start">
+        <i data-lucide="check-circle" class="w-4 h-4 text-blue-700 mt-0.5 flex-none"></i>
+        <div class="flex-1">
+            <p id="status-title" class="font-semibold text-gray-900 text-sm">Notification</p>
+            <p id="status-msg" class="text-xs text-gray-500 mt-0.5"></p>
+        </div>
+        <button onclick="hideToast()" class="text-gray-300 hover:text-gray-500"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS GLOBAUX (chargés avant le DOM)
+═══════════════════════════════════════════ -->
+<script>
+    // --- UI GLOBALE ---
+    window.toggleSection = (id) => {
+        const section = document.getElementById(id);
+        if (!section) return;
+        const isHidden = section.classList.contains('hidden-section');
+        const iconId = id.replace('section-', 'icon-');
+        const icon = document.getElementById(iconId);
+        document.querySelectorAll('.collapsible-content').forEach(s => { s.classList.add('hidden-section'); s.classList.remove('open-section'); });
+        document.querySelectorAll('[id^="icon-"]').forEach(i => i.style.transform = 'rotate(0deg)');
+        if (isHidden) {
+            section.classList.remove('hidden-section'); section.classList.add('open-section');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
+        if (window.lucide) lucide.createIcons();
+    };
+    window.showToast = (title, msg) => {
+        const t = document.getElementById('status-toast');
+        if (!t) return;
+        document.getElementById('status-title').textContent = title;
+        document.getElementById('status-msg').textContent = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 4000);
+    };
+    window.hideToast = () => document.getElementById('status-toast')?.classList.add('hidden');
+    window.closeModal = () => document.getElementById('publish-modal')?.classList.add('hidden');
+
+    // --- AVATAR ---
+    window.handleThumbnail = (input) => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.getElementById('vignette-preview');
+            const ph = document.getElementById('vignette-placeholder');
+            if (img) { img.src = e.target.result; img.classList.remove('hidden'); }
+            if (ph) ph.classList.add('hidden');
+            updatePreviews();
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // --- APERÇU DYNAMIQUE ---
+    window.updatePreviews = () => {
+        const title = document.getElementById('bot-title')?.value || 'Titre du Projet';
+        const name = document.getElementById('bot-name')?.value || 'Assistant Albert';
+        const vigImg = document.getElementById('vignette-preview');
+        const hasImg = vigImg && vigImg.src && vigImg.src !== window.location.href && !vigImg.classList.contains('hidden');
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        const toggle = (id, hidden) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', hidden); };
+        const setSrc = (id, src) => { const el = document.getElementById(id); if (el) el.src = src; };
+        set('preview-bot-title', title);
+        set('preview-bot-desc', 'Bonjour ! Je suis ' + name + '.');
+        set('preview-bot-name-top', name);
+        toggle('preview-bot-icon', !hasImg);
+        toggle('preview-bot-icon-placeholder', hasImg);
+        toggle('preview-bot-avatar-large', !hasImg);
+        toggle('preview-bot-avatar-placeholder', hasImg);
+        if (hasImg) { setSrc('preview-bot-icon', vigImg.src); setSrc('preview-bot-avatar-large', vigImg.src); }
+    };
+
+    // ═══════════════════════════════════════════
+    // MOTEUR NUAGE (WebDAV Nextcloud)
+    // ═══════════════════════════════════════════
+    let storageMode = null;
+    let nuageToken = null;
+    let folderHandle = null;
+    const NUAGE_BASE = 'https://nuage.apps.education.fr/public.php/webdav/';
+
+    window.connectNuage = async () => {
+        const raw = document.getElementById('nuage-link-input').value.trim();
+        if (!raw) { alert('Collez votre lien Nuage.'); return; }
+        const match = raw.match(/\/s\/([a-zA-Z0-9]+)/);
+        if (!match) { alert('Lien invalide. Il doit ressembler à :\nhttps://nuage.apps.education.fr/s/XXXXXXXX'); return; }
+        nuageToken = match[1];
+        storageMode = 'nuage';
+        try {
+            const res = await fetch(NUAGE_BASE, {
+                method: 'PROPFIND',
+                headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':'), 'Depth': '1' }
+            });
+            if (!res.ok && res.status !== 207) throw new Error('HTTP ' + res.status);
+            document.getElementById('startup-screen').style.display = 'none';
+            updateStorageBadge('☁️ Nuage apps.education.fr');
+            showToast('☁️ Connecté', 'Dossier Nuage chargé.');
+            await loadLibrary();
+        } catch(e) {
+            alert('Connexion impossible.\nVérifiez le lien et que "Autoriser l\'édition" est activé.\n\nErreur : ' + e.message);
+            nuageToken = null; storageMode = null;
+        }
+    };
+
+    // ═══════════════════════════════════════════
+    // MOTEUR DOSSIER LOCAL (USB / Disque)
+    // ═══════════════════════════════════════════
+    window.connectFolder = async () => {
+        if (!window.showDirectoryPicker) {
+            alert('Votre navigateur ne supporte pas cette fonctionnalité.\nUtilisez Google Chrome ou Microsoft Edge.');
+            return;
+        }
+        try {
+            folderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            storageMode = 'folder';
+            document.getElementById('startup-screen').style.display = 'none';
+            updateStorageBadge('💾 ' + folderHandle.name);
+            showToast('💾 Dossier connecté', folderHandle.name);
+            await loadLibrary();
+        } catch(e) {
+            if (e.name !== 'AbortError') alert('Erreur : ' + e.message);
+        }
+    };
+
+    function updateStorageBadge(label) {
+        const b = document.getElementById('storage-badge');
+        if (b) b.textContent = label;
+    }
+
+    // ═══════════════════════════════════════════
+    // API FICHIERS — lectures/écritures unifiées
+    // ═══════════════════════════════════════════
+    async function readBotFile(filename) {
+        if (storageMode === 'nuage') {
+            const res = await fetch(NUAGE_BASE + filename, { headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':') } });
+            return res.ok ? await res.json() : null;
+        } else if (storageMode === 'folder') {
+            try { const fh = await folderHandle.getFileHandle(filename); return JSON.parse(await (await fh.getFile()).text()); }
+            catch { return null; }
+        }
+    }
+    async function writeBotFile(filename, data) {
+        const content = JSON.stringify(data, null, 2);
+        if (storageMode === 'nuage') {
+            const res = await fetch(NUAGE_BASE + filename, {
+                method: 'PUT',
+                headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':'), 'Content-Type': 'application/json' },
+                body: content
+            });
+            if (!res.ok) throw new Error('WebDAV ' + res.status);
+        } else if (storageMode === 'folder') {
+            const fh = await folderHandle.getFileHandle(filename, { create: true });
+            const w = await fh.createWritable(); await w.write(content); await w.close();
+        }
+    }
+    async function deleteBotFile(filename) {
+        if (storageMode === 'nuage') {
+            await fetch(NUAGE_BASE + filename, { method: 'DELETE', headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':') } });
+        } else if (storageMode === 'folder') {
+            try { await folderHandle.removeEntry(filename); } catch {}
+        }
+    }
+    async function listBotFiles() {
+        if (storageMode === 'nuage') {
+            const res = await fetch(NUAGE_BASE, { method: 'PROPFIND', headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':'), 'Depth': '1' } });
+            const xml = new DOMParser().parseFromString(await res.text(), 'application/xml');
+            return Array.from(xml.querySelectorAll('response href'))
+                .map(h => decodeURIComponent(h.textContent.split('/').pop()))
+                .filter(n => n.startsWith('bot_') && n.endsWith('.json'));
+        } else if (storageMode === 'folder') {
+            const files = [];
+            for await (const [name] of folderHandle.entries()) {
+                if (name.startsWith('bot_') && name.endsWith('.json')) files.push(name);
+            }
+            return files;
+        }
+        return [];
+    }
+</script>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header class="flex-none bg-white border-b border-gray-200 z-20">
+    <div class="h-1 bg-blue-700"></div>
+    <div class="flex items-center justify-between px-6 py-3">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-blue-700 rounded flex items-center justify-center text-white">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-gray-900 text-base leading-none">Mentoria</h1>
+                <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio de création — Éducation Nationale</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div id="storage-badge" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded text-[11px] text-green-700 font-medium">
+                🔒 Souverain
+            </div>
+            <button onclick="resetForm()" class="btn btn-secondary text-xs py-1.5">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouveau
+            </button>
+            <button onclick="saveCurrentBot()" class="btn btn-primary text-xs py-1.5">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i> Enregistrer
+            </button>
+            <button onclick="publishBot()" class="btn btn-primary text-xs py-1.5" style="background:#16a34a;border-color:#15803d">
+                <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Publier
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     LAYOUT PRINCIPAL
+═══════════════════════════════════════════ -->
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR BIBLIOTHÈQUE -->
+    <aside class="w-52 flex-none bg-white border-r border-gray-200 flex flex-col">
+        <div class="p-3 border-b border-gray-100">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Mes assistants</p>
+        </div>
+        <div id="bot-library-list" class="flex-1 overflow-y-auto sidebar-scroll p-2">
+            <p class="text-xs text-gray-400 italic text-center py-3 mt-4">Connectez-vous pour voir vos bots</p>
+        </div>
+    </aside>
+
+    <!-- PANNEAU DE CONFIGURATION -->
+    <aside class="w-[400px] flex-none bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden">
+        <div class="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-3">
+
+            <!-- SECTION 1 : IDENTITÉ -->
+            <div class="section-card">
+                <div class="section-header" onclick="toggleSection('section-identity')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-blue-700 text-white rounded flex items-center justify-center text-[9px] font-bold">1</span>
+                        Identité & Présentation
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-identity" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-identity" class="collapsible-content open-section">
+                    <div class="section-body space-y-4">
+                        <!-- Vignette -->
+                        <div>
+                            <label class="label">Image de l'assistant (avatar)</label>
+                            <div class="relative w-full h-28 border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition-colors" onclick="document.getElementById('vignette-input').click()">
+                                <img id="vignette-preview" class="hidden absolute inset-0 w-full h-full object-cover" />
+                                <div id="vignette-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 gap-1">
+                                    <i data-lucide="image-plus" class="w-6 h-6"></i>
+                                    <span class="text-[10px]">Cliquez pour choisir une image</span>
+                                    <span class="text-[9px] text-gray-300">PNG, JPG, AVIF, WebP</span>
+                                </div>
+                                <input type="file" id="vignette-input" class="hidden" accept="image/png,image/jpeg,image/avif,image/webp,image/gif" onchange="handleThumbnail(this)">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="label">Titre du projet</label>
+                            <input type="text" id="bot-title" class="input-field" placeholder="Ex: Assistant de Mathématiques 3e" oninput="updatePreviews()">
+                        </div>
+                        <div>
+                            <label class="label">Nom de l'assistant (affiché à l'élève)</label>
+                            <input type="text" id="bot-name" class="input-field" placeholder="Ex: MathBot, Prof Dupont..." oninput="updatePreviews()">
+                        </div>
+                        <div>
+                            <label class="label">Thème / Discipline</label>
+                            <input type="text" id="bot-theme" class="input-field" placeholder="Ex: Mathématiques, Histoire, Musique...">
+                        </div>
+                        <div>
+                            <label class="label">Âge / Niveau des élèves</label>
+                            <input type="text" id="bot-target-age" class="input-field" placeholder="Ex: 12-14 ans — 4e, Terminale...">
+                        </div>
+                        <div>
+                            <label class="label">Message de bienvenue</label>
+                            <textarea id="bot-welcome" class="input-field" rows="2" placeholder="Ex: Bonjour ! Je suis là pour vous aider en maths..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2 : PÉDAGOGIE -->
+            <div class="section-card">
+                <div class="section-header" onclick="toggleSection('section-pedagogy')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-blue-700 text-white rounded flex items-center justify-center text-[9px] font-bold">2</span>
+                        Pédagogie & Corpus
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-pedagogy" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-pedagogy" class="collapsible-content hidden-section">
+                    <div class="section-body space-y-4">
+                        <div>
+                            <label class="label">Instructions pour l'IA</label>
+                            <textarea id="bot-instructions" class="input-field" rows="4" placeholder="Ex: En tant que professeur de mathématiques, tu connais parfaitement le programme de 3e. Tu réponds uniquement aux questions liées aux mathématiques..."></textarea>
+                        </div>
+                        <div>
+                            <label class="label">Règles pédagogiques (Barrières)</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="REPLY_CONCISE">
+                                    <span class="text-[11px] text-gray-700">Réponses concises (max 200 car.)</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="MAIEUTIC">
+                                    <span class="text-[11px] text-gray-700">Maïeutique (ne pas donner la réponse)</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="TONE_ENCOURAGE">
+                                    <span class="text-[11px] text-gray-700">Ton encourageant et bienveillant</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="INSTANT_FEEDBACK">
+                                    <span class="text-[11px] text-gray-700">Commentaires instantanés sur les réponses</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="CREATIVITY">
+                                    <span class="text-[11px] text-gray-700">Encourager la créativité</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="PATIENCE">
+                                    <span class="text-[11px] text-gray-700">Patience et guidage pas à pas</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="CELEBRATE">
+                                    <span class="text-[11px] text-gray-700">Célébrer les petites victoires</span>
+                                </label>
+                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" class="rule-toggle mt-0.5" value="SHORT_TEXTS">
+                                    <span class="text-[11px] text-gray-700">Utiliser des textes courts</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-red-50 border border-red-100 rounded-lg">
+                            <label class="label text-red-700">🛡️ Barrière Thématique Stricte</label>
+                            <input type="text" id="bot-strict-theme" class="input-field border-red-200 focus:border-red-500" placeholder="Ex: La technologie au collège cycle 4">
+                            <p class="text-[9px] text-red-500 mt-1 italic">Si l'élève sort de ce thème, l'IA refusera de répondre.</p>
+                        </div>
+                        <div>
+                            <label class="label">Règles personnalisées</label>
+                            <textarea id="bot-custom-rules" class="input-field" rows="2" placeholder="Ex: Terminez toujours par un encouragement. Utilisez des exemples concrets..."></textarea>
+                        </div>
+                        <div>
+                            <label class="label flex items-center justify-between">
+                                <span>Corpus de connaissance</span>
+                                <span id="file-count" class="text-gray-400 font-normal">0 / 5 fichiers</span>
+                            </label>
+                            <button onclick="document.getElementById('corpus-input').click()" class="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-all">
+                                <i data-lucide="file-plus" class="w-4 h-4 inline mr-1"></i> Ajouter PDF ou TXT (max 5)
+                            </button>
+                            <input type="file" id="corpus-input" class="hidden" multiple accept=".pdf,.txt,.md" onchange="handleCorpusFiles(this)">
+                            <div id="file-status-list" class="mt-2 space-y-1"></div>
+                            <textarea id="bot-corpus-text" class="hidden"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3 : API -->
+            <div class="section-card">
+                <div class="section-header" onclick="toggleSection('section-discovery')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-blue-700 text-white rounded flex items-center justify-center text-[9px] font-bold">3</span>
+                        Sécurité & API
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-discovery" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-discovery" class="collapsible-content hidden-section">
+                    <div class="section-body space-y-4">
+                        <div>
+                            <label class="label"><i data-lucide="key" class="w-3 h-3 inline"></i> Clé API Albert (Etalab)</label>
+                            <input type="password" id="api-key" class="input-field font-mono" placeholder="sk-...">
+                            <p class="text-[10px] text-gray-400 mt-1 italic">Nécessaire pour le fonctionnement de l'IA souveraine.</p>
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="saveCurrentBot()" class="btn btn-primary w-full text-xs py-2 justify-center">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Valider et Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- ZONE D'APERÇU -->
+    <main class="flex-1 bg-gray-100 p-8 flex flex-col items-center justify-center overflow-hidden">
+        <div class="w-full max-w-[600px] flex flex-col h-full max-h-[800px]">
+            <div class="mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-700 ai-loading"></span>
+                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Aperçu de l'interface élève</span>
+            </div>
+            <div class="flex-1 bg-white rounded-lg shadow border border-gray-200 flex flex-col overflow-hidden">
+                <div class="h-12 bg-blue-700 flex items-center px-6 gap-3">
+                    <div class="w-7 h-7 bg-white/20 rounded flex items-center justify-center overflow-hidden">
+                        <img id="preview-bot-icon" src="default_avatar.png" class="w-full h-full object-cover" />
+                        <i id="preview-bot-icon-placeholder" data-lucide="bot" class="hidden w-4 h-4 text-white"></i>
+                    </div>
+                    <div id="preview-bot-name-top" class="font-semibold text-white text-sm">Assistant Albert</div>
+                    <div class="ml-auto flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+                        <span class="text-[10px] text-blue-200">En ligne</span>
+                    </div>
+                </div>
+                <div class="flex-1 preview-bg flex flex-col items-center justify-center text-center p-10">
+                    <div class="slide-in flex flex-col items-center gap-5">
+                        <div class="w-16 h-16 bg-blue-700 rounded-xl flex items-center justify-center text-white shadow-xl overflow-hidden border-2 border-white">
+                            <img id="preview-bot-avatar-large" src="default_avatar.png" class="w-full h-full object-cover" />
+                            <i id="preview-bot-avatar-placeholder" data-lucide="cpu" class="hidden w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h3 id="preview-bot-title" class="font-bold text-gray-900 text-xl mb-1">Titre du Projet</h3>
+                            <p id="preview-bot-desc" class="text-gray-500 text-sm max-w-xs mx-auto">Configurez l'assistant pour voir l'aperçu.</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-400 bg-gray-50 border border-gray-200 px-4 py-2 rounded">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                            Cliquez sur « Publier » pour générer le lien élève
+                        </div>
+                    </div>
+                </div>
+                <div class="h-14 border-t border-gray-100 flex items-center px-4 gap-3">
+                    <div class="flex-1 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-xs text-gray-400">Saisir un message...</div>
+                    <div class="w-8 h-8 bg-blue-700 rounded flex items-center justify-center text-white">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL PUBLICATION -->
+<div id="publish-modal" class="hidden fixed inset-0 bg-gray-900/50 z-[110] flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-lg shadow-xl flex flex-col relative overflow-hidden slide-in border border-gray-200">
+        <div class="h-1 bg-blue-700"></div>
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-900">Partager l'assistant</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="label">Lien de partage élève</label>
+                <div class="flex gap-2">
+                    <input id="share-link" readonly type="text" class="input-field flex-1 text-blue-700 font-mono text-xs" value="Cliquez sur Publier...">
+                    <button onclick="copyToClipboard('share-link')" class="btn btn-primary"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+                </div>
+            </div>
+            <div class="p-4 bg-green-50 border border-green-100 rounded text-xs text-green-800 leading-relaxed">
+                🔒 <strong>Souverain :</strong> Ce lien contient toute la configuration. Les élèves n'ont pas besoin de compte. Aucune donnée ne passe par un serveur tiers.
+            </div>
+        </div>
+        <div class="p-6 border-t border-gray-100 flex justify-end">
+            <button onclick="closeModal()" class="btn btn-primary">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MOTEUR PRINCIPAL
+═══════════════════════════════════════════ -->
+<script>
+    const rulesMap = {
+        'REPLY_CONCISE': 'Fournis des réponses concises et claires (maximum 200 caractères).',
+        'MAIEUTIC': "Conseille l'élève, mais ne donne pas la réponse directement. Guide-le par la maïeutique.",
+        'TONE_ENCOURAGE': 'Utilise un ton encourageant et bienveillant.',
+        'INSTANT_FEEDBACK': 'Offre des commentaires instantanés sur les réponses de l’élève.',
+        'CREATIVITY': 'Encourage la créativité dans la résolution de problèmes.',
+        'PATIENCE': 'Reste patient et guide l’élève à travers les défis, pas à pas.',
+        'CELEBRATE': 'Célèbre les petites victoires et les progrès de l’élève.',
+        'SHORT_TEXTS': 'Utilise des textes courts pour favoriser l’engagement.'
+    };
+
+    let library = {};
+    let currentBotId = null;
+    let uploadedFiles = [];
+
+    document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
+
+    // --- BIBLIOTHÈQUE ---
+    window.loadLibrary = async () => {
+        library = {};
+        try {
+            const files = await listBotFiles();
+            for (const filename of files) {
+                const bot = await readBotFile(filename);
+                if (bot && bot.id) library[bot.id] = bot;
+            }
+        } catch(e) { showToast('⚠️ Erreur', 'Lecture impossible : ' + e.message); }
+        updateLibraryUI();
+    };
+
+    window.updateLibraryUI = () => {
+        const list = document.getElementById('bot-library-list');
+        if (!list) return;
+        const bots = Object.values(library);
+        if (bots.length === 0) {
+            list.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-3">Aucun assistant — cliquez sur "Nouveau"</p>';
+            return;
+        }
+        bots.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+        list.innerHTML = bots.map(bot => `
+            <div class="bot-card flex items-center justify-between p-2.5 mb-2 cursor-pointer" onclick="loadBot('${bot.id}')">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                    <div class="w-7 h-7 bg-blue-50 text-blue-700 rounded flex items-center justify-center flex-none"><i data-lucide="cpu" class="w-3.5 h-3.5"></i></div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-gray-800 truncate">${bot.config.title}</p>
+                        <p class="text-[10px] text-gray-400">${bot.config.theme || 'Thème libre'}</p>
+                    </div>
+                </div>
+                <button onclick="event.stopPropagation(); deleteBot('${bot.id}')" class="p-1.5 text-gray-300 hover:text-red-500 flex-none"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            </div>
+        `).join('');
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // --- SAUVEGARDE ---
+    window.saveCurrentBot = async () => {
+        if (!storageMode) { showToast('⚠️ Non connecté', 'Choisissez un mode de stockage au démarrage.'); return; }
+        const title = document.getElementById('bot-title')?.value?.trim();
+        if (!title) { showToast('⚠️ Titre manquant', 'Renseignez le titre (section 1).'); return; }
+        if (!currentBotId) currentBotId = 'bot_' + Date.now();
+        const vigImg = document.getElementById('vignette-preview');
+        const hasVig = vigImg && vigImg.src && vigImg.src !== window.location.href && !vigImg.classList.contains('hidden');
+        const selectedRules = Array.from(document.querySelectorAll('.rule-toggle:checked')).map(cb => rulesMap[cb.value]);
+        const botData = {
+            id: currentBotId, updatedAt: new Date().toISOString(),
+            config: {
+                title,
+                instructions: document.getElementById('bot-instructions')?.value || '',
+                name: document.getElementById('bot-name')?.value || '',
+                targetAge: document.getElementById('bot-target-age')?.value || '',
+                theme: document.getElementById('bot-theme')?.value || '',
+                welcomeMessage: document.getElementById('bot-welcome')?.value || '',
+                pedagogicRules: selectedRules,
+                strictTheme: document.getElementById('bot-strict-theme')?.value || '',
+                customRules: document.getElementById('bot-custom-rules')?.value || '',
+            },
+            corpus: document.getElementById('bot-corpus-text')?.value || '',
+            apiKey: document.getElementById('api-key')?.value || '',
+            vignette: hasVig ? vigImg.src : null
+        };
+        try {
+            await writeBotFile(currentBotId + '.json', botData);
+            library[currentBotId] = botData;
+            showToast('✅ Enregistré', 'Assistant sauvegardé.');
+            updateLibraryUI();
+        } catch(e) { showToast('❌ Erreur', e.message); }
+    };
+
+    // --- CHARGEMENT ---
+    window.loadBot = (id) => {
+        const bot = library[id]; if (!bot) return;
+        currentBotId = id;
+        const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val || ''; };
+        set('bot-title', bot.config.title); set('bot-instructions', bot.config.instructions);
+        set('bot-name', bot.config.name); set('bot-target-age', bot.config.targetAge);
+        set('bot-theme', bot.config.theme); set('bot-welcome', bot.config.welcomeMessage);
+        set('bot-strict-theme', bot.config.strictTheme);
+        set('bot-custom-rules', bot.config.customRules); set('bot-corpus-text', bot.corpus);
+        set('api-key', bot.apiKey);
+        document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = (bot.config.pedagogicRules || []).includes(rulesMap[cb.value]); });
+        const vigImg = document.getElementById('vignette-preview');
+        const ph = document.getElementById('vignette-placeholder');
+        if (bot.vignette && vigImg) { vigImg.src = bot.vignette; vigImg.classList.remove('hidden'); if (ph) ph.classList.add('hidden'); }
+        else if (vigImg) { vigImg.classList.add('hidden'); if (ph) ph.classList.remove('hidden'); }
+        uploadedFiles = bot.corpus ? [{ name: 'Corpus enregistré', content: bot.corpus }] : [];
+        updateFileUI(); updatePreviews(); showToast('Chargé', bot.config.title);
+    };
+
+    // --- SUPPRESSION ---
+    window.deleteBot = async (id) => {
+        if (!confirm('Supprimer cet assistant ?')) return;
+        try { await deleteBotFile(id + '.json'); delete library[id]; if (currentBotId === id) resetForm(); updateLibraryUI(); showToast('Supprimé', 'Assistant retiré.'); }
+        catch(e) { showToast('❌ Erreur', e.message); }
+    };
+
+    // --- RESET ---
+    window.resetForm = () => {
+        currentBotId = null;
+        ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text','api-key'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        document.querySelectorAll('.rule-toggle').forEach(cb => cb.checked = false);
+        uploadedFiles = []; updateFileUI();
+        const vi = document.getElementById('vignette-preview'); const ph = document.getElementById('vignette-placeholder');
+        if (vi) vi.classList.add('hidden'); if (ph) ph.classList.remove('hidden');
+        updatePreviews();
+    };
+
+    // --- PUBLICATION ---
+    window.publishBot = async () => {
+        await saveCurrentBot();
+        const bot = library[currentBotId]; if (!bot) return;
+        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(bot))));
+        const base = window.location.href.replace(/index\.html.*$/, '');
+        document.getElementById('share-link').value = base + 'compagnion.html#config=' + encoded;
+        document.getElementById('publish-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // --- CORPUS ---
+    window.handleCorpusFiles = async (input) => {
+        const files = Array.from(input.files);
+        if (uploadedFiles.length + files.length > 5) return showToast('Limite', 'Max 5 fichiers.');
+        for (const file of files) {
+            showToast('Lecture', file.name);
+            let text;
+            if (file.type === 'application/pdf') {
+                const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+                text = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const pg = await pdf.getPage(i);
+                    text += (await pg.getTextContent()).items.map(x => x.str).join(' ') + '\n';
+                }
+            } else { text = await file.text(); }
+            uploadedFiles.push({ name: file.name, content: text });
+        }
+        updateFileUI(); input.value = '';
+    };
+
+    window.updateFileUI = () => {
+        const list = document.getElementById('file-status-list');
+        const count = document.getElementById('file-count');
+        if (count) count.textContent = uploadedFiles.length + ' / 5 fichiers';
+        if (list) {
+            list.innerHTML = uploadedFiles.map((f, i) => `
+                <div class="flex items-center justify-between p-2 bg-blue-50 border border-blue-100 rounded text-[10px]">
+                    <span class="truncate flex-1 font-medium text-blue-700">${f.name}</span>
+                    <button onclick="removeFile(${i})" class="text-red-400 ml-2"><i data-lucide="x" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+        const ct = document.getElementById('bot-corpus-text');
+        if (ct) ct.value = uploadedFiles.map(f => '--- SOURCE: ' + f.name + ' ---\n' + f.content).join('\n\n');
+    };
+
+    window.removeFile = (idx) => { uploadedFiles.splice(idx, 1); updateFileUI(); };
+
+    window.copyToClipboard = (id) => {
+        const el = document.getElementById(id); el.select();
+        document.execCommand('copy'); showToast('Copié', 'Lien copié dans le presse-papiers !');
+    };
+</script>
+</body>
+</html>
