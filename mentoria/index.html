@@ -63,7 +63,7 @@
             </div>
             <h1 class="text-3xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
                 Mentoria 
-                <span class="text-[10px] bg-white/20 text-white/80 px-2 py-0.5 rounded-full font-medium border border-white/10">v1.8</span>
+                <span class="text-[10px] bg-white/20 text-white/80 px-2 py-0.5 rounded-full font-medium border border-white/10">v1.9</span>
             </h1>
             <p class="text-blue-200 text-sm mt-1">Studio de création d'assistants pédagogiques souverains</p>
         </div>
@@ -80,20 +80,25 @@
                         <svg class="w-5 h-5 text-orange-700" fill="currentColor" viewBox="0 0 24 24"><path d="M22.65 14.39L20.31 7.24L19.5 4.78C19.4 4.47 19.11 4.26 18.78 4.26C18.46 4.26 18.17 4.47 18.06 4.78L17.25 7.24H6.75L5.94 4.78C5.83 4.47 5.54 4.26 5.22 4.26C4.89 4.26 4.6 4.47 4.5 4.78L3.69 7.24L1.35 14.39C1.21 14.83 1.37 15.31 1.74 15.58L12 23L22.26 15.58C22.63 15.31 22.79 14.83 22.65 14.39Z"/></svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-semibold text-gray-900 text-sm">🦊 La Forge — En ligne</p>
-                        <p class="text-gray-400 text-[10px] mt-0.5 mb-3">Enregistrez vos bots directement dans votre dépôt GitLab. Accessible de partout.</p>
+                        <p class="font-semibold text-gray-900 text-sm">🦊 Connexion via La Forge</p>
+                        <p class="text-gray-400 text-[10px] mt-0.5 mb-3">Identifiez-vous pour accéder à vos assistants stockés sur GitLab.</p>
                         <div class="space-y-2">
-                            <input id="forge-token" type="password" placeholder="Votre Jeton (Token) d'accès" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="">
+                            <input id="forge-token" type="password" placeholder="Votre Jeton d'accès (Badge)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="">
                             <div class="flex gap-2">
-                                <input id="forge-project-id" type="text" placeholder="ID Projet (ex: 12345)" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="gcormi/frojet">
-                                <button onclick="connectForge()" class="px-4 py-2 bg-orange-600 text-white text-xs font-semibold rounded-lg hover:bg-orange-700 transition-colors whitespace-nowrap">Connexion</button>
+                                <input id="forge-project-id" type="text" placeholder="Projet (ex: gcormi/frojet)" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="gcormi/frojet">
+                                <button onclick="connectForge()" class="px-4 py-2 bg-orange-600 text-white text-xs font-semibold rounded-lg hover:bg-orange-700 transition-colors whitespace-nowrap">Se connecter</button>
                             </div>
                             <label class="flex items-center gap-2 cursor-pointer mt-1">
                                 <input type="checkbox" id="remember-forge" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                                <span class="text-[10px] text-gray-500">Mémoriser sur ce PC (déconseillé sur PC partagé)</span>
+                                <span class="text-[10px] text-gray-500">Rester connecté sur ce PC</span>
                             </label>
                         </div>
-                        <p class="text-[10px] text-orange-600 mt-2 cursor-pointer hover:underline" onclick="document.getElementById('forge-help').classList.toggle('hidden')">▶ Comment obtenir mon jeton ?</p>
+                        <p class="text-[10px] text-orange-600 mt-2 flex items-center gap-1">
+                            <a href="https://forge.apps.education.fr/-/profile/personal_access_tokens?name=Mentoria&scopes=api" target="_blank" class="hover:underline flex items-center gap-1 font-semibold">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                Obtenir mon badge d'accès
+                            </a>
+                        </p>
                         <div id="forge-help" class="hidden mt-2 p-3 bg-orange-50 rounded-lg text-[10px] text-orange-800 leading-relaxed shadow-inner">
                             1. Allez sur <strong>La Forge</strong> > Profil (en haut à droite) > <strong>Edit Profile</strong><br>
                             2. Menu gauche : <strong>Access Tokens</strong> > <strong>Add new token</strong><br>
@@ -390,15 +395,15 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="font-bold text-gray-900 text-base leading-none">Mentoria</h1>
-                    <span class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[8px] font-bold rounded border border-gray-200">v1.8</span>
+                    <span class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[8px] font-bold rounded border border-gray-200">v1.9</span>
                 </div>
                 <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio de création — Éducation Nationale</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
             <div id="storage-badge" onclick="disconnectStorage()" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded text-[11px] text-green-700 font-medium cursor-pointer hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-all group">
-                <span class="group-hover:hidden">🔒 Souverain</span>
-                <span class="hidden group-hover:inline">⚠️ Déconnexion</span>
+                <span class="group-hover:hidden">👤 Session active</span>
+                <span class="hidden group-hover:inline">👋 Déconnexion</span>
             </div>
             <button onclick="resetForm()" class="btn btn-secondary text-xs py-1.5">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouveau
