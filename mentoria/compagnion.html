@@ -330,6 +330,8 @@
     }
 
     // ─── 5. ENVOI ET APPEL API ALBERT ─────────────────────────────────────────
+    // Remplace l'URL ci-dessous par ton URL Cloudflare Worker après déploiement
+    const ALBERT_PROXY_URL = 'https://TON_WORKER.workers.dev';
     const msgInput   = document.getElementById('message-input');
     const sendBtn    = document.getElementById('send-button');
     const chatForm   = document.getElementById('chat-form');
@@ -388,7 +390,14 @@ ${botConfig.corpus || '(Aucun corpus fourni — utilise tes connaissances géné
         ];
 
         try {
-            const res = await fetch('https://albert.api.etalab.gouv.fr/v1/chat/completions', {
+            // Utilise l'URL du proxy définie dans le bot, sinon l'URL par défaut
+            const targetUrl = botConfig.proxyUrl || ALBERT_PROXY_URL;
+            
+            if (!targetUrl || targetUrl.includes('TON_WORKER')) {
+                throw new Error("L'URL du relais (proxy) n'est pas configurée. Contactez votre professeur.");
+            }
+
+            const res = await fetch(targetUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
