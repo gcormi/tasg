@@ -63,7 +63,7 @@
             </div>
             <h1 class="text-3xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
                 Mentoria 
-                <span class="text-[10px] bg-white/20 text-white/80 px-2 py-0.5 rounded-full font-medium border border-white/10">v1.3</span>
+                <span class="text-[10px] bg-white/20 text-white/80 px-2 py-0.5 rounded-full font-medium border border-white/10">v1.5</span>
             </h1>
             <p class="text-blue-200 text-sm mt-1">Studio de création d'assistants pédagogiques souverains</p>
         </div>
@@ -73,30 +73,29 @@
                 <h2 class="font-semibold text-gray-900 text-base">Où sont stockés vos bots ?</h2>
                 <p class="text-gray-500 text-xs mt-1">Choisissez votre mode. Vos données ne quittent jamais votre contrôle.</p>
             </div>
-            <!-- Option Nuage -->
-            <div class="p-5 border-b border-gray-100">
+            <!-- Option La Forge (GitLab) -->
+            <div class="p-5 border-b border-gray-100 bg-orange-50/30">
                 <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-none mt-0.5">
-                        <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-none mt-0.5">
+                        <svg class="w-5 h-5 text-orange-700" fill="currentColor" viewBox="0 0 24 24"><path d="M22.65 14.39L20.31 7.24L19.5 4.78C19.4 4.47 19.11 4.26 18.78 4.26C18.46 4.26 18.17 4.47 18.06 4.78L17.25 7.24H6.75L5.94 4.78C5.83 4.47 5.54 4.26 5.22 4.26C4.89 4.26 4.6 4.47 4.5 4.78L3.69 7.24L1.35 14.39C1.21 14.83 1.37 15.31 1.74 15.58L12 23L22.26 15.58C22.63 15.31 22.79 14.83 22.65 14.39Z"/></svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-semibold text-gray-900 text-sm">☁️ Nuage — apps.education.fr</p>
-                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Accédez à vos bots depuis n'importe quel PC. Collez le lien de votre dossier Nuage partagé.</p>
-                        <div class="flex gap-2">
-                            <input id="nuage-link-input" type="text" placeholder="https://nuage.apps.education.fr/s/..." class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono">
-                            <button onclick="connectNuage()" class="px-4 py-2 bg-blue-700 text-white text-xs font-semibold rounded-lg hover:bg-blue-800 transition-colors whitespace-nowrap">Connexion</button>
-                        </div>
-                        <p class="text-[10px] text-blue-600 mt-2 cursor-pointer hover:underline" onclick="document.getElementById('nuage-help').classList.toggle('hidden')">▶ Comment obtenir ce lien ?</p>
-                        <div id="nuage-help" class="hidden mt-2 p-3 bg-blue-50 rounded-lg text-[10px] text-blue-800 leading-relaxed shadow-inner">
-                            <div class="flex gap-3 mb-2">
-                                <img src="data_sovereignty.png" class="w-12 h-12 rounded bg-white p-1 border border-blue-100 shadow-sm" alt="Diagramme souveraineté">
-                                <div class="flex-1">
-                                    1. Allez sur <strong>nuage.apps.education.fr</strong><br>
-                                    2. Créez un dossier <strong>Mentoria</strong><br>
-                                    3. Clic droit → <strong>Partager</strong> → activez <strong>"Autoriser l'édition"</strong>
-                                </div>
+                        <p class="font-semibold text-gray-900 text-sm">🦊 La Forge — En ligne</p>
+                        <p class="text-gray-400 text-[10px] mt-0.5 mb-3">Enregistrez vos bots directement dans votre dépôt GitLab. Accessible de partout.</p>
+                        <div class="space-y-2">
+                            <input id="forge-token" type="password" placeholder="Votre Jeton (Token) d'accès" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="">
+                            <div class="flex gap-2">
+                                <input id="forge-project-id" type="text" placeholder="ID Projet (ex: 12345)" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="gcormi/frojet">
+                                <button onclick="connectForge()" class="px-4 py-2 bg-orange-600 text-white text-xs font-semibold rounded-lg hover:bg-orange-700 transition-colors whitespace-nowrap">Connexion</button>
                             </div>
-                            4. Copiez le lien de partage et collez-le ici. Vos données restent sur le cloud français.
+                        </div>
+                        <p class="text-[10px] text-orange-600 mt-2 cursor-pointer hover:underline" onclick="document.getElementById('forge-help').classList.toggle('hidden')">▶ Comment obtenir mon jeton ?</p>
+                        <div id="forge-help" class="hidden mt-2 p-3 bg-orange-50 rounded-lg text-[10px] text-orange-800 leading-relaxed shadow-inner">
+                            1. Allez sur <strong>La Forge</strong> > Profil (en haut à droite) > <strong>Edit Profile</strong><br>
+                            2. Menu gauche : <strong>Access Tokens</strong> > <strong>Add new token</strong><br>
+                            3. Nom : "Mentoria" / Expiration : (vide) / Cocher : <strong>api</strong><br>
+                            4. Cliquez sur <strong>Create</strong> et copiez le jeton affiché.<br>
+                            5. <strong>ID Projet</strong> : C'est le chemin de votre projet (ex: <code>gcormi/frojet</code>).
                         </div>
                     </div>
                 </div>
@@ -180,6 +179,7 @@
     };
 
     // --- APERÇU DYNAMIQUE ---
+    // --- APERÇU DYNAMIQUE ---
     window.updatePreviews = () => {
         const title = document.getElementById('bot-title')?.value || 'Titre du Projet';
         const name = document.getElementById('bot-name')?.value || 'Assistant Albert';
@@ -199,48 +199,43 @@
     };
 
     // ═══════════════════════════════════════════
-    // MOTEUR NUAGE (WebDAV Nextcloud)
+    // MOTEUR LA FORGE (GitLab API)
     // ═══════════════════════════════════════════
-    let storageMode = null;
-    let nuageToken = null;
-    let folderHandle = null;
-    let nuageBaseUrl = 'https://nuage.apps.education.fr/public.php/webdav/';
+    let forgeToken = null;
+    let forgeProjectId = null;
+    let forgePath = 'mentoria'; // Dossier de stockage
 
-    window.connectNuage = async () => {
-        const raw = document.getElementById('nuage-link-input').value.trim();
-        if (!raw) { alert('Collez votre lien Nuage.'); return; }
+    window.connectForge = async () => {
+        forgeToken = document.getElementById('forge-token').value.trim();
+        let pid = document.getElementById('forge-project-id').value.trim();
+        forgeProjectId = encodeURIComponent(pid);
         
-        // Détecte l'hôte (nuage03...) et le jeton de partage (/s/XXX)
-        // On supporte maintenant les liens avec ou sans /index.php/ avant le /s/
-        const match = raw.match(/https?:\/\/([a-zA-Z0-9.-]+).*\/s\/([a-zA-Z0-9]+)/);
-        if (!match) { 
-            alert('Lien de partage invalide.\n\nAssurez-vous de :\n1. Faire un clic droit sur votre dossier Mentoria\n2. Cliquer sur "Partager"\n3. Copier le "Lien de partage" (il doit contenir "/s/")'); 
-            return; 
-        }
+        if (!forgeToken || !pid) { alert('Jeton et ID Projet requis.'); return; }
         
-        const host = match[1];
-        nuageToken = match[2];
-        
-        // Si le lien contient /index.php/, on l'ajoute à la base WebDAV
-        const hasIndex = raw.includes('/index.php/');
-        nuageBaseUrl = `https://${host}${hasIndex ? '/index.php' : ''}/public.php/webdav/`;
-        
-        storageMode = 'nuage';
-        
+        storageMode = 'forge';
         try {
-            const res = await fetch(nuageBaseUrl, {
-                method: 'PROPFIND',
-                headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':'), 'Depth': '1' }
+            // Test de connexion : lister les fichiers
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, {
+                headers: { 'PRIVATE-TOKEN': forgeToken }
             });
-            if (!res.ok && res.status !== 207) throw new Error('HTTP ' + res.status);
+            
+            if (!res.ok) {
+                // Si le dossier n'existe pas encore, c'est OK, on pourra le créer au premier save
+                if (res.status !== 404) throw new Error('Accès refusé. Vérifiez votre jeton et l\'ID projet.');
+            }
+            
             document.getElementById('startup-screen').style.display = 'none';
-            updateStorageBadge(`☁️ ${host}`);
-            showToast('☁️ Connecté', 'Dossier Nuage chargé.');
+            updateStorageBadge(`🦊 La Forge`);
+            showToast('🦊 Connecté', 'Dépôt GitLab synchronisé.');
             await loadLibrary();
         } catch(e) {
-            alert('Connexion impossible.\n\n1. Vérifiez que "Autoriser l\'édition" est bien coché sur le lien de partage.\n2. Si l\'erreur persiste, il se peut que Nuage bloque la connexion (CORS).\n\nErreur : ' + e.message);
-            nuageToken = null; storageMode = null;
+            alert('Connexion impossible :\n' + e.message);
+            storageMode = null;
         }
+    };
+
+    window.connectNuage = () => {
+        alert('❌ Le mode Nuage direct est désactivé (blocage CORS).\n\nUtilisez le mode "La Forge" pour un accès en ligne, ou le mode "Dossier Local" avec votre dossier Nuage synchronisé sur votre PC.');
     };
 
     // ═══════════════════════════════════════════
@@ -271,9 +266,14 @@
     // ═══════════════════════════════════════════
     // API FICHIERS — lectures/écritures unifiées
     // ═══════════════════════════════════════════
+    let storageMode = null;
+    let folderHandle = null;
+
     async function readBotFile(filename) {
-        if (storageMode === 'nuage') {
-            const res = await fetch(nuageBaseUrl + filename, { headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':') } });
+        if (storageMode === 'forge') {
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${encodeURIComponent(forgePath + '/' + filename)}/raw?ref=main`, {
+                headers: { 'PRIVATE-TOKEN': forgeToken }
+            });
             return res.ok ? await res.json() : null;
         } else if (storageMode === 'folder') {
             try { const fh = await folderHandle.getFileHandle(filename); return JSON.parse(await (await fh.getFile()).text()); }
@@ -282,31 +282,48 @@
     }
     async function writeBotFile(filename, data) {
         const content = JSON.stringify(data, null, 2);
-        if (storageMode === 'nuage') {
-            const res = await fetch(nuageBaseUrl + filename, {
-                method: 'PUT',
-                headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':'), 'Content-Type': 'application/json' },
-                body: content
+        if (storageMode === 'forge') {
+            const filePath = encodeURIComponent(forgePath + '/' + filename);
+            const check = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}?ref=main`, {
+                headers: { 'PRIVATE-TOKEN': forgeToken }
             });
-            if (!res.ok) throw new Error('WebDAV ' + res.status);
+            const method = check.ok ? 'PUT' : 'POST';
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}`, {
+                method: method,
+                headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    branch: 'main',
+                    content: content,
+                    commit_message: `Update ${filename} via Mentoria Studio`
+                })
+            });
+            if (!res.ok) throw new Error('GitLab API ' + res.status);
         } else if (storageMode === 'folder') {
             const fh = await folderHandle.getFileHandle(filename, { create: true });
             const w = await fh.createWritable(); await w.write(content); await w.close();
         }
     }
     async function deleteBotFile(filename) {
-        if (storageMode === 'nuage') {
-            await fetch(nuageBaseUrl + filename, { method: 'DELETE', headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':') } });
+        if (storageMode === 'forge') {
+            const filePath = encodeURIComponent(forgePath + '/' + filename);
+            await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}`, {
+                method: 'DELETE',
+                headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ branch: 'main', commit_message: `Delete ${filename} via Mentoria Studio` })
+            });
         } else if (storageMode === 'folder') {
             try { await folderHandle.removeEntry(filename); } catch {}
         }
     }
     async function listBotFiles() {
-        if (storageMode === 'nuage') {
-            const res = await fetch(NUAGE_BASE, { method: 'PROPFIND', headers: { 'Authorization': 'Basic ' + btoa(nuageToken + ':'), 'Depth': '1' } });
-            const xml = new DOMParser().parseFromString(await res.text(), 'application/xml');
-            return Array.from(xml.querySelectorAll('response href'))
-                .map(h => decodeURIComponent(h.textContent.split('/').pop()))
+        if (storageMode === 'forge') {
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, {
+                headers: { 'PRIVATE-TOKEN': forgeToken }
+            });
+            if (!res.ok) return [];
+            const files = await res.json();
+            return files
+                .map(f => f.name)
                 .filter(n => n.startsWith('bot_') && n.endsWith('.json'));
         } else if (storageMode === 'folder') {
             const files = [];
@@ -332,7 +349,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="font-bold text-gray-900 text-base leading-none">Mentoria</h1>
-                    <span class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[8px] font-bold rounded border border-gray-200">v1.3</span>
+                    <span class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[8px] font-bold rounded border border-gray-200">v1.5</span>
                 </div>
                 <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio de création — Éducation Nationale</p>
             </div>
