@@ -90,12 +90,27 @@ Un autre enseignant peut utiliser Mentoria de façon totalement indépendante. I
 
 1. Ouvrir la même URL : `https://gcormi.forge.apps.education.fr/frojet/mentoria/`
 2. Obtenir **sa propre clé API Albert**
-3. Utiliser **son propre Nextcloud** (`apps.education.fr`) ou son dossier local pour stocker ses bots
+3. Choisir son mode de stockage (voir ci-dessous)
 
 **Les bots de chaque enseignant sont complètement isolés :**
-- Chaque config est stockée dans le Nextcloud personnel du prof — personne d'autre n'y a accès
 - Le lien élève est auto-contenu (config encodée dans l'URL) — aucun serveur commun
 - Vous ne voyez jamais les bots de vos collègues, et eux non plus les vôtres
+
+---
+
+## Modes de stockage des bots
+
+### 🦊 La Forge (recommandé)
+Les bots sont stockés dans votre dépôt GitLab sur `forge.apps.education.fr`.  
+Accessible depuis n'importe quel PC avec votre jeton d'accès. Infrastructure Éducation Nationale.
+
+### 💾 Clé USB / Dossier local
+Les bots sont stockés dans un dossier sur votre PC ou clé USB.  
+Fonctionne sans internet. Accessible uniquement depuis ce PC.
+
+> **Astuce Nuage apps.education.fr** : si vous avez installé l'application de synchronisation Nextcloud sur votre PC, vous pouvez pointer Mentoria vers votre dossier Nuage synchronisé localement. Les bots se retrouvent automatiquement dans votre Nuage via la sync — mais c'est l'application Nextcloud qui fait le travail, pas Mentoria directement.
+>
+> ⚠️ La connexion directe au Nuage depuis le navigateur n'est pas possible (blocage CORS).
 
 ---
 

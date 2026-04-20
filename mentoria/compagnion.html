@@ -309,9 +309,10 @@
     window.handleQuickReply = function(idx) {
         const qr = botConfig.config.quickReplies[idx];
         if (!qr) return;
-        
-        // On envoie le prompt caché mais on affiche le label dans le chat
-        submitMessage(qr.label, qr.prompt);
+        // Le préfixe indique à l'IA que c'est une action unique : elle exécute la demande
+        // puis reprend son rôle d'assistant normal pour la suite de la conversation.
+        const oneShot = `[DEMANDE PONCTUELLE — exécute UNIQUEMENT cette action, puis reprends ton rôle d'assistant habituel pour la suite] ${qr.prompt}`;
+        submitMessage(qr.label, oneShot);
     };
 
     // ─── 4. RENDU DES MESSAGES ────────────────────────────────────────────────
@@ -421,8 +422,12 @@ RÈGLES PÉDAGOGIQUES (À RESPECTER ABSOLUMENT) :
 
 IDENTITÉ ÉLÈVE : L'élève qui te parle s'identifie comme "${studentName}". Utilise son prénom si tu l'extrais.
 
-CORPUS DE RÉFÉRENCE (tes seules connaissances pour cette séance) :
-${botConfig.corpus || '(Aucun corpus fourni — utilise tes connaissances générales.)'}
+${(() => {
+    const src = cfg.answerSource || 'both';
+    if (src === 'albert') return '(Utilise tes connaissances générales. Aucun corpus restreint.)';
+    if (src === 'corpus') return `CORPUS DE RÉFÉRENCE (source EXCLUSIVE — tu ne dois répondre QUE sur la base de ce corpus) :\n${botConfig.corpus || '(Aucun corpus fourni.)'}\nSi la réponse ne se trouve pas dans ce corpus, indique-le à l'élève et ne réponds pas en dehors.`;
+    return `CORPUS DE RÉFÉRENCE (prioritaire) :\n${botConfig.corpus || '(Aucun corpus fourni — utilise tes connaissances générales.)'}`;
+})()}
 `.trim();
 
         const messages = [

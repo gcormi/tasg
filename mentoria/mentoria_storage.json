@@ -1,0 +1,65 @@
+{
+  "name": "Mentoria Storage — Nuage apps.edu",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mentoria_storage",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "c1a2b3d4-e5f6-7890-aaaa-111111111101",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Récupération des paramètres\nconst body = $input.first().json.body || $input.first().json;\nconst { action, username, password, filename, content } = body;\nconst folder = 'Mentoria';\n\nif (!username || !password) {\n  return [{ json: { success: false, error: 'Identifiants manquants' } }];\n}\n\nconst baseUrl = `https://nuage.apps.education.fr/remote.php/dav/files/${encodeURIComponent(username)}/${folder}/`;\nconst auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');\n\nconst req = async (method, url, reqBody, contentType) => {\n  const options = {\n    method,\n    url,\n    headers: {\n      'Authorization': auth,\n      ...(contentType ? { 'Content-Type': contentType } : {}),\n      ...(method === 'PROPFIND' ? { 'Depth': '1' } : {})\n    },\n    returnFullResponse: true,\n    ignoreHttpStatusErrors: true\n  };\n  if (reqBody) options.body = reqBody;\n  return await this.helpers.httpRequest(options);\n};\n\ntry {\n  // TEST : vérifie les identifiants et crée le dossier Mentoria si besoin\n  if (action === 'test') {\n    const r = await req('PROPFIND', `https://nuage.apps.education.fr/remote.php/dav/files/${encodeURIComponent(username)}/`, '<?xml version=\"1.0\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:displayname/></d:prop></d:propfind>', 'application/xml');\n    if (r.statusCode === 401) return [{ json: { success: false, error: 'Identifiants invalides — vérifiez votre mot de passe d\\'application.' } }];\n    if (r.statusCode === 207 || r.statusCode === 200) {\n      // Crée le dossier Mentoria (ignore l'erreur 405 si existe déjà)\n      await req('MKCOL', baseUrl, null, null);\n      return [{ json: { success: true, action: 'test' } }];\n    }\n    return [{ json: { success: false, error: 'Erreur connexion: ' + r.statusCode } }];\n  }\n\n  // LISTE : retourne les fichiers bot_*.json\n  if (action === 'list') {\n    const xmlBody = '<?xml version=\"1.0\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:displayname/></d:prop></d:propfind>';\n    const r = await req('PROPFIND', baseUrl, xmlBody, 'application/xml');\n    const xml = typeof r.body === 'string' ? r.body : '';\n    const files = [];\n    const re = /<[dD]:href[^>]*>([^<]+)<\\/[dD]:href>/g;\n    let m;\n    while ((m = re.exec(xml)) !== null) {\n      const name = decodeURIComponent(m[1]).split('/').filter(Boolean).pop();\n      if (name && name.startsWith('bot_') && name.endsWith('.json')) files.push({ name });\n    }\n    return [{ json: { success: true, files } }];\n  }\n\n  // LECTURE\n  if (action === 'read') {\n    const r = await req('GET', baseUrl + encodeURIComponent(filename), null, null);\n    if (r.statusCode === 404) return [{ json: { success: false, error: 'Fichier introuvable' } }];\n    const parsed = typeof r.body === 'string' ? JSON.parse(r.body) : r.body;\n    return [{ json: { success: true, content: parsed } }];\n  }\n\n  // ÉCRITURE\n  if (action === 'write') {\n    const data = typeof content === 'string' ? content : JSON.stringify(content, null, 2);\n    await req('PUT', baseUrl + encodeURIComponent(filename), data, 'application/json');\n    return [{ json: { success: true, action: 'write' } }];\n  }\n\n  // SUPPRESSION\n  if (action === 'delete') {\n    await req('DELETE', baseUrl + encodeURIComponent(filename), null, null);\n    return [{ json: { success: true, action: 'delete' } }];\n  }\n\n  return [{ json: { success: false, error: 'Action inconnue: ' + action } }];\n\n} catch(e) {\n  return [{ json: { success: false, error: e.message } }];\n}"
+      },
+      "id": "c1a2b3d4-e5f6-7890-aaaa-111111111102",
+      "name": "Logique WebDAV",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              { "name": "Access-Control-Allow-Origin", "value": "*" },
+              { "name": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
+              { "name": "Access-Control-Allow-Headers", "value": "Content-Type" },
+              { "name": "Content-Type", "value": "application/json" }
+            ]
+          }
+        }
+      },
+      "id": "c1a2b3d4-e5f6-7890-aaaa-111111111103",
+      "name": "Répondre",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [680, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Logique WebDAV", "type": "main", "index": 0 }]]
+    },
+    "Logique WebDAV": {
+      "main": [[{ "node": "Répondre", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "c1a2b3d4-e5f6-7890-aaaa-111111111100",
+  "meta": { "templateCredsSetupCompleted": true },
+  "id": "mentoria-storage-001",
+  "tags": []
+}

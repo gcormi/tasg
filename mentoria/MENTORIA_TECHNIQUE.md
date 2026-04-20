@@ -83,7 +83,35 @@ Alternative Cloudflare Worker (solution de secours, non souveraine).
 
 ---
 
-## Modèle Albert utilisé
-Le modèle est défini dans la configuration de chaque bot (champ `model` dans le JSON de config).
-Modèle recommandé : `gemma-4-31b` (vérifié actif — avril 2026).
-Ancienne valeur `openweight-medium` à éviter (obsolète).
+## Modèles Albert disponibles
+
+L'API Albert propose les alias suivants (vérifiés avril 2026) :
+
+| Alias | Modèle | Usage |
+|-------|--------|-------|
+| `openweight-large` | openai/gpt-oss-120b | Tâches complexes |
+| `openweight-medium` | mistralai/Mistral-Small-3.2-24B-Instruct-2506 | Tâches modérées ✅ **utilisé par Mentoria** |
+| `openweight-small` | mistralai/Ministral-3-8B-Instruct-2512 | Tâches simples |
+| `openweight-code` | Qwen/Qwen3-Coder-30B | Code |
+| `openweight-audio` | openai/whisper-large-v3 | Transcription audio |
+| `openweight-embeddings` | BAAI/bge-m3 | Vectorisation RAG |
+
+**Modèle par défaut dans Mentoria : `openweight-medium`**
+Défini dans `compagnion.html` : `model: botConfig.model || 'openweight-medium'`
+Peut être surchargé par le champ `model` dans la config du bot.
+
+### Équivalences et choix du modèle
+
+| Alias Albert | Équivalent commercial | Recommandation |
+|-------------|----------------------|----------------|
+| `openweight-small` | ≈ GPT-3.5 | Trop limité pour Mentoria |
+| `openweight-medium` | ≈ GPT-4o mini / Claude Haiku | **Recommandé** — rapide, suffisant pour usage scolaire |
+| `openweight-large` | ≈ GPT-4o / Claude Sonnet | Plus puissant mais plus lent |
+
+**`openweight-medium` (Mistral Small 3.2, 24B paramètres)** est le bon compromis pour Mentoria :
+- Suit bien les instructions système (corpus, règles pédagogiques)
+- Rapide pour des échanges en classe
+- Suffisant pour expliquer un cours, donner des indices, poser des questions
+- Pas adapté à du raisonnement très complexe (maths avancées, dissertations longues)
+
+Pour des assistants sur des sujets complexes, passer à `openweight-large` est possible en modifiant le champ `model` dans la config du bot.

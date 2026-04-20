@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentoria — Studio de Création</title>
+    <title>Mentoria — Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,141 +12,172 @@
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
     <style>
         :root {
-            --blue-inst: #1d4ed8; --blue-light: #eff6ff;
-            --border: #d1d5db; --text: #111827; --text-muted: #6b7280; --bg: #f3f4f6;
+            --teal: #0d9488; --teal-dark: #0f766e; --teal-light: #f0fdfa;
+            --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b; --bg: #f1f5f9;
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
-        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        .collapsible-content { transition: all 0.3s ease; overflow: hidden; }
+        .sb-scroll::-webkit-scrollbar { width: 4px; }
+        .sb-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .cfg-scroll::-webkit-scrollbar { width: 4px; }
+        .cfg-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .collapsible-content { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; }
         .hidden-section { max-height: 0; opacity: 0; }
-        .open-section { max-height: 3000px; opacity: 1; }
+        .open-section { max-height: 5000px; opacity: 1; }
         .input-field {
             width: 100%; background: white; border: 1px solid var(--border);
-            border-radius: 6px; padding: 8px 12px; font-size: 13px;
-            font-family: 'Inter', sans-serif; color: var(--text);
-            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+            border-radius: 6px; padding: 8px 12px; font-size: 12.5px;
+            font-family: 'Inter', sans-serif; color: var(--text); outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .input-field:focus { border-color: var(--blue-inst); box-shadow: 0 0 0 3px rgba(29,78,216,0.12); }
-        .input-field::placeholder { color: #9ca3af; }
-        .label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
-        .section-card { background: white; border: 1px solid var(--border); border-radius: 8px; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; }
-        .section-header:hover { background: #f9fafb; }
-        .section-body { padding: 16px; border-top: 1px solid var(--border); }
-        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
-        .btn-primary { background: var(--blue-inst); color: white; border-color: #1e3a8a; }
-        .btn-primary:hover { background: #1e40af; }
-        .btn-secondary { background: white; color: var(--text); border-color: var(--border); }
-        .btn-secondary:hover { background: #f9fafb; }
-        .preview-bg { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        .input-field:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12); }
+        .input-field::placeholder { color: #94a3b8; }
+        .label { display: block; font-size: 10.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; user-select: none; transition: background 0.15s; }
+        .section-hdr:hover { background: #f8fafc; }
+        .section-body { padding: 14px; border-top: 1px solid var(--border); }
+        .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+        .btn-teal { background: var(--teal); color: white; border-color: var(--teal-dark); }
+        .btn-teal:hover { background: var(--teal-dark); }
+        .btn-green { background: #16a34a; color: white; border-color: #15803d; }
+        .btn-green:hover { background: #15803d; }
+        .btn-ghost { background: white; color: var(--text); border-color: var(--border); }
+        .btn-ghost:hover { background: #f8fafc; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+        .btn-danger:hover { background: #fecaca; }
+        .source-btn { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: white; color: var(--text-muted); }
+        .source-btn.active { background: var(--teal); color: white; border-color: var(--teal-dark); }
+        .source-btn:first-child { border-radius: 6px 0 0 6px; }
+        .source-btn:last-child { border-radius: 0 6px 6px 0; }
+        .source-btn:not(:last-child) { border-right: 0; }
+        .preset-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid; transition: all 0.15s; }
+        .preset-tag:hover { transform: translateY(-1px); }
+        .tab-btn { padding: 5px 10px; font-size: 11px; font-weight: 600; border-radius: 5px; cursor: pointer; transition: all 0.15s; color: var(--text-muted); }
+        .tab-btn.active { background: var(--teal); color: white; }
+        .tab-btn:not(.active):hover { background: #f1f5f9; }
         @keyframes pulse-soft { 0%,100%{opacity:1}50%{opacity:0.6} }
         .ai-loading { animation: pulse-soft 2s infinite; }
-        @keyframes slideIn { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
-        .slide-in { animation: slideIn 0.4s ease-out forwards; }
-        .bot-card { border: 1px solid var(--border); border-radius: 6px; background: white; }
-        .bot-card:hover { border-color: var(--blue-inst); background: var(--blue-light); }
+        @keyframes slideIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
+        .slide-in { animation: slideIn 0.35s ease-out forwards; }
+        .bot-item { border-radius: 7px; padding: 9px 10px; cursor: pointer; transition: background 0.15s; }
+        .bot-item:hover { background: #1e293b; }
+        .bot-item.active { background: #1e293b; border-left: 2px solid var(--teal); }
+        .preview-bg { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        .rule-chip { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 7px; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; }
+        .rule-chip:hover { border-color: var(--teal); background: var(--teal-light); }
+        .rule-chip input[type="checkbox"] { accent-color: var(--teal); margin-top: 2px; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-<!-- ═══════════════════════════════════════════
-     ÉCRAN DE DÉMARRAGE — CHOIX DU STOCKAGE
-═══════════════════════════════════════════ -->
-<div id="startup-screen" class="fixed inset-0 z-[200] flex items-center justify-center" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);">
-    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 30px 30px;"></div>
+<!-- ══════════════════════════════════════
+     ÉCRAN DE DÉMARRAGE
+══════════════════════════════════════ -->
+<div id="startup-screen" class="fixed inset-0 z-[200] flex items-center justify-center" style="background: linear-gradient(135deg, #0f172a 0%, #134e4a 50%, #0d9488 100%);">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 32px 32px;"></div>
     <div class="relative w-full max-w-lg mx-4">
-        <!-- Logo -->
         <div class="text-center mb-6">
-            <div class="inline-flex items-center justify-center w-24 h-24 bg-white/10 rounded-3xl mb-4 border border-white/20 overflow-hidden shadow-2xl">
-                <img src="mentoria_hero.png" class="w-full h-full object-cover" alt="Mentoria Logo">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-2xl mb-4 border border-white/20 overflow-hidden shadow-2xl">
+                <img src="mentoria_hero.png" class="w-full h-full object-cover" alt="Mentoria" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div style="display:none" class="w-full h-full items-center justify-center text-3xl">🎓</div>
             </div>
-            <h1 class="text-3xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
-                Mentoria 
-                <span class="text-[10px] bg-white/20 text-white/80 px-2 py-0.5 rounded-full font-medium border border-white/10">v2.4</span>
-            </h1>
-            <p class="text-blue-200 text-sm mt-1">Studio de création d'assistants pédagogiques souverains</p>
+            <h1 class="text-3xl font-bold text-white tracking-tight">Mentoria</h1>
+            <p class="text-teal-200 text-sm mt-1" style="color:#99f6e4">Studio · Assistants pédagogiques souverains</p>
         </div>
-        <!-- Card -->
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="font-semibold text-gray-900 text-base">Où sont stockés vos bots ?</h2>
-                <p class="text-gray-500 text-xs mt-1">Choisissez votre mode. Vos données ne quittent jamais votre contrôle.</p>
+            <div class="p-5 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-900 text-sm">Où sont stockés vos assistants ?</h2>
+                <p class="text-gray-400 text-xs mt-0.5">Vos données restent sous votre contrôle.</p>
             </div>
-            <!-- Option La Forge (GitLab) -->
-            <div class="p-5 border-b border-gray-100 bg-orange-50/30">
+            <!-- Forge -->
+            <div class="p-5 border-b border-gray-100" style="background:#fffbf0">
                 <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-none mt-0.5">
-                        <svg class="w-5 h-5 text-orange-700" fill="currentColor" viewBox="0 0 24 24"><path d="M22.65 14.39L20.31 7.24L19.5 4.78C19.4 4.47 19.11 4.26 18.78 4.26C18.46 4.26 18.17 4.47 18.06 4.78L17.25 7.24H6.75L5.94 4.78C5.83 4.47 5.54 4.26 5.22 4.26C4.89 4.26 4.6 4.47 4.5 4.78L3.69 7.24L1.35 14.39C1.21 14.83 1.37 15.31 1.74 15.58L12 23L22.26 15.58C22.63 15.31 22.79 14.83 22.65 14.39Z"/></svg>
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-none mt-0.5" style="background:#fff7ed">
+                        <svg class="w-5 h-5" style="color:#c2410c" fill="currentColor" viewBox="0 0 24 24"><path d="M22.65 14.39L20.31 7.24L19.5 4.78C19.4 4.47 19.11 4.26 18.78 4.26C18.46 4.26 18.17 4.47 18.06 4.78L17.25 7.24H6.75L5.94 4.78C5.83 4.47 5.54 4.26 5.22 4.26C4.89 4.26 4.6 4.47 4.5 4.78L3.69 7.24L1.35 14.39C1.21 14.83 1.37 15.31 1.74 15.58L12 23L22.26 15.58C22.63 15.31 22.79 14.83 22.65 14.39Z"/></svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-semibold text-gray-900 text-sm">🦊 Connexion via La Forge</p>
-                        <p class="text-gray-400 text-[10px] mt-0.5 mb-3">Identifiez-vous pour accéder à vos assistants stockés sur GitLab.</p>
+                        <p class="font-semibold text-gray-900 text-sm">🦊 La Forge (GitLab EN)</p>
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Synchronisation sur votre dépôt GitLab.</p>
                         <div class="space-y-2">
-                            <input id="forge-token" type="password" placeholder="Votre Jeton d'accès (Badge)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="">
+                            <input id="forge-token" type="password" placeholder="Jeton d'accès (Badge)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
                             <div class="flex gap-2">
-                                <input id="forge-project-id" type="text" placeholder="Projet (ex: gcormi/frojet)" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-orange-500 font-mono" value="gcormi/frojet">
-                                <button onclick="connectForge()" class="px-4 py-2 bg-orange-600 text-white text-xs font-semibold rounded-lg hover:bg-orange-700 transition-colors whitespace-nowrap">Se connecter</button>
+                                <input id="forge-project-id" type="text" placeholder="Projet (ex: gcormi/frojet)" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono" value="gcormi/frojet">
+                                <button onclick="connectForge()" class="px-4 py-2 text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap" style="background:#c2410c">Se connecter</button>
                             </div>
-                            <label class="flex items-center gap-2 cursor-pointer mt-1">
-                                <input type="checkbox" id="remember-forge" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="remember-forge">
                                 <span class="text-[10px] text-gray-500">Rester connecté sur ce PC</span>
                             </label>
                         </div>
-                        <p class="text-[10px] text-orange-600 mt-2 flex items-center gap-1">
-                            <a href="https://forge.apps.education.fr/-/user_settings/personal_access_tokens?name=Mentoria&scopes=api" target="_blank" class="hover:underline flex items-center gap-1 font-semibold">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                Obtenir mon badge d'accès
-                            </a>
-                        </p>
-                        <div id="forge-help" class="hidden mt-2 p-3 bg-orange-50 rounded-lg text-[10px] text-orange-800 leading-relaxed shadow-inner">
-                            1. Allez sur <strong>La Forge</strong> > Profil (en haut à droite) > <strong>Edit Profile</strong><br>
-                            2. Menu gauche : <strong>Access Tokens</strong> > <strong>Add new token</strong><br>
-                            3. Nom : "Mentoria" / Expiration : (vide) / Cocher : <strong>api</strong><br>
-                            4. Cliquez sur <strong>Create</strong> et copiez le jeton affiché.<br>
-                            5. <strong>ID Projet</strong> : C'est le chemin de votre projet (ex: <code>gcormi/frojet</code>).
-                        </div>
+                        <a href="https://forge.apps.education.fr/-/user_settings/personal_access_tokens?name=Mentoria&scopes=api" target="_blank" class="text-[10px] font-semibold mt-2 flex items-center gap-1" style="color:#c2410c">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            Obtenir mon badge d'accès
+                        </a>
                     </div>
                 </div>
             </div>
-            <!-- Option USB -->
+            <!-- Nuage apps.edu -->
+            <div class="p-5 border-b border-gray-100" style="background:#f0f9ff">
+                <div class="flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-none mt-0.5" style="background:#e0f2fe">
+                        <svg class="w-5 h-5" style="color:#0369a1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900 text-sm">☁️ Nuage apps.education.fr</p>
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Vos bots dans votre Nuage EN. Accessible depuis n'importe quel PC.</p>
+                        <div class="space-y-2">
+                            <input id="nuage-username" type="text" placeholder="Identifiant apps.edu (ex: p.dupont)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
+                            <div class="flex gap-2">
+                                <input id="nuage-password" type="password" placeholder="Mot de passe d'application" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
+                                <button onclick="connectNuage()" class="px-4 py-2 text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap" style="background:#0369a1">Se connecter</button>
+                            </div>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="remember-nuage">
+                                <span class="text-[10px] text-gray-500">Rester connecté sur ce PC</span>
+                            </label>
+                        </div>
+                        <p class="text-[10px] mt-2" style="color:#0369a1">
+                            💡 <strong>Mot de passe d'application :</strong> dans votre Nuage → Paramètres → Sécurité → <em>Créer un nouveau mot de passe d'application</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- USB -->
             <div class="p-5">
                 <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-none mt-0.5">
-                        <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center flex-none mt-0.5">
+                        <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
                     </div>
                     <div class="flex-1">
                         <p class="font-semibold text-gray-900 text-sm">💾 Clé USB / Dossier local</p>
-                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Vos bots dans un dossier sur votre clé ou disque. Fonctionne sans internet.</p>
-                        <button onclick="connectFolder()" class="w-full py-2 border-2 border-dashed border-green-300 text-green-700 text-xs font-semibold rounded-lg hover:bg-green-50 hover:border-green-400 transition-all">
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Fonctionne sans internet. Chrome/Edge requis.</p>
+                        <button onclick="connectFolder()" class="w-full py-2 border-2 border-dashed border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg hover:bg-emerald-50 transition-all">
                             📁 Choisir mon dossier Mentoria...
                         </button>
-                        <p class="text-[10px] text-gray-400 mt-1.5">⚠️ Nécessite Chrome ou Edge</p>
                     </div>
                 </div>
             </div>
         </div>
-        <p class="text-center text-blue-200 text-[10px] mt-4">🔒 Aucune donnée transmise à Google ou tiers — Conforme RGPD — Éducation Nationale</p>
+        <p class="text-center text-[10px] mt-4" style="color:#5eead4">🔒 Aucune donnée transmise à Google ou tiers · RGPD · Éducation Nationale</p>
     </div>
 </div>
 
 <!-- TOAST -->
-<div id="status-toast" class="hidden fixed top-5 right-5 z-[100] max-w-xs w-full bg-white shadow-lg rounded-lg p-4 border border-gray-200 border-l-4 border-l-blue-700">
+<div id="status-toast" class="hidden fixed top-5 right-5 z-[100] max-w-xs w-full bg-white shadow-xl rounded-xl p-4 border border-gray-100 border-l-4 slide-in" style="border-left-color: var(--teal)">
     <div class="flex gap-3 items-start">
-        <i data-lucide="check-circle" class="w-4 h-4 text-blue-700 mt-0.5 flex-none"></i>
+        <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-none" style="color:var(--teal)"></i>
         <div class="flex-1">
-            <p id="status-title" class="font-semibold text-gray-900 text-sm">Notification</p>
+            <p id="status-title" class="font-semibold text-gray-900 text-sm"></p>
             <p id="status-msg" class="text-xs text-gray-500 mt-0.5"></p>
         </div>
         <button onclick="hideToast()" class="text-gray-300 hover:text-gray-500"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     SCRIPTS GLOBAUX (chargés avant le DOM)
-═══════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SCRIPTS GLOBAUX
+══════════════════════════════════════ -->
 <script>
-    // --- UI GLOBALE ---
     window.toggleSection = (id) => {
         const section = document.getElementById(id);
         if (!section) return;
@@ -167,15 +198,15 @@
         document.getElementById('status-title').textContent = title;
         document.getElementById('status-msg').textContent = msg;
         t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 4000);
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => t.classList.add('hidden'), 4000);
     };
     window.hideToast = () => document.getElementById('status-toast')?.classList.add('hidden');
     window.closeModal = () => document.getElementById('publish-modal')?.classList.add('hidden');
+    window.closePreviewModal = () => document.getElementById('preview-modal')?.classList.add('hidden');
 
-    // --- AVATAR ---
     window.handleThumbnail = (input) => {
-        const file = input.files[0];
-        if (!file) return;
+        const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = document.getElementById('vignette-preview');
@@ -187,8 +218,6 @@
         reader.readAsDataURL(file);
     };
 
-    // --- APERÇU DYNAMIQUE ---
-    // --- APERÇU DYNAMIQUE ---
     window.updatePreviews = () => {
         const title = document.getElementById('bot-title')?.value || 'Titre du Projet';
         const name = document.getElementById('bot-name')?.value || 'Assistant Albert';
@@ -197,42 +226,32 @@
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         const toggle = (id, hidden) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', hidden); };
         const setSrc = (id, src) => { const el = document.getElementById(id); if (el) el.src = src; };
-        set('preview-bot-title', title);
-        set('preview-bot-desc', 'Bonjour ! Je suis ' + name + '.');
+        // mini preview
+        set('mini-preview-title', title); set('mini-preview-name', name);
+        toggle('mini-preview-img', !hasImg); toggle('mini-preview-icon', hasImg);
+        if (hasImg) setSrc('mini-preview-img', vigImg.src);
+        // full preview modal
+        set('preview-bot-title', title); set('preview-bot-desc', 'Bonjour ! Je suis ' + name + '.');
         set('preview-bot-name-top', name);
-        toggle('preview-bot-icon', !hasImg);
-        toggle('preview-bot-icon-placeholder', hasImg);
-        toggle('preview-bot-avatar-large', !hasImg);
-        toggle('preview-bot-avatar-placeholder', hasImg);
+        toggle('preview-bot-icon', !hasImg); toggle('preview-bot-icon-placeholder', hasImg);
+        toggle('preview-bot-avatar-large', !hasImg); toggle('preview-bot-avatar-placeholder', hasImg);
         if (hasImg) { setSrc('preview-bot-icon', vigImg.src); setSrc('preview-bot-avatar-large', vigImg.src); }
     };
 
-    // ═══════════════════════════════════════════
-    // MOTEUR LA FORGE (GitLab API)
-    // ═══════════════════════════════════════════
-    let forgeToken = null;
-    let forgeProjectId = null;
-    let forgePath = 'mentoria'; // Dossier de stockage
+    // ── FORGE ──
+    let forgeToken = null, forgeProjectId = null, forgePath = 'mentoria';
 
     window.connectForge = async () => {
         forgeToken = document.getElementById('forge-token').value.trim();
         let pid = document.getElementById('forge-project-id').value.trim();
         forgeProjectId = encodeURIComponent(pid);
-        
         if (!forgeToken || !pid) { alert('Jeton et ID Projet requis.'); return; }
-        
         storageMode = 'forge';
         try {
-            // Test de connexion : lister les fichiers
             const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, {
                 headers: { 'PRIVATE-TOKEN': forgeToken }
             });
-            
-            if (!res.ok) {
-                if (res.status !== 404) throw new Error('Accès refusé. Vérifiez votre jeton.');
-            }
-            
-            // Mémorisation locale facultative
+            if (!res.ok && res.status !== 404) throw new Error('Accès refusé. Vérifiez votre jeton.');
             if (document.getElementById('remember-forge').checked) {
                 localStorage.setItem('mentoria_forge_token', forgeToken);
                 localStorage.setItem('mentoria_forge_pid', pid);
@@ -240,24 +259,16 @@
                 localStorage.removeItem('mentoria_forge_token');
                 localStorage.removeItem('mentoria_forge_pid');
             }
-            
             document.getElementById('startup-screen').style.display = 'none';
-            updateStorageBadge(`🦊 GitLab : ${pid}`);
+            updateStorageBadge(`🦊 ${pid}`);
             showToast('🦊 Connecté', 'Dépôt GitLab synchronisé.');
             await loadLibrary();
-        } catch(e) {
-            alert('Connexion impossible :\n' + e.message);
-            storageMode = null;
-        }
+        } catch(e) { alert('Connexion impossible :\n' + e.message); storageMode = null; }
     };
 
-    // Auto-chargement des infos mémorisées et détection auto du projet
     window.addEventListener('DOMContentLoaded', () => {
         const savedToken = localStorage.getItem('mentoria_forge_token');
         const savedPid = localStorage.getItem('mentoria_forge_pid');
-        
-        // Tentative de détection auto du projet depuis l'URL
-        // URL type : gcormi.forge.apps.education.fr/frojet/mentoria/
         const url = window.location.href;
         let detectedPid = null;
         if (url.includes('.forge.apps.education.fr')) {
@@ -265,11 +276,7 @@
             const repo = url.split('.fr/')[1].split('/')[0];
             detectedPid = user + '/' + repo;
         }
-
-        if (savedToken) {
-            document.getElementById('forge-token').value = savedToken;
-            document.getElementById('remember-forge').checked = true;
-        }
+        if (savedToken) { document.getElementById('forge-token').value = savedToken; document.getElementById('remember-forge').checked = true; }
         document.getElementById('forge-project-id').value = savedPid || detectedPid || 'gcormi/frojet';
     });
 
@@ -280,75 +287,102 @@
         window.location.reload();
     };
 
-    window.connectNuage = () => {
-        alert('❌ Le mode Nuage direct est désactivé (blocage CORS).\n\nUtilisez le mode "La Forge" pour un accès en ligne, ou le mode "Dossier Local" avec votre dossier Nuage synchronisé sur votre PC.');
-    };
-
-    // ═══════════════════════════════════════════
-    // MOTEUR DOSSIER LOCAL (USB / Disque)
-    // ═══════════════════════════════════════════
+    // ── DOSSIER LOCAL ──
     window.connectFolder = async () => {
-        if (!window.showDirectoryPicker) {
-            alert('Votre navigateur ne supporte pas cette fonctionnalité.\nUtilisez Google Chrome ou Microsoft Edge.');
-            return;
-        }
+        if (!window.showDirectoryPicker) { alert('Utilisez Google Chrome ou Microsoft Edge.'); return; }
         try {
             folderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
             storageMode = 'folder';
             document.getElementById('startup-screen').style.display = 'none';
-            updateStorageBadge('💾 USB : ' + folderHandle.name);
+            updateStorageBadge('💾 ' + folderHandle.name);
             showToast('💾 Dossier connecté', folderHandle.name);
             await loadLibrary();
+        } catch(e) { if (e.name !== 'AbortError') alert('Erreur : ' + e.message); }
+    };
+
+    // ── NUAGE apps.edu ──
+    const NUAGE_PROXY_URL = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage';
+    let nuageUsername = null, nuagePassword = null;
+
+    async function callNuage(action, options = {}) {
+        const res = await fetch(NUAGE_PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, username: nuageUsername, password: nuagePassword, ...options })
+        });
+        if (!res.ok) throw new Error('Proxy erreur ' + res.status);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Erreur inconnue');
+        return data;
+    }
+
+    window.connectNuage = async () => {
+        const u = document.getElementById('nuage-username')?.value.trim();
+        const p = document.getElementById('nuage-password')?.value.trim();
+        if (!u || !p) { alert('Identifiant et mot de passe requis.'); return; }
+        nuageUsername = u; nuagePassword = p;
+        storageMode = 'nuage';
+        try {
+            showToast('⏳ Connexion…', 'Vérification du Nuage apps.edu…');
+            await callNuage('test');
+            if (document.getElementById('remember-nuage')?.checked) {
+                localStorage.setItem('mentoria_nuage_user', u);
+                localStorage.setItem('mentoria_nuage_pass', p);
+            } else {
+                localStorage.removeItem('mentoria_nuage_user');
+                localStorage.removeItem('mentoria_nuage_pass');
+            }
+            document.getElementById('startup-screen').style.display = 'none';
+            updateStorageBadge('☁️ Nuage : ' + u);
+            showToast('☁️ Connecté', 'Nuage apps.edu synchronisé.');
+            await loadLibrary();
         } catch(e) {
-            if (e.name !== 'AbortError') alert('Erreur : ' + e.message);
+            storageMode = null; nuageUsername = null; nuagePassword = null;
+            alert('Connexion impossible :\n' + e.message);
         }
     };
 
-    function updateStorageBadge(label) {
-        const b = document.getElementById('storage-label');
-        if (b) b.textContent = label;
-    }
+    // Auto-remplissage Nuage mémorisé
+    window.addEventListener('DOMContentLoaded', () => {
+        const su = localStorage.getItem('mentoria_nuage_user');
+        const sp = localStorage.getItem('mentoria_nuage_pass');
+        if (su) { document.getElementById('nuage-username').value = su; document.getElementById('nuage-password').value = sp || ''; document.getElementById('remember-nuage').checked = true; }
+    });
 
+    function updateStorageBadge(label) {
+        const b = document.getElementById('storage-label'); if (b) b.textContent = label;
+    }
     window.setSync = (active) => {
-        const s = document.getElementById('sync-indicator');
-        if (s) s.classList.toggle('hidden', !active);
+        const s = document.getElementById('sync-indicator'); if (s) s.classList.toggle('hidden', !active);
     };
 
-    // ═══════════════════════════════════════════
-    // API FICHIERS — lectures/écritures unifiées
-    // ═══════════════════════════════════════════
-    let storageMode = null;
-    let folderHandle = null;
+    // ── API FICHIERS ──
+    let storageMode = null, folderHandle = null;
 
     async function readBotFile(filename) {
         if (storageMode === 'forge') {
-            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${encodeURIComponent(forgePath + '/' + filename)}/raw?ref=main`, {
-                headers: { 'PRIVATE-TOKEN': forgeToken }
-            });
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${encodeURIComponent(forgePath + '/' + filename)}/raw?ref=main`, { headers: { 'PRIVATE-TOKEN': forgeToken } });
             return res.ok ? await res.json() : null;
+        } else if (storageMode === 'nuage') {
+            const data = await callNuage('read', { filename });
+            return data.content || null;
         } else if (storageMode === 'folder') {
-            try { const fh = await folderHandle.getFileHandle(filename); return JSON.parse(await (await fh.getFile()).text()); }
-            catch { return null; }
+            try { const fh = await folderHandle.getFileHandle(filename); return JSON.parse(await (await fh.getFile()).text()); } catch { return null; }
         }
     }
     async function writeBotFile(filename, data) {
         const content = JSON.stringify(data, null, 2);
         if (storageMode === 'forge') {
             const filePath = encodeURIComponent(forgePath + '/' + filename);
-            const check = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}?ref=main`, {
-                headers: { 'PRIVATE-TOKEN': forgeToken }
-            });
+            const check = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}?ref=main`, { headers: { 'PRIVATE-TOKEN': forgeToken } });
             const method = check.ok ? 'PUT' : 'POST';
             const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}`, {
-                method: method,
-                headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    branch: 'main',
-                    content: content,
-                    commit_message: `Update ${filename} via Mentoria Studio`
-                })
+                method, headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ branch: 'main', content, commit_message: `Update ${filename} via Mentoria Studio` })
             });
             if (!res.ok) throw new Error('GitLab API ' + res.status);
+        } else if (storageMode === 'nuage') {
+            await callNuage('write', { filename, content });
         } else if (storageMode === 'folder') {
             const fh = await folderHandle.getFileHandle(filename, { create: true });
             const w = await fh.createWritable(); await w.write(content); await w.close();
@@ -358,216 +392,228 @@
         if (storageMode === 'forge') {
             const filePath = encodeURIComponent(forgePath + '/' + filename);
             await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}`, {
-                method: 'DELETE',
-                headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
+                method: 'DELETE', headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ branch: 'main', commit_message: `Delete ${filename} via Mentoria Studio` })
             });
+        } else if (storageMode === 'nuage') {
+            await callNuage('delete', { filename });
         } else if (storageMode === 'folder') {
             try { await folderHandle.removeEntry(filename); } catch {}
         }
     }
     async function listBotFiles() {
         if (storageMode === 'forge') {
-            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, {
-                headers: { 'PRIVATE-TOKEN': forgeToken }
-            });
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, { headers: { 'PRIVATE-TOKEN': forgeToken } });
             if (!res.ok) return [];
-            const files = await res.json();
-            return files
-                .map(f => f.name)
-                .filter(n => n.startsWith('bot_') && n.endsWith('.json'));
+            return (await res.json()).map(f => f.name).filter(n => n.startsWith('bot_') && n.endsWith('.json'));
+        } else if (storageMode === 'nuage') {
+            const data = await callNuage('list');
+            return (data.files || []).map(f => f.name);
         } else if (storageMode === 'folder') {
             const files = [];
-            for await (const [name] of folderHandle.entries()) {
-                if (name.startsWith('bot_') && name.endsWith('.json')) files.push(name);
-            }
+            for await (const [name] of folderHandle.entries()) { if (name.startsWith('bot_') && name.endsWith('.json')) files.push(name); }
             return files;
         }
         return [];
     }
 </script>
 
-<!-- ═══════════════════════════════════════════
+<!-- ══════════════════════════════════════
      HEADER
-═══════════════════════════════════════════ -->
+══════════════════════════════════════ -->
 <header class="flex-none bg-white border-b border-gray-200 z-20">
-    <div class="h-1 bg-blue-700"></div>
-    <div class="flex items-center justify-between px-6 py-3">
+    <div class="h-1" style="background: linear-gradient(90deg, var(--teal), #6366f1)"></div>
+    <div class="flex items-center justify-between px-5 py-2.5">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-blue-700 rounded flex items-center justify-center text-white">
-                <i data-lucide="cpu" class="w-5 h-5"></i>
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background:var(--teal)">
+                <i data-lucide="graduation-cap" class="w-4.5 h-4.5"></i>
             </div>
             <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="font-bold text-gray-900 text-base leading-none">Mentoria</h1>
-                    <span class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[8px] font-bold rounded border border-gray-200">v2.4</span>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="font-bold text-gray-900 text-sm leading-none">Mentoria</h1>
+                    <span class="px-1.5 py-0.5 text-[8px] font-bold rounded border" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4">v2.5</span>
                 </div>
-                <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio de création — Éducation Nationale</p>
+                <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio · Éducation Nationale</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <!-- Indicateur de synchro (caché par défaut) -->
-            <div id="sync-indicator" class="hidden flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 ai-loading">
-                <i data-lucide="refresh-cw" class="w-3 h-3 animate-spin"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Synchro...</span>
+        <div class="flex items-center gap-2">
+            <div id="sync-indicator" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full border ai-loading text-[10px] font-bold uppercase tracking-wider" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4">
+                <i data-lucide="refresh-cw" class="w-3 h-3 animate-spin"></i> Synchro...
             </div>
-
-            <div id="storage-badge" onclick="disconnectStorage()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600 font-medium cursor-pointer hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200 transition-all group">
-                <i data-lucide="database" class="w-3.5 h-3.5"></i>
-                <span id="storage-label" class="group-hover:hidden">Stockage</span>
-                <span class="hidden group-hover:inline">Changer de stockage</span>
-            </div>
-            
-            <div class="h-6 w-px bg-gray-200 mx-1"></div>
-
-            <button onclick="resetForm()" class="btn btn-secondary text-xs py-1.5">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouveau
+            <button id="storage-badge" onclick="disconnectStorage()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium cursor-pointer transition-all" style="background:#f8fafc;border-color:var(--border);color:var(--text-muted)">
+                <i data-lucide="database" class="w-3 h-3"></i>
+                <span id="storage-label">Stockage</span>
             </button>
-            <button onclick="saveCurrentBot()" class="btn btn-primary text-xs py-1.5">
-                <i data-lucide="save" class="w-3.5 h-3.5"></i> Enregistrer
-            </button>
-            <button onclick="publishBot()" class="btn btn-primary text-xs py-1.5" style="background:#16a34a;border-color:#15803d">
-                <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Publier
-            </button>
+            <div class="w-px h-5 bg-gray-200"></div>
+            <button onclick="resetForm()" class="btn btn-ghost py-1.5 text-xs"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouveau</button>
+            <button onclick="saveCurrentBot()" class="btn btn-teal py-1.5 text-xs"><i data-lucide="save" class="w-3.5 h-3.5"></i> Enregistrer</button>
+            <button onclick="publishBot()" class="btn btn-green py-1.5 text-xs"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> Publier</button>
         </div>
     </div>
 </header>
 
-<!-- ═══════════════════════════════════════════
+<!-- ══════════════════════════════════════
      LAYOUT PRINCIPAL
-═══════════════════════════════════════════ -->
+══════════════════════════════════════ -->
 <div class="flex flex-1 overflow-hidden">
 
-    <!-- SIDEBAR BIBLIOTHÈQUE -->
-    <aside class="w-52 flex-none bg-white border-r border-gray-200 flex flex-col">
-        <div class="p-3 border-b border-gray-100">
-            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Mes assistants</p>
+    <!-- SIDEBAR BIBLIOTHÈQUE (sombre) -->
+    <aside class="w-56 flex-none flex flex-col overflow-hidden" style="background:#0f172a">
+        <div class="px-4 pt-4 pb-2">
+            <p class="text-[9px] font-bold uppercase tracking-widest" style="color:#475569">Mes assistants</p>
         </div>
-        <div id="bot-library-list" class="flex-1 overflow-y-auto sidebar-scroll p-2">
-            <p class="text-xs text-gray-400 italic text-center py-3 mt-4">Connectez-vous pour voir vos bots</p>
+        <div id="bot-library-list" class="flex-1 overflow-y-auto sb-scroll px-2 pb-4">
+            <p class="text-xs italic text-center py-6 mt-2" style="color:#475569">Connectez-vous<br>pour voir vos bots</p>
+        </div>
+        <div class="p-3 border-t" style="border-color:#1e293b">
+            <button onclick="resetForm()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors" style="background:#1e293b;color:#94a3b8" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouvel assistant
+            </button>
         </div>
     </aside>
 
     <!-- PANNEAU DE CONFIGURATION -->
-    <aside class="w-[400px] flex-none bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden">
-        <div class="flex-1 overflow-y-auto sidebar-scroll p-4 space-y-3">
+    <main class="flex-1 flex flex-col overflow-hidden" style="background:var(--bg)">
+
+        <!-- MINI APERÇU (barre supérieure) -->
+        <div class="flex-none flex items-center gap-4 px-5 py-3 bg-white border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-gray-100 flex items-center justify-center flex-none" style="background:#f0fdfa">
+                    <img id="mini-preview-img" class="hidden w-full h-full object-cover" src="">
+                    <i id="mini-preview-icon" data-lucide="bot" class="w-5 h-5" style="color:var(--teal)"></i>
+                </div>
+                <div>
+                    <p id="mini-preview-title" class="text-sm font-semibold text-gray-900 leading-none">Titre du projet</p>
+                    <p id="mini-preview-name" class="text-xs text-gray-400 mt-0.5">Nom de l'assistant</p>
+                </div>
+            </div>
+            <button onclick="openPreviewModal()" class="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4" onmouseover="this.style.background='#ccfbf1'" onmouseout="this.style.background='#f0fdfa'">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Prévisualiser
+            </button>
+        </div>
+
+        <!-- FORMULAIRE SCROLLABLE -->
+        <div class="flex-1 overflow-y-auto cfg-scroll p-5 space-y-3">
 
             <!-- SECTION 1 : IDENTITÉ -->
-            <div class="section-card">
-                <div class="section-header" onclick="toggleSection('section-identity')">
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-identity')">
                     <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
-                        <span class="w-5 h-5 bg-blue-700 text-white rounded flex items-center justify-center text-[9px] font-bold">1</span>
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:var(--teal)">1</span>
                         Identité & Présentation
                     </span>
                     <i data-lucide="chevron-down" id="icon-identity" class="w-4 h-4 text-gray-400"></i>
                 </div>
                 <div id="section-identity" class="collapsible-content open-section">
-                    <div class="section-body space-y-4">
-                        <!-- Vignette -->
-                        <div>
-                            <label class="label">Image de l'assistant (avatar)</label>
-                            <div class="relative w-full h-28 border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition-colors" onclick="document.getElementById('vignette-input').click()">
-                                <img id="vignette-preview" class="hidden absolute inset-0 w-full h-full object-cover" />
-                                <div id="vignette-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 gap-1">
-                                    <i data-lucide="image-plus" class="w-6 h-6"></i>
-                                    <span class="text-[10px]">Cliquez pour choisir une image</span>
-                                    <span class="text-[9px] text-gray-300">PNG, JPG, AVIF, WebP</span>
+                    <div class="section-body space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 overflow-hidden cursor-pointer flex-none transition-all hover:border-teal-400 group" onclick="document.getElementById('vignette-input').click()" style="background:#f8fafc">
+                                <img id="vignette-preview" class="hidden absolute inset-0 w-full h-full object-cover">
+                                <div id="vignette-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-1" style="color:#cbd5e1">
+                                    <i data-lucide="image-plus" class="w-5 h-5"></i>
+                                </div>
+                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center rounded-xl" style="background:rgba(13,148,136,0.15)">
+                                    <i data-lucide="camera" class="w-4 h-4" style="color:var(--teal)"></i>
                                 </div>
                                 <input type="file" id="vignette-input" class="hidden" accept="image/png,image/jpeg,image/avif,image/webp,image/gif" onchange="handleThumbnail(this)">
                             </div>
+                            <div class="flex-1">
+                                <label class="label">Avatar de l'assistant</label>
+                                <p class="text-[10px] text-gray-400">PNG, JPG, AVIF, WebP<br>Affiché à l'élève dans le compagnon.</p>
+                                <button onclick="document.getElementById('vignette-input').click()" class="mt-1.5 text-[10px] font-semibold px-2 py-1 rounded border transition-colors" style="color:var(--teal);border-color:#99f6e4;background:#f0fdfa">Choisir une image</button>
+                            </div>
                         </div>
-                        <div>
-                            <label class="label">Titre du projet</label>
-                            <input type="text" id="bot-title" class="input-field" placeholder="Ex: Assistant de Mathématiques 3e" oninput="updatePreviews()">
-                        </div>
-                        <div>
-                            <label class="label">Nom de l'assistant (affiché à l'élève)</label>
-                            <input type="text" id="bot-name" class="input-field" placeholder="Ex: MathBot, Prof Dupont..." oninput="updatePreviews()">
-                        </div>
-                        <div>
-                            <label class="label">Thème / Discipline</label>
-                            <input type="text" id="bot-theme" class="input-field" placeholder="Ex: Mathématiques, Histoire, Musique...">
-                        </div>
-                        <div>
-                            <label class="label">Âge / Niveau des élèves</label>
-                            <input type="text" id="bot-target-age" class="input-field" placeholder="Ex: 12-14 ans — 4e, Terminale...">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label">Titre du projet</label>
+                                <input type="text" id="bot-title" class="input-field" placeholder="Ex: Maths 3e" oninput="updatePreviews()">
+                            </div>
+                            <div>
+                                <label class="label">Nom de l'assistant</label>
+                                <input type="text" id="bot-name" class="input-field" placeholder="Ex: MathBot" oninput="updatePreviews()">
+                            </div>
+                            <div>
+                                <label class="label">Thème / Discipline</label>
+                                <input type="text" id="bot-theme" class="input-field" placeholder="Ex: Histoire">
+                            </div>
+                            <div>
+                                <label class="label">Âge / Niveau</label>
+                                <input type="text" id="bot-target-age" class="input-field" placeholder="Ex: 4e, 14 ans">
+                            </div>
                         </div>
                         <div>
                             <label class="label">Message de bienvenue</label>
-                            <textarea id="bot-welcome" class="input-field" rows="2" placeholder="Ex: Bonjour ! Je suis là pour vous aider en maths..."></textarea>
+                            <textarea id="bot-welcome" class="input-field" rows="2" placeholder="Ex: Bonjour ! Prêt à explorer ce chapitre ?"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 2 : PÉDAGOGIE -->
-            <div class="section-card">
-                <div class="section-header" onclick="toggleSection('section-pedagogy')">
+            <!-- SECTION 2 : PÉDAGOGIE & CORPUS -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-pedagogy')">
                     <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
-                        <span class="w-5 h-5 bg-blue-700 text-white rounded flex items-center justify-center text-[9px] font-bold">2</span>
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:var(--teal)">2</span>
                         Pédagogie & Corpus
                     </span>
                     <i data-lucide="chevron-down" id="icon-pedagogy" class="w-4 h-4 text-gray-400"></i>
                 </div>
                 <div id="section-pedagogy" class="collapsible-content hidden-section">
                     <div class="section-body space-y-4">
+
+                        <!-- Instructions -->
                         <div>
                             <label class="label">Instructions pour l'IA</label>
-                            <textarea id="bot-instructions" class="input-field" rows="4" placeholder="Ex: En tant que professeur de mathématiques, tu connais parfaitement le programme de 3e. Tu réponds uniquement aux questions liées aux mathématiques..."></textarea>
+                            <textarea id="bot-instructions" class="input-field" rows="3" placeholder="Ex: Tu es un tuteur de mathématiques. Tu guides les élèves sans donner les réponses directement…"></textarea>
                         </div>
+
+                        <!-- Source des réponses -->
                         <div>
-                            <label class="label">Règles pédagogiques (Barrières)</label>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="REPLY_CONCISE">
-                                    <span class="text-[11px] text-gray-700">Réponses concises (max 200 car.)</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="MAIEUTIC">
-                                    <span class="text-[11px] text-gray-700">Maïeutique (ne pas donner la réponse)</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="TONE_ENCOURAGE">
-                                    <span class="text-[11px] text-gray-700">Ton encourageant et bienveillant</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="INSTANT_FEEDBACK">
-                                    <span class="text-[11px] text-gray-700">Commentaires instantanés sur les réponses</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="CREATIVITY">
-                                    <span class="text-[11px] text-gray-700">Encourager la créativité</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="PATIENCE">
-                                    <span class="text-[11px] text-gray-700">Patience et guidage pas à pas</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="CELEBRATE">
-                                    <span class="text-[11px] text-gray-700">Célébrer les petites victoires</span>
-                                </label>
-                                <label class="flex items-start gap-2 p-2 rounded border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" class="rule-toggle mt-0.5" value="SHORT_TEXTS">
-                                    <span class="text-[11px] text-gray-700">Utiliser des textes courts</span>
-                                </label>
+                            <label class="label">Source des réponses</label>
+                            <div class="flex" id="source-selector">
+                                <button class="source-btn" data-source="corpus" onclick="setAnswerSource('corpus')">📄 Corpus seul</button>
+                                <button class="source-btn active" data-source="both" onclick="setAnswerSource('both')">⚖️ Les deux</button>
+                                <button class="source-btn" data-source="albert" onclick="setAnswerSource('albert')">🤖 Albert seul</button>
+                            </div>
+                            <p id="source-hint" class="text-[10px] mt-1.5 italic text-gray-400">L'IA utilise le corpus ET ses connaissances générales.</p>
+                        </div>
+
+                        <!-- Règles pédagogiques -->
+                        <div>
+                            <label class="label">Règles pédagogiques</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="REPLY_CONCISE"><span class="text-[11px] text-gray-700">Réponses concises</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="MAIEUTIC"><span class="text-[11px] text-gray-700">Maïeutique</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="TONE_ENCOURAGE"><span class="text-[11px] text-gray-700">Ton encourageant</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="INSTANT_FEEDBACK"><span class="text-[11px] text-gray-700">Feedback instantané</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CREATIVITY"><span class="text-[11px] text-gray-700">Encourager la créativité</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="PATIENCE"><span class="text-[11px] text-gray-700">Guidage pas à pas</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CELEBRATE"><span class="text-[11px] text-gray-700">Célébrer les victoires</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="SHORT_TEXTS"><span class="text-[11px] text-gray-700">Textes courts</span></label>
                             </div>
                         </div>
-                        <div class="p-3 bg-red-50 border border-red-100 rounded-lg">
-                            <label class="label text-red-700">🛡️ Barrière Thématique Stricte</label>
-                            <input type="text" id="bot-strict-theme" class="input-field border-red-200 focus:border-red-500" placeholder="Ex: La technologie au collège cycle 4">
-                            <p class="text-[9px] text-red-500 mt-1 italic">Si l'élève sort de ce thème, l'IA refusera de répondre.</p>
+
+                        <!-- Barrière thématique -->
+                        <div class="p-3 rounded-lg" style="background:#fff1f2;border:1px solid #fecdd3">
+                            <label class="label" style="color:#be123c">🛡️ Barrière Thématique Stricte</label>
+                            <input type="text" id="bot-strict-theme" class="input-field" style="border-color:#fecdd3" placeholder="Ex: La technologie au collège cycle 4">
+                            <p class="text-[9px] mt-1 italic" style="color:#e11d48">Si l'élève sort de ce thème, l'IA refusera de répondre.</p>
                         </div>
+
+                        <!-- Règles personnalisées -->
                         <div>
                             <label class="label">Règles personnalisées</label>
-                            <textarea id="bot-custom-rules" class="input-field" rows="2" placeholder="Ex: Terminez toujours par un encouragement. Utilisez des exemples concrets..."></textarea>
+                            <textarea id="bot-custom-rules" class="input-field" rows="2" placeholder="Ex: Terminz toujours par un encouragement. Utilisez des exemples concrets…"></textarea>
                         </div>
+
+                        <!-- Corpus -->
                         <div>
                             <label class="label flex items-center justify-between">
                                 <span>Corpus de connaissance</span>
-                                <span id="file-count" class="text-gray-400 font-normal">0 / 5 fichiers</span>
+                                <span id="file-count" class="font-normal text-gray-400">0 / 5 fichiers</span>
                             </label>
-                            <button onclick="document.getElementById('corpus-input').click()" class="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-all">
-                                <i data-lucide="file-plus" class="w-4 h-4 inline mr-1"></i> Ajouter PDF ou TXT (max 5)
+                            <button onclick="document.getElementById('corpus-input').click()" class="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:text-teal-600 transition-all flex items-center justify-center gap-2" style="--hover-border: var(--teal)">
+                                <i data-lucide="file-plus" class="w-4 h-4"></i> Ajouter PDF ou TXT (max 5)
                             </button>
                             <input type="file" id="corpus-input" class="hidden" multiple accept=".pdf,.txt,.md" onchange="handleCorpusFiles(this)">
                             <div id="file-status-list" class="mt-2 space-y-1"></div>
@@ -577,186 +623,279 @@
                 </div>
             </div>
 
-            <!-- SECTION 2.b : BOUTONS RAPIDES -->
-            <div class="section-card">
-                <div class="section-header" onclick="toggleSection('section-quick-replies')">
+            <!-- SECTION 3 : BOUTONS RAPIDES -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-quick-replies')">
                     <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
-                        <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                        <i data-lucide="zap" class="w-4 h-4" style="color:#f59e0b"></i>
                         Boutons de réponse rapide
                     </span>
-                    <i data-lucide="chevron-down" id="icon-quick-replies" class="w-4 h-4 text-gray-400"></i>
-                </div>
-                <div id="section-quick-replies" class="collapsible-content hidden-section">
-                    <div class="section-body space-y-3">
-                        <p class="text-[10px] text-gray-400 italic">Ajoutez des boutons pour aider l'élève à interagir avec l'IA (ex: "Un indice", "Aide-moi à démarrer").</p>
-                        <div id="quick-replies-list" class="space-y-2">
-                            <!-- Liste des boutons -->
-                        </div>
-                        <button onclick="addQuickReply()" class="btn btn-secondary w-full text-[11px] py-1.5 justify-center mt-2">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un bouton
-                        </button>
+                    <div class="flex items-center gap-2">
+                        <span id="qr-count-badge" class="hidden px-1.5 py-0.5 text-white text-[9px] font-bold rounded-full" style="background:var(--teal)">0</span>
+                        <i data-lucide="chevron-down" id="icon-quick-replies" class="w-4 h-4 text-gray-400"></i>
                     </div>
                 </div>
-            </div>
-
-            <!-- SECTION 3 : API -->
-            <div class="section-card">
-                <div class="section-header" onclick="toggleSection('section-discovery')">
-                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
-                        <span class="w-5 h-5 bg-blue-700 text-white rounded flex items-center justify-center text-[9px] font-bold">3</span>
-                        Sécurité & API
-                    </span>
-                    <i data-lucide="chevron-down" id="icon-discovery" class="w-4 h-4 text-gray-400"></i>
-                </div>
-                <div id="section-discovery" class="collapsible-content hidden-section">
+                <div id="section-quick-replies" class="collapsible-content hidden-section">
                     <div class="section-body space-y-4">
+
+                        <!-- Bibliothèque pré-configurée -->
                         <div>
-                            <label class="label"><i data-lucide="key" class="w-3 h-3 inline"></i> Clé API Albert (Etalab)</label>
-                            <input type="password" id="api-key" class="input-field font-mono" placeholder="sk-...">
+                            <label class="label">Bibliothèque pré-configurée</label>
+                            <!-- Onglets catégories -->
+                            <div class="flex gap-1 mb-3 p-1 rounded-lg" style="background:#f1f5f9">
+                                <button class="tab-btn active" onclick="showPresetCategory('aide', this)">💡 Aide</button>
+                                <button class="tab-btn" onclick="showPresetCategory('approfondissement', this)">🔭 Approfondir</button>
+                                <button class="tab-btn" onclick="showPresetCategory('evaluation', this)">✅ Évaluation</button>
+                                <button class="tab-btn" onclick="showPresetCategory('navigation', this)">🗺️ Navigation</button>
+                            </div>
+                            <!-- Boutons preset par catégorie -->
+                            <div id="preset-aide" class="preset-panel flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Donne-moi un indice','Donne-moi un indice pour avancer sans me donner la réponse directement.')">+ Donne-moi un indice</button>
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Je ne comprends pas','Je n\'ai pas compris. Peux-tu expliquer autrement, avec d\'autres mots ou un exemple ?')">+ Je ne comprends pas</button>
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Explique autrement','Peux-tu expliquer ce point d\'une façon différente ?')">+ Explique autrement</button>
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Aide-moi à démarrer','Je ne sais pas par où commencer. Aide-moi à démarrer.')">+ Aide-moi à démarrer</button>
+                            </div>
+                            <div id="preset-approfondissement" class="preset-panel hidden flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('En savoir plus','Peux-tu approfondir ce point ?')">+ En savoir plus</button>
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('Un exemple concret','Donne-moi un exemple concret pour mieux comprendre.')">+ Un exemple concret</button>
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('Points essentiels','Quels sont les points essentiels à retenir ?')">+ Points essentiels</button>
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('Pour aller plus loin','Que puis-je lire ou faire pour aller plus loin sur ce sujet ?')">+ Pour aller plus loin</button>
+                            </div>
+                            <div id="preset-evaluation" class="preset-panel hidden flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Pose-moi une question','Pose-moi une question pour vérifier que j\'ai bien compris.')">+ Pose-moi une question</button>
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Évalue ma réponse','Évalue ma compréhension et dis-moi ce que j\'ai bien saisi ou manqué.')">+ Évalue ma réponse</button>
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Quiz rapide','Fais-moi un quiz rapide sur ce qu\'on vient de voir.')">+ Quiz rapide</button>
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Résume notre échange','Résume les points importants de notre échange.')">+ Résume notre échange</button>
+                            </div>
+                            <div id="preset-navigation" class="preset-panel hidden flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Retour au sujet','Revenons au sujet principal.')">+ Retour au sujet</button>
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Que dois-je retenir ?','Que dois-je absolument retenir de ce qu\'on a vu ?')">+ Que dois-je retenir ?</button>
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Passons à la suite','Passons à la prochaine notion ou étape.')">+ Passons à la suite</button>
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Récapitulatif','Fais un récapitulatif clair de tout ce qu\'on a abordé.')">+ Récapitulatif</button>
+                            </div>
                         </div>
+
+                        <!-- Boutons actifs -->
                         <div>
-                            <label class="label"><i data-lucide="link" class="w-3 h-3 inline"></i> Relais API (Proxy / Webhook)</label>
-                            <input type="text" id="api-proxy-url" class="input-field font-mono text-[10px]" placeholder="https://n8n... / https://mon-worker...">
-                            <p class="text-[10px] text-gray-400 mt-1 italic">L'URL du webhook n8n ou du Worker pour contourner le blocage CORS.</p>
-                        </div>
-                        <div class="pt-2">
-                            <button onclick="saveCurrentBot()" class="btn btn-primary w-full text-xs py-2 justify-center">
-                                <i data-lucide="save" class="w-3.5 h-3.5"></i> Valider et Enregistrer
+                            <label class="label">Boutons actifs sur le compagnon</label>
+                            <div id="quick-replies-list" class="space-y-2 mb-2"></div>
+                            <button onclick="addQuickReply()" class="btn btn-ghost w-full text-[11px] py-1.5 justify-center">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un bouton personnalisé
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div>
-    </aside>
-
-    <!-- ZONE D'APERÇU -->
-    <main class="flex-1 bg-gray-100 p-8 flex flex-col items-center justify-center overflow-hidden">
-        <div class="w-full max-w-[600px] flex flex-col h-full max-h-[800px]">
-            <div class="mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-blue-700 ai-loading"></span>
-                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Aperçu de l'interface élève</span>
-            </div>
-            <div class="flex-1 bg-white rounded-lg shadow border border-gray-200 flex flex-col overflow-hidden">
-                <div class="h-12 bg-blue-700 flex items-center px-6 gap-3">
-                    <div class="w-7 h-7 bg-white/20 rounded flex items-center justify-center overflow-hidden">
-                        <img id="preview-bot-icon" src="default_avatar.png" class="w-full h-full object-cover" />
-                        <i id="preview-bot-icon-placeholder" data-lucide="bot" class="hidden w-4 h-4 text-white"></i>
-                    </div>
-                    <div id="preview-bot-name-top" class="font-semibold text-white text-sm">Assistant Albert</div>
-                    <div class="ml-auto flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-                        <span class="text-[10px] text-blue-200">En ligne</span>
-                    </div>
+            <!-- SECTION 4 : API -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-discovery')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:var(--teal)">4</span>
+                        Sécurité & API
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-discovery" class="w-4 h-4 text-gray-400"></i>
                 </div>
-                <div class="flex-1 preview-bg flex flex-col items-center justify-center text-center p-10">
-                    <div class="slide-in flex flex-col items-center gap-5">
-                        <div class="w-16 h-16 bg-blue-700 rounded-xl flex items-center justify-center text-white shadow-xl overflow-hidden border-2 border-white">
-                            <img id="preview-bot-avatar-large" src="default_avatar.png" class="w-full h-full object-cover" />
-                            <i id="preview-bot-avatar-placeholder" data-lucide="cpu" class="hidden w-8 h-8"></i>
+                <div id="section-discovery" class="collapsible-content hidden-section">
+                    <div class="section-body space-y-3">
+                        <div>
+                            <label class="label"><i data-lucide="key" class="w-3 h-3 inline mr-1"></i>Clé API Albert (Etalab)</label>
+                            <input type="password" id="api-key" class="input-field font-mono" placeholder="sk-..." oninput="saveApiKeyLocally()">
+                            <div id="api-key-reused" class="hidden mt-1.5 flex items-center gap-1.5 text-[10px] font-medium" style="color:var(--teal)">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i>
+                                Clé précédente réutilisée — <button onclick="clearApiKey()" class="underline ml-0.5" style="color:#64748b">Changer</button>
+                            </div>
                         </div>
                         <div>
-                            <h3 id="preview-bot-title" class="font-bold text-gray-900 text-xl mb-1">Titre du Projet</h3>
-                            <p id="preview-bot-desc" class="text-gray-500 text-sm max-w-xs mx-auto">Configurez l'assistant pour voir l'aperçu.</p>
+                            <label class="label"><i data-lucide="link" class="w-3 h-3 inline mr-1"></i>Relais API (Proxy / Webhook n8n)</label>
+                            <input type="text" id="api-proxy-url" class="input-field font-mono text-[10px]" placeholder="https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat">
+                            <p class="text-[10px] text-gray-400 mt-1 italic">Laissez vide pour utiliser le webhook Mentoria par défaut.</p>
                         </div>
-                        <div class="flex items-center gap-2 text-xs text-gray-400 bg-gray-50 border border-gray-200 px-4 py-2 rounded">
-                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
-                            Cliquez sur « Publier » pour générer le lien élève
-                        </div>
-                    </div>
-                </div>
-                <div class="h-14 border-t border-gray-100 flex items-center px-4 gap-3">
-                    <div class="flex-1 bg-gray-50 border border-gray-200 rounded px-3 py-2 text-xs text-gray-400">Saisir un message...</div>
-                    <div class="w-8 h-8 bg-blue-700 rounded flex items-center justify-center text-white">
-                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                        <button onclick="saveCurrentBot()" class="btn btn-teal w-full text-xs py-2 justify-center">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Valider et Enregistrer
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
+
+        </div><!-- fin scroll -->
     </main>
 </div>
 
-<!-- MODAL PUBLICATION -->
-<div id="publish-modal" class="hidden fixed inset-0 bg-gray-900/50 z-[110] flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg w-full max-w-lg shadow-xl flex flex-col relative overflow-hidden slide-in border border-gray-200">
-        <div class="h-1 bg-blue-700"></div>
-        <div class="flex justify-between items-center p-6 border-b border-gray-100">
-            <h3 class="font-semibold text-gray-900">Partager l'assistant</h3>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+<!-- ══════════════════════════════════════
+     MODAL PRÉVISUALISATION
+══════════════════════════════════════ -->
+<div id="preview-modal" class="hidden fixed inset-0 z-[115] flex items-center justify-center p-6" style="background:rgba(15,23,42,0.7)">
+    <div class="relative w-full max-w-[400px] flex flex-col rounded-2xl overflow-hidden shadow-2xl slide-in" style="max-height:85vh">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-white border-b border-gray-100">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Aperçu élève</span>
+            <button onclick="closePreviewModal()" class="text-gray-300 hover:text-gray-600 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <div class="p-6 space-y-4">
-            <div>
-                <label class="label">Lien de partage élève</label>
-                <div class="flex gap-2">
-                    <input id="share-link" readonly type="text" class="input-field flex-1 text-blue-700 font-mono text-xs" value="Cliquez sur Publier...">
-                    <button onclick="copyToClipboard('share-link')" class="btn btn-primary"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+        <div class="flex flex-col flex-1 overflow-hidden" style="min-height:0">
+            <!-- topbar -->
+            <div class="h-11 flex items-center px-4 gap-2.5 flex-none" style="background:var(--teal)">
+                <div class="w-6 h-6 rounded flex items-center justify-center overflow-hidden" style="background:rgba(255,255,255,0.2)">
+                    <img id="preview-bot-icon" src="default_avatar.png" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    <i id="preview-bot-icon-placeholder" data-lucide="bot" class="hidden w-3.5 h-3.5 text-white"></i>
+                </div>
+                <div id="preview-bot-name-top" class="font-semibold text-white text-sm">Assistant</div>
+                <div class="ml-auto flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-green-300 rounded-full"></span>
+                    <span class="text-[9px] text-white/70">En ligne</span>
                 </div>
             </div>
-            <div class="p-4 bg-green-50 border border-green-100 rounded text-xs text-green-800 leading-relaxed">
-                🔒 <strong>Souverain :</strong> Ce lien contient toute la configuration. Les élèves n'ont pas besoin de compte. Aucune donnée ne passe par un serveur tiers.
+            <!-- body -->
+            <div class="flex-1 preview-bg flex flex-col items-center justify-center text-center p-8 overflow-hidden">
+                <div class="slide-in flex flex-col items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center text-white shadow-lg overflow-hidden border-2 border-white" style="background:var(--teal)">
+                        <img id="preview-bot-avatar-large" src="default_avatar.png" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <i id="preview-bot-avatar-placeholder" data-lucide="graduation-cap" class="hidden w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h3 id="preview-bot-title" class="font-bold text-gray-900 text-lg mb-1">Titre du Projet</h3>
+                        <p id="preview-bot-desc" class="text-gray-500 text-sm max-w-[240px] mx-auto">Configurez l'assistant pour voir l'aperçu.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-[11px] text-gray-400 bg-white border border-gray-200 px-3 py-2 rounded-lg shadow-sm">
+                        <i data-lucide="info" class="w-3 h-3"></i> Cliquez sur « Publier » pour partager
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="p-6 border-t border-gray-100 flex justify-end">
-            <button onclick="closeModal()" class="btn btn-primary">Fermer</button>
+            <!-- input bar -->
+            <div class="h-12 border-t border-gray-100 flex items-center px-3 gap-2 bg-white flex-none">
+                <div class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-400">Saisir un message…</div>
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white flex-none" style="background:var(--teal)">
+                    <i data-lucide="send" class="w-3 h-3"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
+<!-- ══════════════════════════════════════
+     MODAL PUBLICATION
+══════════════════════════════════════ -->
+<div id="publish-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4" style="background:rgba(15,23,42,0.7)">
+    <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden slide-in border border-gray-100">
+        <div class="h-1" style="background:linear-gradient(90deg,var(--teal),#6366f1)"></div>
+        <div class="flex justify-between items-center p-5 border-b border-gray-100">
+            <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Partager l'assistant</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Copiez ce lien et partagez-le à vos élèves.</p>
+            </div>
+            <button onclick="closeModal()" class="text-gray-300 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-5 space-y-4">
+            <div>
+                <label class="label">Lien élève</label>
+                <div class="flex gap-2">
+                    <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="Cliquez sur Publier…">
+                    <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+                </div>
+            </div>
+            <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d">
+                🔒 <strong>Souverain :</strong> Lien auto-contenu. Aucun compte élève. Aucune donnée transmise à un tiers.
+            </div>
+        </div>
+        <div class="p-5 border-t border-gray-100 flex justify-end">
+            <button onclick="closeModal()" class="btn btn-teal">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
      MOTEUR PRINCIPAL
-═══════════════════════════════════════════ -->
+══════════════════════════════════════ -->
 <script>
     const rulesMap = {
         'REPLY_CONCISE': 'Fournis des réponses concises et claires (maximum 200 caractères).',
         'MAIEUTIC': "Conseille l'élève, mais ne donne pas la réponse directement. Guide-le par la maïeutique.",
         'TONE_ENCOURAGE': 'Utilise un ton encourageant et bienveillant.',
-        'INSTANT_FEEDBACK': 'Offre des commentaires instantanés sur les réponses de l’élève.',
+        'INSTANT_FEEDBACK': "Offre des commentaires instantanés sur les réponses de l'élève.",
         'CREATIVITY': 'Encourage la créativité dans la résolution de problèmes.',
-        'PATIENCE': 'Reste patient et guide l’élève à travers les défis, pas à pas.',
-        'CELEBRATE': 'Célèbre les petites victoires et les progrès de l’élève.',
-        'SHORT_TEXTS': 'Utilise des textes courts pour favoriser l’engagement.'
+        'PATIENCE': "Reste patient et guide l'élève à travers les défis, pas à pas.",
+        'CELEBRATE': "Célèbre les petites victoires et les progrès de l'élève.",
+        'SHORT_TEXTS': "Utilise des textes courts pour favoriser l'engagement."
     };
 
-    let library = {};
-    let currentBotId = null;
-    let uploadedFiles = [];
-    let quickReplies = [];
+    const sourceHints = {
+        'corpus': "L'IA répondra UNIQUEMENT à partir du corpus fourni. Si l'information n'y est pas, elle le signalera.",
+        'both': "L'IA utilise le corpus ET ses connaissances générales.",
+        'albert': "L'IA utilise uniquement ses connaissances générales (le corpus est ignoré)."
+    };
+
+    let library = {}, currentBotId = null, uploadedFiles = [], quickReplies = [];
+    let currentAnswerSource = 'both';
+    let activePresetCategory = 'aide';
 
     document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
 
-    // --- BOUTONS RAPIDES ---
+    // ── SOURCE DES RÉPONSES ──
+    window.setAnswerSource = (source) => {
+        currentAnswerSource = source;
+        document.querySelectorAll('.source-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.source === source);
+        });
+        const hint = document.getElementById('source-hint');
+        if (hint) hint.textContent = sourceHints[source] || '';
+    };
+
+    // ── BIBLIOTHÈQUE PRESET ──
+    window.showPresetCategory = (cat, btn) => {
+        activePresetCategory = cat;
+        document.querySelectorAll('.preset-panel').forEach(p => p.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const panel = document.getElementById('preset-' + cat);
+        if (panel) panel.classList.remove('hidden');
+        if (btn) btn.classList.add('active');
+    };
+
+    window.addPreset = (label, prompt) => {
+        if (quickReplies.some(qr => qr.label === label)) {
+            showToast('Déjà ajouté', '"' + label + '" est déjà dans la liste.');
+            return;
+        }
+        quickReplies.push({ label, prompt });
+        renderQuickReplies();
+        showToast('✅ Ajouté', '"' + label + '" ajouté aux boutons.');
+    };
+
+    // ── BOUTONS RAPIDES ──
     window.addQuickReply = (label = '', prompt = '') => {
         quickReplies.push({ label, prompt });
         renderQuickReplies();
     };
-
-    window.removeQuickReply = (idx) => {
-        quickReplies.splice(idx, 1);
-        renderQuickReplies();
-    };
-
+    window.removeQuickReply = (idx) => { quickReplies.splice(idx, 1); renderQuickReplies(); };
     window.renderQuickReplies = () => {
         const list = document.getElementById('quick-replies-list');
+        const badge = document.getElementById('qr-count-badge');
+        if (badge) {
+            const count = quickReplies.length;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        }
         if (!list) return;
         list.innerHTML = quickReplies.map((qr, i) => `
-            <div class="flex flex-col gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg group">
+            <div class="flex flex-col gap-1.5 p-3 rounded-lg border" style="background:#f8fafc;border-color:var(--border)">
                 <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Bouton ${i+1}</span>
-                    <button onclick="removeQuickReply(${i})" class="text-gray-300 hover:text-red-500 transition-colors">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Bouton ${i+1}</span>
+                    <button onclick="removeQuickReply(${i})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                 </div>
-                <input type="text" class="input-field py-1 px-2 text-[11px] font-bold" placeholder="Label (ex: Un indice)" value="${qr.label}" oninput="quickReplies[${i}].label = this.value">
-                <textarea class="input-field py-1 px-2 text-[10px]" placeholder="Prompt envoyé à l'IA" rows="2" oninput="quickReplies[${i}].prompt = this.value">${qr.prompt}</textarea>
+                <input type="text" class="input-field py-1.5 px-2 text-[11px] font-bold" placeholder="Label (affiché sur le bouton)" value="${qr.label.replace(/"/g,'&quot;')}" oninput="quickReplies[${i}].label = this.value; renderQuickReplies()">
+                <textarea class="input-field py-1.5 px-2 text-[10px]" placeholder="Prompt envoyé à l'IA" rows="2" oninput="quickReplies[${i}].prompt = this.value">${qr.prompt}</textarea>
             </div>
         `).join('');
         if (window.lucide) lucide.createIcons();
     };
-
     window.getQuickRepliesData = () => quickReplies.filter(qr => qr.label.trim() && qr.prompt.trim());
 
-    // --- BIBLIOTHÈQUE ---
+    // ── APERÇU MODAL ──
+    window.openPreviewModal = () => {
+        updatePreviews();
+        document.getElementById('preview-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // ── BIBLIOTHÈQUE ──
     window.loadLibrary = async () => {
         library = {};
         try {
@@ -774,28 +913,32 @@
         if (!list) return;
         const bots = Object.values(library);
         if (bots.length === 0) {
-            list.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-3">Aucun assistant — cliquez sur "Nouveau"</p>';
+            list.innerHTML = '<p class="text-xs italic text-center py-6" style="color:#475569">Aucun assistant.<br>Créez le premier !</p>';
             return;
         }
         bots.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
         list.innerHTML = bots.map(bot => `
-            <div class="bot-card flex items-center justify-between p-2.5 mb-2 cursor-pointer" onclick="loadBot('${bot.id}')">
-                <div class="flex items-center gap-2.5 overflow-hidden">
-                    <div class="w-7 h-7 bg-blue-50 text-blue-700 rounded flex items-center justify-center flex-none"><i data-lucide="cpu" class="w-3.5 h-3.5"></i></div>
+            <div class="bot-item flex items-center justify-between mb-1 ${bot.id === currentBotId ? 'active' : ''}" onclick="loadBot('${bot.id}')">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <div class="w-6 h-6 rounded flex items-center justify-center flex-none" style="background:#1e293b">
+                        <i data-lucide="graduation-cap" class="w-3 h-3" style="color:var(--teal)"></i>
+                    </div>
                     <div class="overflow-hidden">
-                        <p class="text-xs font-semibold text-gray-800 truncate">${bot.config.title}</p>
-                        <p class="text-[10px] text-gray-400">${bot.config.theme || 'Thème libre'}</p>
+                        <p class="text-xs font-semibold truncate" style="color:#e2e8f0">${bot.config.title}</p>
+                        <p class="text-[9px] truncate" style="color:#64748b">${bot.config.theme || 'Thème libre'}</p>
                     </div>
                 </div>
-                <button onclick="event.stopPropagation(); deleteBot('${bot.id}')" class="p-1.5 text-gray-300 hover:text-red-500 flex-none"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                <button onclick="event.stopPropagation(); deleteBot('${bot.id}')" class="p-1 flex-none opacity-0 hover:opacity-100 transition-opacity" style="color:#475569" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#475569'">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
             </div>
         `).join('');
         if (window.lucide) lucide.createIcons();
     };
 
-    // --- SAUVEGARDE ---
+    // ── SAUVEGARDE ──
     window.saveCurrentBot = async () => {
-        if (!storageMode) { showToast('⚠️ Non connecté', 'Choisissez un mode de stockage au démarrage.'); return; }
+        if (!storageMode) { showToast('⚠️ Non connecté', 'Choisissez un mode de stockage.'); return; }
         const title = document.getElementById('bot-title')?.value?.trim();
         if (!title) { showToast('⚠️ Titre manquant', 'Renseignez le titre (section 1).'); return; }
         if (!currentBotId) currentBotId = 'bot_' + Date.now();
@@ -814,10 +957,11 @@
                 pedagogicRules: selectedRules,
                 strictTheme: document.getElementById('bot-strict-theme')?.value || '',
                 customRules: document.getElementById('bot-custom-rules')?.value || '',
-                quickReplies: getQuickRepliesData()
+                quickReplies: getQuickRepliesData(),
+                answerSource: currentAnswerSource
             },
             corpus: document.getElementById('bot-corpus-text')?.value || '',
-            apiKey: document.getElementById('api-key')?.value || '',
+            apiKey: (() => { const k = document.getElementById('api-key')?.value || ''; if (k) localStorage.setItem('mentoria_api_key', k); return k; })(),
             proxyUrl: document.getElementById('api-proxy-url')?.value || '',
             vignette: hasVig ? vigImg.src : null
         };
@@ -831,7 +975,7 @@
         finally { setSync(false); }
     };
 
-    // --- CHARGEMENT ---
+    // ── CHARGEMENT ──
     window.loadBot = (id) => {
         const bot = library[id]; if (!bot) return;
         currentBotId = id;
@@ -839,39 +983,78 @@
         set('bot-title', bot.config.title); set('bot-instructions', bot.config.instructions);
         set('bot-name', bot.config.name); set('bot-target-age', bot.config.targetAge);
         set('bot-theme', bot.config.theme); set('bot-welcome', bot.config.welcomeMessage);
-        set('bot-strict-theme', bot.config.strictTheme);
-        set('bot-custom-rules', bot.config.customRules); set('bot-corpus-text', bot.corpus);
-        set('api-key', bot.apiKey);
+        set('bot-strict-theme', bot.config.strictTheme); set('bot-custom-rules', bot.config.customRules);
+        set('bot-corpus-text', bot.corpus);
+        set('api-key', bot.apiKey || localStorage.getItem('mentoria_api_key') || '');
+        document.getElementById('api-key-reused')?.classList.add('hidden');
         set('api-proxy-url', bot.proxyUrl || '');
         document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = (bot.config.pedagogicRules || []).includes(rulesMap[cb.value]); });
+        setAnswerSource(bot.config.answerSource || 'both');
         const vigImg = document.getElementById('vignette-preview');
         const ph = document.getElementById('vignette-placeholder');
         if (bot.vignette && vigImg) { vigImg.src = bot.vignette; vigImg.classList.remove('hidden'); if (ph) ph.classList.add('hidden'); }
         else if (vigImg) { vigImg.classList.add('hidden'); if (ph) ph.classList.remove('hidden'); }
         uploadedFiles = bot.corpus ? [{ name: 'Corpus enregistré', content: bot.corpus }] : [];
         quickReplies = bot.config.quickReplies || [];
-        updateFileUI(); renderQuickReplies(); updatePreviews(); showToast('Chargé', bot.config.title);
+        updateFileUI(); renderQuickReplies(); updatePreviews();
+        showToast('Chargé', bot.config.title);
+        updateLibraryUI();
     };
 
-    // --- SUPPRESSION ---
+    // ── SUPPRESSION ──
     window.deleteBot = async (id) => {
         if (!confirm('Supprimer cet assistant ?')) return;
-        try { await deleteBotFile(id + '.json'); delete library[id]; if (currentBotId === id) resetForm(); updateLibraryUI(); showToast('Supprimé', 'Assistant retiré.'); }
-        catch(e) { showToast('❌ Erreur', e.message); }
+        try {
+            await deleteBotFile(id + '.json');
+            delete library[id];
+            if (currentBotId === id) resetForm();
+            updateLibraryUI();
+            showToast('Supprimé', 'Assistant retiré.');
+        } catch(e) { showToast('❌ Erreur', e.message); }
     };
 
-    // --- RESET ---
+    // ── CLÉ API PERSISTANTE ──
+    window.saveApiKeyLocally = () => {
+        const k = document.getElementById('api-key')?.value;
+        if (k) localStorage.setItem('mentoria_api_key', k);
+        document.getElementById('api-key-reused')?.classList.add('hidden');
+    };
+    window.clearApiKey = () => {
+        const el = document.getElementById('api-key');
+        if (el) { el.value = ''; el.focus(); }
+        localStorage.removeItem('mentoria_api_key');
+        document.getElementById('api-key-reused')?.classList.add('hidden');
+    };
+    function restoreSavedApiKey() {
+        const saved = localStorage.getItem('mentoria_api_key');
+        const el = document.getElementById('api-key');
+        const hint = document.getElementById('api-key-reused');
+        if (saved && el && !el.value) {
+            el.value = saved;
+            if (hint) hint.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+    }
+
+    // ── RESET ──
     window.resetForm = () => {
         currentBotId = null;
-        ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text','api-key','api-proxy-url'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text','api-proxy-url'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         document.querySelectorAll('.rule-toggle').forEach(cb => cb.checked = false);
-        uploadedFiles = []; quickReplies = []; updateFileUI(); renderQuickReplies();
-        const vi = document.getElementById('vignette-preview'); const ph = document.getElementById('vignette-placeholder');
+        setAnswerSource('both');
+        uploadedFiles = []; quickReplies = [];
+        updateFileUI(); renderQuickReplies();
+        const vi = document.getElementById('vignette-preview'), ph = document.getElementById('vignette-placeholder');
         if (vi) vi.classList.add('hidden'); if (ph) ph.classList.remove('hidden');
+        // Restaurer la clé API précédente
+        const apiEl = document.getElementById('api-key');
+        if (apiEl) apiEl.value = '';
+        restoreSavedApiKey();
         updatePreviews();
+        updateLibraryUI();
     };
 
-    // --- PUBLICATION ---
+    // ── PUBLICATION ──
     window.publishBot = async () => {
         await saveCurrentBot();
         const bot = library[currentBotId]; if (!bot) return;
@@ -882,12 +1065,12 @@
         if (window.lucide) lucide.createIcons();
     };
 
-    // --- CORPUS ---
+    // ── CORPUS ──
     window.handleCorpusFiles = async (input) => {
         const files = Array.from(input.files);
         if (uploadedFiles.length + files.length > 5) return showToast('Limite', 'Max 5 fichiers.');
         for (const file of files) {
-            showToast('Lecture', file.name);
+            showToast('Lecture…', file.name);
             let text;
             if (file.type === 'application/pdf') {
                 const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
@@ -908,9 +1091,9 @@
         if (count) count.textContent = uploadedFiles.length + ' / 5 fichiers';
         if (list) {
             list.innerHTML = uploadedFiles.map((f, i) => `
-                <div class="flex items-center justify-between p-2 bg-blue-50 border border-blue-100 rounded text-[10px]">
-                    <span class="truncate flex-1 font-medium text-blue-700">${f.name}</span>
-                    <button onclick="removeFile(${i})" class="text-red-400 ml-2"><i data-lucide="x" class="w-3 h-3"></i></button>
+                <div class="flex items-center justify-between p-2 rounded text-[10px]" style="background:#f0fdfa;border:1px solid #99f6e4">
+                    <span class="truncate flex-1 font-medium" style="color:var(--teal-dark)">${f.name}</span>
+                    <button onclick="removeFile(${i})" class="ml-2 text-gray-300 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button>
                 </div>
             `).join('');
             if (window.lucide) lucide.createIcons();
@@ -923,7 +1106,8 @@
 
     window.copyToClipboard = (id) => {
         const el = document.getElementById(id); el.select();
-        document.execCommand('copy'); showToast('Copié', 'Lien copié dans le presse-papiers !');
+        document.execCommand('copy');
+        showToast('✅ Copié', 'Lien copié dans le presse-papiers !');
     };
 </script>
 </body>
