@@ -1,6 +1,6 @@
 {
   "id": "bot_1776422667178",
-  "updatedAt": "2026-04-20T13:38:04.063Z",
+  "updatedAt": "2026-04-20T13:46:03.459Z",
   "config": {
     "title": "Chopin - Musique",
     "instructions": "un grand specialiste de la vie et l'oeuvre de chopin.",
@@ -20,6 +20,10 @@
       {
         "label": "Un indice ?",
         "prompt": "je suis bloqué, donne-moi un indice pédagogique sur l'œuvre ou la vie de Chopin pour m'aider à avancer sans me donner la réponse directement."
+      },
+      {
+        "label": "Quiz rapide",
+        "prompt": "Fais-moi un quiz rapide sur ce qu'on vient de voir."
       }
     ],
     "answerSource": "both"
