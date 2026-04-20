@@ -1,0 +1,52 @@
+{
+  "name": "Mentoria_proxy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mentoria_chat",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://albert.api.etalab.gouv.fr/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ $json.headers.authorization }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}"
+      },
+      "name": "Albert API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [256, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 200 }
+      },
+      "name": "Répondre",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [512, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Albert API", "type": "main", "index": 0 }]] },
+    "Albert API": { "main": [[{ "node": "Répondre", "type": "main", "index": 0 }]] }
+  }
+}
