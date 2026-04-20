@@ -1,4 +1,4 @@
-# Notice d'utilisation — Mentoria
+# Notice d'utilisation — Mentoria v2.5
 ## Guide pour les enseignants
 
 ---
@@ -7,7 +7,7 @@
 
 Mentoria permet à un enseignant de créer des **assistants IA personnalisés** pour ses élèves. Chaque assistant est configuré sur un thème précis (histoire, maths, musique...), avec ses propres règles pédagogiques et son propre corpus de référence.
 
-L'élève accède à l'assistant via un simple lien — sans compte, sans application à installer.
+L'élève accède à l'assistant via un simple lien — **sans compte, sans application à installer**.
 
 **Tout est souverain** : hébergé sur la forge de l'Éducation Nationale, l'IA utilisée est Albert (Etalab/DINUM).
 
@@ -22,116 +22,164 @@ Albert est l'IA souveraine française développée par Etalab pour les agents pu
 1. Rendez-vous sur le Playground Albert et créez un compte
 2. Dans la section "API Keys", générez une clé
 3. **Copiez-la immédiatement** — elle ne s'affiche qu'une seule fois
-4. Conservez-la précieusement (dans un gestionnaire de mots de passe)
+4. Conservez-la (gestionnaire de mots de passe ou note sécurisée)
 
 > La clé ressemble à : `sk-eyJhbGci...`
 
+La clé est mémorisée automatiquement dans votre navigateur — vous n'aurez à la saisir qu'une seule fois par PC.
+
 ---
 
-### 2. Accéder à Mentoria Studio
-L'interface de création des assistants est disponible sur la forge :
-`https://gcormi.forge.apps.education.fr/frojet/mentoria`
+### 2. Un espace de stockage pour vos bots
 
-> Il n'y a rien à installer — tout fonctionne dans le navigateur (Chrome ou Edge recommandé).
+Choisissez l'option qui vous convient :
+
+#### ☁️ Nuage apps.education.fr (recommandé)
+Vos bots sont stockés dans votre Nuage personnel EN. Accessible depuis n'importe quel PC.
+
+**Première connexion (5 minutes, une seule fois) :**
+1. Connectez-vous sur [nuage.apps.education.fr](https://nuage.apps.education.fr)
+2. Cliquez sur votre nom en haut à droite → **Paramètres**
+3. Menu gauche → **Sécurité**
+4. Tout en bas : **"Créer un nouveau mot de passe d'application"**
+5. Nom : tapez `Mentoria` → **Créer**
+6. **Copiez le mot de passe affiché** (une seule fois !)
+
+> ⚠️ Ce n'est pas votre vrai mot de passe — c'est un mot de passe spécifique à Mentoria, plus sûr.
+
+#### 🦊 La Forge (GitLab EN)
+Pour les enseignants à l'aise avec les outils numériques. Bots stockés dans votre dépôt GitLab.
+Nécessite un compte sur `forge.apps.education.fr` et un jeton d'accès.
+
+#### 💾 Clé USB / Dossier local
+Bots stockés sur votre PC ou clé USB. Fonctionne sans internet.
+Nécessite Chrome ou Edge. Non accessible depuis un autre PC (sauf si vous branchez la clé).
+
+---
+
+### 3. Accéder à Mentoria Studio
+`https://gcormi.forge.apps.education.fr/frojet/mentoria/`
+
+Rien à installer — tout fonctionne dans le navigateur.
 
 ---
 
 ## Créer votre premier assistant
 
-### Étape 1 — Ouvrir Mentoria Studio
-Ouvrez `index.html` dans votre navigateur.
+### Étape 1 — Se connecter
+Au démarrage, choisissez votre mode de stockage et connectez-vous.
 
-### Étape 2 — Configurer l'assistant
-Remplissez les champs :
-
+### Étape 2 — Section 1 : Identité
 | Champ | Description | Exemple |
 |-------|-------------|---------|
-| **Nom** | Le nom affiché à l'élève | "Spécialiste de Chopin" |
-| **Thème** | La matière ou le sujet | "Musique classique" |
-| **Instructions** | Ce que le bot doit faire | "Tu aides les élèves à découvrir Chopin" |
-| **Public cible** | L'âge ou le niveau | "Élèves de 4ème" |
-| **Message d'accueil** | Premier message affiché | "Bonjour ! Prêt à explorer Chopin ?" |
-| **Corpus** | Vos documents de référence | Copier-coller un texte de cours |
-| **Clé API Albert** | Votre clé personnelle | `sk-eyJ...` |
+| **Avatar** | Photo ou dessin de l'assistant | Photo d'un robot |
+| **Titre du projet** | Nom interne (pour vous) | "Techno Cycle 4 — ch.3" |
+| **Nom de l'assistant** | Affiché à l'élève | "TechBot" |
+| **Thème** | La matière ou le sujet | "Technologie au collège" |
+| **Âge / Niveau** | Public cible | "4e, 13-14 ans" |
+| **Message de bienvenue** | Premier message affiché | "Bonjour ! Prêt à explorer ?" |
 
-### Étape 3 — Générer le lien élève
-Cliquez sur **"Générer le lien"**. Vous obtenez une URL de ce type :
-```
-https://gcormi.forge.apps.education.fr/frojet/mentoria/compagnion.html#config=eyJ...
-```
+### Étape 3 — Section 2 : Pédagogie & Corpus
 
-Ce lien contient toute la configuration encodée — **partagez-le avec vos élèves** via ENT, email ou QR code.
+**Instructions** : décrivez le rôle de l'IA en quelques phrases.
+
+**Source des réponses** (3 choix) :
+- 📄 **Corpus seul** — l'IA répond uniquement à partir de vos documents
+- ⚖️ **Les deux** — corpus + connaissances générales d'Albert (recommandé)
+- 🤖 **Albert seul** — ignore le corpus, connaissances générales uniquement
+
+**Règles pédagogiques** : cochez ce que vous voulez activer.
+Certaines sont cochées par défaut (ton encourageant, rediriger hors sujet, refuser contenu inapproprié).
+
+**Interdictions** : cochez pour restreindre les comportements de l'IA.
+Le champ **Thème strict** limite l'IA à un sujet précis.
+
+**Votre propre règle** : inventez librement une règle en texte libre.
+> Ex: "Commence toujours par une question de relance."
+
+**Corpus** : ajoutez jusqu'à 5 fichiers PDF ou TXT (le cours du jour, une fiche...).
+> Conseil : un corpus ciblé (la fiche de la séance) est plus efficace qu'un gros manuel.
+> Limite recommandée : ~50 pages max.
+
+### Étape 4 — Section 3 : Boutons de réponse rapide
+
+Des boutons s'affichent à l'élève pour l'aider à interagir.
+
+**Bibliothèque pré-configurée** par catégorie :
+- 💡 **Aide** : "Donne-moi un indice", "Je ne comprends pas"...
+- 🔭 **Approfondir** : "En savoir plus", "Un exemple concret"...
+- ✅ **Évaluation** : "Quiz rapide", "Pose-moi une question"...
+- 🗺️ **Navigation** : "Retour au sujet", "Récapitulatif"...
+
+Cliquez sur un bouton pour l'ajouter. Vous pouvez aussi créer des boutons personnalisés.
+
+> Ces boutons sont des **actions ponctuelles** — après y avoir répondu, l'IA reprend son comportement normal.
+
+### Étape 5 — Section 4 : Clé API
+Saisissez votre clé Albert. Elle est mémorisée automatiquement pour les prochains bots.
+
+### Étape 6 — Publier
+Cliquez sur **Publier** → vous obtenez un lien de ce type :
+```
+https://gcormi.forge.apps.education.fr/frojet/mentoria/compagnion.html#config=...
+```
+**Partagez ce lien** à vos élèves via ENT, email ou QR code.
 
 ---
 
 ## Ce que voit l'élève
 
 1. L'élève ouvre le lien
-2. Il saisit son **identifiant** (prénom, pseudonyme, ou code classe)
-3. Il peut discuter avec l'assistant IA
-4. L'assistant répond en respectant vos règles pédagogiques et votre corpus
+2. Il saisit son **prénom ou pseudonyme**
+3. Il discute avec l'assistant IA
+4. Les boutons rapides (si configurés) l'aident à formuler ses demandes
 
-> **Conseil RGPD** : demandez aux élèves d'utiliser un pseudonyme ou leur prénom uniquement — évitez nom + prénom + classe.
-
----
-
-## Bonnes pratiques pédagogiques
-
-- **Corpus ciblé** : plus votre corpus est précis, plus l'assistant sera pertinent
-- **Règles strictes** : activez "Thème strict" pour que le bot refuse les questions hors sujet
-- **Tester avant diffusion** : testez le lien vous-même avant de le donner aux élèves
-- **Un assistant par séquence** : créez un assistant différent pour chaque chapitre ou séance
+> **Conseil RGPD** : demandez aux élèves d'utiliser un pseudonyme — évitez nom + prénom + classe.
 
 ---
 
 ## Partager Mentoria avec un collègue
 
-Un autre enseignant peut utiliser Mentoria de façon totalement indépendante. Il lui suffit de :
+Un collègue peut utiliser Mentoria de façon totalement indépendante :
 
-1. Ouvrir la même URL : `https://gcormi.forge.apps.education.fr/frojet/mentoria/`
-2. Obtenir **sa propre clé API Albert**
-3. Choisir son mode de stockage (voir ci-dessous)
-
-**Les bots de chaque enseignant sont complètement isolés :**
-- Le lien élève est auto-contenu (config encodée dans l'URL) — aucun serveur commun
-- Vous ne voyez jamais les bots de vos collègues, et eux non plus les vôtres
+1. Il ouvre la même URL
+2. Il crée son mot de passe d'application Nuage (5 min, une fois)
+3. Il obtient sa propre clé API Albert
+4. Ses bots sont dans **son** Nuage — personne d'autre n'y a accès
 
 ---
 
-## Modes de stockage des bots
+## Bonnes pratiques pédagogiques
 
-### 🦊 La Forge (recommandé)
-Les bots sont stockés dans votre dépôt GitLab sur `forge.apps.education.fr`.  
-Accessible depuis n'importe quel PC avec votre jeton d'accès. Infrastructure Éducation Nationale.
-
-### 💾 Clé USB / Dossier local
-Les bots sont stockés dans un dossier sur votre PC ou clé USB.  
-Fonctionne sans internet. Accessible uniquement depuis ce PC.
-
-> **Astuce Nuage apps.education.fr** : si vous avez installé l'application de synchronisation Nextcloud sur votre PC, vous pouvez pointer Mentoria vers votre dossier Nuage synchronisé localement. Les bots se retrouvent automatiquement dans votre Nuage via la sync — mais c'est l'application Nextcloud qui fait le travail, pas Mentoria directement.
->
-> ⚠️ La connexion directe au Nuage depuis le navigateur n'est pas possible (blocage CORS).
+- **Corpus ciblé** : le cours du jour, pas le manuel entier
+- **Tester avant diffusion** : ouvrez le lien vous-même avant de le donner aux élèves
+- **Un assistant par séquence** : créez un assistant différent pour chaque chapitre
+- **Règles strictes** : activez "Hors sujet → rediriger" pour cadrer les échanges
+- **Maïeutique** : activez "Ne jamais donner la réponse directement" pour faire réfléchir
 
 ---
 
 ## Questions fréquentes
 
 **L'assistant ne répond pas ?**
-Vérifiez que votre clé API Albert est valide et non expirée. Connectez-vous au Playground Albert pour vérifier.
+Vérifiez que votre clé API Albert est valide. Connectez-vous au Playground Albert pour vérifier.
 
 **L'élève voit "Lien invalide" ?**
 Le lien a été tronqué lors du copier-coller. Repartagez-le en entier.
 
 **Puis-je modifier un assistant après l'avoir créé ?**
-Oui — retournez dans Mentoria Studio, modifiez la configuration et générez un nouveau lien.
+Oui — retournez dans le Studio, chargez le bot depuis votre bibliothèque, modifiez et regénérez le lien.
 
 **Mes élèves ont-ils besoin d'un compte ?**
-Non — aucun compte, aucune installation, juste le lien.
+Non — aucun compte, aucune installation.
+
+**L'IA reste bloquée en mode quiz après qu'un élève a cliqué un bouton ?**
+Cela ne devrait plus arriver — les boutons sont configurés en "action ponctuelle". Si le problème persiste, rechargez la page.
 
 ---
 
 ## Contacts et aide
 
-- **Problème technique** : contactez Gilles Cormi (académie de Corse) via la forge
-- **Accès n8n** (proxy Albert) : Thomas Sanson via Tchap incubateur EN
-- **Communauté enseignants-développeurs** : salon Tchap #n8n de l'incubateur EN
+- **Problème technique** : Gilles Cormi (académie de Corse) via la forge
+- **Accès n8n** (proxy Albert/Nuage) : Thomas Sanson via Tchap incubateur EN
+- **Communauté** : salon Tchap #n8n de l'incubateur EN

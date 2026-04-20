@@ -1,117 +1,215 @@
-# Documentation technique — Mentoria
-
-## Problème résolu : blocage CORS
-
-### Contexte
-Mentoria est hébergé sur la forge des communs numériques de l'Éducation Nationale (`gcormi.forge.apps.education.fr`). L'application appelle l'API Albert (IA souveraine française d'Etalab) pour alimenter les assistants pédagogiques.
-
-### Le problème
-L'API Albert (`https://albert.api.etalab.gouv.fr`) ne retournait pas les headers CORS nécessaires, ce qui bloquait toutes les requêtes depuis le navigateur avec l'erreur :
-```
-Access to fetch has been blocked by CORS policy: 
-No 'Access-Control-Allow-Origin' header is present on the requested resource.
-```
-
-### Solution retenue : proxy n8n souverain
-
-Après investigation, l'équipe **Live Quiz** (V. Schoeffter & G. Remande, académie de Nantes) utilisait déjà un webhook **n8n** hébergé sur `n8n.incubateur.education.gouv.fr` comme proxy souverain entre le navigateur et l'API Albert.
-
-Cette solution a été reproduite pour Mentoria grâce à l'accès obtenu auprès de **Thomas Sanson** (incubateur de l'Éducation Nationale).
+# Documentation technique — Mentoria v2.5
 
 ---
 
-## Architecture de la solution
+## Architecture générale
 
 ```
-Navigateur (élève)
+Navigateur (élève ou prof)
        │
-       ▼
-https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat
-       │  (proxy souverain — Éducation Nationale)
-       ▼
-https://albert.api.etalab.gouv.fr/v1/chat/completions
-       │  (IA souveraine française — Etalab/DINUM)
-       ▼
-Réponse renvoyée au navigateur
+       ├─► n8n.incubateur.education.gouv.fr/webhook/mentoria_chat
+       │         (proxy Albert — API IA souveraine)
+       │
+       ├─► n8n.incubateur.education.gouv.fr/webhook/mentoria_storage
+       │         (proxy Nuage — WebDAV apps.education.fr)
+       │
+       └─► forge.apps.education.fr / nuage.apps.education.fr
+                 (stockage des bots JSON)
 ```
 
-**Souveraineté** : 100% infrastructure française (EN + Etalab), aucun service américain impliqué.
+**Souveraineté** : 100% infrastructure française (EN + Etalab/DINUM). Aucun service américain.
+
+---
+
+## Problème CORS résolu
+
+L'API Albert (`https://albert.api.etalab.gouv.fr`) ne retourne pas les headers CORS nécessaires depuis un navigateur. Solution : proxy n8n souverain hébergé sur `n8n.incubateur.education.gouv.fr`, obtenu via **Thomas Sanson** (incubateur EN).
 
 ---
 
 ## Fichiers clés
 
-### `compagnion.html`
-L'URL du proxy est définie ligne ~337 :
-```javascript
-const ALBERT_PROXY_URL = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat';
+| Fichier | Rôle |
+|---------|------|
+| `index.html` | Studio de création (interface professeur) |
+| `compagnion.html` | Interface élève (lien partageable) |
+| `mentoria_proxy.json` | Workflow n8n — proxy Albert API |
+| `mentoria_storage.json` | Workflow n8n — proxy Nuage apps.edu (WebDAV) |
+| `worker.js` | Alternative Cloudflare Worker (secours, non souverain) |
+
+---
+
+## Workflow n8n 1 — Proxy Albert (`mentoria_chat`)
+
+**URL** : `https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat`
+
+3 nœuds : Webhook POST → HTTP Request Albert API → Répondre
+
+Le navigateur envoie :
+```json
+{
+  "model": "openweight-medium",
+  "messages": [...],
+  "temperature": 0.7
+}
 ```
-Pour changer le proxy, modifier uniquement cette ligne.
-
-### `mentoria_proxy.json`
-Workflow n8n à importer sur `n8n.incubateur.education.gouv.fr`.
-Contient 3 nœuds :
-1. **Webhook** — reçoit les requêtes POST depuis le navigateur (CORS `*` activé)
-2. **Albert API** — relaie la requête vers l'API Albert avec le header Authorization
-3. **Répondre** — retourne la réponse au navigateur
-
-### `worker.js`
-Alternative Cloudflare Worker (solution de secours, non souveraine).
-À utiliser uniquement si le webhook n8n devient indisponible.
+avec le header `Authorization: Bearer sk-...`
 
 ---
 
-## Déploiement du workflow n8n
+## Workflow n8n 2 — Proxy Nuage (`mentoria_storage`)
 
-1. Se connecter sur `https://n8n.incubateur.education.gouv.fr`
-   (accès via Thomas Sanson — canal Tchap incubateur EN)
-2. Créer un nouveau workflow
-3. Importer `mentoria_proxy.json` via le menu `...` → Import from file
-4. Publier le workflow
-5. Récupérer la **Production URL** du nœud Webhook :
-   `https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat`
+**URL** : `https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage`
+
+3 nœuds : Webhook POST → Code JavaScript (logique WebDAV) → Répondre
+
+### Actions supportées
+
+| Action | Méthode WebDAV | Description |
+|--------|---------------|-------------|
+| `test` | GET OCS API | Vérifie les identifiants, crée le dossier Mentoria |
+| `list` | GET | Lit `manifest.json` (liste des bots) |
+| `read` | GET | Lit un fichier `bot_xxx.json` |
+| `write` | PUT | Écrit un fichier + met à jour `manifest.json` |
+| `delete` | DELETE | Supprime un fichier + met à jour `manifest.json` |
+
+### Pourquoi un manifest ?
+La méthode WebDAV `PROPFIND` (listing de dossier) n'est pas supportée par le moteur HTTP du Code node n8n. On utilise à la place un fichier `manifest.json` qui liste les bots — mis à jour à chaque écriture/suppression.
+
+### Structure dans le Nuage
+```
+nuage.apps.education.fr/remote.php/dav/files/{username}/Mentoria/
+├── manifest.json          ← liste des noms de fichiers
+├── bot_1234567890.json
+├── bot_9876543210.json
+└── ...
+```
+
+### Requête depuis le Studio
+```javascript
+fetch('https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'list' | 'read' | 'write' | 'delete' | 'test',
+    username: 'gcormi',
+    password: 'mot-de-passe-application',
+    filename: 'bot_xxx.json',   // pour read/write/delete
+    content: { ... }            // pour write
+  })
+})
+```
 
 ---
 
-## Contacts utiles
+## Modes de stockage (Studio)
 
-| Personne | Rôle | Contact |
-|----------|------|---------|
-| Vincent Schoeffter | Co-auteur Live Quiz | vincent.schoeffter@ac-nantes.fr |
-| Gauthier Remande | Co-auteur Live Quiz | gauthier.remande@ac-nantes.fr |
-| Thomas Sanson | Accès n8n incubateur EN | Via Tchap incubateur |
+### 🦊 La Forge (GitLab EN)
+- Bots stockés dans `{projet}/mentoria/bot_xxx.json`
+- API GitLab : lecture/écriture via `PRIVATE-TOKEN`
+- Accessible depuis n'importe quel PC avec le jeton
+
+### ☁️ Nuage apps.education.fr
+- Bots stockés dans `Mentoria/` du Nuage personnel
+- Via proxy n8n WebDAV
+- Nécessite un **mot de passe d'application** (pas le vrai mot de passe)
+- Création : Nuage → Paramètres → Sécurité → Mot de passe d'application
+
+### 💾 Dossier local / USB
+- Bots dans un dossier choisi via File System Access API
+- Chrome/Edge uniquement
+- Non portable entre PC (sauf si dossier Nuage synchronisé)
+
+---
+
+## Lien élève — Encodage
+
+Le lien élève contient toute la configuration encodée dans le hash URL :
+```
+compagnion.html#config={encoded}
+```
+
+**Encodage (index.html)** :
+```javascript
+LZString.compressToEncodedURIComponent(JSON.stringify(bot))
+```
+
+**Décodage (compagnion.html)** :
+```javascript
+// Essaie LZString (nouveau format), puis btoa (ancien format)
+json = LZString.decompressFromEncodedURIComponent(b64);
+```
+
+LZString compresse le JSON à ~40% de sa taille originale, permettant des corpus de 300KB+ sans problème.
+
+---
+
+## Limites du corpus
+
+| Taille texte | Verdict |
+|-------------|---------|
+| < 50KB (≈ 15 pages) | ✅ Idéal |
+| 50-120KB (≈ 50 pages) | ✅ OK — limite de la fenêtre Albert |
+| 120-300KB | ⚠️ Albert ignore la fin |
+| > 300KB | ❌ Lien trop long |
+
+PDF.js extrait uniquement le texte (pas les images). 50 pages PDF ≈ 75-100KB de texte extrait.
+
+---
+
+## Avatar / vignette
+
+L'image uploadée est automatiquement redimensionnée à **128×128 px max** (JPEG 82%) via un canvas HTML5 avant stockage. Cela réduit une photo de 400KB à ~6KB.
 
 ---
 
 ## Modèles Albert disponibles
 
-L'API Albert propose les alias suivants (vérifiés avril 2026) :
-
 | Alias | Modèle | Usage |
 |-------|--------|-------|
 | `openweight-large` | openai/gpt-oss-120b | Tâches complexes |
-| `openweight-medium` | mistralai/Mistral-Small-3.2-24B-Instruct-2506 | Tâches modérées ✅ **utilisé par Mentoria** |
+| `openweight-medium` | mistralai/Mistral-Small-3.2-24B-Instruct-2506 | **Défaut Mentoria** ✅ |
 | `openweight-small` | mistralai/Ministral-3-8B-Instruct-2512 | Tâches simples |
 | `openweight-code` | Qwen/Qwen3-Coder-30B | Code |
-| `openweight-audio` | openai/whisper-large-v3 | Transcription audio |
-| `openweight-embeddings` | BAAI/bge-m3 | Vectorisation RAG |
+| `openweight-audio` | openai/whisper-large-v3 | Audio |
+| `openweight-embeddings` | BAAI/bge-m3 | RAG |
 
-**Modèle par défaut dans Mentoria : `openweight-medium`**
-Défini dans `compagnion.html` : `model: botConfig.model || 'openweight-medium'`
-Peut être surchargé par le champ `model` dans la config du bot.
+**`openweight-medium`** = Mistral Small 3.2 (24B) ≈ GPT-4o mini. Rapide, suit bien les instructions système, suffisant pour usage scolaire.
 
-### Équivalences et choix du modèle
+---
 
-| Alias Albert | Équivalent commercial | Recommandation |
-|-------------|----------------------|----------------|
-| `openweight-small` | ≈ GPT-3.5 | Trop limité pour Mentoria |
-| `openweight-medium` | ≈ GPT-4o mini / Claude Haiku | **Recommandé** — rapide, suffisant pour usage scolaire |
-| `openweight-large` | ≈ GPT-4o / Claude Sonnet | Plus puissant mais plus lent |
+## Source des réponses
 
-**`openweight-medium` (Mistral Small 3.2, 24B paramètres)** est le bon compromis pour Mentoria :
-- Suit bien les instructions système (corpus, règles pédagogiques)
-- Rapide pour des échanges en classe
-- Suffisant pour expliquer un cours, donner des indices, poser des questions
-- Pas adapté à du raisonnement très complexe (maths avancées, dissertations longues)
+Champ `config.answerSource` dans le bot JSON :
 
-Pour des assistants sur des sujets complexes, passer à `openweight-large` est possible en modifiant le champ `model` dans la config du bot.
+| Valeur | Comportement |
+|--------|-------------|
+| `'both'` | Corpus + connaissances générales (défaut) |
+| `'corpus'` | Corpus exclusivement — l'IA signale si absent |
+| `'albert'` | Connaissances générales uniquement (corpus ignoré) |
+
+Modifie le system prompt dans `compagnion.html` ligne ~424.
+
+---
+
+## Boutons de réponse rapide — comportement
+
+Les boutons rapides envoient un prompt "one-shot" pour éviter que l'IA reste bloquée dans un mode (ex: quiz permanent). Le prompt réel est préfixé par :
+
+```
+[DEMANDE PONCTUELLE — exécute UNIQUEMENT cette action,
+puis reprends ton rôle d'assistant habituel pour la suite]
+```
+
+L'élève voit le label du bouton, pas ce préfixe.
+
+---
+
+## Contacts
+
+| Personne | Rôle | Contact |
+|----------|------|---------|
+| Gilles Cormi | Auteur Mentoria | forge.apps.education.fr |
+| Thomas Sanson | Accès n8n incubateur EN | Via Tchap incubateur |
+| Vincent Schoeffter | Co-auteur Live Quiz | vincent.schoeffter@ac-nantes.fr |
+| Gauthier Remande | Co-auteur Live Quiz | gauthier.remande@ac-nantes.fr |

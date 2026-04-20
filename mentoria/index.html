@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
     <style>
         :root {
@@ -209,11 +210,23 @@
         const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            const img = document.getElementById('vignette-preview');
-            const ph = document.getElementById('vignette-placeholder');
-            if (img) { img.src = e.target.result; img.classList.remove('hidden'); }
-            if (ph) ph.classList.add('hidden');
-            updatePreviews();
+            // Redimensionne l'image à max 128x128 pour garder le lien léger
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 128;
+                const ratio = Math.min(MAX / tempImg.width, MAX / tempImg.height, 1);
+                canvas.width = Math.round(tempImg.width * ratio);
+                canvas.height = Math.round(tempImg.height * ratio);
+                canvas.getContext('2d').drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+                const small = canvas.toDataURL('image/jpeg', 0.82);
+                const img = document.getElementById('vignette-preview');
+                const ph = document.getElementById('vignette-placeholder');
+                if (img) { img.src = small; img.classList.remove('hidden'); }
+                if (ph) ph.classList.add('hidden');
+                updatePreviews();
+            };
+            tempImg.src = e.target.result;
         };
         reader.readAsDataURL(file);
     };
@@ -1100,7 +1113,7 @@
     window.publishBot = async () => {
         await saveCurrentBot();
         const bot = library[currentBotId]; if (!bot) return;
-        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(bot))));
+        const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(bot));
         const base = window.location.href.replace(/index\.html.*$/, '');
         document.getElementById('share-link').value = base + 'compagnion.html#config=' + encoded;
         document.getElementById('publish-modal').classList.remove('hidden');

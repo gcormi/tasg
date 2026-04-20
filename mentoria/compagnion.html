@@ -6,6 +6,7 @@
     <title>Mon Tuteur - Mentoria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
@@ -221,7 +222,14 @@
         }
         try {
             const b64 = hash.slice(prefix.length);
-            const json = decodeURIComponent(escape(atob(b64)));
+            // Essaie LZString (nouveau format), puis btoa (ancien format)
+            let json;
+            try {
+                json = LZString.decompressFromEncodedURIComponent(b64);
+                if (!json) throw new Error('LZ vide');
+            } catch {
+                json = decodeURIComponent(escape(atob(b64)));
+            }
             botConfig = JSON.parse(json);
             if (!botConfig || !botConfig.config || !botConfig.config.title) throw new Error('Structure invalide');
             renderBotAppearance();
