@@ -195,7 +195,11 @@
      LOGIQUE PRINCIPALE — SANS FIREBASE
 ══════════════════════════════════════ -->
 <script>
-    lucide.createIcons();
+    // Sécurité pour Lucide
+    function safeCreateIcons() {
+        try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error("Lucide failed", e); }
+    }
+    safeCreateIcons();
 
     // ─── 1. DÉCODAGE DE LA CONFIG DEPUIS L'URL (#config=BASE64) ───────────────
     let botConfig = null;
@@ -205,7 +209,7 @@
         document.getElementById('error-message').textContent = msg;
         document.getElementById('error-detail').textContent = detail;
         document.getElementById('error-screen').classList.add('visible');
-        lucide.createIcons();
+        safeCreateIcons();
     }
 
     (function loadConfig() {
@@ -250,9 +254,10 @@
     let chatHistory = [];
     let studentName = '';
 
-    // Activer le bouton "Entrer" dès qu'on tape un identifiant
+    // Activer le bouton "Entrer" dès qu'on tape un identifiant (et que le bot est chargé)
     document.getElementById('student-name-input').addEventListener('input', function() {
-        document.getElementById('start-btn').disabled = !this.value.trim();
+        const btn = document.getElementById('start-btn');
+        btn.disabled = !this.value.trim() || !botConfig;
     });
 
     window.startChat = function() {
@@ -298,7 +303,7 @@
             </button>
         `).join('');
         container.classList.remove('hidden');
-        lucide.createIcons();
+        safeCreateIcons();
     }
 
     window.handleQuickReply = function(idx) {
@@ -353,7 +358,7 @@
                 </div>
             `);
         });
-        lucide.createIcons();
+        safeCreateIcons();
         setTimeout(() => container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' }), 50);
     }
 
