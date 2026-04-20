@@ -590,20 +590,49 @@
                                 <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="PATIENCE"><span class="text-[11px] text-gray-700">Guidage pas à pas</span></label>
                                 <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CELEBRATE"><span class="text-[11px] text-gray-700">Célébrer les victoires</span></label>
                                 <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="SHORT_TEXTS"><span class="text-[11px] text-gray-700">Textes courts</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CRITICAL_THINKING"><span class="text-[11px] text-gray-700">Stimuler la pensée critique</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="INTERACTIVE"><span class="text-[11px] text-gray-700">Conversation interactive</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="FUN"><span class="text-[11px] text-gray-700">Atmosphère ludique</span></label>
                             </div>
                         </div>
 
-                        <!-- Barrière thématique -->
+                        <!-- Interdictions -->
                         <div class="p-3 rounded-lg" style="background:#fff1f2;border:1px solid #fecdd3">
-                            <label class="label" style="color:#be123c">🛡️ Barrière Thématique Stricte</label>
-                            <input type="text" id="bot-strict-theme" class="input-field" style="border-color:#fecdd3" placeholder="Ex: La technologie au collège cycle 4">
-                            <p class="text-[9px] mt-1 italic" style="color:#e11d48">Si l'élève sort de ce thème, l'IA refusera de répondre.</p>
+                            <label class="label" style="color:#be123c">🚫 Interdictions & Restrictions</label>
+                            <div class="space-y-2 mt-2">
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="REDIRECT_OFF_TOPIC" style="accent-color:#e11d48">
+                                    <span class="text-[11px] text-gray-700">Hors sujet → rediriger vers le thème (ne pas répondre)</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_DIRECT_ANSWER">
+                                    <span class="text-[11px] text-gray-700">Ne jamais donner la réponse directement</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_EXTERNAL_TOOLS">
+                                    <span class="text-[11px] text-gray-700">Ne pas suggérer d'autres sites, outils ou IA</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_INAPPROPRIATE">
+                                    <span class="text-[11px] text-gray-700">Refuser tout contenu inapproprié ou offensant</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_SPOILERS">
+                                    <span class="text-[11px] text-gray-700">Ne pas révéler les réponses aux exercices/évaluations</span>
+                                </label>
+                            </div>
+                            <div class="mt-3">
+                                <label class="label" style="color:#be123c">Thème strict (optionnel)</label>
+                                <input type="text" id="bot-strict-theme" class="input-field" style="border-color:#fecdd3" placeholder="Ex: La technologie au collège cycle 4">
+                                <p class="text-[9px] mt-1 italic" style="color:#e11d48">Précise le thème autorisé si vous avez coché "Hors sujet → rediriger".</p>
+                            </div>
                         </div>
 
-                        <!-- Règles personnalisées -->
-                        <div>
-                            <label class="label">Règles personnalisées</label>
-                            <textarea id="bot-custom-rules" class="input-field" rows="2" placeholder="Ex: Terminz toujours par un encouragement. Utilisez des exemples concrets…"></textarea>
+                        <!-- Règle inventée par l'enseignant -->
+                        <div class="p-3 rounded-lg border-2 border-dashed" style="border-color:#c7d2fe;background:#eef2ff">
+                            <label class="label" style="color:#4338ca">✏️ Votre propre règle</label>
+                            <p class="text-[10px] mb-2" style="color:#6366f1">Décrivez librement une règle que vous inventez — l'IA l'appliquera comme les autres.</p>
+                            <textarea id="bot-custom-rules" class="input-field" rows="3" placeholder="Ex: Commence toujours ta réponse par une question de relance.&#10;Ex: Utilise uniquement des exemples liés au quotidien des collégiens.&#10;Ex: Termine chaque réponse par un emoji encourageant."></textarea>
                         </div>
 
                         <!-- Corpus -->
@@ -814,7 +843,15 @@
         'CREATIVITY': 'Encourage la créativité dans la résolution de problèmes.',
         'PATIENCE': "Reste patient et guide l'élève à travers les défis, pas à pas.",
         'CELEBRATE': "Célèbre les petites victoires et les progrès de l'élève.",
-        'SHORT_TEXTS': "Utilise des textes courts pour favoriser l'engagement."
+        'SHORT_TEXTS': "Utilise des textes courts pour favoriser l'engagement.",
+        'CRITICAL_THINKING': "Pose des questions pour stimuler la pensée critique de l'élève.",
+        'INTERACTIVE': "Maintiens la conversation interactive et engageante.",
+        'FUN': "Crée une atmosphère ludique et positive — apprendre doit être amusant !",
+        'REDIRECT_OFF_TOPIC': "INTERDIT : Si l'élève pose une question hors sujet, ne réponds pas. Redirige-le poliment vers le thème principal en expliquant que tu ne peux traiter que ce sujet.",
+        'NO_DIRECT_ANSWER': "INTERDIT : Ne donne jamais la réponse directement. Guide toujours l'élève pour qu'il trouve par lui-même.",
+        'NO_EXTERNAL_TOOLS': "INTERDIT : Ne suggère jamais d'autres sites web, outils numériques ou intelligences artificielles.",
+        'NO_INAPPROPRIATE': "INTERDIT : Refuse immédiatement toute demande de contenu violent, offensant ou inapproprié pour un contexte scolaire.",
+        'NO_SPOILERS': "INTERDIT : Ne révèle jamais les réponses aux exercices, évaluations ou devoirs. Aide l'élève à trouver, sans donner la solution."
     };
 
     const sourceHints = {
@@ -1041,6 +1078,11 @@
         currentBotId = null;
         ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text','api-proxy-url'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         document.querySelectorAll('.rule-toggle').forEach(cb => cb.checked = false);
+        // Règles cochées par défaut sur un nouveau bot
+        ['TONE_ENCOURAGE', 'NO_INAPPROPRIATE', 'INTERACTIVE', 'REDIRECT_OFF_TOPIC'].forEach(key => {
+            const cb = document.querySelector(`.rule-toggle[value="${key}"]`);
+            if (cb) cb.checked = true;
+        });
         setAnswerSource('both');
         uploadedFiles = []; quickReplies = [];
         updateFileUI(); renderQuickReplies();
