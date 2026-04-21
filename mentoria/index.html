@@ -325,7 +325,10 @@
         });
         if (!res.ok) throw new Error('Proxy erreur ' + res.status);
         const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Erreur inconnue');
+        if (!data.success) {
+            const debugInfo = data.debug ? '\n\nDébug: ' + JSON.stringify(data.debug) : '';
+            throw new Error((data.error || 'Erreur inconnue') + debugInfo);
+        }
         return data;
     }
 
