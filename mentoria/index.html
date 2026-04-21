@@ -108,13 +108,15 @@
                                 <input id="nuage-password" type="password" placeholder="Mot de passe d'application" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
                                 <button onclick="connectNuage()" class="px-4 py-2 text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap" style="background:#0369a1">Se connecter</button>
                             </div>
+                            <input id="nuage-server" type="text" placeholder="Instance Nuage (ex: nuage03.apps.education.fr)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono text-gray-500">
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="remember-nuage">
                                 <span class="text-[10px] text-gray-500">Rester connecté sur ce PC</span>
                             </label>
                         </div>
                         <p class="text-[10px] mt-2" style="color:#0369a1">
-                            💡 <strong>Mot de passe d'application :</strong> dans votre Nuage → Paramètres → Sécurité → <em>Créer un nouveau mot de passe d'application</em>
+                            💡 <strong>Mot de passe d'application :</strong> dans votre Nuage → Paramètres → Sécurité → <em>Créer un nouveau mot de passe d'application</em><br>
+                            💡 <strong>Instance :</strong> laisser vide par défaut. Si erreur 405, indiquez votre URL Nuage (visible dans l'adresse de votre navigateur sur apps.edu).
                         </p>
                     </div>
                 </div>
@@ -333,13 +335,13 @@
 
     // ── NUAGE apps.edu ──
     const NUAGE_PROXY_URL = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage';
-    let nuageUsername = null, nuagePassword = null;
+    let nuageUsername = null, nuagePassword = null, nuageServer = null;
 
     async function callNuage(action, options = {}) {
         const res = await fetch(NUAGE_PROXY_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, username: nuageUsername, password: nuagePassword, ...options })
+            body: JSON.stringify({ action, username: nuageUsername, password: nuagePassword, server: nuageServer, ...options })
         });
         if (!res.ok) throw new Error('Proxy erreur ' + res.status);
         const data = await res.json();
@@ -353,8 +355,9 @@
     window.connectNuage = async () => {
         const u = document.getElementById('nuage-username')?.value.trim();
         const p = document.getElementById('nuage-password')?.value.trim();
+        const s = document.getElementById('nuage-server')?.value.trim() || 'nuage.apps.education.fr';
         if (!u || !p) { alert('Identifiant et mot de passe requis.'); return; }
-        nuageUsername = u; nuagePassword = p;
+        nuageUsername = u; nuagePassword = p; nuageServer = s;
         storageMode = 'nuage';
         try {
             showToast('⏳ Connexion…', 'Vérification du Nuage apps.edu…');
@@ -362,9 +365,11 @@
             if (document.getElementById('remember-nuage')?.checked) {
                 localStorage.setItem('mentoria_nuage_user', u);
                 localStorage.setItem('mentoria_nuage_pass', p);
+                localStorage.setItem('mentoria_nuage_server', s);
             } else {
                 localStorage.removeItem('mentoria_nuage_user');
                 localStorage.removeItem('mentoria_nuage_pass');
+                localStorage.removeItem('mentoria_nuage_server');
             }
             document.getElementById('startup-screen').style.display = 'none';
             updateStorageBadge('☁️ Nuage : ' + u);
@@ -380,7 +385,13 @@
     window.addEventListener('DOMContentLoaded', () => {
         const su = localStorage.getItem('mentoria_nuage_user');
         const sp = localStorage.getItem('mentoria_nuage_pass');
-        if (su) { document.getElementById('nuage-username').value = su; document.getElementById('nuage-password').value = sp || ''; document.getElementById('remember-nuage').checked = true; }
+        const ss = localStorage.getItem('mentoria_nuage_server');
+        if (su) {
+            document.getElementById('nuage-username').value = su;
+            document.getElementById('nuage-password').value = sp || '';
+            if (ss && ss !== 'nuage.apps.education.fr') document.getElementById('nuage-server').value = ss;
+            document.getElementById('remember-nuage').checked = true;
+        }
     });
 
     function updateStorageBadge(label) {

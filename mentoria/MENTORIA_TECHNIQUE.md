@@ -1,4 +1,4 @@
-# Documentation technique — Mentoria v2.5
+# Documentation technique — Mentoria v2.6
 
 ---
 
@@ -76,9 +76,17 @@ avec le header `Authorization: Bearer sk-...`
 ### Pourquoi un manifest ?
 La méthode WebDAV `PROPFIND` (listing de dossier) n'est pas supportée par le moteur HTTP du Code node n8n. On utilise à la place un fichier `manifest.json` qui liste les bots — mis à jour à chaque écriture/suppression.
 
+### Gestion des instances Nuage
+
+apps.education.fr répartit les utilisateurs sur plusieurs instances (`nuage01`, `nuage02`, `nuage03`...). Le proxy accepte un paramètre `server` optionnel pour cibler la bonne instance. Si absent, il utilise `nuage.apps.education.fr` par défaut.
+
+Le champ "Instance Nuage" dans le Studio permet à l'enseignant de préciser son instance (visible dans l'URL de son navigateur quand il est connecté au Nuage). La valeur est sauvegardée dans `localStorage` si "Rester connecté" est coché.
+
+**Diagnostic d'un 405 :** la réponse `test` inclut `debug.server` pour confirmer l'instance utilisée.
+
 ### Structure dans le Nuage
 ```
-nuage.apps.education.fr/remote.php/dav/files/{username}/Mentoria/
+{nuageXX}.apps.education.fr/remote.php/dav/files/{username}/mentoria/
 ├── manifest.json          ← liste des noms de fichiers
 ├── bot_1234567890.json
 ├── bot_9876543210.json
@@ -94,6 +102,7 @@ fetch('https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage', {
     action: 'list' | 'read' | 'write' | 'delete' | 'test',
     username: 'gcormi',
     password: 'mot-de-passe-application',
+    server: 'nuage03.apps.education.fr',  // optionnel, défaut : nuage.apps.education.fr
     filename: 'bot_xxx.json',   // pour read/write/delete
     content: { ... }            // pour write
   })
@@ -211,5 +220,8 @@ L'élève voit le label du bouton, pas ce préfixe.
 |----------|------|---------|
 | Gilles Cormi | Auteur Mentoria | forge.apps.education.fr |
 | Thomas Sanson | Accès n8n incubateur EN | Via Tchap incubateur |
+| Nicolas Varlot | Support Nuage Ac-Versailles | Via Tchap apps.edu |
+| Paulo Santos | Support Nuage Ac-Reims | Via Tchap apps.edu |
+| Benoît Piedallu | Support technique EN | Via Tchap apps.edu |
 | Vincent Schoeffter | Co-auteur Live Quiz | vincent.schoeffter@ac-nantes.fr |
 | Gauthier Remande | Co-auteur Live Quiz | gauthier.remande@ac-nantes.fr |

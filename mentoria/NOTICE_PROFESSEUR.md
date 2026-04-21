@@ -1,4 +1,4 @@
-# Notice d'utilisation — Mentoria v2.5
+# Notice d'utilisation — Mentoria v2.6
 ## Guide pour les enseignants
 
 ---
@@ -39,13 +39,19 @@ Vos bots sont stockés dans votre Nuage personnel EN. Accessible depuis n'import
 
 **Première connexion (5 minutes, une seule fois) :**
 1. Connectez-vous sur [nuage.apps.education.fr](https://nuage.apps.education.fr)
-2. Cliquez sur votre nom en haut à droite → **Paramètres**
-3. Menu gauche → **Sécurité**
-4. Tout en bas : **"Créer un nouveau mot de passe d'application"**
-5. Nom : tapez `Mentoria` → **Créer**
-6. **Copiez le mot de passe affiché** (une seule fois !)
+2. Notez l'URL de votre navigateur — elle ressemble à `https://nuage03.apps.education.fr/...` : retenez `nuage03` (ou `nuage01`, `nuage02`... selon votre académie)
+3. Cliquez sur votre nom en haut à droite → **Paramètres**
+4. Menu gauche → **Sécurité**
+5. Tout en bas : **"Créer un nouveau mot de passe d'application"**
+6. Nom : tapez `Mentoria` → **Créer**
+7. **Copiez le mot de passe affiché** (une seule fois !)
 
 > ⚠️ Ce n'est pas votre vrai mot de passe — c'est un mot de passe spécifique à Mentoria, plus sûr.
+
+**Dans Mentoria Studio :**
+- Saisissez votre identifiant et ce mot de passe d'application
+- Dans le champ **"Instance Nuage"**, entrez votre URL notée à l'étape 2 (ex: `nuage03.apps.education.fr`)
+- Si vous laissez ce champ vide et obtenez une erreur 405, c'est qu'il faut renseigner votre instance
 
 #### 🦊 La Forge (GitLab EN)
 Pour les enseignants à l'aise avec les outils numériques. Bots stockés dans votre dépôt GitLab.
@@ -175,6 +181,9 @@ Non — aucun compte, aucune installation.
 
 **L'IA reste bloquée en mode quiz après qu'un élève a cliqué un bouton ?**
 Cela ne devrait plus arriver — les boutons sont configurés en "action ponctuelle". Si le problème persiste, rechargez la page.
+
+**Erreur 405 lors de la connexion au Nuage ?**
+Votre compte est sur une instance spécifique (nuage01, nuage02, nuage03...). Connectez-vous sur votre Nuage et regardez l'URL dans votre navigateur. Renseignez cette instance dans le champ "Instance Nuage" du Studio (ex: `nuage03.apps.education.fr`).
 
 ---
 
