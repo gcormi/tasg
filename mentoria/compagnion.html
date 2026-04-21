@@ -97,7 +97,7 @@
                 <input
                     type="text"
                     id="student-name-input"
-                    placeholder="Ex: prenom.nom"
+                    placeholder="Ex: jmartin (votre identifiant ENT)"
                     class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 mt-2 focus:border-indigo-500 focus:bg-white outline-none transition-all text-center font-black text-base text-slate-900 shadow-sm"
                 >
             </div>
@@ -142,6 +142,9 @@
                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Élève</span>
                 <span class="text-[11px] font-black text-slate-900" id="display-student-name">...</span>
             </div>
+            <button onclick="exportDiscussion()" title="Sauvegarder la discussion" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 transition-colors" style="pointer-events:auto">
+                <i data-lucide="download" class="w-4 h-4"></i>
+            </button>
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 group-hover:text-indigo-400 transition-colors pointer-events-none">
                 <i data-lucide="grip-horizontal" class="w-5 h-5"></i>
             </div>
@@ -521,6 +524,49 @@ ${(() => {
         dragHandle.style.cursor = 'move';
         document.body.style.userSelect = '';
     });
+
+    // ─── EXPORT DISCUSSION ────────────────────────────────────────────────────
+    window.exportDiscussion = function() {
+        if (!chatHistory.length) return;
+
+        const cfg = botConfig.config;
+        const botName = (cfg.name || 'Assistant').replace(/[^a-zA-Z0-9_\-]/g, '_');
+        const identifiant = (studentName || 'eleve').replace(/[^a-zA-Z0-9_\-]/g, '_');
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const heureStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        let lines = [];
+        lines.push('══════════════════════════════════════════════');
+        lines.push(`  Mentoria — Export de discussion`);
+        lines.push(`  Bot       : ${cfg.name || 'Assistant'}`);
+        lines.push(`  Thème     : ${cfg.theme || cfg.title || ''}`);
+        lines.push(`  Identifiant : ${studentName}`);
+        lines.push(`  Date      : ${dateStr} à ${heureStr}`);
+        lines.push('══════════════════════════════════════════════');
+        lines.push('');
+
+        for (const msg of chatHistory) {
+            if (msg.role === 'assistant') {
+                lines.push(`[${cfg.name || 'Assistant'}]`);
+                lines.push(msg.content);
+            } else {
+                lines.push(`[${studentName}]`);
+                lines.push(msg.content);
+            }
+            lines.push('');
+        }
+
+        const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Mentoria_${botName}_${identifiant}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
 
 </script>
 </body>
