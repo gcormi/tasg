@@ -88,6 +88,8 @@ Au démarrage, choisissez votre mode de stockage et connectez-vous.
 ### Étape 3 — Section 2 : Pédagogie & Corpus
 
 **Instructions** : décrivez le rôle de l'IA en quelques phrases.
+> ⚠️ **Limite instructions : 200 mots maximum** (≈ 1 Ko). Au-delà, Albert ignore une partie des consignes.
+> Modèle efficace : *"Tu es un professeur expérimenté de [discipline]. Tu t'adresses à des élèves de [niveau]. Tu guides sans donner les réponses directement. Tu utilises des exemples concrets."*
 
 **Source des réponses** (3 choix) :
 - 📄 **Corpus seul** — l'IA répond uniquement à partir de vos documents
@@ -104,8 +106,9 @@ Le champ **Thème strict** limite l'IA à un sujet précis.
 > Ex: "Commence toujours par une question de relance."
 
 **Corpus** : ajoutez jusqu'à 5 fichiers PDF ou TXT (le cours du jour, une fiche...).
+> ⚠️ **Limite corpus : 200 Ko maximum** (environ 7 cours de 28 Ko, ou ~50 pages PDF).
 > Conseil : un corpus ciblé (la fiche de la séance) est plus efficace qu'un gros manuel.
-> Limite recommandée : ~50 pages max.
+> Format idéal : fichiers TXT exportés depuis vos cours — plus légers et mieux lus qu'un PDF.
 
 ### Étape 4 — Section 3 : Boutons de réponse rapide
 
