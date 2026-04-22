@@ -528,6 +528,7 @@ ${(() => {
     // ─── EXPORT DISCUSSION ────────────────────────────────────────────────────
     window.exportDiscussion = function() {
         if (!chatHistory.length) return;
+        if (!confirm('Voulez-vous vraiment exporter cette discussion ? Un fichier texte va être téléchargé sur votre appareil.')) return;
 
         const cfg = botConfig.config;
         const botName = (cfg.name || 'Assistant').replace(/[^a-zA-Z0-9_\-]/g, '_');
