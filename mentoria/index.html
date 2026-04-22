@@ -665,6 +665,22 @@
                                     <input type="checkbox" class="rule-toggle" value="NO_SPOILERS">
                                     <span class="text-[11px] text-gray-700">Ne pas révéler les réponses aux exercices/évaluations</span>
                                 </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_LONG_REPLY">
+                                    <span class="text-[11px] text-gray-700">Réponses courtes (150 mots max) — laisser la parole à l'élève</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_VALIDATE_WRONG">
+                                    <span class="text-[11px] text-gray-700">Ne jamais valider une réponse incorrecte de l'élève</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_JARGON">
+                                    <span class="text-[11px] text-gray-700">Pas de jargon sans explication immédiate</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_ADULT_CONTENT">
+                                    <span class="text-[11px] text-gray-700">Refuser les sujets non scolaires (réseaux sociaux, jeux…)</span>
+                                </label>
                             </div>
                             <div class="mt-3">
                                 <label class="label" style="color:#be123c">Thème strict (optionnel)</label>
@@ -901,7 +917,11 @@
         'NO_DIRECT_ANSWER': "INTERDIT : Ne donne jamais la réponse directement. Guide toujours l'élève pour qu'il trouve par lui-même.",
         'NO_EXTERNAL_TOOLS': "INTERDIT : Ne suggère jamais d'autres sites web, outils numériques ou intelligences artificielles.",
         'NO_INAPPROPRIATE': "INTERDIT : Refuse immédiatement toute demande de contenu violent, offensant ou inapproprié pour un contexte scolaire.",
-        'NO_SPOILERS': "INTERDIT : Ne révèle jamais les réponses aux exercices, évaluations ou devoirs. Aide l'élève à trouver, sans donner la solution."
+        'NO_SPOILERS': "INTERDIT : Ne révèle jamais les réponses aux exercices, évaluations ou devoirs. Aide l'élève à trouver, sans donner la solution.",
+        'NO_LONG_REPLY': "INTERDIT : Ne fais jamais de longs monologues. Chaque réponse doit être courte (150 mots max) et laisser la parole à l'élève.",
+        'NO_VALIDATE_WRONG': "INTERDIT : Ne valide jamais une réponse incorrecte de l'élève, même partiellement. Signale l'erreur avec bienveillance.",
+        'NO_JARGON': "INTERDIT : N'utilise pas de termes techniques ou de jargon sans les expliquer immédiatement avec des mots simples.",
+        'NO_ADULT_CONTENT': "INTERDIT : Refuse toute discussion sur des sujets non scolaires (réseaux sociaux, jeux vidéo, vie privée). Redirige vers l'apprentissage."
     };
 
     const sourceHints = {
