@@ -699,7 +699,7 @@
                                     <input type="text" id="corpus-url-input" placeholder="https://fr.wikipedia.org/wiki/..." class="input-field text-xs flex-1">
                                     <button onclick="addCorpusUrl()" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-white" style="background:var(--teal)">+ Ajouter</button>
                                 </div>
-                                <p class="text-[10px] text-gray-400 mt-1 italic">Le texte de chaque page sera extrait et ajouté au corpus à l'enregistrement.</p>
+                                <p class="text-[10px] text-gray-400 mt-1 italic">Le texte de chaque page sera extrait et ajouté au corpus à l'enregistrement. (max 5 URLs)</p>
                             </div>
                             <textarea id="bot-corpus-text" class="hidden"></textarea>
                         </div>
@@ -1210,7 +1210,7 @@
         const url = input?.value?.trim();
         if (!url || !url.startsWith('http')) { showToast('⚠️ URL invalide', 'L\'URL doit commencer par http(s)://'); return; }
         if (corpusUrls.includes(url)) { showToast('⚠️ Déjà ajoutée', 'Cette URL est déjà dans la liste.'); return; }
-        if (corpusUrls.length >= 3) { showToast('⚠️ Limite', 'Maximum 3 URLs de référence.'); return; }
+        if (corpusUrls.length >= 5) { showToast('⚠️ Limite', 'Maximum 5 URLs de référence.'); return; }
         corpusUrls.push(url);
         if (input) input.value = '';
         renderUrlList();
