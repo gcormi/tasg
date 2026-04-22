@@ -1243,16 +1243,16 @@
         const classKey = Math.random().toString(36).slice(2, 6).toUpperCase();
         const botForShare = JSON.parse(JSON.stringify(bot));
         if (botForShare.loggingConfig) botForShare.loggingConfig.classKey = classKey;
+        const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(botForShare));
+        const base = window.location.href.replace(/index\.html.*$/, '');
+        const link = base + 'compagnion.html#config=' + encoded;
         // Mémoriser le groupe dans localStorage pour le suivi
         const groupsKey = 'mentoria_groups_' + currentBotId;
         const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
-        const link = base + 'compagnion.html#config=' + encoded;
         groups.unshift({ classKey, date: new Date().toLocaleDateString('fr-FR'), link });
         if (groups.length > 20) groups.pop();
         localStorage.setItem(groupsKey, JSON.stringify(groups));
-        const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(botForShare));
-        const base = window.location.href.replace(/index\.html.*$/, '');
-        document.getElementById('share-link').value = base + 'compagnion.html#config=' + encoded;
+        document.getElementById('share-link').value = link;
         const keyEl = document.getElementById('share-class-key');
         if (keyEl) keyEl.textContent = classKey;
         document.getElementById('publish-modal').classList.remove('hidden');
