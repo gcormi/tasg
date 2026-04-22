@@ -442,7 +442,7 @@
     });
 
     msgInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && !e.shiftKey && msgInput.value.trim()) {
+        if (e.key === 'Enter' && !e.shiftKey && msgInput.value.trim() && !sendBtn.disabled) {
             e.preventDefault();
             submitMessage(msgInput.value.trim());
         }
@@ -454,7 +454,7 @@
     });
 
     async function submitMessage(displayText, hiddenPrompt = null) {
-        if (!displayText || !studentName) return;
+        if (!displayText || !studentName || sendBtn.disabled) return;
 
         // On ajoute le message visible dans l'historique
         chatHistory.push({ role: 'user', content: displayText });
