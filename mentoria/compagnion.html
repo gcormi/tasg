@@ -285,6 +285,7 @@
                     password: lc.password,
                     server: lc.server || 'nuage.apps.education.fr',
                     botId: botConfig.id,
+                    classKey: lc.classKey || 'default',
                     ...extra
                 })
             });
@@ -530,9 +531,8 @@ ${(() => {
             if (!reply) throw new Error('Réponse vide de l\'API.');
             addBotMessage(reply);
 
-            // Logging pour le suivi de classe (best-effort, non bloquant)
-            logMessage('user', displayText);
-            logMessage('assistant', reply);
+            // Logging séquentiel pour éviter les écritures simultanées sur le même fichier
+            logMessage('user', displayText).then(() => logMessage('assistant', reply));
 
         } catch (err) {
             console.error('[Mentoria] Erreur API :', err);

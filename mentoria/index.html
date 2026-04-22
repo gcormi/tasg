@@ -896,6 +896,10 @@
                     <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
                 </div>
             </div>
+            <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca">
+                👥 <strong>Code de groupe :</strong> <span id="share-class-key" class="font-mono font-black text-lg tracking-widest">—</span>
+                <span class="block mt-1 text-[10px] text-indigo-400">Notez ce code — il vous permettra de retrouver cette classe dans le suivi. Chaque publication génère un code différent.</span>
+            </div>
             <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d">
                 🔒 <strong>Souverain :</strong> Lien auto-contenu. Aucun compte élève. Aucune donnée transmise à un tiers.
             </div>
@@ -924,6 +928,11 @@
                 <button onclick="refreshSuivi()" title="Actualiser" class="text-gray-400 hover:text-indigo-500 transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
                 <button onclick="closeSuiviModal()" class="text-gray-300 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
+        </div>
+        <!-- SÉLECTEUR DE GROUPE -->
+        <div class="flex items-center gap-2 px-5 py-2 border-b border-gray-100 bg-slate-50 flex-none">
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Groupe</span>
+            <select id="suivi-group-select" onchange="suiviSelectedStudent=null; refreshSuivi()" class="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1 font-mono font-bold text-indigo-600 bg-white"></select>
         </div>
         <!-- LISTE ÉLÈVES -->
         <div id="suivi-student-list" class="flex-none border-b border-gray-100 overflow-y-auto" style="max-height:200px">
@@ -1227,9 +1236,21 @@
     window.publishBot = async () => {
         await saveCurrentBot();
         const bot = library[currentBotId]; if (!bot) return;
-        const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(bot));
+        // Générer un code de groupe unique à chaque publication
+        const classKey = Math.random().toString(36).slice(2, 6).toUpperCase();
+        const botForShare = JSON.parse(JSON.stringify(bot));
+        if (botForShare.loggingConfig) botForShare.loggingConfig.classKey = classKey;
+        // Mémoriser le groupe dans localStorage pour le suivi
+        const groupsKey = 'mentoria_groups_' + currentBotId;
+        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+        groups.unshift({ classKey, date: new Date().toLocaleDateString('fr-FR') });
+        if (groups.length > 20) groups.pop();
+        localStorage.setItem(groupsKey, JSON.stringify(groups));
+        const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(botForShare));
         const base = window.location.href.replace(/index\.html.*$/, '');
         document.getElementById('share-link').value = base + 'compagnion.html#config=' + encoded;
+        const keyEl = document.getElementById('share-class-key');
+        if (keyEl) keyEl.textContent = classKey;
         document.getElementById('publish-modal').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
     };
@@ -1237,15 +1258,27 @@
     // ── SUIVI DE CLASSE ──
     let suiviSelectedStudent = null;
 
+    function getSuiviClassKey() {
+        return document.getElementById('suivi-group-select')?.value || 'default';
+    }
+
     async function callNuageSuivi(action, extra = {}) {
         if (storageMode !== 'nuage' || !nuageUsername) return null;
-        return callNuage(action, { botId: currentBotId, ...extra });
+        return callNuage(action, { botId: currentBotId, classKey: getSuiviClassKey(), ...extra });
     }
 
     window.openSuiviModal = async () => {
         if (!currentBotId) { showToast('⚠️ Aucun bot', 'Ouvrez ou créez un assistant.'); return; }
         if (storageMode !== 'nuage') { showToast('⚠️ Nuage requis', 'Le suivi nécessite le mode Nuage.'); return; }
         document.getElementById('suivi-bot-name').textContent = '— ' + (library[currentBotId]?.config?.title || currentBotId);
+        // Charger les groupes connus pour ce bot
+        const groupsKey = 'mentoria_groups_' + currentBotId;
+        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+        const sel = document.getElementById('suivi-group-select');
+        if (sel) {
+            sel.innerHTML = groups.map(g => `<option value="${g.classKey}">${g.classKey} — ${g.date}</option>`).join('');
+            if (!groups.length) sel.innerHTML = '<option value="default">default</option>';
+        }
         document.getElementById('suivi-modal').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
         suiviSelectedStudent = null;
@@ -1259,13 +1292,22 @@
         const data = await callNuageSuivi('get_logs');
         if (!data?.sessions) {
             listEl.innerHTML = '<div class="p-4 text-xs text-gray-400 text-center">Aucun élève connecté.</div>';
+            suiviSelectedStudent = null;
+            document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>';
             return;
         }
         const sessions = data.sessions;
         const students = Object.keys(sessions);
         if (!students.length) {
             listEl.innerHTML = '<div class="p-4 text-xs text-gray-400 text-center">Aucun élève connecté.</div>';
+            suiviSelectedStudent = null;
+            document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>';
             return;
+        }
+        // Si l'élève sélectionné n'est plus dans la liste, on réinitialise
+        if (suiviSelectedStudent && !students.includes(suiviSelectedStudent)) {
+            suiviSelectedStudent = null;
+            document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>';
         }
         listEl.innerHTML = students.map(sid => {
             const s = sessions[sid];
@@ -1275,7 +1317,7 @@
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 flex-none"></span>
                     <span class="text-xs font-bold text-gray-800">${sid}</span>
-                    <span class="text-[10px] text-gray-400">${s.msgCount || 0} msg · ${ts}</span>
+                    <span class="text-[10px] text-gray-400">${s.messageCount || s.msgCount || 0} msg · ${ts}</span>
                 </div>
                 <button onclick="event.stopPropagation(); banSuiviStudent('${sid}')" title="Expulser" class="text-gray-300 hover:text-red-500 transition-colors">
                     <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
@@ -1332,7 +1374,8 @@
 
     window.deleteAllLogs = async () => {
         if (!confirm('Supprimer tous les logs de ce bot ? Cette action est irréversible.')) return;
-        await callNuageSuivi('delete_logs');
+        const result = await callNuageSuivi('delete_logs');
+        if (!result) { showToast('❌ Erreur', 'Non connecté au Nuage ou bot non sélectionné.'); return; }
         suiviSelectedStudent = null;
         showToast('✅ Logs supprimés', 'Tous les journaux ont été effacés.');
         await refreshSuivi();
