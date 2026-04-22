@@ -91,6 +91,11 @@
         </div>
         <p class="text-slate-500 mb-8 font-medium text-xs leading-relaxed" id="welcome-short-desc">Votre assistant personnel se prépare.</p>
 
+        <!-- Notice RGPD -->
+        <div id="rgpd-notice" class="text-[10px] text-slate-400 bg-slate-50 rounded-2xl px-4 py-3 text-left leading-relaxed border border-slate-100">
+            <span class="font-black text-slate-500">🔒 Confidentialité</span> — Vos échanges avec cet assistant sont visibles par votre professeur pendant 7 jours, conformément au RGPD. Utilisez votre identifiant ENT.
+        </div>
+
         <div class="space-y-4">
             <div class="text-left px-2">
                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Identifiant ENT</label>
@@ -265,20 +270,67 @@
     let chatHistory = [];
     let studentName = '';
 
+    const STORAGE_PROXY_URL = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage';
+
+    async function callStorage(action, extra = {}) {
+        const lc = botConfig?.loggingConfig;
+        if (!lc?.username || !lc?.password) return null;
+        try {
+            const res = await fetch(STORAGE_PROXY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action,
+                    username: lc.username,
+                    password: lc.password,
+                    server: lc.server || 'nuage.apps.education.fr',
+                    botId: botConfig.id,
+                    ...extra
+                })
+            });
+            return res.ok ? await res.json() : null;
+        } catch { return null; }
+    }
+
+    async function logMessage(role, text) {
+        if (!studentName || !botConfig?.loggingConfig) return;
+        await callStorage('log_message', {
+            studentId: studentName,
+            role,
+            text
+        });
+    }
+
     // Activer le bouton "Entrer" dès qu'on tape un identifiant (et que le bot est chargé)
     document.getElementById('student-name-input').addEventListener('input', function() {
         const btn = document.getElementById('start-btn');
         btn.disabled = !this.value.trim() || !botConfig;
     });
 
-    window.startChat = function() {
+    window.startChat = async function() {
         const input = document.getElementById('student-name-input');
         if (!input.value.trim()) {
             input.classList.add('border-red-500');
             setTimeout(() => input.classList.remove('border-red-500'), 1000);
             return;
         }
-        studentName = input.value.trim();
+        const btn = document.getElementById('start-btn');
+        btn.disabled = true;
+        const tentativeId = input.value.trim().toLowerCase();
+
+        // Vérification ban
+        if (botConfig?.loggingConfig) {
+            const banCheck = await callStorage('check_banned', { studentId: tentativeId });
+            if (banCheck?.banned) {
+                input.classList.add('border-red-500');
+                input.value = '';
+                input.placeholder = '⛔ Identifiant bloqué';
+                btn.disabled = false;
+                return;
+            }
+        }
+
+        studentName = tentativeId;
         document.getElementById('display-student-name').textContent = studentName;
 
         // Masquer l'écran d'accueil
@@ -477,6 +529,10 @@ ${(() => {
             const reply = data.choices?.[0]?.message?.content;
             if (!reply) throw new Error('Réponse vide de l\'API.');
             addBotMessage(reply);
+
+            // Logging pour le suivi de classe (best-effort, non bloquant)
+            logMessage('user', displayText);
+            logMessage('assistant', reply);
 
         } catch (err) {
             console.error('[Mentoria] Erreur API :', err);
