@@ -1,4 +1,4 @@
-# Documentation technique — Mentoria v2.6
+# Documentation technique — Mentoria v2.7
 
 ---
 
@@ -76,6 +76,8 @@ avec le header `Authorization: Bearer sk-...`
 ### Pourquoi un manifest ?
 La méthode WebDAV `PROPFIND` (listing de dossier) n'est pas supportée par le moteur HTTP du Code node n8n. On utilise à la place un fichier `manifest.json` qui liste les bots — mis à jour à chaque écriture/suppression.
 
+**Architecture du manifest (v2.7) :** le client (`index.html`) envoie la liste complète des fichiers connus (`manifest`) dans chaque requête `write`. n8n écrit directement ce manifest sans lire l'ancien depuis le Nuage. Cette approche est plus fiable car elle évite les problèmes de cache ou de parsing WebDAV côté n8n.
+
 ### Gestion des instances Nuage
 
 apps.education.fr répartit les utilisateurs sur plusieurs instances (`nuage01`, `nuage02`, `nuage03`...). Le proxy accepte un paramètre `server` optionnel pour cibler la bonne instance. Si absent, il utilise `nuage.apps.education.fr` par défaut.
@@ -103,8 +105,9 @@ fetch('https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage', {
     username: 'gcormi',
     password: 'mot-de-passe-application',
     server: 'nuage03.apps.education.fr',  // optionnel, défaut : nuage.apps.education.fr
-    filename: 'bot_xxx.json',   // pour read/write/delete
-    content: { ... }            // pour write
+    filename: 'bot_xxx.json',             // pour read/write/delete
+    content: { ... },                     // pour write
+    manifest: ['bot_1.json', 'bot_2.json'] // pour write — liste complète envoyée par le client
   })
 })
 ```
@@ -119,10 +122,11 @@ fetch('https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage', {
 - Accessible depuis n'importe quel PC avec le jeton
 
 ### ☁️ Nuage apps.education.fr
-- Bots stockés dans `Mentoria/` du Nuage personnel
-- Via proxy n8n WebDAV
+- Bots stockés dans `mentoria/` du Nuage personnel
+- Via proxy n8n WebDAV (mutualisé — tous les enseignants utilisent le même proxy incubateur EN)
 - Nécessite un **mot de passe d'application** (pas le vrai mot de passe)
 - Création : Nuage → Paramètres → Sécurité → Mot de passe d'application
+- Le champ "Relais API" a été supprimé en v2.7 — inutile car tous les enseignants passent par le même proxy mutualisé
 
 ### 💾 Dossier local / USB
 - Bots dans un dossier choisi via File System Access API
