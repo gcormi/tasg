@@ -334,15 +334,29 @@
         studentName = tentativeId;
         document.getElementById('display-student-name').textContent = studentName;
 
+        // Charger l'historique précédent si disponible
+        let hasHistory = false;
+        if (botConfig?.loggingConfig) {
+            const logData = await callStorage('get_student_log', { studentId: studentName });
+            if (logData?.log?.length > 0) {
+                // Limiter aux 40 derniers messages pour ne pas dépasser le contexte Albert
+                const recent = logData.log.slice(-40);
+                chatHistory = recent.map(e => ({ role: e.role, content: e.text }));
+                chatHistory.push({ role: 'separator', content: '— Reprise de session —' });
+                hasHistory = true;
+            }
+        }
+
         // Masquer l'écran d'accueil
         const ws = document.getElementById('welcome-screen');
         ws.style.opacity = '0';
         ws.style.transition = 'opacity 0.4s ease';
         setTimeout(() => ws.classList.add('hidden'), 400);
 
-        // Message de bienvenue
-        const welcomeMsg = (botConfig.config.welcomeMessage || 'Bonjour ! Prêt pour la séance ?')
-                           .replace('{name}', studentName);
+        // Message de bienvenue (différent si reprise)
+        const welcomeMsg = hasHistory
+            ? `Bon retour ${studentName} ! Je me souviens de notre dernière discussion. Tu veux continuer ?`
+            : (botConfig.config.welcomeMessage || 'Bonjour ! Prêt pour la séance ?').replace('{name}', studentName);
         addBotMessage(welcomeMsg);
 
         // Rendu des boutons rapides
@@ -397,6 +411,15 @@
         const container = document.getElementById('chat-container');
         container.innerHTML = '';
         chatHistory.forEach((msg, idx) => {
+            if (msg.role === 'separator') {
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-center gap-3 my-2">
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${msg.content}</span>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>`);
+                return;
+            }
             const isUser = msg.role === 'user';
             const isError = msg.role === 'error';
             const avatarHtml = (!isUser && !isError && botConfig.vignette)
@@ -496,7 +519,7 @@ ${(() => {
 
         const messages = [
             { role: 'system', content: systemPrompt },
-            ...chatHistory.slice(0, -1).filter(m => m.role !== 'error').map(m => ({ role: m.role, content: m.content })),
+            ...chatHistory.slice(0, -1).filter(m => m.role !== 'error' && m.role !== 'separator').map(m => ({ role: m.role, content: m.content })),
             { role: 'user', content: promptForAI }
         ];
 
