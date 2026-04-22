@@ -541,6 +541,24 @@ ${(() => {
                 content: `Désolé, une erreur de connexion s'est produite. Réessaie dans un instant.\n\n(${err.message})`
             });
             renderMessages();
+            loadingDiv.classList.add('hidden');
+            // Cooldown 4s après une erreur pour éviter de surcharger Albert
+            let countdown = 4;
+            const countEl = document.createElement('span');
+            countEl.style.cssText = 'font-size:10px;color:#94a3b8;margin-left:6px';
+            sendBtn.parentElement?.appendChild(countEl);
+            const timer = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    countEl.remove();
+                    sendBtn.disabled = false;
+                } else {
+                    countEl.textContent = `(${countdown}s)`;
+                }
+            }, 1000);
+            countEl.textContent = `(${countdown}s)`;
+            return;
         } finally {
             loadingDiv.classList.add('hidden');
             sendBtn.disabled = false;
