@@ -1143,10 +1143,15 @@
         setSync(true);
         try {
             const files = await listBotFiles();
+            let missing = 0;
             for (const filename of files) {
-                const bot = await readBotFile(filename);
-                if (bot && bot.id) library[bot.id] = bot;
+                try {
+                    const bot = await readBotFile(filename);
+                    if (bot && bot.id) library[bot.id] = bot;
+                    else missing++;
+                } catch { missing++; }
             }
+            if (missing > 0) showToast('⚠️ Fichiers introuvables', `${missing} bot(s) référencé(s) dans le manifest mais absent(s) du Nuage — ignoré(s).`);
         } catch(e) { showToast('⚠️ Erreur', 'Lecture impossible : ' + e.message); }
         finally { setSync(false); }
         updateLibraryUI();
@@ -1181,11 +1186,25 @@
     };
 
     // ── SAUVEGARDE ──
+    function slugify(str) {
+        return str.toLowerCase()
+            .normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_|_$/g, '')
+            .substring(0, 40) || 'bot';
+    }
+
     window.saveCurrentBot = async () => {
         if (!storageMode) { showToast('⚠️ Non connecté', 'Choisissez un mode de stockage.'); return; }
         const title = document.getElementById('bot-title')?.value?.trim();
         if (!title) { showToast('⚠️ Titre manquant', 'Renseignez le titre (section 1).'); return; }
-        if (!currentBotId) currentBotId = 'bot_' + Date.now();
+        if (!currentBotId) {
+            const slug = slugify(title);
+            let candidate = 'bot_' + slug;
+            let n = 2;
+            while (library[candidate]) { candidate = 'bot_' + slug + '_' + n++; }
+            currentBotId = candidate;
+        }
         const vigImg = document.getElementById('vignette-preview');
         const hasVig = vigImg && vigImg.src && vigImg.src !== window.location.href && !vigImg.classList.contains('hidden');
         const selectedRules = Array.from(document.querySelectorAll('.rule-toggle:checked')).map(cb => rulesMap[cb.value]);
