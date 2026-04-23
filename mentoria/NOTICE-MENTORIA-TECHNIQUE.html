@@ -145,11 +145,32 @@
         th, td { padding: 0.75rem; border: 1px solid var(--border-color); text-align: left; }
         th { background-color: var(--sidebar-bg); font-weight: 600; color: #111827; }
 
+        /* License footer */
+        .license-footer {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background-color: var(--sidebar-bg);
+            border-top: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .license-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .license-content img { flex-shrink: 0; }
+        .license-content p { margin-bottom: 0.4rem; }
+
         /* Responsive */
         @media (max-width: 900px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
             .content { padding: 2rem 1.5rem; }
+            .license-content { flex-direction: column; }
         }
     </style>
 </head>
@@ -174,6 +195,7 @@
                 <li><a href="#section-4">4. Le Relais Souverain (Proxy n8n)</a></li>
                 <li><a href="#section-5">5. Architecture du Lien Élève (Base64)</a></li>
                 <li><a href="#section-6">6. Traitement IA & Prompts</a></li>
+                <li><a href="#section-7">7. Contacts & Crédits</a></li>
             </ul>
         </nav>
     </aside>
@@ -182,7 +204,13 @@
 
         <header>
             <h1>Documentation Technique & Architecture</h1>
-            <p class="subtitle">Spécifications techniques de <strong>Mentoria</strong> (v2.7+), le studio de création d'assistants pédagogiques souverains conçu et développé par <strong>Gilles Cormi</strong>         </header>
+            <p class="subtitle">Spécifications techniques de <strong>Mentoria</strong> v2.7+</p>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.75rem; margin-bottom: 0;">
+                ✍️ Conçu et développé par <strong>Gilles Cormi</strong>, enseignant (académie de Corse) —
+                <a href="https://gcormi.forge.apps.education.fr/frojet/mentoria/" target="_blank">gcormi.forge.apps.education.fr/frojet/mentoria</a>
+                &nbsp;·&nbsp; v2.7 — Avril 2026
+            </p>
+        </header>
 
         <!-- SECTION WIP -->
         <section id="section-wip">
@@ -310,6 +338,35 @@
             <h3>Extraction du Corpus</h3>
             <p>L'intégration de fichiers PDF se fait purement côté client via la librairie <strong>PDF.js</strong>. Seul le texte brut est extrait et concaténé. Une limite stricte de <strong>200 Ko de texte pur</strong> est recommandée pour ne pas saturer le lien Base64 ni la fenêtre de contexte du modèle (<em>Context Window</em>).</p>
 
+            <h3>Modèles Albert disponibles</h3>
+            <table>
+                <thead>
+                    <tr><th>Alias API</th><th>Modèle réel</th><th>Usage</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>openweight-medium</code></td><td>Mistral-Small-3.2-24B-Instruct</td><td><strong>Défaut Mentoria ✅</strong> — Rapide, suit bien les instructions</td></tr>
+                    <tr><td><code>openweight-large</code></td><td>openai/gpt-oss-120b</td><td>Tâches complexes, réponses longues</td></tr>
+                    <tr><td><code>openweight-small</code></td><td>Ministral-3-8B-Instruct</td><td>Tâches simples, réponses courtes</td></tr>
+                    <tr><td><code>openweight-code</code></td><td>Qwen3-Coder-30B</td><td>Génération de code</td></tr>
+                    <tr><td><code>openweight-embeddings</code></td><td>BAAI/bge-m3</td><td>RAG / similarité sémantique</td></tr>
+                </tbody>
+            </table>
+            <p><strong><code>openweight-medium</code></strong> (Mistral Small 3.2, 24B) est l'équivalent de GPT-4o mini. Il est suffisamment rapide et fidèle aux instructions système pour l'usage scolaire.</p>
+
+            <h3>Limites du corpus</h3>
+            <table>
+                <thead>
+                    <tr><th>Taille texte extrait</th><th>Verdict</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>&lt; 50 Ko (≈ 15 pages)</td><td>✅ Idéal — fenêtre de contexte pleinement exploitée</td></tr>
+                    <tr><td>50–120 Ko (≈ 50 pages)</td><td>✅ OK — proche de la limite de la fenêtre Albert</td></tr>
+                    <tr><td>120–300 Ko</td><td>⚠️ Albert ignore la fin du corpus</td></tr>
+                    <tr><td>&gt; 300 Ko</td><td>❌ URL trop longue — page élève en erreur</td></tr>
+                </tbody>
+            </table>
+            <p>PDF.js extrait uniquement le texte brut (pas les images). 50 pages PDF ≈ 75–100 Ko de texte extrait. Préférer les fichiers TXT exportés depuis le cours.</p>
+
             <h3>Les Boutons de "Réponse Rapide" (One-Shot Prompting)</h3>
             <p>Les boutons proposés à l'élève dans le Compagnon utilisent une technique d'injection asynchrone :</p>
             <ul>
@@ -320,6 +377,37 @@
             </ul>
             <p>Cette technique force l'IA à agir de manière directive sur un seul échange, sans altérer durablement son "Persona" pédagogique principal.</p>
         </section>
+
+        <!-- SECTION 7 -->
+        <section id="section-7">
+            <h2>7. Contacts & Crédits</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Personne</th><th>Rôle</th><th>Contact</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Gilles Cormi</strong></td><td>Auteur de Mentoria (académie de Corse)</td><td><a href="https://gcormi.forge.apps.education.fr" target="_blank">forge.apps.education.fr</a></td></tr>
+                    <tr><td><strong>Thomas Sanson</strong></td><td>Accès n8n incubateur EN (proxy Albert/Nuage)</td><td>Via Tchap incubateur EN</td></tr>
+                    <tr><td><strong>Nicolas Varlot</strong></td><td>Support Nuage — Ac. Versailles</td><td>Via Tchap apps.edu</td></tr>
+                    <tr><td><strong>Paulo Santos</strong></td><td>Support Nuage — Ac. Reims</td><td>Via Tchap apps.edu</td></tr>
+                    <tr><td><strong>Benoît Piedallu</strong></td><td>Support technique EN</td><td>Via Tchap apps.edu</td></tr>
+                    <tr><td><strong>Vincent Schoeffter</strong></td><td>Co-auteur Live Quiz</td><td>vincent.schoeffter@ac-nantes.fr</td></tr>
+                    <tr><td><strong>Gauthier Remande</strong></td><td>Co-auteur Live Quiz</td><td>gauthier.remande@ac-nantes.fr</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- LICENSE FOOTER -->
+        <footer class="license-footer">
+            <div class="license-content">
+                <img src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" alt="Licence CC BY-NC-SA 4.0">
+                <div>
+                    <p><strong>Mentoria</strong> est une création originale de <strong>Gilles Cormi</strong>, enseignant (académie de Corse). Cette documentation est diffusée sous licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution — Pas d'Utilisation Commerciale — Partage dans les Mêmes Conditions 4.0 (CC BY-NC-SA 4.0)</a>.</p>
+                    <p style="margin-bottom: 0;">Vous êtes libre de partager et d'adapter ce document à condition de : <strong>créditer Gilles Cormi</strong> comme auteur · <strong>ne pas en faire un usage commercial</strong> · <strong>redistribuer sous les mêmes conditions</strong>. Mentoria n'est pas un produit officiel de l'Éducation Nationale — il utilise ses infrastructures souveraines (Nuage, La Forge, Albert/Etalab).</p>
+                </div>
+            </div>
+        </footer>
 
     </div>
 

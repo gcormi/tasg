@@ -236,6 +236,31 @@
             color: #111827;
         }
 
+        /* License footer */
+        .license-footer {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background-color: var(--sidebar-bg);
+            border-top: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .license-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .license-content img {
+            flex-shrink: 0;
+        }
+
+        .license-content p {
+            margin-bottom: 0.4rem;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             body {
@@ -253,6 +278,10 @@
 
             .content {
                 padding: 2rem 1.5rem;
+            }
+
+            .license-content {
+                flex-direction: column;
             }
         }
     </style>
@@ -286,6 +315,8 @@
                 <li><a href="#section-6">6. Le Suivi Pédagogique (Console)</a></li>
                 <li><a href="#section-7">7. L'Interface Élève (Compagnon)</a></li>
                 <li><a href="#section-8">8. Dépannage & FAQ Technique</a></li>
+                <li><a href="#section-9">9. Bonnes pratiques pédagogiques</a></li>
+                <li><a href="#section-10">10. Contacts & Communauté</a></li>
             </ul>
         </nav>
     </aside>
@@ -294,8 +325,12 @@
 
         <header>
             <h1>Le Guide Ultime de l'Enseignant</h1>
-            <p class="subtitle">Bienvenue dans <strong>Mentoria</strong>, le studio de création d'assistants
-                pédagogiques (IA) conçu par Gilles Cormi</p>
+            <p class="subtitle">Bienvenue dans <strong>Mentoria</strong> — studio de création d'assistants pédagogiques IA souverains.</p>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.75rem; margin-bottom: 0;">
+                ✍️ Conçu et développé par <strong>Gilles Cormi</strong>, enseignant (académie de Corse) —
+                <a href="https://gcormi.forge.apps.education.fr/frojet/mentoria/" target="_blank">gcormi.forge.apps.education.fr/frojet/mentoria</a>
+                &nbsp;·&nbsp; v2.7 — Avril 2026
+            </p>
         </header>
 
         <!-- SECTION 1 -->
@@ -625,6 +660,65 @@
                     Mentoria ne laisse aucune trace de vos bots sur un PC partagé (en salle des profs par exemple).</p>
             </div>
         </section>
+
+        <!-- SECTION 9 -->
+        <section id="section-9">
+            <h2>9. Bonnes pratiques pédagogiques</h2>
+
+            <ul>
+                <li><strong>Corpus ciblé :</strong> Donnez le cours du jour, pas le manuel entier. Un corpus de 2-3 pages ciblées est bien plus efficace qu'un document de 80 pages.</li>
+                <li><strong>Format TXT de préférence :</strong> Exportez vos cours en TXT plutôt qu'en PDF — plus léger et mieux lu par Albert.</li>
+                <li><strong>Tester avant diffusion :</strong> Ouvrez le lien élève vous-même et posez quelques questions avant de le distribuer en classe.</li>
+                <li><strong>Un assistant par séquence :</strong> Créez un assistant différent pour chaque chapitre ou séance plutôt qu'un bot généraliste.</li>
+                <li><strong>Activer "Hors sujet → rediriger" :</strong> Indispensable pour cadrer les échanges et éviter les dérives.</li>
+                <li><strong>Maïeutique :</strong> Activez "Ne jamais donner la réponse directement" pour forcer l'élève à réfléchir — c'est la posture pédagogique la plus efficace.</li>
+                <li><strong>Instructions courtes :</strong> Restez sous 200 mots dans le champ Instructions. Au-delà, Albert commence à ignorer une partie des consignes.</li>
+                <li><strong>Conseil RGPD :</strong> Si vous utilisez le mode "pseudonyme" (sans suivi de classe), demandez aux élèves d'utiliser un identifiant neutre — évitez nom + prénom + classe combinés.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 10 -->
+        <section id="section-10">
+            <h2>10. Contacts & Communauté</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Personne</th>
+                        <th>Rôle</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gilles Cormi</strong></td>
+                        <td>Auteur de Mentoria — questions d'usage, bugs, retours</td>
+                        <td><a href="https://gcormi.forge.apps.education.fr" target="_blank">forge.apps.education.fr</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thomas Sanson</strong></td>
+                        <td>Accès au relais n8n (proxy Albert/Nuage de l'incubateur EN)</td>
+                        <td>Via Tchap — salon incubateur EN</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Communauté</strong></td>
+                        <td>Échanges, retours terrain, partage de bots</td>
+                        <td>Salon Tchap <code>#n8n</code> de l'incubateur EN</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- LICENSE FOOTER -->
+        <footer class="license-footer">
+            <div class="license-content">
+                <img src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" alt="Licence CC BY-NC-SA 4.0">
+                <div>
+                    <p><strong>Mentoria</strong> est une création originale de <strong>Gilles Cormi</strong>, enseignant (académie de Corse). Cette documentation est diffusée sous licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution — Pas d'Utilisation Commerciale — Partage dans les Mêmes Conditions 4.0 (CC BY-NC-SA 4.0)</a>.</p>
+                    <p style="margin-bottom: 0;">Vous êtes libre de partager et d'adapter ce document à condition de : <strong>créditer Gilles Cormi</strong> comme auteur · <strong>ne pas en faire un usage commercial</strong> · <strong>redistribuer sous les mêmes conditions</strong>. Mentoria n'est pas un produit officiel de l'Éducation Nationale — il utilise ses infrastructures souveraines (Nuage, La Forge, Albert/Etalab).</p>
+                </div>
+            </div>
+        </footer>
 
     </div>
 

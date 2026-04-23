@@ -244,6 +244,26 @@
             flex-shrink: 0;
         }
 
+        /* License footer */
+        .license-footer {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background-color: var(--sidebar-bg);
+            border-top: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .license-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .license-content img { flex-shrink: 0; }
+        .license-content p { margin-bottom: 0.4rem; }
+
         /* Responsive */
         @media (max-width: 900px) {
             body {
@@ -262,6 +282,8 @@
             .content {
                 padding: 2rem 1.5rem;
             }
+
+            .license-content { flex-direction: column; }
         }
     </style>
 </head>
@@ -294,8 +316,11 @@
 
         <header>
             <h1>Feuille de Route & Vision</h1>
-            <p class="subtitle">Découvrez les prochaines étapes, les ambitions et la philosophie de
-                <strong>Mentoria</strong>, conçu et développé par <strong>Gilles Cormi</strong>.
+            <p class="subtitle">Prochaines étapes, ambitions et philosophie de <strong>Mentoria</strong>.</p>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.75rem; margin-bottom: 0;">
+                ✍️ Conçu et développé par <strong>Gilles Cormi</strong>, enseignant (académie de Corse) —
+                <a href="https://gcormi.forge.apps.education.fr/frojet/mentoria/" target="_blank">gcormi.forge.apps.education.fr/frojet/mentoria</a>
+                &nbsp;·&nbsp; v2.7 — Avril 2026
             </p>
         </header>
 
@@ -439,9 +464,27 @@
             <ul class="task-list">
                 <li><span class="task-todo">□</span> <strong>Export/Import Unitaire :</strong> Pouvoir télécharger un
                     bot spécifique au format JSON depuis le Studio pour l'envoyer par email à un collègue, afin de créer
-                    une véritable "bibliothèque d'assistants" partageable au sein de l'Éducation Nationale.</li>
+                    une véritable "bibliothèque d'assistants" partageable entre enseignants.</li>
+            </ul>
+
+            <h3>D. Aide intégrée (In-App)</h3>
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Icônes d'aide <code>(?)</code> :</strong> Ajouter une icône contextuelle à côté de chaque champ complexe du Studio pour expliquer l'usage sans quitter l'interface.</li>
+                <li><span class="task-todo">□</span> <strong>Tutoriel visuel au démarrage :</strong> Intégrer un guide en 3 étapes sur l'écran de connexion pour les enseignants qui découvrent l'outil (clé API, mot de passe d'application Nuage, premier bot).</li>
+                <li><span class="task-todo">□</span> <strong>Badge de statut connectivité :</strong> Indicateur visuel Vert / Rouge pour signaler en temps réel si le relais n8n et la connexion Nuage sont opérationnels.</li>
             </ul>
         </section>
+
+        <!-- LICENSE FOOTER -->
+        <footer class="license-footer">
+            <div class="license-content">
+                <img src="https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png" alt="Licence CC BY-NC-SA 4.0">
+                <div>
+                    <p><strong>Mentoria</strong> est une création originale de <strong>Gilles Cormi</strong>, enseignant (académie de Corse). Cette documentation est diffusée sous licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Creative Commons Attribution — Pas d'Utilisation Commerciale — Partage dans les Mêmes Conditions 4.0 (CC BY-NC-SA 4.0)</a>.</p>
+                    <p style="margin-bottom: 0;">Vous êtes libre de partager et d'adapter ce document à condition de : <strong>créditer Gilles Cormi</strong> comme auteur · <strong>ne pas en faire un usage commercial</strong> · <strong>redistribuer sous les mêmes conditions</strong>. Mentoria n'est pas un produit officiel de l'Éducation Nationale — il utilise ses infrastructures souveraines (Nuage, La Forge, Albert/Etalab).</p>
+                </div>
+            </div>
+        </footer>
 
     </div>
 
