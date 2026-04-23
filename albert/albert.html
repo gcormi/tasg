@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,38 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .slide-in { animation: slideIn 0.3s ease-out forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 
     <!-- Firebase SDK (Compat) -->
@@ -20,6 +47,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
+
 <body class="flex flex-col h-screen bg-slate-50 font-sans text-slate-800 transition-all">
 
     <!-- HEADER -->
@@ -31,20 +59,24 @@
             <div>
                 <h1 class="text-xl font-bold text-slate-900 leading-none">Mon Assistant IA</h1>
                 <div class="flex items-center gap-2 mt-1">
-                    <div id="sovereignty-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-all">
+                    <div id="sovereignty-badge"
+                        class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-all">
                         <!-- Rempli par JS -->
                     </div>
-                    <span id="sync-status" class="hidden text-[10px] font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1">
+                    <span id="sync-status"
+                        class="hidden text-[10px] font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1">
                         <i data-lucide="cloud-off" class="w-3 h-3"></i> Hors ligne
                     </span>
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="resetChat()" title="Réinitialiser la conversation" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+            <button onclick="resetChat()" title="Réinitialiser la conversation"
+                class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </button>
-            <button onclick="toggleSettings(true)" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all">
+            <button onclick="toggleSettings(true)"
+                class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all">
                 <i data-lucide="settings" class="w-6 h-6"></i>
             </button>
         </div>
@@ -71,21 +103,21 @@
 
     <!-- ZONE DE SAISIE -->
     <footer class="bg-white border-t p-4 pb-6">
-        <form id="chat-form" class="max-w-4xl mx-auto flex gap-3 p-2 bg-slate-50/50 rounded-2xl border-2 border-slate-100 focus-within:border-indigo-300 transition-all">
-            <textarea 
-                id="message-input"
+        <form id="chat-form"
+            class="max-w-4xl mx-auto flex gap-3 p-2 bg-slate-50/50 rounded-2xl border-2 border-slate-100 focus-within:border-indigo-300 transition-all">
+            <textarea id="message-input"
                 class="flex-1 bg-transparent border-none focus:ring-0 p-3 min-h-[44px] max-h-32 resize-none text-slate-700 outline-none"
-                placeholder="Message Albert..."
-                rows="1"
-            ></textarea>
-            <button type="submit" id="send-btn" class="px-6 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100 disabled:bg-slate-300 transition-all hover:bg-indigo-700 flex items-center justify-center">
+                placeholder="Message Albert..." rows="1"></textarea>
+            <button type="submit" id="send-btn"
+                class="px-6 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100 disabled:bg-slate-300 transition-all hover:bg-indigo-700 flex items-center justify-center">
                 <i data-lucide="send" class="w-5 h-5"></i>
             </button>
         </form>
     </footer>
 
     <!-- MODAL PARAMÈTRES -->
-    <div id="settings-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div id="settings-modal"
+        class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl slide-in">
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -100,35 +132,48 @@
             <div class="space-y-4 text-sm max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
                 <!-- SELECTEUR DE PROVIDER -->
                 <div class="p-1 bg-slate-100 rounded-2xl flex gap-1">
-                    <button onclick="switchProvider('albert')" id="btn-prov-albert" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all">Albert (Etalab)</button>
-                    <button onclick="switchProvider('gemini')" id="btn-prov-gemini" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all">Gemini (Google)</button>
+                    <button onclick="switchProvider('albert')" id="btn-prov-albert"
+                        class="flex-1 py-2 rounded-xl text-xs font-bold transition-all">Albert (Etalab)</button>
+                    <button onclick="switchProvider('gemini')" id="btn-prov-gemini"
+                        class="flex-1 py-2 rounded-xl text-xs font-bold transition-all">Gemini (Google)</button>
                 </div>
 
                 <!-- CONFIG ALBERT -->
                 <div id="config-albert" class="space-y-4">
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">URL API Albert</label>
-                        <input type="text" id="set-url" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs">
+                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">URL API
+                            Albert</label>
+                        <input type="text" id="set-url"
+                            class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs">
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé d'API Albert (Bearer)</label>
-                        <input type="password" id="set-key" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs" placeholder="sk-...">
+                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé d'API Albert
+                            (Bearer)</label>
+                        <input type="password" id="set-key"
+                            class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs"
+                            placeholder="sk-...">
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
+                        <label
+                            class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
                             Modèle Albert
-                            <button onclick="fetchModels()" class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
+                            <button onclick="fetchModels()"
+                                class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
                                 <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> Actualiser
                             </button>
                         </label>
-                        <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white" onchange="toggleCustomModel()">
+                        <select id="set-model"
+                            class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white"
+                            onchange="toggleCustomModel()">
                             <option value="openweight-medium">Albert Moyen (Mistral 24B)</option>
                             <option value="openweight-large">Albert Grand (GPT-120B)</option>
                             <option value="openweight-small">Albert Rapide (8B)</option>
                             <option value="openweight-code">Albert Code (Qwen 30B)</option>
                             <option value="custom">Autre...</option>
                         </select>
-                        <input type="text" id="set-model-custom" class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2" placeholder="ID exact">
+                        <input type="text" id="set-model-custom"
+                            class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2"
+                            placeholder="ID exact">
                     </div>
                 </div>
 
@@ -136,16 +181,22 @@
                 <div id="config-gemini" class="hidden space-y-4">
                     <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
                         <p class="text-[10px] text-orange-700 leading-tight">
-                            <i data-lucide="alert-triangle" class="w-3 h-3 inline"></i> <strong>Note :</strong> Gemini n'est pas une IA souveraine. Ne l'utilisez pas pour des données administratives sensibles.
+                            <i data-lucide="alert-triangle" class="w-3 h-3 inline"></i> <strong>Note :</strong> Gemini
+                            n'est pas une IA souveraine. Ne l'utilisez pas pour des données administratives sensibles.
                         </p>
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé API Google AI Studio</label>
-                        <input type="password" id="set-gemini-key" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs" placeholder="AIza...">
+                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé API Google AI
+                            Studio</label>
+                        <input type="password" id="set-gemini-key"
+                            class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs"
+                            placeholder="AIza...">
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Modèle Gemini</label>
-                        <select id="set-gemini-model" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
+                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Modèle
+                            Gemini</label>
+                        <select id="set-gemini-model"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
                             <option value="gemini-3-flash-preview">Gemini 3 Flash (Preview)</option>
                             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                             <option value="gemini-1.5-flash">Gemini 1.5 Flash (Standard)</option>
@@ -156,13 +207,18 @@
 
                 <div class="pt-2">
                     <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" id="set-proxy" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
-                        <span class="font-bold text-slate-700 text-[12px] group-hover:text-indigo-600 transition-colors">Proxy CORS (Recommandé pour Albert)</span>
+                        <input type="checkbox" id="set-proxy"
+                            class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
+                        <span
+                            class="font-bold text-slate-700 text-[12px] group-hover:text-indigo-600 transition-colors">Proxy
+                            CORS (Recommandé pour Albert)</span>
                     </label>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider block mb-3">Synchronisation Cloud</label>
+                    <label
+                        class="font-bold text-slate-500 text-[11px] uppercase tracking-wider block mb-3">Synchronisation
+                        Cloud</label>
                     <div id="auth-section" class="bg-slate-50 rounded-2xl p-4 border-2 border-slate-100">
                         <!-- Rempli par JS -->
                     </div>
@@ -170,7 +226,8 @@
             </div>
 
             <div class="mt-8">
-                <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-indigo-100 transition-all hover:bg-indigo-700 flex items-center justify-center gap-2">
+                <button onclick="saveSettings()"
+                    class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-indigo-100 transition-all hover:bg-indigo-700 flex items-center justify-center gap-2">
                     <i data-lucide="save" class="w-5 h-5"></i> SAUVEGARDER
                 </button>
             </div>
@@ -191,7 +248,7 @@
             messagingSenderId: "494625342197",
             appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
         };
-        
+
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
@@ -199,7 +256,7 @@
 
         // 2. État IA
         let provider = localStorage.getItem('ai_provider') || 'albert';
-        
+
         // Settings Albert
         let apiUrl = localStorage.getItem('albert_api_url') || 'https://albert.api.etalab.gouv.fr/v1/chat/completions';
         let apiKey = localStorage.getItem('albert_api_key') || '';
@@ -233,13 +290,13 @@
                 syncStatus.innerHTML = '<i data-lucide="cloud" class="w-3 h-3 text-indigo-500"></i> Sync Cloud Active';
                 syncStatus.classList.remove('text-rose-500');
                 syncStatus.classList.add('text-indigo-500');
-                
+
                 // Charger les paramètres depuis Firestore
                 try {
                     const doc = await db.collection('users').doc(user.uid).collection('config').doc('albert').get();
                     if (doc.exists) {
                         const cloudData = doc.data();
-                        
+
                         // Sync Albert
                         if (!apiKey && cloudData.apiKey) {
                             apiKey = cloudData.apiKey;
@@ -264,7 +321,7 @@
                             provider = cloudData.provider;
                             localStorage.setItem('ai_provider', provider);
                         }
-                        
+
                         updateStatus();
                     }
                 } catch (e) {
@@ -339,11 +396,11 @@
 
         function switchProvider(p) {
             provider = p;
-            
+
             // Mise à jour de l'UI du modal
             document.getElementById('btn-prov-albert').className = p === 'albert' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-indigo-600" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-700";
             document.getElementById('btn-prov-gemini').className = p === 'gemini' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-indigo-600" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-700";
-            
+
             document.getElementById('config-albert').classList.toggle('hidden', p !== 'albert');
             document.getElementById('config-gemini').classList.toggle('hidden', p !== 'gemini');
         }
@@ -353,7 +410,7 @@
             messages.forEach(msg => {
                 const isUser = msg.role === 'user';
                 const isError = msg.role === 'error';
-                
+
                 const bubbleClass = isUser ? 'bg-indigo-600 text-white shadow-indigo-50' : (isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-white border border-slate-200 shadow-sm');
                 const avatarClass = isUser ? 'bg-slate-200 text-slate-600' : (isError ? 'bg-red-100 text-red-600' : 'bg-indigo-600 text-white shadow-md');
                 const icon = isUser ? 'user' : (isError ? 'alert-circle' : 'bot');
@@ -391,32 +448,32 @@
                 alert("Veuillez d'abord saisir votre clé API.");
                 return;
             }
-            
+
             const btn = event.currentTarget;
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i data-lucide="loader-2" class="w-2.5 h-2.5 animate-spin"></i> Chargement...';
             lucide.createIcons();
-            
+
             try {
                 // Utilisation du même tunnel Proxy que pour le Chat
                 const baseModelsUrl = apiUrl.replace('/chat/completions', '/models');
                 const finalUrl = useProxy ? `https://cors-anywhere.herokuapp.com/${baseModelsUrl}` : baseModelsUrl;
-                
+
                 const response = await fetch(finalUrl, {
-                    headers: { 
+                    headers: {
                         'Authorization': `Bearer ${apiKey}`,
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-                
+
                 if (!response.ok) throw new Error("Erreur lors de la récupération");
-                
+
                 const data = await response.json();
                 const select = document.getElementById('set-model');
-                
+
                 // On garde les options par défaut et on ajoute les nouvelles
                 const defaults = ['openweight-medium', 'openweight-large', 'openweight-small', 'openweight-code', 'custom'];
-                
+
                 data.data.forEach(m => {
                     if (!defaults.includes(m.id)) {
                         const opt = document.createElement('option');
@@ -425,7 +482,7 @@
                         select.insertBefore(opt, select.lastElementChild);
                     }
                 });
-                
+
                 alert(`${data.data.length} modèles trouvés sur Albert ! La liste a été mise à jour.`);
             } catch (err) {
                 console.error(err);
@@ -437,9 +494,9 @@
         }
 
         function toggleSettings(show) {
-            if(show) {
+            if (show) {
                 switchProvider(provider);
-                
+
                 // Albert Settings
                 document.getElementById('set-url').value = apiUrl;
                 document.getElementById('set-key').value = apiKey;
@@ -492,7 +549,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true }).catch(e => console.error("Erreur sauvegarde cloud:", e));
             }
-            
+
             toggleSettings(false);
             updateStatus();
             messages.push({ role: 'bot', text: `✅ Configuration mise à jour. Source active : ${provider === 'albert' ? 'Albert' : 'Gemini'}` });
@@ -512,11 +569,12 @@
         chatForm.onsubmit = async (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
-            if(!text || loading.classList.contains('hidden') === false) return;
+            if (!text || loading.classList.contains('hidden') === false) return;
 
             messages.push({ role: 'user', text });
             messageInput.value = '';
             renderMessages();
+            loading.classList.remove('hidden');
 
             if (provider === 'albert') {
                 await callAlbert(text);
@@ -526,7 +584,7 @@
         };
 
         async function callAlbert(text) {
-            if(!apiKey) {
+            if (!apiKey) {
                 messages.push({ role: 'error', text: '⚠️ Clé API Albert manquante.' });
                 renderMessages();
                 loading.classList.add('hidden');
@@ -539,7 +597,7 @@
                     apiMessages.push({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text });
                 });
 
-                const finalUrl = useProxy ? `https://cors-anywhere.herokuapp.com/${apiUrl}` : apiUrl;
+                const finalUrl = useProxy ? `https://corsproxy.io/?${encodeURIComponent(apiUrl)}` : apiUrl;
                 const response = await fetch(finalUrl, {
                     method: 'POST',
                     headers: {
@@ -565,7 +623,7 @@
         }
 
         async function callGemini(text) {
-            if(!geminiKey) {
+            if (!geminiKey) {
                 messages.push({ role: 'error', text: '⚠️ Clé API Gemini manquante. Configurez-la dans les paramètres.' });
                 renderMessages();
                 loading.classList.add('hidden');
@@ -614,4 +672,5 @@
 
     </script>
 </body>
+
 </html>
