@@ -503,9 +503,9 @@
             <div>
                 <div class="flex items-center gap-1.5">
                     <h1 class="font-bold text-gray-900 text-sm leading-none">Mentoria</h1>
-                    <span class="px-1.5 py-0.5 text-[8px] font-bold rounded border" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4">v2.5</span>
+                    <span class="px-1.5 py-0.5 text-[8px] font-bold rounded border" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4">v2.7</span>
                 </div>
-                <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio · Éducation Nationale</p>
+                <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio · par Gilles Cormi</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -521,6 +521,21 @@
             <button onclick="saveCurrentBot()" class="btn btn-teal py-1.5 text-xs"><i data-lucide="save" class="w-3.5 h-3.5"></i> Enregistrer</button>
             <button onclick="publishBot()" class="btn btn-green py-1.5 text-xs"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> Publier</button>
             <button onclick="openSuiviModal()" class="btn btn-ghost py-1.5 text-xs" style="color:#6366f1;border-color:#e0e7ff"><i data-lucide="users" class="w-3.5 h-3.5"></i> Suivi</button>
+            <div class="w-px h-5 bg-gray-200"></div>
+            <div class="relative" id="help-menu-wrapper">
+                <button onclick="toggleHelpMenu()" class="btn btn-ghost py-1.5 text-xs" title="Documentation"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Aide</button>
+                <div id="help-menu" class="hidden absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1">
+                    <a href="NOTICE-MENTORIA-PROF.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-500"></i> Guide enseignant
+                    </a>
+                    <a href="NOTICE-MENTORIA-TECHNIQUE.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        <i data-lucide="settings" class="w-3.5 h-3.5 text-teal-500"></i> Documentation technique
+                    </a>
+                    <a href="ROADMAPS-MENTORIA.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        <i data-lucide="map" class="w-3.5 h-3.5 text-indigo-500"></i> Feuille de route
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </header>
@@ -1531,6 +1546,17 @@
         document.execCommand('copy');
         showToast('✅ Copié', 'Lien copié dans le presse-papiers !');
     };
+
+    window.toggleHelpMenu = () => {
+        const menu = document.getElementById('help-menu');
+        menu.classList.toggle('hidden');
+    };
+    document.addEventListener('click', (e) => {
+        const wrapper = document.getElementById('help-menu-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            document.getElementById('help-menu')?.classList.add('hidden');
+        }
+    });
 </script>
 </body>
 </html>
