@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Mentoria — Documentation Technique & Architecture</title>
+    <style>
+        :root {
+            --primary-color: #0d9488; /* Teal */
+            --primary-hover: #0f766e;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-page: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb;
+            --sidebar-bg: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-page);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Layout : Sidebar + Content */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .content {
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            color: #111827;
+            font-size: 2.25rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-top: 0;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            color: #111827;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p, ul, ol { margin-bottom: 1rem; }
+        ul, ol { padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* Navigation Sidebar */
+        .sidebar h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            border: none;
+            color: #111827;
+        }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar li { margin-bottom: 0.5rem; }
+        .sidebar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: block;
+            padding: 0.25rem 0;
+            transition: color 0.2s;
+        }
+        .sidebar a:hover { color: var(--primary-color); font-weight: 500; }
+
+        /* Links & text */
+        a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        strong { color: #111827; font-weight: 600; }
+
+        code {
+            background-color: #f3f4f6;
+            color: #ef4444;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.875em;
+        }
+
+        /* Callouts / Alert boxes */
+        .callout {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+        .callout h4 { margin-top: 0; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0; }
+
+        .callout-wip { background-color: #fdf4ff; border-color: #c026d3; color: #831843; }
+        .callout-wip h4 { color: #a21caf; }
+
+        .callout-info { background-color: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }
+        .callout-info h4 { color: #1e40af; }
+
+        .callout-success { background-color: #f0fdf4; border-color: #22c55e; color: #166534; }
+        .callout-success h4 { color: #15803d; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        th, td { padding: 0.75rem; border: 1px solid var(--border-color); text-align: left; }
+        th { background-color: var(--sidebar-bg); font-weight: 600; color: #111827; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
+            .content { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚙️</div>
+            <h2 style="color: var(--primary-color); font-size: 1.5rem; margin: 0;">Mentoria</h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem;">
+                Documentation Technique
+            </div>
+        </div>
+        <nav>
+            <h2>Sommaire</h2>
+            <ul>
+                <li><a href="#section-wip">🚧 Work In Progress</a></li>
+                <li><a href="#section-1">1. Souveraineté & Institutions</a></li>
+                <li><a href="#section-2">2. Conformité RGPD By Design</a></li>
+                <li><a href="#section-3">3. Moteurs de Stockage</a></li>
+                <li><a href="#section-4">4. Le Relais Souverain (Proxy n8n)</a></li>
+                <li><a href="#section-5">5. Architecture du Lien Élève (Base64)</a></li>
+                <li><a href="#section-6">6. Traitement IA & Prompts</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="content">
+
+        <header>
+            <h1>Documentation Technique & Architecture</h1>
+            <p class="subtitle">Spécifications techniques de <strong>Mentoria</strong> (v2.7+), le studio de création d'assistants pédagogiques souverains conçu et développé par <strong>Gilles Cormi</strong>         </header>
+
+        <!-- SECTION WIP -->
+        <section id="section-wip">
+            <div class="callout callout-wip">
+                <h4><span style="font-size: 1.2rem;">🚧</span> Work In Progress — Outil en évolution continue</h4>
+                <p>Mentoria est un projet en développement actif (actuellement en <strong>version 2.7</strong>), conçu selon une approche agile. Les fonctionnalités techniques décrites dans ce document (comme l'utilisation de l'API WebDAV, le proxy n8n, ou la gestion des flux de logs) font l'objet d'optimisations régulières pour répondre au mieux aux contraintes réseaux et capacitaires de l'Éducation Nationale. L'architecture est susceptible d'évoluer.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 1 -->
+        <section id="section-1">
+            <h2>1. Souveraineté Numérique & Outils Institutionnels</h2>
+            <p>Le développement de la v2 a marqué un tournant architectural majeur : <strong>la suppression totale des services cloud commerciaux tiers (Firebase, Google Cloud)</strong>.</p>
+            
+            <p>Mentoria s'appuie aujourd'hui exclusivement sur l'infrastructure de l'État :</p>
+            <ul>
+                <li><strong>Le Cerveau IA :</strong> <em>Albert</em>, développé par Etalab / DINUM (<code>albert.api.etalab.gouv.fr</code>), utilisant des modèles Open Weights hébergés en France.</li>
+                <li><strong>Le Stockage (Nuage) :</strong> Les espaces Nextcloud académiques (<code>nuage.apps.education.fr</code>).</li>
+                <li><strong>Le Stockage (Forge) :</strong> Le GitLab de l'Éducation Nationale (<code>forge.apps.education.fr</code>).</li>
+                <li><strong>Les Relais & Proxys :</strong> Hébergés sur l'incubateur de l'Éducation Nationale (<code>n8n.incubateur.education.gouv.fr</code>).</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section id="section-2">
+            <h2>2. Conformité RGPD "By Design"</h2>
+            <p>L'architecture de Mentoria a été pensée dès sa conception pour garantir une conformité stricte au Règlement Général sur la Protection des Données (RGPD) et assurer la sécurité des informations des élèves. Les choix techniques ont fait l'objet d'échanges et de sollicitations auprès des correspondants des services ministériels (notamment les équipes d'<em>apps.education.fr</em> et de l'incubateur EN) afin de s'assurer que l'outil s'intègre parfaitement dans le cadre de confiance de l'institution.</p>
+
+            <div class="callout callout-success">
+                <h4>Aucun traitement de données personnelles côté serveur central</h4>
+                <ul>
+                    <li><strong>Principe de minimisation (Sans compte) :</strong> L'élève n'a pas de compte à créer. L'authentification se fait de manière purement déclarative par l'élève (via son identifiant ENT de type <code>prenom.nom</code>) à l'ouverture du lien, minimisant ainsi la collecte de données au strict nécessaire.</li>
+                    <li><strong>Absence de Base de Données Tiers :</strong> Il n'y a aucune base de données commerciale (SQL/NoSQL) centralisant les bots, les requêtes ou les élèves. Tout est géré sous forme de fichiers plats hébergés au sein du cloud académique souverain de l'enseignant.</li>
+                    <li><strong>Durée de vie et purge des logs :</strong> Les interactions entre l'élève et l'IA (le "Suivi de classe") sont stockées de façon éphémère dans l'espace Nextcloud personnel de l'enseignant. Elles ont une finalité strictement pédagogique. L'interface offre un outil de purge permettant à l'enseignant de supprimer définitivement ces logs à la fin de la séance, respectant ainsi le droit à l'effacement.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECTION 3 -->
+        <section id="section-3">
+            <h2>3. Les 3 Moteurs de Stockage</h2>
+            <p>Mentoria Studio est une application client lourd (Single Page Application - HTML/CSS/JS pur). Elle n'a pas de backend propre, mais dialogue avec trois moteurs de stockage distincts au choix de l'utilisateur :</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Moteur</th>
+                        <th>Protocole / API</th>
+                        <th>Authentification</th>
+                        <th>Spécificités techniques</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Nuage</strong><br>(Nextcloud EN)</td>
+                        <td>WebDAV (via Proxy n8n)</td>
+                        <td>Mot de passe d'application</td>
+                        <td>Utilise un fichier <code>manifest.json</code> pour lister les bots (car la requête HTTP <code>PROPFIND</code> du WebDAV est mal supportée par le proxy).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Local / USB</strong></td>
+                        <td>File System Access API</td>
+                        <td>Sélection de dossier navigateur</td>
+                        <td>Opère 100% hors-ligne. Les bots sont sauvegardés physiquement (<code>bot_xxx.json</code>). Restreint à Chrome/Edge.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>La Forge</strong></td>
+                        <td>GitLab REST API v4</td>
+                        <td>Personal Access Token (Badge)</td>
+                        <td>Création de commits via API pour sauvegarder ou lire les fichiers <code>.json</code> dans la branche <code>main</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SECTION 4 -->
+        <section id="section-4">
+            <h2>4. Le Relais Souverain (Proxy n8n)</h2>
+            <p>Pour des raisons de sécurité, les navigateurs web appliquent des politiques <strong>CORS (Cross-Origin Resource Sharing)</strong>. Les serveurs de l'API Albert et de Nuage apps.education.fr n'autorisent pas nativement les requêtes directes depuis une page web externe.</p>
+            
+            <p>La solution architecturale, validée suite aux sollicitations des correspondants techniques ministériels, repose sur des flux <strong>n8n</strong> hébergés de manière sécurisée sur les serveurs de l'incubateur de l'Éducation Nationale :</p>
+
+            <h3>Webhook 1 : <code>mentoria_chat</code> (Proxy Albert)</h3>
+            <ul>
+                <li><strong>Rôle :</strong> Recevoir la requête de l'élève (Modèle, Température, Historique), injecter les headers CORS manquants, et relayer la requête vers <code>https://albert.api.etalab.gouv.fr/v1/chat/completions</code> avec le Token Bearer de l'enseignant.</li>
+            </ul>
+
+            <h3>Webhook 2 : <code>mentoria_storage</code> (Proxy Nuage & Logs)</h3>
+            <ul>
+                <li><strong>Rôle :</strong> Transformer les requêtes JSON simples de l'application en requêtes WebDAV complexes pour interagir avec Nextcloud.</li>
+                <li><strong>Fonctions :</strong> <code>list</code>, <code>read</code>, <code>write</code>, <code>delete</code>, <code>test</code>.</li>
+                <li><strong>Suivi de classe :</strong> Gère l'écriture séquentielle des logs d'interaction de la classe, avec gestion des verrous pour éviter la corruption de fichiers lors d'écritures simultanées de multiples élèves.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 5 -->
+        <section id="section-5">
+            <h2>5. Architecture du Lien Élève (URL Auto-portée Base64)</h2>
+            <p>Comment l'élève accède-t-il au bot si Mentoria n'a pas de base de données de publication ?</p>
+            
+            <p>Mentoria utilise un mécanisme d'encodage de la configuration <strong>directement dans le hash de l'URL</strong>. L'interface <code>compagnion.html</code> est une coquille vide qui se structure dynamiquement à la lecture de son URL.</p>
+
+            <div class="callout callout-info">
+                <h4>Flux de publication</h4>
+                <ol>
+                    <li>L'enseignant clique sur "Publier" dans le Studio.</li>
+                    <li>Le script JS rassemble le titre, le prompt, le corpus textuel, l'avatar, et la clé API chiffrée dans un objet JSON.</li>
+                    <li>Cet objet est compressé en LZ-String puis encodé en Base64.</li>
+                    <li>L'URL finale est générée : <code>https://.../compagnion.html#config=LZStringBase64...</code></li>
+                </ol>
+            </div>
+
+            <h3>Gestion de l'Avatar (Optimisation de poids)</h3>
+            <p>Puisque l'avatar est encodé en Data-URI (Base64) dans le lien, une image trop lourde produirait une URL qui dépasserait les limites acceptées par les navigateurs ou les ENT (souvent bloqués à 2000-8000 caractères).</p>
+            <p><strong>Solution :</strong> À l'upload, l'image est passée dans un élément <code>&lt;canvas&gt;</code> HTML5, redimensionnée proportionnellement à un <strong>maximum de 128x128 pixels</strong>, et compressée en JPEG à 82%, réduisant généralement son poids de 500 Ko à ~5 Ko.</p>
+        </section>
+
+        <!-- SECTION 6 -->
+        <section id="section-6">
+            <h2>6. Traitement IA & Engineering des Prompts</h2>
+            
+            <h3>Modèles supportés</h3>
+            <p>Mentoria cible par défaut le modèle <code>openweight-medium</code> de l'API Albert (qui pointe actuellement vers <em>Mistral-Small-3.2-24B-Instruct</em>). Ce modèle offre le meilleur ratio entre vitesse de réponse et fidélité au prompt (indispensable pour l'application stricte des règles de maïeutique).</p>
+
+            <h3>Extraction du Corpus</h3>
+            <p>L'intégration de fichiers PDF se fait purement côté client via la librairie <strong>PDF.js</strong>. Seul le texte brut est extrait et concaténé. Une limite stricte de <strong>200 Ko de texte pur</strong> est recommandée pour ne pas saturer le lien Base64 ni la fenêtre de contexte du modèle (<em>Context Window</em>).</p>
+
+            <h3>Les Boutons de "Réponse Rapide" (One-Shot Prompting)</h3>
+            <p>Les boutons proposés à l'élève dans le Compagnon utilisent une technique d'injection asynchrone :</p>
+            <ul>
+                <li>L'élève clique sur le bouton "Donne-moi un indice".</li>
+                <li>Dans l'interface, le message affiché est "Donne-moi un indice".</li>
+                <li>Mais techniquement, Mentoria envoie le payload suivant à l'IA :<br>
+                    <code>[DEMANDE PONCTUELLE — exécute UNIQUEMENT cette action, puis reprends ton rôle d'assistant habituel pour la suite] Donne-moi un indice pour avancer sans me donner la réponse directement.</code></li>
+            </ul>
+            <p>Cette technique force l'IA à agir de manière directive sur un seul échange, sans altérer durablement son "Persona" pédagogique principal.</p>
+        </section>
+
+    </div>
+
+</body>
+</html>

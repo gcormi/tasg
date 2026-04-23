@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentoria — Suivi de classe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .student-card { transition: all 0.15s; border-left: 3px solid transparent; }
+        .student-card:hover { background: #f1f5f9; border-left-color: #a5b4fc; }
+        .student-card.selected { background: #eef2ff; border-left-color: #6366f1; }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+        .refreshing { animation: pulse 1s infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col overflow-hidden text-slate-800">
+
+<!-- ── HEADER ── -->
+<header class="flex-none bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-4 shadow-sm">
+    <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-black" style="background:linear-gradient(135deg,#6366f1,#14b8a6)">M</div>
+        <div>
+            <h1 class="text-sm font-black text-slate-900 leading-none">Mentoria <span class="text-slate-400 font-normal">· Suivi de classe</span></h1>
+            <p class="text-[10px] text-slate-400 mt-0.5" id="status-text">Non connecté</p>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-2 ml-auto">
+        <!-- Sélecteur de bot -->
+        <select id="bot-select" onchange="onBotChange()" class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-700 font-medium hidden">
+            <option value="">— Choisir un bot —</option>
+        </select>
+        <!-- Sélecteur de groupe -->
+        <select id="group-select" onchange="onGroupChange()" class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white font-mono font-bold text-indigo-600 hidden">
+            <option value="">— Groupe —</option>
+        </select>
+        <!-- Copier lien -->
+        <button id="copy-link-btn" onclick="copyGroupLink()" class="hidden text-xs px-2.5 py-1.5 rounded-lg border border-indigo-200 text-indigo-500 hover:bg-indigo-50 transition-colors flex items-center gap-1">
+            <i data-lucide="link" class="w-3 h-3"></i> Copier lien
+        </button>
+        <!-- Refresh -->
+        <button onclick="manualRefresh()" title="Actualiser" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-colors">
+            <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
+        </button>
+        <!-- Supprimer logs -->
+        <button onclick="deleteAllLogs()" title="Supprimer tous les logs" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+        <!-- Connexion -->
+        <button onclick="toggleLoginPanel()" id="login-btn" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-indigo-600 transition-colors flex items-center gap-1.5">
+            <i data-lucide="plug" class="w-3 h-3"></i> <span id="login-btn-label">Connexion</span>
+        </button>
+    </div>
+</header>
+
+<!-- ── PANEL CONNEXION ── -->
+<div id="login-panel" class="flex-none bg-indigo-50 border-b border-indigo-100 px-5 py-3 hidden">
+    <div class="flex items-end gap-3 max-w-2xl">
+        <div class="flex-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Identifiant Nuage</label>
+            <input id="inp-user" type="text" placeholder="gcormi" class="mt-1 w-full text-xs border border-indigo-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-indigo-400">
+        </div>
+        <div class="flex-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Mot de passe d'application</label>
+            <input id="inp-pass" type="password" placeholder="••••••••" class="mt-1 w-full text-xs border border-indigo-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-indigo-400">
+        </div>
+        <div class="flex-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Instance Nuage</label>
+            <input id="inp-server" type="text" placeholder="nuage03.apps.education.fr" class="mt-1 w-full text-xs border border-indigo-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-indigo-400">
+        </div>
+        <button onclick="connect()" class="text-xs px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-semibold flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-3 h-3"></i> Connexion
+        </button>
+    </div>
+    <p id="login-error" class="text-[11px] text-red-500 mt-2 hidden"></p>
+</div>
+
+<!-- ── CORPS PRINCIPAL ── -->
+<div class="flex-1 flex overflow-hidden">
+
+    <!-- LISTE ÉLÈVES -->
+    <aside class="w-72 flex-none bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+        <div class="flex-none px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Élèves connectés</span>
+            <span id="student-count" class="text-[10px] text-slate-400">—</span>
+        </div>
+        <div id="student-list" class="flex-1 overflow-y-auto">
+            <div class="flex flex-col items-center justify-center h-full text-slate-300 gap-3 p-6">
+                <i data-lucide="users" class="w-10 h-10"></i>
+                <p class="text-xs text-center">Connectez-vous et sélectionnez un bot pour voir les élèves.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONVERSATION -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <div id="conv-header" class="flex-none px-5 py-3 bg-white border-b border-slate-100 hidden">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-sm font-black text-slate-800" id="conv-student-name">—</span>
+                    <span class="text-[10px] text-slate-400 ml-2" id="conv-student-stats"></span>
+                </div>
+                <button onclick="banCurrentStudent()" class="text-xs px-2.5 py-1 rounded-lg border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-1">
+                    <i data-lucide="user-x" class="w-3 h-3"></i> Expulser
+                </button>
+            </div>
+        </div>
+        <div id="conv-body" class="flex-1 overflow-y-auto p-5 space-y-3 bg-slate-50">
+            <div class="flex flex-col items-center justify-center h-full text-slate-300 gap-3">
+                <i data-lucide="message-square" class="w-10 h-10"></i>
+                <p class="text-xs">Cliquez sur un élève pour voir sa conversation.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="flex-none bg-white border-t border-slate-100 px-5 py-2 flex items-center justify-between">
+    <span class="text-[10px] text-slate-300">Actualisation auto toutes les 30 s</span>
+    <span class="text-[10px] text-slate-300" id="last-refresh-text"></span>
+</footer>
+
+<script>
+    const PROXY = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage';
+
+    let nuageUser = '', nuagePass = '', nuageServer = '';
+    let currentBotId = null, currentClassKey = 'default', selectedStudent = null;
+    let sessions = {};
+
+    lucide.createIcons();
+
+    // ── AUTO-REMPLISSAGE DEPUIS localStorage (partagé avec index.html) ──
+    window.addEventListener('DOMContentLoaded', () => {
+        const u = localStorage.getItem('mentoria_nuage_user');
+        const p = localStorage.getItem('mentoria_nuage_pass');
+        const s = localStorage.getItem('mentoria_nuage_server');
+        if (u) document.getElementById('inp-user').value = u;
+        if (p) document.getElementById('inp-pass').value = p;
+        if (s) document.getElementById('inp-server').value = s;
+        if (u && p) connect();
+        else toggleLoginPanel();
+    });
+
+    // ── CONNEXION ──
+    async function connect() {
+        const u = document.getElementById('inp-user').value.trim();
+        const p = document.getElementById('inp-pass').value.trim();
+        const s = document.getElementById('inp-server').value.trim() || 'nuage.apps.education.fr';
+        if (!u || !p) { showLoginError('Identifiant et mot de passe requis.'); return; }
+        nuageUser = u; nuagePass = p; nuageServer = s;
+        const res = await callNuage('test');
+        if (!res?.success) { showLoginError('Connexion impossible : ' + (res?.error || 'erreur inconnue')); return; }
+        document.getElementById('login-panel').classList.add('hidden');
+        document.getElementById('status-text').textContent = 'Connecté · ' + u + ' · ' + s;
+        document.getElementById('login-btn-label').textContent = u;
+        await loadBotList();
+        startAutoRefresh();
+    }
+
+    function showLoginError(msg) {
+        const el = document.getElementById('login-error');
+        el.textContent = msg; el.classList.remove('hidden');
+    }
+
+    function toggleLoginPanel() {
+        document.getElementById('login-panel').classList.toggle('hidden');
+        document.getElementById('login-error').classList.add('hidden');
+    }
+
+    // ── APPEL NUAGE ──
+    async function callNuage(action, extra = {}) {
+        try {
+            const res = await fetch(PROXY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, username: nuageUser, password: nuagePass, server: nuageServer, ...extra })
+            });
+            return res.ok ? await res.json() : null;
+        } catch { return null; }
+    }
+
+    // ── LISTE DES BOTS ──
+    async function loadBotList() {
+        const data = await callNuage('list');
+        const files = (data?.files || []).map(f => f.name).filter(n => n.startsWith('bot_'));
+        const sel = document.getElementById('bot-select');
+        sel.innerHTML = '<option value="">— Choisir un bot —</option>';
+        // Lire le titre de chaque bot
+        for (const f of files) {
+            const botData = await callNuage('read', { filename: f });
+            const title = botData?.content?.config?.title || f;
+            const id = f.replace('.json', '');
+            sel.innerHTML += `<option value="${id}">${title}</option>`;
+        }
+        sel.classList.remove('hidden');
+    }
+
+    // ── SÉLECTION BOT ──
+    window.onBotChange = () => {
+        currentBotId = document.getElementById('bot-select').value || null;
+        selectedStudent = null;
+        loadGroupList();
+        if (currentBotId) refresh();
+    };
+
+    function loadGroupList() {
+        const sel = document.getElementById('group-select');
+        const copyBtn = document.getElementById('copy-link-btn');
+        if (!currentBotId) { sel.classList.add('hidden'); copyBtn.classList.add('hidden'); return; }
+        const groups = JSON.parse(localStorage.getItem('mentoria_groups_' + currentBotId) || '[]');
+        sel.innerHTML = groups.map(g => `<option value="${g.classKey}">${g.classKey} — ${g.date}</option>`).join('');
+        if (!groups.length) sel.innerHTML = '<option value="default">default</option>';
+        currentClassKey = sel.value || 'default';
+        sel.classList.remove('hidden');
+        copyBtn.classList.remove('hidden');
+        lucide.createIcons();
+    }
+
+    window.onGroupChange = () => {
+        currentClassKey = document.getElementById('group-select').value || 'default';
+        selectedStudent = null;
+        refresh();
+    };
+
+    // ── COPIER LIEN ──
+    window.copyGroupLink = () => {
+        const groups = JSON.parse(localStorage.getItem('mentoria_groups_' + currentBotId) || '[]');
+        const group = groups.find(g => g.classKey === currentClassKey);
+        if (group?.link) navigator.clipboard.writeText(group.link).then(() => setStatus('Lien copié !'));
+        else setStatus('Lien introuvable — republiez depuis le Studio.');
+    };
+
+    // ── ACTUALISATION ──
+    function startAutoRefresh() {
+        clearInterval(window._autoRefresh);
+        window._autoRefresh = setInterval(refresh, 30000);
+    }
+
+    window.manualRefresh = async () => {
+        document.getElementById('refresh-icon').classList.add('refreshing');
+        await refresh();
+        setTimeout(() => document.getElementById('refresh-icon').classList.remove('refreshing'), 600);
+    };
+
+    async function refresh() {
+        if (!currentBotId) return;
+        const data = await callNuage('get_logs', { botId: currentBotId, classKey: currentClassKey });
+        sessions = data?.sessions || {};
+        renderStudentList();
+        if (selectedStudent) loadConversation(selectedStudent);
+        document.getElementById('last-refresh-text').textContent = 'Actualisé à ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    }
+
+    // ── LISTE ÉLÈVES ──
+    function renderStudentList() {
+        const list = document.getElementById('student-list');
+        const students = Object.keys(sessions);
+        document.getElementById('student-count').textContent = students.length + ' élève' + (students.length > 1 ? 's' : '');
+        if (!students.length) {
+            list.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-slate-300 gap-3 p-6"><i data-lucide="user-x" class="w-8 h-8"></i><p class="text-xs text-center">Aucun élève connecté pour ce groupe.</p></div>';
+            lucide.createIcons();
+            return;
+        }
+        list.innerHTML = students.map(sid => {
+            const s = sessions[sid];
+            const lastTs = new Date(s.lastActivity || 0).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            const firstTs = s.firstActivity ? new Date(s.firstActivity).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : lastTs;
+            const count = s.messageCount || 0;
+            const preview = s.lastMessage ? s.lastMessage.slice(0, 55) + (s.lastMessage.length > 55 ? '…' : '') : '';
+            const roleIcon = s.lastRole === 'assistant' ? '🤖' : '🧑';
+            const isSelected = sid === selectedStudent;
+            return `<div onclick="selectStudent('${sid}')" class="student-card px-4 py-3 cursor-pointer border-b border-slate-50 ${isSelected ? 'selected' : ''}">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 flex-none"></span>
+                        <span class="text-xs font-bold text-slate-800">${sid}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400">${count} msg</span>
+                </div>
+                <p class="text-[10px] text-slate-400 pl-4">${firstTs} → ${lastTs}</p>
+                ${preview ? `<p class="text-[10px] text-slate-400 pl-4 mt-0.5 truncate">${roleIcon} ${preview}</p>` : ''}
+            </div>`;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    // ── SÉLECTION ÉLÈVE ──
+    window.selectStudent = async (sid) => {
+        selectedStudent = sid;
+        renderStudentList();
+        await loadConversation(sid);
+    };
+
+    async function loadConversation(sid) {
+        const s = sessions[sid] || {};
+        document.getElementById('conv-header').classList.remove('hidden');
+        document.getElementById('conv-student-name').textContent = sid;
+        document.getElementById('conv-student-stats').textContent = (s.messageCount || 0) + ' messages · ' + new Date(s.firstActivity || 0).toLocaleDateString('fr-FR');
+
+        const data = await callNuage('get_student_log', { botId: currentBotId, classKey: currentClassKey, studentId: sid });
+        const log = data?.log || [];
+        const body = document.getElementById('conv-body');
+        if (!log.length) {
+            body.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-slate-300 gap-2"><i data-lucide="message-square" class="w-8 h-8"></i><p class="text-xs">Aucun message enregistré.</p></div>';
+            lucide.createIcons();
+            return;
+        }
+        body.innerHTML = log.map(entry => {
+            const isUser = entry.role === 'user';
+            const ts = new Date(entry.ts).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            const text = entry.text.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t])).replace(/\n/g, '<br>');
+            return `<div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-[75%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${isUser ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700 shadow-sm'}">
+                    <div class="text-[9px] opacity-50 mb-1 ${isUser ? 'text-right' : ''}">${isUser ? sid : 'Bot'} · ${ts}</div>
+                    ${text}
+                </div>
+            </div>`;
+        }).join('');
+        body.scrollTop = body.scrollHeight;
+    }
+
+    // ── EXPULSER ──
+    window.banCurrentStudent = async () => {
+        if (!selectedStudent || !confirm(`Expulser ${selectedStudent} ? L'élève ne pourra plus accéder à ce bot.`)) return;
+        await callNuage('ban_student', { botId: currentBotId, classKey: currentClassKey, studentId: selectedStudent });
+        setStatus(`${selectedStudent} expulsé.`);
+        selectedStudent = null;
+        document.getElementById('conv-header').classList.add('hidden');
+        document.getElementById('conv-body').innerHTML = '<div class="flex flex-col items-center justify-center h-full text-slate-300 gap-2"><p class="text-xs">Élève expulsé.</p></div>';
+        await refresh();
+    };
+
+    // ── SUPPRIMER LOGS ──
+    window.deleteAllLogs = async () => {
+        if (!currentBotId) { setStatus('Aucun bot sélectionné.'); return; }
+        if (!confirm('Supprimer tous les logs de ce groupe ? Cette action est irréversible.')) return;
+        await callNuage('delete_logs', { botId: currentBotId, classKey: currentClassKey });
+        selectedStudent = null;
+        document.getElementById('conv-header').classList.add('hidden');
+        document.getElementById('conv-body').innerHTML = '<div class="flex flex-col items-center justify-center h-full text-slate-300 gap-2"><p class="text-xs">Logs supprimés.</p></div>';
+        setStatus('Logs supprimés.');
+        await refresh();
+    };
+
+    function setStatus(msg) {
+        document.getElementById('last-refresh-text').textContent = msg;
+        setTimeout(() => document.getElementById('last-refresh-text').textContent = '', 3000);
+    }
+</script>
+</body>
+</html>

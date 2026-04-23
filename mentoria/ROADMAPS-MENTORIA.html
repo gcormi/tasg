@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ Mentoria — Feuille de Route & Vision</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            /* Indigo */
+            --primary-hover: #4338ca;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-page: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb;
+            --sidebar-bg: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-page);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Layout : Sidebar + Content */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .content {
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            color: #111827;
+            font-size: 2.25rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-top: 0;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            color: #111827;
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p,
+        ul,
+        ol {
+            margin-bottom: 1rem;
+        }
+
+        ul,
+        ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Navigation Sidebar */
+        .sidebar h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            border: none;
+            color: #111827;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: block;
+            padding: 0.25rem 0;
+            transition: color 0.2s;
+        }
+
+        .sidebar a:hover {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Links & text */
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        code {
+            background-color: #f3f4f6;
+            color: #ef4444;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-size: 0.875em;
+        }
+
+        /* Callouts / Alert boxes */
+        .callout {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .callout h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-wip {
+            background-color: #fdf4ff;
+            border-color: #c026d3;
+            color: #831843;
+        }
+
+        .callout-wip h4 {
+            color: #a21caf;
+        }
+
+        .callout-info {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e3a8a;
+        }
+
+        .callout-info h4 {
+            color: #1e40af;
+        }
+
+        .callout-success {
+            background-color: #f0fdf4;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        .callout-success h4 {
+            color: #15803d;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .callout-warning h4 {
+            color: #b45309;
+        }
+
+        /* Checklists */
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .task-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-done {
+            color: #16a34a;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .task-todo {
+            color: #d1d5db;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 1.5rem;
+            }
+
+            .content {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🗺️</div>
+            <h2 style="color: var(--primary-color); font-size: 1.5rem; margin: 0;">Mentoria</h2>
+            <div
+                style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem;">
+                Feuille de Route & Vision
+            </div>
+        </div>
+        <nav>
+            <h2>Sommaire</h2>
+            <ul>
+                <li><a href="#section-wip">🚧 Work In Progress</a></li>
+                <li><a href="#section-1">1. La Vision Stratégique</a></li>
+                <li><a href="#section-2">2. Philosophie & RGPD</a></li>
+                <li><a href="#section-3">3. Jalons Franchis (Réalisations)</a></li>
+                <li><a href="#section-4">4. Objectifs à court terme (Tests)</a></li>
+                <li><a href="#section-5">5. Évolutions Techniques Futures</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="content">
+
+        <header>
+            <h1>Feuille de Route & Vision</h1>
+            <p class="subtitle">Découvrez les prochaines étapes, les ambitions et la philosophie de
+                <strong>Mentoria</strong>, conçu et développé par <strong>Gilles Cormi</strong>.
+            </p>
+        </header>
+
+        <!-- SECTION WIP -->
+        <section id="section-wip">
+            <div class="callout callout-wip">
+                <h4><span style="font-size: 1.2rem;">🚧</span> Work In Progress — Outil en évolution continue</h4>
+                <p>Mentoria est un projet vivant développé en méthode Agile. Les éléments présentés dans cette feuille
+                    de route représentent le cap stratégique actuel. L'outil est constamment affiné grâce aux retours
+                    des utilisateurs sur le terrain et à la coordination technique avec les services de l'État
+                    (Incubateur EN et DINUM).</p>
+            </div>
+        </section>
+
+        <!-- SECTION 1 -->
+        <section id="section-1">
+            <h2>1. La Vision : "Le meilleur des deux mondes"</h2>
+            <p>L'objectif fondamental de Mentoria est de créer un hybride parfait pour l'enseignement, combinant la
+                rigueur structurelle d'un cours scénarisé et la fluidité d'un dialogue naturel avec l'intelligence
+                artificielle.</p>
+
+            <ul>
+                <li><strong>La structure :</strong> Permettre à l'enseignant de garder le contrôle.
+                    Mentoria intègre des <em>boutons de choix rapides</em> pour guider l'élève, et prévoit à terme
+                    d'intégrer des "Missions" ou des étapes fixes dans la progression pédagogique.</li>
+                <li><strong>L'Intelligence (L'héritage Albert) :</strong> Offrir une fluidité conversationnelle.
+                    L'IA Albert gère le dialogue libre entre les étapes imposées, en appliquant des règles strictes de
+                    maïeutique pour faire réfléchir l'élève sans jamais "faire à sa place". L'ancrage sur le corpus de
+                    l'enseignant permet de réduire drastiquement les hallucinations.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section id="section-2">
+            <h2>2. Philosophie Institutionnelle & Conformité RGPD</h2>
+            <p>Mentoria n'est pas qu'un outil technique, c'est une <strong>démarche politique et pédagogique</strong>
+                forte. Il a été pensé avec l'aide des correspondants ministériels pour s'inscrire parfaitement dans le
+                cadre de confiance de l'institution.</p>
+
+            <div class="callout callout-info">
+                <h4>Les piliers du projet :</h4>
+                <ul>
+                    <li><strong>Souveraineté Absolue :</strong> Utilisation exclusive des infrastructures de l'État.
+                        Exit les géants du web (Google, Firebase, AWS). Le tryptique fondateur est : <em>Nuage EN</em>,
+                        <em>L'IA Albert (Etalab)</em>, et <em>La Forge EN</em>.
+                    </li>
+                    <li><strong>RGPD by design :</strong> Le principe de minimisation des données est poussé à
+                        l'extrême. Les élèves n'ont pas de compte, et il n'y a aucune base de données centrale qui piste
+                        leurs habitudes.</li>
+                    <li><strong>Universalité et Accessibilité :</strong> L'outil a vocation à être utilisable par tout
+                        enseignant, même sans bagage technique, en s'appuyant uniquement sur ses identifiants
+                        académiques existants.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECTION 3 -->
+        <section id="section-3">
+            <h2>3. Jalons Franchis (Ce qui a été réalisé)</h2>
+            <p>Le passage à la v2 souveraine a permis de concrétiser les fondations techniques de Mentoria :</p>
+
+            <ul class="task-list">
+                <li><span class="task-done">✓</span> <strong>Suppression totale des dépendances commerciales :</strong>
+                    Retrait complet de Firebase. L'application fonctionne de manière autonome en s'appuyant sur des
+                    fichiers JSON (Base de données orientée documents locaux).</li>
+                <li><span class="task-done">✓</span> <strong>Moteurs de stockage souverains :</strong> Intégration de
+                    l'API WebDAV pour la synchronisation sur les espaces Nextcloud de l'Éducation Nationale, et de l'API
+                    GitLab pour La Forge.</li>
+                <li><span class="task-done">✓</span> <strong>Mode 100% hors-ligne (Air-gap) :</strong> Support de l'API
+                    <em>File System Access</em> permettant à un professeur en zone blanche de sauvegarder ses bots sur
+                    clé USB.
+                </li>
+                <li><span class="task-done">✓</span> <strong>Publication décentralisée (Base64) :</strong> Création
+                    d'une URL auto-portée. La configuration de l'assistant (règles, corpus, avatar) est encapsulée
+                    directement dans le lien élève, supprimant le besoin d'un serveur d'hébergement pour la
+                    consultation.</li>
+                <li><span class="task-done">✓</span> <strong>Suivi de classe en temps réel :</strong> Mise en place du
+                    système de supervision des logs (effaçables) via le relais proxy souverain n8n.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 4 -->
+        <section id="section-4">
+            <h2>4. Objectifs à court terme (Phase de test)</h2>
+            <p>Les prochaines semaines sont dédiées à la consolidation et à l'assurance qualité des fonctionnalités
+                actuelles.</p>
+
+            <div class="callout callout-warning">
+                <h4>Priorité 1 : Tests et Validation en conditions réelles</h4>
+                <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li><strong>Tests de charge Nuage :</strong> Vérification de la résilience du proxy n8n face à une
+                        classe de 35 élèves écrivant simultanément leurs logs sur le serveur Nextcloud de l'enseignant.
+                    </li>
+                    <li><strong>Compatibilité Navigateurs :</strong> Validation approfondie du décodeur
+                        <code>compagnion.html</code> sur d'anciens navigateurs ou tablettes souvent présents en
+                        établissement.
+                    </li>
+                    <li><strong>Gestion des avatars :</strong> Tests d'encodage avec différents formats d'images (PNG,
+                        JPG, AVIF, WebP) pour garantir la légèreté des URLs.</li>
+                </ul>
+            </div>
+
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Robustesse des erreurs :</strong> Améliorer l'UX avec des
+                    messages d'erreur très clairs si l'instance Nuage est mal configurée ou si l'API Albert est saturée
+                    (mise en place d'un système de retry automatique).</li>
+                <li><span class="task-todo">□</span> <strong>Documentation In-App :</strong> Finaliser l'intégration
+                    d'icônes d'aide <code>(?)</code> directement à côté de chaque champ complexe dans le Studio pour
+                    guider les enseignants novices.</li>
+            </ul>
+        </section>
+
+        <!-- SECTION 5 -->
+        <section id="section-5">
+            <h2>5. Évolutions Techniques & Pédagogiques Futures</h2>
+            <p>La vision à moyen/long terme pour Mentoria vise à étendre ses capacités sans sacrifier sa légèreté.</p>
+
+            <h3>A. Ergonomie et Interface</h3>
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Bouton "Changer de stockage" :</strong> Intégrer un moyen
+                    rapide de revenir à l'écran d'accueil sans devoir purger manuellement son navigateur.</li>
+                <li><span class="task-todo">□</span> <strong>Indicateur de synchronisation :</strong> Améliorer le
+                    retour visuel (spinner) lors de la lecture/écriture sur le Nuage ou la Forge pour éviter les clics
+                    multiples.</li>
+            </ul>
+
+            <h3>B. Optimisation des charges réseau (Taille des Bots)</h3>
+            <p>Le modèle d'URL en Base64 montre ses limites si l'enseignant ajoute une photo de profil trop lourde ou un
+                cours de 200 pages.</p>
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Alerte de poids URL :</strong> Créer une jauge visuelle
+                    dans le Studio qui vire au rouge si le bot dépasse la taille critique acceptée par les ENT
+                    (généralement 8 Ko).</li>
+                <li><span class="task-todo">□</span> <strong>Externalisation (Étude de faisabilité) :</strong> Envisager
+                    de stocker l'Avatar et la Clé API séparément (dans un fichier de configuration maître sur le Nuage)
+                    pour que l'URL élève ne contienne qu'un identifiant de requête léger, résolvant définitivement les
+                    problèmes de liens trop longs.</li>
+            </ul>
+
+            <h3>C. Collaboratif & Échanges</h3>
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Export/Import Unitaire :</strong> Pouvoir télécharger un
+                    bot spécifique au format JSON depuis le Studio pour l'envoyer par email à un collègue, afin de créer
+                    une véritable "bibliothèque d'assistants" partageable au sein de l'Éducation Nationale.</li>
+            </ul>
+        </section>
+
+    </div>
+
+</body>
+
+</html>

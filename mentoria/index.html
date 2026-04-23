@@ -223,6 +223,29 @@
         clearInterval(window._suiviInterval);
     };
 
+    // Drag de la fenêtre suivi
+    (function() {
+        let drag = false, sx, sy, sl, st;
+        document.addEventListener('mousedown', e => {
+            const handle = document.getElementById('suivi-drag-handle');
+            if (!handle || !handle.contains(e.target) || e.target.closest('button')) return;
+            const win = document.getElementById('suivi-window');
+            drag = true; sx = e.clientX; sy = e.clientY;
+            win.style.transform = 'none';
+            const r = win.getBoundingClientRect();
+            sl = r.left; st = r.top;
+            win.style.left = sl + 'px'; win.style.top = st + 'px';
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', e => {
+            if (!drag) return;
+            const win = document.getElementById('suivi-window');
+            win.style.left = (sl + e.clientX - sx) + 'px';
+            win.style.top  = (st + e.clientY - sy) + 'px';
+        });
+        document.addEventListener('mouseup', () => { drag = false; document.body.style.userSelect = ''; });
+    })();
+
     window.handleThumbnail = (input) => {
         const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
@@ -913,10 +936,10 @@
 <!-- ══════════════════════════════════════
      MODAL SUIVI DE CLASSE
 ══════════════════════════════════════ -->
-<div id="suivi-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4" style="background:rgba(15,23,42,0.7)">
-    <div class="bg-white rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden border border-gray-100" style="max-height:90vh;display:flex;flex-direction:column">
-        <div class="h-1" style="background:linear-gradient(90deg,#6366f1,var(--teal))"></div>
-        <div class="flex justify-between items-center p-5 border-b border-gray-100 flex-none">
+<div id="suivi-modal" class="hidden fixed inset-0 z-[120]" style="background:rgba(15,23,42,0.5)">
+    <div id="suivi-window" class="bg-white rounded-xl shadow-2xl border border-gray-100 absolute" style="display:flex;flex-direction:column;width:680px;height:80vh;min-width:400px;min-height:300px;resize:both;overflow:auto;top:50%;left:50%;transform:translate(-50%,-50%)">
+        <div class="h-1 flex-none rounded-tl-xl rounded-tr-xl" style="background:linear-gradient(90deg,#6366f1,var(--teal))"></div>
+        <div id="suivi-drag-handle" class="flex justify-between items-center p-5 border-b border-gray-100 flex-none cursor-move select-none">
             <div>
                 <h3 class="font-semibold text-gray-900 text-sm flex items-center gap-2">
                     <i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Suivi de classe
