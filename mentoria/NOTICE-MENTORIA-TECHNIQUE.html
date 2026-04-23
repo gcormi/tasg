@@ -367,6 +367,44 @@
             </table>
             <p>PDF.js extrait uniquement le texte brut (pas les images). 50 pages PDF ≈ 75–100 Ko de texte extrait. Préférer les fichiers TXT exportés depuis le cours.</p>
 
+            <h3>Niveaux de difficulté (injection dans le prompt)</h3>
+            <p>Le sélecteur Débutant / Standard / Avancé du Studio ajoute une ligne conditionnelle en début de prompt système côté Compagnon :</p>
+            <ul>
+                <li><em>Débutant :</em> <code>NIVEAU DIFFICULTÉ : Débutant — utilise un vocabulaire très simple, beaucoup d'exemples concrets du quotidien, progression pas à pas. Sois très encourageant et patient.</code></li>
+                <li><em>Standard :</em> aucune ligne ajoutée (comportement par défaut).</li>
+                <li><em>Avancé :</em> <code>NIVEAU DIFFICULTÉ : Avancé — utilise un vocabulaire précis et technique, exige de la rigueur dans les réponses, pousse l'élève à justifier et nuancer ses propos.</code></li>
+            </ul>
+            <p>La valeur est stockée dans le champ <code>config.difficulty</code> de l'objet bot JSON et encodée dans l'URL élève.</p>
+
+            <h3>Templates de posture</h3>
+            <p>Les 5 templates (Le Socratique, Le Coach, etc.) sont des objets JS côté Studio qui pré-remplissent :</p>
+            <ul>
+                <li>Le champ <code>bot-instructions</code> (textarea).</li>
+                <li>Les règles pédagogiques (cases à cocher <code>.rule-toggle</code>).</li>
+                <li>Le niveau de difficulté via <code>setDifficulty()</code>.</li>
+            </ul>
+            <p>Ils ne modifient pas l'avatar, le corpus, les boutons rapides ni la clé API. Ils sont purement côté Studio (pas encodés différemment dans l'URL — c'est le résultat de leur application qui est encodé).</p>
+
+            <h3>Export / Import unitaire (format JSON)</h3>
+            <p>Le fichier <code>.json</code> exporté est exactement l'objet bot stocké en mémoire, sans transformation :</p>
+            <pre style="background:#f1f5f9;padding:0.75rem;border-radius:6px;font-size:0.8rem;overflow-x:auto;">{
+  "id": "bot_pink_floyd",
+  "updatedAt": "2026-04-23T...",
+  "config": {
+    "title": "Pink Floyd",
+    "instructions": "...",
+    "difficulty": "standard",
+    "answerSource": "both",
+    "pedagogicRules": [...],
+    ...
+  },
+  "corpus": "...",
+  "apiKey": "sk-...",
+  "vignette": "data:image/jpeg;base64,...",
+  "loggingConfig": { "username": "...", ... }
+}</pre>
+            <p>À l'import, le fichier est parsé, son <code>id</code> vérifié, puis écrit via <code>writeBotFile()</code> dans le stockage actif (Nuage, Forge ou local). Le manifest est mis à jour en conséquence.</p>
+
             <h3>Les Boutons de "Réponse Rapide" (One-Shot Prompting)</h3>
             <p>Les boutons proposés à l'élève dans le Compagnon utilisent une technique d'injection asynchrone :</p>
             <ul>

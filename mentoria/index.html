@@ -583,10 +583,17 @@
         <div id="bot-library-list" class="flex-1 overflow-y-auto sb-scroll px-2 pb-4">
             <p class="text-xs italic text-center py-6 mt-2" style="color:#475569">Connectez-vous<br>pour voir vos bots</p>
         </div>
-        <div class="p-3 border-t" style="border-color:#1e293b">
+        <div class="p-3 border-t space-y-1.5" style="border-color:#1e293b">
             <button onclick="resetForm()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors" style="background:#1e293b;color:#94a3b8" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouvel assistant
             </button>
+            <button onclick="exportBotJson()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors" style="background:#1e293b;color:#64748b" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'" title="Télécharger l'assistant courant en .json">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Exporter .json
+            </button>
+            <label class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors" style="background:#1e293b;color:#64748b" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'" title="Importer un assistant depuis un fichier .json">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Importer .json
+                <input type="file" accept=".json" class="hidden" onchange="importBotJson(this)">
+            </label>
         </div>
     </aside>
 
@@ -692,6 +699,17 @@
                         <div>
                             <label class="label">Instructions pour l'IA <span class="tip" data-tip="Décrivez le rôle de l'IA en quelques phrases.&#10;&#10;⚠️ Limite : 200 mots max. Au-delà, Albert dilue son attention et ignore certaines consignes.&#10;&#10;Modèle efficace : &quot;Tu es un professeur de [discipline]. Tu t'adresses à des [niveau]. Tu guides sans donner les réponses directement.&quot;">?</span></label>
                             <textarea id="bot-instructions" class="input-field" rows="3" placeholder="Ex: Tu es un tuteur de mathématiques. Tu guides les élèves sans donner les réponses directement…" oninput="updateBotWeight()"></textarea>
+                        </div>
+
+                        <!-- Niveau de difficulté -->
+                        <div>
+                            <label class="label">Niveau de difficulté <span class="tip" data-tip="🌱 Débutant : vocabulaire simple, exemples concrets, très encourageant.&#10;&#10;📚 Standard : adapté au niveau indiqué dans le profil.&#10;&#10;🎯 Avancé : vocabulaire précis, rigueur exigée, l'élève est mis au défi.">?</span></label>
+                            <div class="flex" id="difficulty-selector">
+                                <button class="source-btn" data-diff="beginner" onclick="setDifficulty('beginner')">🌱 Débutant</button>
+                                <button class="source-btn active" data-diff="standard" onclick="setDifficulty('standard')">📚 Standard</button>
+                                <button class="source-btn" data-diff="advanced" onclick="setDifficulty('advanced')">🎯 Avancé</button>
+                            </div>
+                            <p id="diff-hint" class="text-[10px] mt-1.5 italic text-gray-400">Adapte le vocabulaire et les exigences au niveau réel de vos élèves.</p>
                         </div>
 
                         <!-- Source des réponses -->
@@ -899,6 +917,44 @@
                 </div>
             </div>
 
+            <!-- SECTION 5 : TEMPLATES DE POSTURE -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-templates')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:#8b5cf6">★</span>
+                        Templates de posture
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-templates" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-templates" class="collapsible-content hidden-section">
+                    <div class="section-body">
+                        <p class="text-[10px] text-gray-400 mb-3">Pré-configurez instantanément l'assistant selon un profil pédagogique. Les instructions et règles actuelles seront remplacées.</p>
+                        <div class="space-y-2">
+                            <button onclick="applyTemplate('socratic')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🧠 Le Socratique</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Guide par les questions. Ne donne jamais la réponse directement.</p>
+                            </button>
+                            <button onclick="applyTemplate('coach')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🏋️ Le Coach</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Motivant, célèbre les progrès. Idéal pour les élèves en difficulté.</p>
+                            </button>
+                            <button onclick="applyTemplate('debater')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🗣️ L'Animateur de débat</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Présente plusieurs angles, joue l'avocat du diable, stimule la réflexion.</p>
+                            </button>
+                            <button onclick="applyTemplate('tutor')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">📖 Le Tuteur de révision</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Concis, feedback immédiat, ne révèle jamais les réponses. Mode exam.</p>
+                            </button>
+                            <button onclick="applyTemplate('challenger')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🎯 Le Challenger</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Exigeant et rigoureux. Pour les élèves avancés qui veulent aller plus loin.</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div><!-- fin scroll -->
     </main>
 </div>
@@ -972,6 +1028,18 @@
                     <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="Cliquez sur Publier…">
                     <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
                 </div>
+            </div>
+            <!-- Jauge de poids du lien -->
+            <div class="p-3 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-semibold text-gray-600">Poids du lien élève (encodé)</span>
+                    <span id="publish-weight-label" class="text-[10px] font-bold text-gray-700">—</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="publish-weight-bar" class="h-full rounded-full transition-all" style="width:0%;background:#22c55e"></div>
+                </div>
+                <p id="publish-weight-warn" class="hidden mt-1.5 text-[10px] text-amber-600">⚠️ Lien lourd — certains ENT ou emails peuvent tronquer les URLs longues. Réduisez le corpus ou retirez l'avatar.</p>
+                <p id="publish-weight-alert" class="hidden mt-1.5 text-[10px] font-semibold text-red-600">🚨 Lien trop lourd (&gt; 200 Ko) — risque de rejet par certaines plateformes. Réduisez impérativement le corpus et/ou l'avatar.</p>
             </div>
             <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca">
                 👥 <strong>Code de groupe :</strong> <span id="share-class-key" class="font-mono font-black text-lg tracking-widest">—</span>
@@ -1067,6 +1135,7 @@
 
     let library = {}, currentBotId = null, uploadedFiles = [], quickReplies = [];
     let currentAnswerSource = 'both';
+    let currentDifficulty = 'standard';
     let activePresetCategory = 'aide';
 
     document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
@@ -1079,6 +1148,96 @@
         });
         const hint = document.getElementById('source-hint');
         if (hint) hint.textContent = sourceHints[source] || '';
+    };
+
+    // ── NIVEAU DE DIFFICULTÉ ──
+    window.setDifficulty = (d) => {
+        currentDifficulty = d;
+        document.querySelectorAll('#difficulty-selector .source-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.diff === d);
+        });
+        const hints = {
+            'beginner': 'Langage simple, exemples concrets et familiers, progression pas à pas, beaucoup d\'encouragements.',
+            'standard': 'Adapte le vocabulaire et les exigences au niveau indiqué dans le profil élève.',
+            'advanced': 'Vocabulaire précis, rigueur exigée, raisonnement poussé — l\'élève est mis au défi.'
+        };
+        const hint = document.getElementById('diff-hint');
+        if (hint) hint.textContent = hints[d] || '';
+    };
+
+    // ── TEMPLATES DE POSTURE ──
+    const TEMPLATES = {
+        'socratic': {
+            instructions: "Tu es un tuteur pédagogique socratique. Tu ne donnes jamais les réponses directement. Tu guides l'élève par des questions de relance successives qui l'amènent à trouver lui-même. Tu valides les raisonnements corrects avec encouragement et corriges les erreurs avec bienveillance.",
+            rules: ['MAIEUTIC', 'NO_DIRECT_ANSWER', 'TONE_ENCOURAGE', 'INTERACTIVE', 'CRITICAL_THINKING'],
+            difficulty: 'standard'
+        },
+        'coach': {
+            instructions: "Tu es un coach pédagogique bienveillant et motivant. Tu célèbres chaque progrès, même petit. Tu adaptes ton langage au niveau de l'élève, tu le rassures et l'encourages à persévérer. Tes réponses sont courtes et positives. Tu utilises des exemples du quotidien.",
+            rules: ['TONE_ENCOURAGE', 'CELEBRATE', 'PATIENCE', 'SHORT_TEXTS', 'FUN'],
+            difficulty: 'beginner'
+        },
+        'debater': {
+            instructions: "Tu es un animateur de débat pédagogique. Tu présentes systématiquement plusieurs points de vue sur chaque sujet. Tu joues l'avocat du diable pour pousser l'élève à argumenter et défendre sa position. Tu ne prends jamais parti toi-même.",
+            rules: ['CRITICAL_THINKING', 'INTERACTIVE', 'REPLY_CONCISE'],
+            difficulty: 'standard'
+        },
+        'tutor': {
+            instructions: "Tu es un tuteur de révision efficace. Tu fournis un feedback immédiat et précis sur chaque réponse. Tu ne révèles jamais les réponses aux exercices — tu pointes les erreurs et guides vers la bonne piste. Tes réponses sont courtes et ciblées.",
+            rules: ['INSTANT_FEEDBACK', 'NO_SPOILERS', 'REPLY_CONCISE', 'NO_VALIDATE_WRONG', 'SHORT_TEXTS'],
+            difficulty: 'standard'
+        },
+        'challenger': {
+            instructions: "Tu es un tuteur exigeant pour élèves avancés. Tu utilises un vocabulaire précis et technique. Tu attends des réponses justifiées et nuancées. Tu soulèves des contre-exemples et remets en question les réponses superficielles pour pousser l'élève à approfondir.",
+            rules: ['CRITICAL_THINKING', 'NO_DIRECT_ANSWER', 'NO_VALIDATE_WRONG', 'INTERACTIVE'],
+            difficulty: 'advanced'
+        }
+    };
+
+    window.applyTemplate = (key) => {
+        const t = TEMPLATES[key];
+        if (!t || !confirm('Appliquer ce template ?\n\nLes instructions et règles actuelles seront remplacées.')) return;
+        const instrEl = document.getElementById('bot-instructions');
+        if (instrEl) instrEl.value = t.instructions;
+        document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = t.rules.includes(cb.value); });
+        setDifficulty(t.difficulty || 'standard');
+        updateBotWeight();
+        // Ouvrir la section pédagogie pour que l'enseignant voie le résultat
+        const pedSection = document.getElementById('section-pedagogy');
+        if (pedSection && pedSection.classList.contains('hidden-section')) toggleSection('section-pedagogy');
+        showToast('✅ Template appliqué', 'Vérifiez les instructions et règles dans la section Pédagogie & Corpus.');
+    };
+
+    // ── EXPORT / IMPORT UNITAIRE ──
+    window.exportBotJson = () => {
+        if (!currentBotId || !library[currentBotId]) { showToast('⚠️ Aucun assistant', 'Ouvrez ou enregistrez un assistant avant d\'exporter.'); return; }
+        const bot = library[currentBotId];
+        const blob = new Blob([JSON.stringify(bot, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = currentBotId + '.json';
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+        showToast('📤 Exporté', currentBotId + '.json téléchargé.');
+    };
+
+    window.importBotJson = async (input) => {
+        const file = input.files[0]; if (!file) return;
+        input.value = '';
+        try {
+            const text = await file.text();
+            const bot = JSON.parse(text);
+            if (!bot.id || !bot.config?.title) throw new Error('Structure invalide — champ id ou config.title manquant.');
+            if (!storageMode) { showToast('⚠️ Non connecté', 'Connectez-vous d\'abord à un stockage.'); return; }
+            if (library[bot.id] && !confirm(`Un assistant "${bot.config.title}" existe déjà (id: ${bot.id}).\nL'écraser ?`)) return;
+            setSync(true);
+            library[bot.id] = bot;
+            const allFilenames = Object.keys(library).map(id => id + '.json');
+            await writeBotFile(bot.id + '.json', bot, allFilenames);
+            showToast('📥 Importé', '"' + bot.config.title + '" ajouté à votre bibliothèque.');
+            updateLibraryUI();
+        } catch(e) { showToast('❌ Erreur import', e.message); }
+        finally { setSync(false); }
     };
 
     // ── BIBLIOTHÈQUE PRESET ──
@@ -1221,7 +1380,8 @@
                 strictTheme: document.getElementById('bot-strict-theme')?.value || '',
                 customRules: document.getElementById('bot-custom-rules')?.value || '',
                 quickReplies: getQuickRepliesData(),
-                answerSource: currentAnswerSource
+                answerSource: currentAnswerSource,
+                difficulty: currentDifficulty
             },
             corpus: document.getElementById('bot-corpus-text')?.value || '',
             corpusUrls,
@@ -1262,6 +1422,7 @@
         document.getElementById('api-key-reused')?.classList.add('hidden');
         document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = (bot.config.pedagogicRules || []).includes(rulesMap[cb.value]); });
         setAnswerSource(bot.config.answerSource || 'both');
+        setDifficulty(bot.config.difficulty || 'standard');
         const vigImg = document.getElementById('vignette-preview');
         const ph = document.getElementById('vignette-placeholder');
         if (bot.vignette && vigImg) { vigImg.src = bot.vignette; vigImg.classList.remove('hidden'); if (ph) ph.classList.add('hidden'); }
@@ -1313,8 +1474,9 @@
     // ── RESET ──
     window.resetForm = () => {
         currentBotId = null;
-        ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text','bot-strict-theme'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         document.querySelectorAll('.rule-toggle').forEach(cb => cb.checked = false);
+        setDifficulty('standard');
         // Règles cochées par défaut sur un nouveau bot
         ['TONE_ENCOURAGE', 'NO_INAPPROPRIATE', 'INTERACTIVE', 'REDIRECT_OFF_TOPIC'].forEach(key => {
             const cb = document.querySelector(`.rule-toggle[value="${key}"]`);
@@ -1353,6 +1515,26 @@
         document.getElementById('share-link').value = link;
         const keyEl = document.getElementById('share-class-key');
         if (keyEl) keyEl.textContent = classKey;
+        // Jauge de poids du lien
+        const urlKo = Math.round(encoded.length / 1024);
+        const wBar = document.getElementById('publish-weight-bar');
+        const wLabel = document.getElementById('publish-weight-label');
+        const wWarn = document.getElementById('publish-weight-warn');
+        const wAlert = document.getElementById('publish-weight-alert');
+        if (wBar && wLabel) {
+            wBar.style.width = Math.min(100, (urlKo / 300) * 100) + '%';
+            wLabel.textContent = urlKo < 1 ? '< 1 Ko' : urlKo + ' Ko';
+            if (urlKo < 100) {
+                wBar.style.background = '#22c55e';
+                wWarn?.classList.add('hidden'); wAlert?.classList.add('hidden');
+            } else if (urlKo < 200) {
+                wBar.style.background = '#f59e0b';
+                wWarn?.classList.remove('hidden'); wAlert?.classList.add('hidden');
+            } else {
+                wBar.style.background = '#ef4444';
+                wWarn?.classList.add('hidden'); wAlert?.classList.remove('hidden');
+            }
+        }
         document.getElementById('publish-modal').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
     };

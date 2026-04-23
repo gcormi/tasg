@@ -305,9 +305,9 @@
                 <li><a href="#section-wip">🚧 Work In Progress</a></li>
                 <li><a href="#section-1">1. La Vision Stratégique</a></li>
                 <li><a href="#section-2">2. Philosophie & RGPD</a></li>
-                <li><a href="#section-3">3. Jalons Franchis (Réalisations)</a></li>
-                <li><a href="#section-4">4. Objectifs à court terme (Tests)</a></li>
-                <li><a href="#section-5">5. Évolutions Techniques Futures</a></li>
+                <li><a href="#section-3">3. Jalons Franchis (v2.7)</a></li>
+                <li><a href="#section-4">4. Objectifs à court terme</a></li>
+                <li><a href="#section-5">5. Évolutions Futures</a></li>
             </ul>
         </nav>
     </aside>
@@ -391,45 +391,49 @@
                     GitLab pour La Forge.</li>
                 <li><span class="task-done">✓</span> <strong>Mode 100% hors-ligne (Air-gap) :</strong> Support de l'API
                     <em>File System Access</em> permettant à un professeur en zone blanche de sauvegarder ses bots sur
-                    clé USB.
-                </li>
-                <li><span class="task-done">✓</span> <strong>Publication décentralisée (Base64) :</strong> Création
+                    clé USB.</li>
+                <li><span class="task-done">✓</span> <strong>Publication décentralisée (LZ-String Base64) :</strong> Création
                     d'une URL auto-portée. La configuration de l'assistant (règles, corpus, avatar) est encapsulée
-                    directement dans le lien élève, supprimant le besoin d'un serveur d'hébergement pour la
-                    consultation.</li>
+                    directement dans le lien élève via LZ-String + Base64, supprimant le besoin d'un serveur d'hébergement.</li>
                 <li><span class="task-done">✓</span> <strong>Suivi de classe en temps réel :</strong> Mise en place du
                     système de supervision des logs (effaçables) via le relais proxy souverain n8n.</li>
+                <li><span class="task-done">✓</span> <strong>Bouton "Changer de stockage" :</strong> Retour à l'écran d'accueil sans rechargement de page ni perte des identifiants mémorisés.</li>
+                <li><span class="task-done">✓</span> <strong>Indicateur de synchronisation :</strong> Badge animé visible lors de toute lecture ou écriture vers le Nuage / la Forge.</li>
+                <li><span class="task-done">✓</span> <strong>Aide intégrée (icônes <code>?</code>) :</strong> Tooltips contextuels au survol sur chaque champ complexe du Studio.</li>
+                <li><span class="task-done">✓</span> <strong>Jauge de poids du bot :</strong> Barre en temps réel dans l'éditeur et dans le modal de publication — verte / orange / rouge selon le poids réel du lien encodé.</li>
+                <li><span class="task-done">✓</span> <strong>Noms de fichiers lisibles (slugify) :</strong> Les bots JSON sont nommés d'après leur titre (ex: <code>bot_pink_floyd.json</code>) au lieu d'un timestamp.</li>
+                <li><span class="task-done">✓</span> <strong>Résilience aux fichiers manquants (Nuage) :</strong> Si un fichier .json est supprimé directement depuis le Nuage, la bibliothèque se charge quand même et signale les absents.</li>
+                <li><span class="task-done">✓</span> <strong>Export / Import unitaire :</strong> Téléchargement d'un bot en <code>.json</code> pour le partager avec un collègue ; import du fichier JSON dans la bibliothèque.</li>
+                <li><span class="task-done">✓</span> <strong>Niveaux de difficulté :</strong> Sélecteur 🌱 Débutant / 📚 Standard / 🎯 Avancé injecté dans le prompt système du Compagnon.</li>
+                <li><span class="task-done">✓</span> <strong>Templates de posture :</strong> 5 profils pré-configurés (Le Socratique, Le Coach, L'Animateur de débat, Le Tuteur de révision, Le Challenger).</li>
             </ul>
         </section>
 
         <!-- SECTION 4 -->
         <section id="section-4">
             <h2>4. Objectifs à court terme (Phase de test)</h2>
-            <p>Les prochaines semaines sont dédiées à la consolidation et à l'assurance qualité des fonctionnalités
-                actuelles.</p>
+            <p>Les prochaines semaines sont dédiées à la validation en conditions réelles et aux 2 dernières fonctionnalités pédagogiques avancées.</p>
 
             <div class="callout callout-warning">
                 <h4>Priorité 1 : Tests et Validation en conditions réelles</h4>
                 <ul style="margin-top: 0.5rem; margin-bottom: 0;">
                     <li><strong>Tests de charge Nuage :</strong> Vérification de la résilience du proxy n8n face à une
-                        classe de 35 élèves écrivant simultanément leurs logs sur le serveur Nextcloud de l'enseignant.
-                    </li>
-                    <li><strong>Compatibilité Navigateurs :</strong> Validation approfondie du décodeur
-                        <code>compagnion.html</code> sur d'anciens navigateurs ou tablettes souvent présents en
-                        établissement.
-                    </li>
+                        classe de 35 élèves écrivant simultanément leurs logs sur le serveur Nextcloud de l'enseignant.</li>
+                    <li><strong>Compatibilité Navigateurs :</strong> Validation du décodeur <code>compagnion.html</code>
+                        sur d'anciens navigateurs ou tablettes souvent présents en établissement.</li>
                     <li><strong>Gestion des avatars :</strong> Tests d'encodage avec différents formats d'images (PNG,
                         JPG, AVIF, WebP) pour garantir la légèreté des URLs.</li>
                 </ul>
             </div>
 
             <ul class="task-list">
-                <li><span class="task-todo">□</span> <strong>Robustesse des erreurs :</strong> Améliorer l'UX avec des
-                    messages d'erreur très clairs si l'instance Nuage est mal configurée ou si l'API Albert est saturée
-                    (mise en place d'un système de retry automatique).</li>
-                <li><span class="task-todo">□</span> <strong>Documentation In-App :</strong> Finaliser l'intégration
-                    d'icônes d'aide <code>(?)</code> directement à côté de chaque champ complexe dans le Studio pour
-                    guider les enseignants novices.</li>
+                <li><span class="task-todo">□</span> <strong>Robustesse des erreurs :</strong> Messages d'erreur très
+                    clairs si le Nuage est mal configuré ou si l'API Albert est saturée (retry automatique).</li>
+                <li><span class="task-todo">□</span> <strong>Externalisation avatar/clé API :</strong> Stocker ces
+                    éléments lourds séparément dans un fichier maître sur le Nuage — le lien élève ne contiendrait plus
+                    qu'un identifiant léger.</li>
+                <li><span class="task-todo">□</span> <strong>Exit Quiz :</strong> Questionnaire de fin de session dans
+                    le Compagnon, avec score intégré dans l'export <code>.txt</code> élève.</li>
             </ul>
         </section>
 
@@ -438,40 +442,39 @@
             <h2>5. Évolutions Techniques & Pédagogiques Futures</h2>
             <p>La vision à moyen/long terme pour Mentoria vise à étendre ses capacités sans sacrifier sa légèreté.</p>
 
-            <h3>A. Ergonomie et Interface</h3>
+            <h3>A. Ergonomie et Interface — <em>réalisé</em></h3>
             <ul class="task-list">
-                <li><span class="task-todo">□</span> <strong>Bouton "Changer de stockage" :</strong> Intégrer un moyen
-                    rapide de revenir à l'écran d'accueil sans devoir purger manuellement son navigateur.</li>
-                <li><span class="task-todo">□</span> <strong>Indicateur de synchronisation :</strong> Améliorer le
-                    retour visuel (spinner) lors de la lecture/écriture sur le Nuage ou la Forge pour éviter les clics
-                    multiples.</li>
+                <li><span class="task-done">✓</span> <strong>Bouton "Changer de stockage" :</strong> Retour à l'écran d'accueil sans rechargement ni perte des identifiants mémorisés.</li>
+                <li><span class="task-done">✓</span> <strong>Indicateur de synchronisation :</strong> Badge animé visible lors de toute opération de lecture/écriture.</li>
+                <li><span class="task-done">✓</span> <strong>Jauge de poids URL :</strong> Jauge en temps réel dans le Studio et dans le modal de publication — vert / orange / rouge.</li>
+                <li><span class="task-done">✓</span> <strong>Aide intégrée (icônes <code>?</code>) :</strong> Tooltips contextuels sur chaque champ complexe du Studio.</li>
             </ul>
 
-            <h3>B. Optimisation des charges réseau (Taille des Bots)</h3>
-            <p>Le modèle d'URL en Base64 montre ses limites si l'enseignant ajoute une photo de profil trop lourde ou un
-                cours de 200 pages.</p>
+            <h3>B. Collaboratif & Échanges — <em>réalisé</em></h3>
             <ul class="task-list">
-                <li><span class="task-todo">□</span> <strong>Alerte de poids URL :</strong> Créer une jauge visuelle
-                    dans le Studio qui vire au rouge si le bot dépasse la taille critique acceptée par les ENT
-                    (généralement 8 Ko).</li>
-                <li><span class="task-todo">□</span> <strong>Externalisation (Étude de faisabilité) :</strong> Envisager
-                    de stocker l'Avatar et la Clé API séparément (dans un fichier de configuration maître sur le Nuage)
-                    pour que l'URL élève ne contienne qu'un identifiant de requête léger, résolvant définitivement les
-                    problèmes de liens trop longs.</li>
+                <li><span class="task-done">✓</span> <strong>Export / Import unitaire :</strong> Téléchargement d'un bot en <code>.json</code> depuis la sidebar pour le partager avec un collègue ; import depuis un fichier <code>.json</code> reçu.</li>
             </ul>
 
-            <h3>C. Collaboratif & Échanges</h3>
+            <h3>C. Pédagogie avancée — <em>réalisé</em></h3>
             <ul class="task-list">
-                <li><span class="task-todo">□</span> <strong>Export/Import Unitaire :</strong> Pouvoir télécharger un
-                    bot spécifique au format JSON depuis le Studio pour l'envoyer par email à un collègue, afin de créer
-                    une véritable "bibliothèque d'assistants" partageable entre enseignants.</li>
+                <li><span class="task-done">✓</span> <strong>Niveaux de difficulté :</strong> Sélecteur Débutant / Standard / Avancé dans le Studio, injecté dans le prompt système du Compagnon.</li>
+                <li><span class="task-done">✓</span> <strong>Templates de posture :</strong> 5 profils pédagogiques pré-configurés (Le Socratique, Le Coach, L'Animateur de débat, Le Tuteur de révision, Le Challenger).</li>
             </ul>
 
-            <h3>D. Aide intégrée (In-App)</h3>
+            <h3>D. Optimisation réseau — <em>en cours</em></h3>
             <ul class="task-list">
-                <li><span class="task-todo">□</span> <strong>Icônes d'aide <code>(?)</code> :</strong> Ajouter une icône contextuelle à côté de chaque champ complexe du Studio pour expliquer l'usage sans quitter l'interface.</li>
-                <li><span class="task-todo">□</span> <strong>Tutoriel visuel au démarrage :</strong> Intégrer un guide en 3 étapes sur l'écran de connexion pour les enseignants qui découvrent l'outil (clé API, mot de passe d'application Nuage, premier bot).</li>
-                <li><span class="task-todo">□</span> <strong>Badge de statut connectivité :</strong> Indicateur visuel Vert / Rouge pour signaler en temps réel si le relais n8n et la connexion Nuage sont opérationnels.</li>
+                <li><span class="task-todo">□</span> <strong>Externalisation avatar/clé API :</strong> Stocker l'avatar et la clé dans un fichier maître sur le Nuage. Le lien élève ne contiendrait plus qu'un identifiant léger, résolvant définitivement les problèmes de lien trop long.</li>
+            </ul>
+
+            <h3>E. Pédagogie avancée — <em>à venir</em></h3>
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Exit Quiz :</strong> Questionnaire de vérification en fin de session dans le Compagnon ; score inclus dans l'export <code>.txt</code> élève.</li>
+            </ul>
+
+            <h3>F. Aide intégrée — <em>à venir</em></h3>
+            <ul class="task-list">
+                <li><span class="task-todo">□</span> <strong>Tutoriel visuel au démarrage :</strong> Guide en 3 étapes sur l'écran de connexion pour les enseignants novices (clé API, mot de passe d'application Nuage, premier bot).</li>
+                <li><span class="task-todo">□</span> <strong>Badge de statut connectivité :</strong> Indicateur Vert / Rouge pour signaler en temps réel si le relais n8n et le Nuage sont opérationnels.</li>
             </ul>
         </section>
 

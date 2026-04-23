@@ -87,7 +87,7 @@
 
         <div class="flex items-center justify-center gap-3 mb-2">
             <h2 class="text-2xl font-black text-slate-900 tracking-tight" id="welcome-title">Chargement...</h2>
-            <span class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded font-black border border-slate-200">v2.4</span>
+            <span class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded font-black border border-slate-200">v2.7</span>
         </div>
         <p class="text-slate-500 mb-8 font-medium text-xs leading-relaxed" id="welcome-short-desc">Votre assistant personnel se prépare.</p>
 
@@ -134,7 +134,7 @@
             <div>
                 <h1 class="font-black text-slate-900 leading-none text-lg tracking-tight flex items-center gap-2">
                     <span id="display-bot-name">...</span>
-                    <span class="text-[8px] bg-slate-50 text-slate-300 px-1 py-0.5 rounded font-black border border-slate-100">v2.4</span>
+                    <span class="text-[8px] bg-slate-50 text-slate-300 px-1 py-0.5 rounded font-black border border-slate-100">v2.7</span>
                 </h1>
                 <div class="flex items-center gap-1.5 mt-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -497,12 +497,17 @@
         const rules = (cfg.pedagogicRules || []).join('\n- ');
         const strictTheme = cfg.strictTheme ? `\nTHÈME STRICT : ${cfg.strictTheme}\nSi l'élève sort de ce thème, refuse poliment et ramène-le au sujet.` : '';
 
+        const difficultyLine = {
+            'beginner': 'NIVEAU DIFFICULTÉ : Débutant — utilise un vocabulaire très simple, beaucoup d\'exemples concrets du quotidien, progression pas à pas. Sois très encourageant et patient.',
+            'advanced': 'NIVEAU DIFFICULTÉ : Avancé — utilise un vocabulaire précis et technique, exige de la rigueur dans les réponses, pousse l\'élève à justifier et nuancer ses propos.'
+        }[cfg.difficulty] || '';
+
         const systemPrompt = `
 TU ES : ${cfg.name || 'un tuteur pédagogique'}.
 RÔLE : ${cfg.instructions || 'Aide les élèves à comprendre et progresser.'}
 PUBLIC : ${cfg.targetAge || 'Élèves du secondaire'}.
 THÈME : ${cfg.theme || 'Sujet libre'}.${strictTheme}
-
+${difficultyLine ? '\n' + difficultyLine : ''}
 RÈGLES PÉDAGOGIQUES (À RESPECTER ABSOLUMENT) :
 - ${rules || 'Sois clair, bienveillant et pédagogique.'}
 - ${cfg.customRules || ''}

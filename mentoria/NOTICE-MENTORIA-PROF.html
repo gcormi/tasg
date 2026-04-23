@@ -306,9 +306,9 @@
                 <li><a href="#section-4">4. Le Studio : Créer un assistant</a>
                     <ul style="padding-left: 1rem; margin-top: 0.5rem;">
                         <li><a href="#step-1">- Identité & Présentation</a></li>
-                        <li><a href="#step-2">- Pédagogie & Règles</a></li>
+                        <li><a href="#step-2">- Pédagogie, Difficulté & Templates</a></li>
                         <li><a href="#step-3">- Corpus de Connaissance</a></li>
-                        <li><a href="#step-4">- Boutons Rapides</a></li>
+                        <li><a href="#step-4">- Boutons Rapides & Export/Import</a></li>
                     </ul>
                 </li>
                 <li><a href="#section-5">5. Publier, Partager et Modifier</a></li>
@@ -458,21 +458,38 @@
                     <br>⚠️ <em>Limite conseillée : 200 mots maximum. Au-delà, l'IA risque de "diluer" son attention et
                         d'ignorer certaines consignes.</em>
                 </li>
+                <li><strong>Niveau de difficulté :</strong> Sélecteur à 3 positions qui ajuste automatiquement le registre de l'IA :
+                    <ul>
+                        <li>🌱 <em>Débutant :</em> vocabulaire simple, exemples du quotidien, très encourageant.</li>
+                        <li>📚 <em>Standard :</em> adapté au profil élève indiqué (réglage par défaut).</li>
+                        <li>🎯 <em>Avancé :</em> vocabulaire précis, rigueur exigée, l'élève est mis au défi de justifier ses réponses.</li>
+                    </ul>
+                </li>
                 <li><strong>Source des réponses :</strong>
                     <ul>
-                        <li><em>Corpus seul :</em> L'IA refusera catégoriquement de répondre si l'information n'est pas
-                            dans vos documents. Très strict, idéal pour des QCM de lecture.</li>
-                        <li><em>Les deux (Recommandé) :</em> L'IA privilégie vos documents mais s'autorise à utiliser sa
-                            culture générale pour expliquer un concept.</li>
+                        <li><em>Corpus seul :</em> L'IA refusera de répondre si l'information n'est pas dans vos documents. Très strict, idéal pour des QCM de lecture.</li>
+                        <li><em>Les deux (Recommandé) :</em> L'IA privilégie vos documents mais utilise sa culture générale pour expliquer un concept.</li>
                         <li><em>Albert seul :</em> L'IA ignore vos documents.</li>
                     </ul>
                 </li>
                 <li><strong>Règles & Interdictions :</strong> Mentoria propose 20 règles pré-configurées (ex: "Ton
-                    encourageant", "Ne jamais donner la réponse", "Refuser le hors-sujet"). Cochez celles qui
-                    correspondent à votre posture pédagogique (Posture de Maïeutique).</li>
+                    encourageant", "Ne jamais donner la réponse", "Refuser le hors-sujet").</li>
                 <li><strong>Votre propre règle :</strong> Vous pouvez inventer une règle libre (ex: <em>"Termine
                         toujours tes phrases par un emoji"</em> ou <em>"Vouvoie l'élève"</em>).</li>
             </ul>
+
+            <div class="callout callout-success">
+                <h4>✨ Templates de posture (Section 5 du Studio)</h4>
+                <p>Plutôt que de tout configurer manuellement, la section <strong>Templates de posture</strong> propose 5 profils pédagogiques pré-construits qui remplissent d'un clic les instructions et les règles :</p>
+                <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li>🧠 <strong>Le Socratique</strong> — guide par les questions, ne donne jamais la réponse.</li>
+                    <li>🏋️ <strong>Le Coach</strong> — bienveillant, célèbre les progrès. Idéal pour les élèves en difficulté.</li>
+                    <li>🗣️ <strong>L'Animateur de débat</strong> — présente plusieurs angles, joue l'avocat du diable.</li>
+                    <li>📖 <strong>Le Tuteur de révision</strong> — concis, feedback immédiat, mode "préparation exam".</li>
+                    <li>🎯 <strong>Le Challenger</strong> — exigeant, pour les élèves avancés qui veulent aller plus loin.</li>
+                </ul>
+                <p style="margin-top: 0.75rem; margin-bottom: 0;">💡 Les templates remplacent les instructions et les règles, mais pas l'avatar, le corpus, ni les boutons rapides. Vérifiez toujours le résultat dans la section Pédagogie & Corpus.</p>
+            </div>
 
             <h3 id="step-3">Étape 3 : Corpus de Connaissance</h3>
             <p>Ce sont les documents que l'IA va "lire" pour construire ses réponses.</p>
@@ -502,8 +519,19 @@
                 <li>Vous pouvez piocher dans la bibliothèque intégrée (Aide, Approfondissement, Évaluation, Navigation)
                     ou créer vos propres boutons personnalisés.</li>
             </ul>
-            <p><strong>Clé API :</strong> C'est ici, tout en bas, que vous collez la clé `sk-...` obtenue à la section
+            <p><strong>Clé API :</strong> C'est ici, tout en bas, que vous collez la clé <code>sk-...</code> obtenue à la section
                 2. Elle est mémorisée localement sur votre ordinateur pour vos prochaines sessions.</p>
+
+            <h3 id="step-export">Exporter et importer un assistant</h3>
+            <p>En bas de la colonne de gauche (bibliothèque), deux boutons permettent l'échange d'assistants entre collègues :</p>
+            <ul>
+                <li><strong>Exporter .json :</strong> Télécharge l'assistant actuellement ouvert dans un fichier <code>.json</code>. Ce fichier contient toute la configuration (instructions, règles, corpus, avatar, clé API). Envoyez-le à un collègue par email ou messagerie Tchap.</li>
+                <li><strong>Importer .json :</strong> Charge un fichier <code>.json</code> reçu d'un collègue et l'ajoute directement à votre bibliothèque (avec sauvegarde automatique dans votre stockage).</li>
+            </ul>
+            <div class="callout callout-warning">
+                <h4>⚠️ Clé API dans le fichier exporté</h4>
+                <p>Le fichier <code>.json</code> exporté contient votre clé API Albert. Ne la partagez pas publiquement. Si vous la partagez avec un collègue, pensez à lui indiquer qu'il devra la remplacer par la sienne dans la Section 4 du Studio.</p>
+            </div>
         </section>
 
         <!-- SECTION 5 -->
@@ -511,10 +539,7 @@
             <h2>5. Publier, Partager et Modifier</h2>
 
             <h3>Comment fonctionne la publication ?</h3>
-            <p>Mentoria utilise une technologie d'<strong>URL auto-portée</strong> (encodage Base64). Lorsque vous
-                cliquez sur "Publier", le logiciel compresse l'intégralité de votre configuration (titre, règles, textes
-                du corpus, image de l'avatar, clé API chiffrée) et l'intègre directement <em>à l'intérieur du lien
-                    Web</em>.</p>
+            <p>Mentoria utilise une technologie d'<strong>URL auto-portée</strong> (compression LZ-String + encodage Base64). Lorsque vous cliquez sur "Publier", le logiciel compresse l'intégralité de votre configuration (titre, règles, textes du corpus, image de l'avatar, clé API) et l'intègre directement <em>à l'intérieur du lien Web</em>.</p>
 
             <div class="callout callout-info">
                 <h4>Pourquoi ce choix technique ?</h4>
@@ -525,19 +550,24 @@
             <h3>Déployer en classe</h3>
             <ol>
                 <li>Cliquez sur <strong>Publier</strong>.</li>
+                <li>Vérifiez la <strong>jauge de poids</strong> — elle affiche le poids réel du lien encodé :
+                    <ul>
+                        <li>🟢 <em>&lt; 100 Ko :</em> lien léger, peut être collé partout.</li>
+                        <li>🟡 <em>100–200 Ko :</em> lien lourd — certains ENT ou emails peuvent le tronquer.</li>
+                        <li>🔴 <em>&gt; 200 Ko :</em> lien trop lourd — réduisez le corpus ou retirez l'avatar.</li>
+                    </ul>
+                </li>
                 <li>Copiez le long lien généré (<code>https://.../compagnion.html#config=...</code>).</li>
-                <li>Notez le <strong>Code de Groupe</strong> (ex: <code>X7M9</code>) qui s'affiche à l'écran. Il est
-                    indispensable pour suivre cette classe spécifique.</li>
-                <li>Distribuez le lien aux élèves via le cahier de texte de l'ENT, un document partagé, ou via un
-                    générateur de QR Code.</li>
+                <li>Notez le <strong>Code de Groupe</strong> (ex: <code>X7M9</code>) affiché. Il est indispensable pour suivre cette classe spécifique.</li>
+                <li>Distribuez le lien via le cahier de texte de l'ENT, un document partagé, ou un QR Code (si le lien est trop long pour l'ENT).</li>
             </ol>
 
             <div class="callout callout-warning">
                 <h4>⚠️ Règle d'Or de la Modification</h4>
                 <p>Puisque toute l'intelligence du bot est contenue dans le lien, <strong>si vous modifiez votre bot
                         dans le Studio, l'ancien lien ne se mettra pas à jour !</strong></p>
-                <p>Vous devez systématiquement cliquer à nouveau sur "Publier", ce qui générera <strong>un nouveau lien
-                        et un nouveau code de groupe</strong> à distribuer aux élèves.</p>
+                <p>Vous devez cliquer à nouveau sur "Publier", ce qui génère <strong>un nouveau lien
+                        et un nouveau code de groupe</strong> à redistribuer aux élèves.</p>
             </div>
         </section>
 
