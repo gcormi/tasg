@@ -141,8 +141,12 @@
                 <!-- CONFIG ALBERT -->
                 <div id="config-albert" class="space-y-4">
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">URL API
-                            Albert</label>
+                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
+                            URL API / RELAIS
+                            <button onclick="setMentoriaPreset()" class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
+                                <i data-lucide="zap" class="w-2.5 h-2.5"></i> Utiliser Relais Mentoria (n8n)
+                            </button>
+                        </label>
                         <input type="text" id="set-url"
                             class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs">
                     </div>
@@ -165,15 +169,16 @@
                         <select id="set-model"
                             class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white"
                             onchange="toggleCustomModel()">
-                            <option value="openweight-medium">Albert Moyen (Mistral 24B)</option>
-                            <option value="openweight-large">Albert Grand (GPT-120B)</option>
-                            <option value="openweight-small">Albert Rapide (8B)</option>
-                            <option value="openweight-code">Albert Code (Qwen 30B)</option>
+                            <option value="albert-medium">Albert Moyen (Mistral 24B)</option>
+                            <option value="albert-large">Albert Grand (GPT-120B)</option>
+                            <option value="albert-small">Albert Rapide (8B)</option>
+                            <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
+                            <option value="openai/gpt-oss-120b">Albert 120B (Souverain)</option>
                             <option value="custom">Autre...</option>
                         </select>
                         <input type="text" id="set-model-custom"
                             class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2"
-                            placeholder="ID exact">
+                            placeholder="ID exact (ex: albert-medium)">
                     </div>
                 </div>
 
@@ -197,10 +202,9 @@
                             Gemini</label>
                         <select id="set-gemini-model"
                             class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
-                            <option value="gemini-3-flash-preview">Gemini 3 Flash (Preview)</option>
-                            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Recommandé)</option>
                             <option value="gemini-1.5-flash">Gemini 1.5 Flash (Standard)</option>
-                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Expert)</option>
                         </select>
                     </div>
                 </div>
@@ -208,11 +212,15 @@
                 <div class="pt-2">
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="checkbox" id="set-proxy"
+                            onchange="document.getElementById('set-proxy-url').classList.toggle('hidden', !this.checked)"
                             class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
                         <span
-                            class="font-bold text-slate-700 text-[12px] group-hover:text-indigo-600 transition-colors">Proxy
-                            CORS (Recommandé pour Albert)</span>
+                            class="font-bold text-slate-700 text-[12px] group-hover:text-indigo-600 transition-colors">Utiliser
+                            un relais Proxy / Webhook</span>
                     </label>
+                    <input type="text" id="set-proxy-url"
+                        class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2"
+                        placeholder="URL proxy (ex: https://corsproxy.io/? ou webhook n8n)">
                 </div>
 
                 <div class="pt-4 border-t border-slate-100">
@@ -260,8 +268,9 @@
         // Settings Albert
         let apiUrl = localStorage.getItem('albert_api_url') || 'https://albert.api.etalab.gouv.fr/v1/chat/completions';
         let apiKey = localStorage.getItem('albert_api_key') || '';
-        let modelName = localStorage.getItem('albert_model') || 'openweight-medium';
+        let modelName = localStorage.getItem('albert_model') || 'albert-medium';
         let useProxy = localStorage.getItem('albert_use_proxy') === 'true';
+        let proxyUrl = localStorage.getItem('albert_proxy_url') || 'https://corsproxy.io/?';
 
         // Settings Gemini
         let geminiKey = localStorage.getItem('gemini_api_key') || '';
@@ -303,10 +312,12 @@
                             apiUrl = cloudData.apiUrl || apiUrl;
                             modelName = cloudData.modelName || modelName;
                             useProxy = cloudData.useProxy !== undefined ? cloudData.useProxy : useProxy;
+                            proxyUrl = cloudData.proxyUrl || proxyUrl;
                             localStorage.setItem('albert_api_key', apiKey);
                             localStorage.setItem('albert_api_url', apiUrl);
                             localStorage.setItem('albert_model', modelName);
                             localStorage.setItem('albert_use_proxy', useProxy);
+                            localStorage.setItem('albert_proxy_url', proxyUrl);
                         }
 
                         // Sync Gemini
@@ -405,6 +416,30 @@
             document.getElementById('config-gemini').classList.toggle('hidden', p !== 'gemini');
         }
 
+        function formatText(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/^\s*-\s+(.*)$/gm, '• $1')
+                .replace(/\n/g, '<br>');
+        }
+
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+
         function renderMessages() {
             chatContainer.innerHTML = '';
             messages.forEach(msg => {
@@ -416,14 +451,21 @@
                 const icon = isUser ? 'user' : (isError ? 'alert-circle' : 'bot');
 
                 const html = `
-                    <div class="flex ${isUser ? 'justify-end' : 'justify-start'} slide-in">
+                    <div class="flex ${isUser ? 'justify-end' : 'justify-start'} slide-in group">
                         <div class="flex max-w-[85%] gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}">
                             <div class="mt-1 flex-none">
                                 <div class="w-9 h-9 rounded-xl flex items-center justify-center ${avatarClass}">
                                     <i data-lucide="${icon}" class="w-5 h-5"></i>
                                 </div>
                             </div>
-                            <div class="px-5 py-3 rounded-2xl ${bubbleClass} whitespace-pre-wrap">${msg.text}</div>
+                            <div class="relative">
+                                <div class="px-5 py-3 rounded-2xl ${bubbleClass}">${isUser ? msg.text : formatText(msg.text)}</div>
+                                ${!isUser && !isError ? `
+                                <button onclick="copyToClipboard(\`${msg.text.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, this)" 
+                                    class="absolute -right-10 top-2 p-2 text-slate-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-all" title="Copier le texte">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -457,16 +499,19 @@
             try {
                 // Utilisation du même tunnel Proxy que pour le Chat
                 const baseModelsUrl = apiUrl.replace('/chat/completions', '/models');
-                const finalUrl = useProxy ? `https://cors-anywhere.herokuapp.com/${baseModelsUrl}` : baseModelsUrl;
+                const currentProxyUrl = proxyUrl || 'https://corsproxy.io/?';
+                const finalUrl = useProxy ? `${currentProxyUrl}${encodeURIComponent(baseModelsUrl)}` : baseModelsUrl;
 
                 const response = await fetch(finalUrl, {
                     headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Authorization': `Bearer ${apiKey}`
                     }
                 });
 
-                if (!response.ok) throw new Error("Erreur lors de la récupération");
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Erreur API (${response.status}): ${errorBody.substring(0, 100)}`);
+                }
 
                 const data = await response.json();
                 const select = document.getElementById('set-model');
@@ -511,6 +556,8 @@
                 }
                 toggleCustomModel();
                 document.getElementById('set-proxy').checked = useProxy;
+                document.getElementById('set-proxy-url').value = proxyUrl;
+                document.getElementById('set-proxy-url').classList.toggle('hidden', !useProxy);
 
                 // Gemini Settings
                 document.getElementById('set-gemini-key').value = geminiKey;
@@ -522,12 +569,20 @@
             }
         }
 
+        function setMentoriaPreset() {
+            document.getElementById('set-url').value = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat';
+            document.getElementById('set-proxy').checked = false;
+            document.getElementById('set-proxy-url').classList.add('hidden');
+            alert("Mode Mentoria configuré ! L'URL du relais n8n a été injectée. N'oubliez pas de sauvegarder.");
+        }
+
         function saveSettings() {
             apiUrl = document.getElementById('set-url').value;
             apiKey = document.getElementById('set-key').value;
             const select = document.getElementById('set-model');
             modelName = (select.value === 'custom') ? document.getElementById('set-model-custom').value : select.value;
             useProxy = document.getElementById('set-proxy').checked;
+            proxyUrl = document.getElementById('set-proxy-url').value || 'https://corsproxy.io/?';
 
             geminiKey = document.getElementById('set-gemini-key').value;
             geminiModel = document.getElementById('set-gemini-model').value;
@@ -537,6 +592,7 @@
             localStorage.setItem('albert_api_key', apiKey);
             localStorage.setItem('albert_model', modelName);
             localStorage.setItem('albert_use_proxy', useProxy);
+            localStorage.setItem('albert_proxy_url', proxyUrl);
             localStorage.setItem('gemini_api_key', geminiKey);
             localStorage.setItem('gemini_model', geminiModel);
 
@@ -544,7 +600,7 @@
             if (currentUser) {
                 db.collection('users').doc(currentUser.uid).collection('config').doc('albert').set({
                     provider,
-                    apiUrl, apiKey, modelName, useProxy,
+                    apiUrl, apiKey, modelName, useProxy, proxyUrl,
                     geminiKey, geminiModel,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true }).catch(e => console.error("Erreur sauvegarde cloud:", e));
@@ -592,30 +648,41 @@
             }
 
             try {
-                const apiMessages = [{ role: "system", content: "Tu es Albert, un assistant IA intelligent d'Etalab." }];
+                const apiMessages = [{ role: "system", content: "Tu es Albert, un assistant pédagogique. Réponds de manière claire, structurée mais fluide, comme dans une discussion. Évite le formatage Markdown complexe (pas de gros titres), utilise uniquement du gras pour souligner les points importants. Tes réponses doivent être faciles à copier-coller dans un document de cours." }];
                 messages.filter(m => m.role !== 'error').forEach(m => {
                     apiMessages.push({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text });
                 });
 
-                const finalUrl = useProxy ? `https://corsproxy.io/?${encodeURIComponent(apiUrl)}` : apiUrl;
+                // Workflow Mentoria/n8n : si l'URL contient n8n, on n'utilise pas de proxy CORS externe
+                const isN8n = apiUrl.includes('n8n.incubateur.education.gouv.fr');
+                const currentProxyUrl = proxyUrl || 'https://corsproxy.io/?';
+                const finalUrl = (useProxy && !isN8n) ? `${currentProxyUrl}${encodeURIComponent(apiUrl)}` : apiUrl;
+
                 const response = await fetch(finalUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({ model: modelName, messages: apiMessages, temperature: 0.7 })
                 });
 
-                if (!response.ok) throw new Error(`Erreur API Albert: ${response.status}`);
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`Erreur API Albert (${response.status}): ${errText.substring(0, 100)}...`);
+                }
 
                 const data = await response.json();
                 messages.push({ role: 'bot', text: data.choices?.[0]?.message?.content || "Pas de réponse." });
                 localStorage.setItem('albert_history', JSON.stringify(messages.slice(-10)));
 
             } catch (error) {
-                messages.push({ role: 'error', text: error.message });
+                console.error("Erreur détaillée:", error);
+                let errorMsg = error.message;
+                if (errorMsg === 'Failed to fetch') {
+                    errorMsg = `Échec de la connexion (Failed to fetch).\n\nURL appelée : ${finalUrl}\n\nCauses possibles :\n1. Le relais n8n est inaccessible.\n2. Blocage CORS (si tu n'utilises pas un serveur local).\n3. Problème de réseau (Education Nationale).`;
+                }
+                messages.push({ role: 'error', text: errorMsg });
             } finally {
                 loading.classList.add('hidden');
                 renderMessages();
@@ -641,7 +708,7 @@
 
                 // Nettoyage du nom du modèle au cas où
                 const cleanModel = geminiModel.replace('models/', '');
-                const url = `https://generativelanguage.googleapis.com/v1/models/${cleanModel}:generateContent?key=${geminiKey}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModel}:generateContent?key=${geminiKey}`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
