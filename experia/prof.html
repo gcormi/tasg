@@ -416,8 +416,10 @@ async function generateActivity(type, count, corpus) {
     { role: 'user', content: prompts[type] }
   ]);
 
-  const match = content.match(/\[[\s\S]*\]/);
-  if (!match) throw new Error(`Pas de JSON valide pour ${type}: ${content.substring(0, 100)}`);
+  // Nettoyer les balises markdown éventuelles
+  const cleaned = content.replace(/```json/gi, '').replace(/```/g, '').trim();
+  const match = cleaned.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error(`Albert n'a pas renvoyé de JSON valide pour "${type}". Réponse reçue : ${content.substring(0, 200)}`);
   return JSON.parse(match[0]);
 }
 
@@ -787,13 +789,22 @@ async function startGeneration() {
       document.getElementById(`step-${activity.id}`).querySelector('span').classList.replace('text-slate-500','text-slate-700');
     } catch(e) {
       stepIcon.innerHTML = '<i data-lucide="x" class="w-3 h-3 text-red-400"></i>';
-      console.error(`Erreur ${activity.id}:`, e);
+      document.getElementById(`step-${activity.id}`).querySelector('span').classList.add('text-red-400');
+      document.getElementById('gen-subtitle').textContent = `⚠️ Erreur sur "${activity.label}" : ${e.message}`;
     }
 
     done++;
     document.getElementById('gen-progress-bar').style.width = `${(done / ACTIVITIES.length) * 100}%`;
     document.getElementById('gen-progress-text').textContent = `${done} / ${ACTIVITIES.length} activités`;
     lucide.createIcons();
+  }
+
+  // Vérifier qu'au moins une activité a été générée
+  const generatedCount = Object.keys(questions).length;
+  if (generatedCount === 0) {
+    document.getElementById('gen-subtitle').textContent = '❌ Aucune activité générée. Vérifiez votre clé API Albert et l\'URL du proxy.';
+    document.getElementById('gen-progress-bar').classList.add('bg-red-400');
+    return;
   }
 
   // Construire et sauvegarder la session
