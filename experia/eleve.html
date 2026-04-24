@@ -1053,7 +1053,9 @@ function iaNext() {
 
 // ─── SAUVEGARDER SCORE ────────────────────────────────────────────────────────
 function saveScore(activity, score, max) {
-  E.scores[activity] = { score, max };
+  const profMax = E.session.scoring?.[activity] ?? max;
+  const profScore = max > 0 ? Math.round((score / max) * profMax * 10) / 10 : 0;
+  E.scores[activity] = { score: profScore, max: profMax, rawScore: score, rawMax: max };
   autoSaveProgress();
   const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
   if (Object.keys(E.scores).length >= available.length) {

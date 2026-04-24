@@ -359,12 +359,12 @@ const state = {
 };
 
 const ACTIVITIES = [
-  { id: 'qcm',          label: 'Quiz QCM',               icon: 'circle-help',     color: 'blue',   default: 10 },
-  { id: 'paires',       label: 'Paires à relier',         icon: 'link',            color: 'purple', default: 8  },
-  { id: 'rapidite',     label: 'Mission rapidité',         icon: 'zap',             color: 'orange', default: 8  },
-  { id: 'completer',    label: 'Compléter la phrase',     icon: 'pen-line',        color: 'green',  default: 5  },
-  { id: 'intrus',       label: 'Détection d\'intrus',     icon: 'search-x',        color: 'amber',  default: 5  },
-  { id: 'questions_ia', label: 'Questions ouvertes IA',   icon: 'message-square',  color: 'indigo', default: 3  }
+  { id: 'qcm',          label: 'Quiz QCM',               icon: 'circle-help',     color: 'blue',   default: 10, defaultPts: 10 },
+  { id: 'paires',       label: 'Paires à relier',         icon: 'link',            color: 'purple', default: 8,  defaultPts: 8  },
+  { id: 'rapidite',     label: 'Mission rapidité',         icon: 'zap',             color: 'orange', default: 8,  defaultPts: 8  },
+  { id: 'completer',    label: 'Compléter la phrase',     icon: 'pen-line',        color: 'green',  default: 5,  defaultPts: 5  },
+  { id: 'intrus',       label: 'Détection d\'intrus',     icon: 'search-x',        color: 'amber',  default: 5,  defaultPts: 5  },
+  { id: 'questions_ia', label: 'Questions ouvertes IA',   icon: 'message-square',  color: 'indigo', default: 3,  defaultPts: 20 }
 ];
 
 const COLOR_MAP = {
@@ -556,10 +556,13 @@ function initActivitiesConfig() {
         <i data-lucide="${a.icon}" class="w-4 h-4"></i>
       </div>
       <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
-      <div class="flex items-center gap-2">
-        <label class="text-xs text-slate-400 font-medium">Questions</label>
+      <div class="flex items-center gap-1.5">
+        <label class="text-xs text-slate-400 font-medium">Q.</label>
         <input type="number" id="act-${a.id}" value="${a.default}" min="2" max="20"
-          class="w-16 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
+          class="w-14 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
+        <label class="text-xs text-slate-400 font-medium">/ pts</label>
+        <input type="number" id="pts-${a.id}" value="${a.defaultPts}" min="1" max="100"
+          class="w-14 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
       </div>
     </div>
   `).join('');
@@ -772,7 +775,11 @@ async function startGeneration() {
   if (!apiKey) { errEl.textContent = 'La clé API Albert est requise.'; errEl.classList.remove('hidden'); return; }
 
   const config = {};
-  ACTIVITIES.forEach(a => { config[a.id] = parseInt(document.getElementById('act-' + a.id).value) || a.default; });
+  const scoring = {};
+  ACTIVITIES.forEach(a => {
+    config[a.id]  = parseInt(document.getElementById('act-' + a.id).value)  || a.default;
+    scoring[a.id] = parseInt(document.getElementById('pts-' + a.id).value)  || a.defaultPts;
+  });
   const retryable = document.getElementById('create-retryable').checked;
   const model = document.getElementById('create-model').value;
   saveConfig();
@@ -828,7 +835,7 @@ async function startGeneration() {
   const code = 'EXP-' + Math.random().toString(36).substring(2,6).toUpperCase();
   const session = {
     id: sessionId, code, title, corpus, createdAt: new Date().toISOString(),
-    config, retryable, questions, model, apiKey
+    config, scoring, retryable, questions, model, apiKey
   };
 
   document.getElementById('gen-subtitle').textContent = 'Sauvegarde sur Nuage...';
