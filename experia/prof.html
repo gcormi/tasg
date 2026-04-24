@@ -482,12 +482,6 @@ function loadSavedConfig() {
   if (cfg.user)   document.getElementById('login-user').value   = cfg.user;
   if (cfg.pass)   document.getElementById('login-pass').value   = cfg.pass;
   if (cfg.apiKey) document.getElementById('create-apikey').value = cfg.apiKey;
-  if (cfg.model) {
-    const sel = document.getElementById('create-model');
-    const opt = [...sel.options].find(o => o.value === cfg.model);
-    if (opt) sel.value = cfg.model;
-    else { const o = new Option(cfg.model, cfg.model); sel.add(o); sel.value = cfg.model; }
-  }
 }
 
 function toggleAdvanced() {
@@ -502,8 +496,7 @@ function saveConfig() {
   const cfg = {
     user:   document.getElementById('login-user').value.trim(),
     pass:   document.getElementById('login-pass').value.trim(),
-    apiKey: document.getElementById('create-apikey').value.trim(),
-    model:  document.getElementById('create-model').value
+    apiKey: document.getElementById('create-apikey').value.trim()
   };
   localStorage.setItem('experia_config', JSON.stringify(cfg));
 }
