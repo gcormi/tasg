@@ -1054,11 +1054,34 @@ function iaNext() {
 // ─── SAUVEGARDER SCORE ────────────────────────────────────────────────────────
 function saveScore(activity, score, max) {
   E.scores[activity] = { score, max };
-  // Vérifier si tout est terminé
+  autoSaveProgress();
   const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
   if (Object.keys(E.scores).length >= available.length) {
     setTimeout(() => showFinalSummary(), 1500);
   }
+}
+
+async function autoSaveProgress() {
+  try {
+    const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+    const done = Object.keys(E.scores).length;
+    const total = available.length;
+    let totalScore = 0, totalMax = 0;
+    available.forEach(a => {
+      if (E.scores[a.id]) { totalScore += (E.scores[a.id].score / E.scores[a.id].max) * 100; totalMax++; }
+    });
+    const globalPct = totalMax ? Math.round(totalScore / totalMax) : 0;
+    const result = {
+      sessionId: E.session.id, sessionTitle: E.session.title,
+      studentId: E.studentId, completedAt: new Date().toISOString(),
+      scores: E.scores, globalPct,
+      partial: done < total, activitiesDone: done, activitiesTotal: total
+    };
+    const listRes = await storage({ action: 'list' });
+    const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
+    const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
+    await storage({ action: 'write', filename, content: result, manifest });
+  } catch(e) { /* sauvegarde silencieuse */ }
 }
 
 // ─── RÉSUMÉ FINAL ─────────────────────────────────────────────────────────────
