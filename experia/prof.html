@@ -50,34 +50,44 @@
 
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
       <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Serveur Nuage</label>
-        <input id="login-server" type="text" value="nuage03.apps.education.fr"
-          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-mono text-sm transition-all">
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Identifiant</label>
-        <input id="login-user" type="text" placeholder="prenom.nom@ac-..."
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Identifiant Nuage</label>
+        <input id="login-user" type="text" placeholder="gcormi"
           class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
       </div>
       <div>
         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
           Mot de passe d'application
-          <a href="https://nuage.apps.education.fr/settings/user/security" target="_blank" class="lowercase ml-2 text-indigo-500 hover:text-indigo-700">
+          <a href="https://nuage03.apps.education.fr/settings/user/security" target="_blank" class="lowercase ml-2 text-indigo-500 hover:text-indigo-700">
             <i data-lucide="external-link" class="w-3 h-3 inline"></i> générer
           </a>
         </label>
         <input id="login-pass" type="password" placeholder="Mot de passe d'application Nextcloud"
           class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
       </div>
+
+      <!-- Paramètres avancés -->
       <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">URL Proxy Albert (n8n)</label>
-        <input id="login-proxy" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat"
-          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-mono text-xs transition-all">
-      </div>
-      <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">URL Stockage Experia (n8n)</label>
-        <input id="login-storage" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/experia_storage"
-          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-mono text-xs transition-all">
+        <button type="button" onclick="toggleAdvanced()" class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors font-bold">
+          <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+          <span id="advanced-label">Paramètres avancés</span>
+        </button>
+        <div id="advanced-settings" class="hidden mt-3 space-y-3 border-t border-slate-100 pt-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Serveur Nuage</label>
+            <input id="login-server" type="text" value="nuage03.apps.education.fr"
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL Proxy Albert (n8n)</label>
+            <input id="login-proxy" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat"
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL Stockage Experia (n8n)</label>
+            <input id="login-storage" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/experia_storage"
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+          </div>
+        </div>
       </div>
 
       <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 font-medium"></div>
@@ -440,16 +450,25 @@ async function importFile(input) {
 // ─── CONFIG PERSISTANTE ───────────────────────────────────────────────────────
 function loadSavedConfig() {
   const cfg = JSON.parse(localStorage.getItem('experia_config') || '{}');
+  if (cfg.user) document.getElementById('login-user').value = cfg.user;
+  if (cfg.pass) document.getElementById('login-pass').value = cfg.pass;
+  // Restaurer les URLs avancées seulement si elles contiennent un chemin complet
   if (cfg.server)  document.getElementById('login-server').value  = cfg.server;
-  if (cfg.user)    document.getElementById('login-user').value    = cfg.user;
-  if (cfg.pass)    document.getElementById('login-pass').value    = cfg.pass;
-  if (cfg.proxy)   document.getElementById('login-proxy').value   = cfg.proxy;
-  if (cfg.storage) document.getElementById('login-storage').value = cfg.storage;
-  if (cfg.apiKey)  document.getElementById('create-apikey').value = cfg.apiKey;
+  if (cfg.proxy  && cfg.proxy.split('/').length  > 4) document.getElementById('login-proxy').value   = cfg.proxy;
+  if (cfg.storage && cfg.storage.split('/').length > 4) document.getElementById('login-storage').value = cfg.storage;
+  if (cfg.apiKey) document.getElementById('create-apikey').value = cfg.apiKey;
   if (cfg.model) {
     const sel = document.getElementById('create-model');
     if ([...sel.options].some(o => o.value === cfg.model)) sel.value = cfg.model;
   }
+}
+
+function toggleAdvanced() {
+  const div = document.getElementById('advanced-settings');
+  const lbl = document.getElementById('advanced-label');
+  const hidden = div.classList.toggle('hidden');
+  lbl.textContent = hidden ? 'Paramètres avancés' : 'Masquer les paramètres';
+  lucide.createIcons();
 }
 
 function saveConfig(extra = {}) {
