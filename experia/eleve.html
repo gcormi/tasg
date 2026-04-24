@@ -63,7 +63,7 @@
       </div>
       <div>
         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Ton identifiant</label>
-        <input id="connect-student" type="text" placeholder="prénom.nom ou numéro élève"
+        <input id="connect-student" type="text" placeholder="Identifiant ENT"
           class="w-full bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-medium transition-all">
       </div>
       <div id="connect-error" class="hidden text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 font-medium"></div>
@@ -97,6 +97,10 @@
       <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Bonjour <span id="dash-student" class="text-emerald-600"></span></p>
       <h2 id="dash-session-title" class="text-2xl font-black text-slate-900"></h2>
       <p class="text-sm text-slate-500 font-medium mt-1">Choisis une activité pour commencer</p>
+      <div id="resume-banner" class="hidden mt-3 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-xl px-4 py-2.5 flex items-center gap-2">
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 flex-none"></i>
+        <span></span>
+      </div>
     </div>
 
     <div id="activities-grid" class="space-y-3"></div>
@@ -519,6 +523,19 @@ async function doConnect() {
 
     E.session = session;
     E.scores = {};
+
+    // Reprendre la progression existante si disponible
+    try {
+      const filename = `result_${session.id}_${studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
+      const prev = await storage({ action: 'read', filename });
+      if (prev.success && prev.content?.scores && Object.keys(prev.content.scores).length > 0) {
+        E.scores = prev.content.scores;
+        E._resuming = true;
+      } else {
+        E._resuming = false;
+      }
+    } catch(e) { E._resuming = false; }
+
     setupDashboard();
     showScreen('dashboard');
   } catch(e) {
@@ -532,6 +549,17 @@ async function doConnect() {
 function setupDashboard() {
   document.getElementById('dash-student').textContent = E.studentId;
   document.getElementById('dash-session-title').textContent = E.session.title;
+
+  // Bandeau reprise
+  const resumeBanner = document.getElementById('resume-banner');
+  if (E._resuming) {
+    const done = Object.keys(E.scores).length;
+    const total = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0).length;
+    resumeBanner.querySelector('span').textContent = `Reprise — tu avais déjà complété ${done} activité${done > 1 ? 's' : ''} sur ${total}. Continue là où tu t'es arrêté(e) !`;
+    resumeBanner.classList.remove('hidden');
+  } else {
+    resumeBanner.classList.add('hidden');
+  }
 
   const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
   const grid = document.getElementById('activities-grid');
