@@ -278,6 +278,11 @@
       <p class="text-xs text-indigo-400 font-medium mt-2">Code session : <strong id="sess-code" class="text-indigo-700 font-black"></strong></p>
     </div>
 
+    <!-- Barème session -->
+    <div id="sess-bareme" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-6 fade-up">
+      <!-- injecté par JS -->
+    </div>
+
     <!-- Résultats élèves -->
     <div class="fade-up">
       <div class="flex items-center justify-between mb-4">
@@ -551,12 +556,14 @@ function logout() {
 function initActivitiesConfig() {
   const container = document.getElementById('activities-config');
   container.innerHTML = ACTIVITIES.map(a => `
-    <div class="activity-row flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+    <div class="activity-row flex items-center gap-3 py-2 border-b border-slate-50 last:border-0" id="row-${a.id}">
+      <input type="checkbox" id="chk-${a.id}" checked onchange="toggleActivity('${a.id}')"
+        class="w-4 h-4 accent-indigo-600 cursor-pointer flex-none">
       <div class="w-8 h-8 rounded-lg flex items-center justify-center ${COLOR_MAP[a.color]}">
         <i data-lucide="${a.icon}" class="w-4 h-4"></i>
       </div>
       <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5" id="cfg-${a.id}">
         <label class="text-xs text-slate-400 font-medium">Q.</label>
         <input type="number" id="act-${a.id}" value="${a.default}" min="2" max="20"
           class="w-14 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
@@ -567,6 +574,15 @@ function initActivitiesConfig() {
     </div>
   `).join('');
   lucide.createIcons();
+}
+
+// ─── TOGGLE ACTIVITÉ ─────────────────────────────────────────────────────────
+function toggleActivity(id) {
+  const checked = document.getElementById('chk-' + id).checked;
+  const row = document.getElementById('row-' + id);
+  const cfg = document.getElementById('cfg-' + id);
+  row.style.opacity = checked ? '' : '0.35';
+  cfg.querySelectorAll('input').forEach(inp => inp.disabled = !checked);
 }
 
 // ─── CHARGEMENT SESSIONS ──────────────────────────────────────────────────────
@@ -636,8 +652,33 @@ async function openSession(id) {
   }))))}`;
   document.getElementById('sess-link').value = link;
 
+  renderBareme(session);
   showScreen('session');
   loadSessionResults();
+}
+
+function renderBareme(session) {
+  const scoring = session.scoring || {};
+  const rows = ACTIVITIES.filter(a => scoring[a.id] !== undefined);
+  const total = rows.reduce((s, a) => s + scoring[a.id], 0);
+
+  document.getElementById('sess-bareme').innerHTML = `
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+        <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Barème de la session
+      </h3>
+      <span class="text-sm font-black text-indigo-700">Total : ${total} pt${total > 1 ? 's' : ''}</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      ${rows.map(a => `
+        <div class="flex items-center gap-1.5 bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-100">
+          <i data-lucide="${a.icon}" class="w-3.5 h-3.5 ${COLOR_MAP[a.color].split(' ')[0]}"></i>
+          <span class="text-xs font-bold text-slate-600">${a.label}</span>
+          <span class="text-xs font-black text-slate-800 ml-1">${scoring[a.id]} pt${scoring[a.id] > 1 ? 's' : ''}</span>
+        </div>`).join('')}
+    </div>
+  `;
+  lucide.createIcons();
 }
 
 function copyLink() {
@@ -776,7 +817,15 @@ async function startGeneration() {
 
   const config = {};
   const scoring = {};
-  ACTIVITIES.forEach(a => {
+  const activeActivities = ACTIVITIES.filter(a => document.getElementById('chk-' + a.id).checked);
+
+  if (activeActivities.length === 0) {
+    errEl.textContent = 'Sélectionnez au moins une activité.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  activeActivities.forEach(a => {
     config[a.id]  = parseInt(document.getElementById('act-' + a.id).value)  || a.default;
     scoring[a.id] = parseInt(document.getElementById('pts-' + a.id).value)  || a.defaultPts;
   });
@@ -786,7 +835,7 @@ async function startGeneration() {
 
   // Préparer l'écran de génération
   const stepsContainer = document.getElementById('gen-steps');
-  stepsContainer.innerHTML = ACTIVITIES.map(a => `
+  stepsContainer.innerHTML = activeActivities.map(a => `
     <div id="step-${a.id}" class="flex items-center gap-3">
       <div id="step-icon-${a.id}" class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center flex-none">
         <div class="w-2 h-2 rounded-full bg-slate-300"></div>
@@ -802,7 +851,7 @@ async function startGeneration() {
   let done = 0;
   let firstError = null;
 
-  for (const activity of ACTIVITIES) {
+  for (const activity of activeActivities) {
     const stepIcon = document.getElementById(`step-icon-${activity.id}`);
     stepIcon.innerHTML = '<div class="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>';
 
@@ -817,8 +866,8 @@ async function startGeneration() {
     }
 
     done++;
-    document.getElementById('gen-progress-bar').style.width = `${(done / ACTIVITIES.length) * 100}%`;
-    document.getElementById('gen-progress-text').textContent = `${done} / ${ACTIVITIES.length} activités`;
+    document.getElementById('gen-progress-bar').style.width = `${(done / activeActivities.length) * 100}%`;
+    document.getElementById('gen-progress-text').textContent = `${done} / ${activeActivities.length} activités`;
     lucide.createIcons();
   }
 
@@ -862,6 +911,7 @@ async function startGeneration() {
   }))))}`;
   document.getElementById('sess-link').value = link;
   document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
+  renderBareme(session);
   lucide.createIcons();
   showScreen('session');
 }
