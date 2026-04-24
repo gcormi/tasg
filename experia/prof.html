@@ -453,12 +453,9 @@ async function importFile(input) {
 // ─── CONFIG PERSISTANTE ───────────────────────────────────────────────────────
 function loadSavedConfig() {
   const cfg = JSON.parse(localStorage.getItem('experia_config') || '{}');
-  if (cfg.user) document.getElementById('login-user').value = cfg.user;
-  if (cfg.pass) document.getElementById('login-pass').value = cfg.pass;
-  // Restaurer les URLs avancées seulement si elles contiennent un chemin complet
-  if (cfg.server)  document.getElementById('login-server').value  = cfg.server;
-  if (cfg.proxy  && cfg.proxy.split('/').length  > 4) document.getElementById('login-proxy').value   = cfg.proxy;
-  if (cfg.storage && cfg.storage.split('/').length > 4) document.getElementById('login-storage').value = cfg.storage;
+  // Seulement identifiant, mot de passe et clé Albert — les URLs gardent leurs valeurs par défaut
+  if (cfg.user)   document.getElementById('login-user').value   = cfg.user;
+  if (cfg.pass)   document.getElementById('login-pass').value   = cfg.pass;
   if (cfg.apiKey) document.getElementById('create-apikey').value = cfg.apiKey;
   if (cfg.model) {
     const sel = document.getElementById('create-model');
@@ -474,16 +471,12 @@ function toggleAdvanced() {
   lucide.createIcons();
 }
 
-function saveConfig(extra = {}) {
+function saveConfig() {
   const cfg = {
-    server:  document.getElementById('login-server').value.trim(),
-    user:    document.getElementById('login-user').value.trim(),
-    pass:    document.getElementById('login-pass').value.trim(),
-    proxy:   document.getElementById('login-proxy').value.trim(),
-    storage: document.getElementById('login-storage').value.trim(),
-    apiKey:  document.getElementById('create-apikey').value.trim(),
-    model:   document.getElementById('create-model').value,
-    ...extra
+    user:   document.getElementById('login-user').value.trim(),
+    pass:   document.getElementById('login-pass').value.trim(),
+    apiKey: document.getElementById('create-apikey').value.trim(),
+    model:  document.getElementById('create-model').value
   };
   localStorage.setItem('experia_config', JSON.stringify(cfg));
 }
