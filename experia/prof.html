@@ -772,6 +772,7 @@ async function startGeneration() {
 
   const questions = {};
   let done = 0;
+  let firstError = null;
 
   for (const activity of ACTIVITIES) {
     const stepIcon = document.getElementById(`step-icon-${activity.id}`);
@@ -784,7 +785,7 @@ async function startGeneration() {
     } catch(e) {
       stepIcon.innerHTML = '<i data-lucide="x" class="w-3 h-3 text-red-400"></i>';
       document.getElementById(`step-${activity.id}`).querySelector('span').classList.add('text-red-400');
-      document.getElementById('gen-subtitle').textContent = `⚠️ Erreur sur "${activity.label}" : ${e.message}`;
+      if (!firstError) firstError = e.message;
     }
 
     done++;
@@ -796,7 +797,7 @@ async function startGeneration() {
   // Vérifier qu'au moins une activité a été générée
   const generatedCount = Object.keys(questions).length;
   if (generatedCount === 0) {
-    document.getElementById('gen-subtitle').textContent = '❌ Aucune activité générée. Vérifiez votre clé API Albert et l\'URL du proxy.';
+    document.getElementById('gen-subtitle').textContent = '❌ ' + (firstError || 'Aucune activité générée — vérifiez votre clé API Albert et l\'URL du proxy.');
     document.getElementById('gen-progress-bar').classList.add('bg-red-400');
     return;
   }
