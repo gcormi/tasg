@@ -647,10 +647,10 @@ function qcmNext() {
 // ══════════════════════════════════════════════
 // JEU 2 : PAIRES
 // ══════════════════════════════════════════════
-let pairesState = { selectedTerm: null, selectedDef: null, matched: [], wrong: 0, total: 0 };
+let pairesState = { selectedTerm: null, selectedDef: null, matched: [], wrongAttempts: 0, total: 0 };
 
 function initPaires() {
-  pairesState = { selectedTerm: null, selectedDef: null, matched: [], wrong: 0, total: E.gameData.length };
+  pairesState = { selectedTerm: null, selectedDef: null, matched: [], wrongAttempts: 0, total: E.gameData.length };
   document.getElementById('paires-end').classList.add('hidden');
   document.getElementById('paires-feedback').classList.add('hidden');
   document.getElementById('paires-score').textContent = '0';
@@ -717,32 +717,39 @@ function checkPair() {
     termEl.classList.remove('selected'); termEl.classList.add('matched');
     defEl.classList.remove('selected');  defEl.classList.add('matched');
     pairesState.matched.push(termData.term);
-    E.gameScore++;
-    document.getElementById('paires-score').textContent = E.gameScore;
+    pairesState.selectedTerm = null;
+    pairesState.selectedDef  = null;
 
     const fb = document.getElementById('paires-feedback');
     fb.className = 'mt-4 text-center text-sm font-bold rounded-xl px-4 py-3 bg-emerald-50 text-emerald-600';
-    fb.textContent = '✓ Bonne paire !';
+    fb.textContent = '✓ Bonne association !';
     fb.classList.remove('hidden');
     setTimeout(() => fb.classList.add('hidden'), 1000);
 
     if (pairesState.matched.length >= pairesState.total) {
       setTimeout(() => {
-        document.getElementById('paires-final-score').textContent = `${E.gameScore}/${pairesState.total}`;
+        const raw = pairesState.total;
+        const penalty = Math.floor(pairesState.wrongAttempts * 0.5);
+        const finalScore = Math.max(0, raw - penalty);
+        document.getElementById('paires-final-score').textContent = `${finalScore}/${raw}`;
         document.getElementById('paires-end').classList.remove('hidden');
-        saveScore('paires', E.gameScore, pairesState.total);
+        saveScore('paires', finalScore, raw);
       }, 600);
     }
   } else {
+    pairesState.wrongAttempts++;
+    pairesState.selectedTerm = null;
+    pairesState.selectedDef  = null;
+
     termEl.classList.add('wrong'); defEl.classList.add('wrong');
     setTimeout(() => {
       termEl.classList.remove('wrong', 'selected');
       defEl.classList.remove('wrong', 'selected');
-    }, 600);
+    }, 800);
 
     const fb = document.getElementById('paires-feedback');
     fb.className = 'mt-4 text-center text-sm font-bold rounded-xl px-4 py-3 bg-red-50 text-red-500';
-    fb.textContent = '✗ Ce n\'est pas la bonne paire';
+    fb.textContent = '✗ Mauvaise association — réessaie !';
     fb.classList.remove('hidden');
     setTimeout(() => fb.classList.add('hidden'), 1200);
   }
