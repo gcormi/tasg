@@ -338,7 +338,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 // ─── ÉTAT ───────────────────────────────────────────────────────────────────
 const state = {
-  nuageUser: '', nuagePass: '', nuageServer: 'nuage.apps.education.fr',
+  nuageUser: '', nuagePass: '', nuageServer: 'nuage03.apps.education.fr',
   storageUrl: '', proxyUrl: '',
   manifest: [], sessions: [],
   currentSession: null, currentResult: null
@@ -437,6 +437,35 @@ async function importFile(input) {
   }
 }
 
+// ─── CONFIG PERSISTANTE ───────────────────────────────────────────────────────
+function loadSavedConfig() {
+  const cfg = JSON.parse(localStorage.getItem('experia_config') || '{}');
+  if (cfg.server)  document.getElementById('login-server').value  = cfg.server;
+  if (cfg.user)    document.getElementById('login-user').value    = cfg.user;
+  if (cfg.pass)    document.getElementById('login-pass').value    = cfg.pass;
+  if (cfg.proxy)   document.getElementById('login-proxy').value   = cfg.proxy;
+  if (cfg.storage) document.getElementById('login-storage').value = cfg.storage;
+  if (cfg.apiKey)  document.getElementById('create-apikey').value = cfg.apiKey;
+  if (cfg.model) {
+    const sel = document.getElementById('create-model');
+    if ([...sel.options].some(o => o.value === cfg.model)) sel.value = cfg.model;
+  }
+}
+
+function saveConfig(extra = {}) {
+  const cfg = {
+    server:  document.getElementById('login-server').value.trim(),
+    user:    document.getElementById('login-user').value.trim(),
+    pass:    document.getElementById('login-pass').value.trim(),
+    proxy:   document.getElementById('login-proxy').value.trim(),
+    storage: document.getElementById('login-storage').value.trim(),
+    apiKey:  document.getElementById('create-apikey').value.trim(),
+    model:   document.getElementById('create-model').value,
+    ...extra
+  };
+  localStorage.setItem('experia_config', JSON.stringify(cfg));
+}
+
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 async function doLogin() {
   const user    = document.getElementById('login-user').value.trim();
@@ -463,6 +492,7 @@ async function doLogin() {
     if (!data.success) { showLoginError(data.error || 'Erreur de connexion.'); btn.textContent = 'Se connecter'; return; }
 
     document.getElementById('dash-user').textContent = user;
+    saveConfig();
     showScreen('dashboard');
     loadSessions();
   } catch (e) {
@@ -709,6 +739,7 @@ async function startGeneration() {
   ACTIVITIES.forEach(a => { config[a.id] = parseInt(document.getElementById('act-' + a.id).value) || a.default; });
   const retryable = document.getElementById('create-retryable').checked;
   const model = document.getElementById('create-model').value;
+  saveConfig();
 
   // Préparer l'écran de génération
   const stepsContainer = document.getElementById('gen-steps');
@@ -784,6 +815,7 @@ async function startGeneration() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 initActivitiesConfig();
+loadSavedConfig();
 lucide.createIcons();
 </script>
 </body>

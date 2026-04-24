@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experia — Notice Professeur</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+    h2 { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- HEADER -->
+<header class="bg-white border-b border-slate-100 sticky top-0 z-10 px-6 py-4 flex items-center gap-3">
+  <a href="index.html" class="flex items-center gap-2">
+    <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+      <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+    </div>
+    <span class="font-black text-slate-800">Experia</span>
+  </a>
+  <span class="text-slate-300">/</span>
+  <span class="font-bold text-slate-500">Notice Professeur</span>
+</header>
+
+<div class="max-w-3xl mx-auto px-6 py-12">
+
+  <!-- TITRE -->
+  <div class="mb-12">
+    <div class="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-full mb-4">
+      <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i> Guide d'utilisation
+    </div>
+    <h1 class="text-4xl font-black text-slate-900 leading-tight mb-3">Notice Professeur</h1>
+    <p class="text-lg text-slate-500 font-medium">Tout ce qu'il faut savoir pour créer et gérer des sessions Experia avec vos élèves.</p>
+  </div>
+
+  <!-- SOMMAIRE -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-10 shadow-sm">
+    <h3 class="font-black text-slate-700 mb-3 text-sm uppercase tracking-wider">Sommaire</h3>
+    <ol class="space-y-2 text-sm font-medium">
+      <li><a href="#c1" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 1. Qu'est-ce qu'Experia ?</a></li>
+      <li><a href="#c2" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 2. Connexion à votre espace Nuage</a></li>
+      <li><a href="#c3" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 3. Créer une session</a></li>
+      <li><a href="#c4" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 4. Partager le lien aux élèves</a></li>
+      <li><a href="#c5" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 5. Consulter les résultats</a></li>
+      <li><a href="#c6" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 6. Les 6 activités auto-corrigées</a></li>
+      <li><a href="#c7" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 7. Confidentialité & RGPD</a></li>
+    </ol>
+  </div>
+
+  <!-- C1 -->
+  <section id="c1" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">1</span>
+      Qu'est-ce qu'Experia ?
+    </h2>
+    <p class="text-slate-600 font-medium mb-4">Experia est une application web éducative qui permet à un professeur de :</p>
+    <ul class="space-y-3 mb-4">
+      <li class="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+        <i data-lucide="upload" class="w-5 h-5 text-indigo-500 mt-0.5 flex-none"></i>
+        <div><strong class="text-slate-800">Fournir un corpus</strong> — texte libre ou fichier PDF/TXT (cours, programme, article…)</div>
+      </li>
+      <li class="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+        <i data-lucide="sparkles" class="w-5 h-5 text-indigo-500 mt-0.5 flex-none"></i>
+        <div><strong class="text-slate-800">Générer automatiquement des activités</strong> — l'IA Albert crée les questions à partir de votre contenu</div>
+      </li>
+      <li class="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+        <i data-lucide="users" class="w-5 h-5 text-indigo-500 mt-0.5 flex-none"></i>
+        <div><strong class="text-slate-800">Partager une session</strong> — les élèves accèdent via un lien + code</div>
+      </li>
+      <li class="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+        <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-500 mt-0.5 flex-none"></i>
+        <div><strong class="text-slate-800">Recevoir des résultats auto-corrigés</strong> — note globale calculée automatiquement, sans correction manuelle</div>
+      </li>
+    </ul>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 font-medium flex items-start gap-2">
+      <i data-lucide="lightbulb" class="w-4 h-4 mt-0.5 flex-none"></i>
+      <span>Experia fonctionne avec l'IA souveraine <strong>Albert</strong> (Étalab / État français) et stocke les données sur votre espace <strong>Nuage apps.education.fr</strong>. Aucune donnée ne quitte les serveurs de l'Éducation Nationale.</span>
+    </div>
+  </section>
+
+  <!-- C2 -->
+  <section id="c2" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">2</span>
+      Connexion à votre espace Nuage
+    </h2>
+    <p class="text-slate-600 font-medium mb-5">Experia sauvegarde les sessions et résultats dans un dossier <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-sm">experia/</code> de votre Nuage personnel.</p>
+
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="key" class="w-4 h-4 text-indigo-500"></i> Étape 1 — Générer un mot de passe d'application
+        </h4>
+        <ol class="list-decimal list-inside space-y-2 text-sm text-slate-600 font-medium">
+          <li>Connectez-vous sur <a href="https://nuage.apps.education.fr" target="_blank" class="text-indigo-600 underline">nuage.apps.education.fr</a></li>
+          <li>Allez dans <strong>Paramètres → Sécurité → Mots de passe d'application</strong></li>
+          <li>Tapez un nom (ex: <em>Experia</em>) et cliquez <strong>Créer</strong></li>
+          <li>Copiez le mot de passe généré <em>(il ne s'affiche qu'une seule fois !)</em></li>
+        </ol>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="folder-plus" class="w-4 h-4 text-indigo-500"></i> Étape 2 — Créer le dossier Experia sur Nuage
+        </h4>
+        <p class="text-sm text-slate-600 font-medium">Dans l'interface web de votre Nuage, créez un dossier nommé exactement <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono">experia</code> (en minuscules) à la racine de vos fichiers.</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4 text-indigo-500"></i> Étape 3 — Se connecter dans Experia
+        </h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex gap-3">
+            <span class="w-36 font-bold text-slate-500 flex-none">Serveur Nuage</span>
+            <code class="bg-slate-100 px-2 py-0.5 rounded font-mono text-slate-700">nuage03.apps.education.fr</code>
+          </div>
+          <div class="flex gap-3">
+            <span class="w-36 font-bold text-slate-500 flex-none">Identifiant</span>
+            <span class="text-slate-600 font-medium">votre identifiant académique (ex: <code class="bg-slate-100 px-1 rounded font-mono">gcormi</code>)</span>
+          </div>
+          <div class="flex gap-3">
+            <span class="w-36 font-bold text-slate-500 flex-none">Mot de passe</span>
+            <span class="text-slate-600 font-medium">le mot de passe d'application généré à l'étape 1</span>
+          </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 mt-3 text-xs text-blue-700 font-medium">
+          <i data-lucide="info" class="w-3.5 h-3.5 inline mr-1"></i>
+          Votre vrai serveur Nuage peut être différent (nuage01, nuage02, nuage03…). Vérifiez-le dans <strong>Fichiers → Paramètres → WebDAV</strong> sur votre Nuage.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C3 -->
+  <section id="c3" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">3</span>
+      Créer une session
+    </h2>
+
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-2">Titre de la session</h4>
+        <p class="text-sm text-slate-600 font-medium">Donnez un titre clair que vos élèves verront (ex: <em>"La vie de Mozart"</em>, <em>"Cycle 4 — Les matériaux"</em>).</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-2">Le corpus</h4>
+        <p class="text-sm text-slate-600 font-medium mb-3">C'est le contenu à partir duquel l'IA génère toutes les questions. Deux options :</p>
+        <ul class="space-y-2 text-sm text-slate-600 font-medium">
+          <li class="flex items-start gap-2"><i data-lucide="type" class="w-4 h-4 text-indigo-400 mt-0.5 flex-none"></i><span><strong>Texte libre</strong> — coller directement votre cours, vos notes, une description de programme</span></li>
+          <li class="flex items-start gap-2"><i data-lucide="file-text" class="w-4 h-4 text-indigo-400 mt-0.5 flex-none"></i><span><strong>Fichier PDF ou TXT</strong> — importer un document, le texte est extrait automatiquement</span></li>
+        </ul>
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3 text-xs text-amber-700 font-medium">
+          Plus le corpus est précis et structuré, plus les questions générées seront pertinentes. Idéalement entre 200 et 3000 mots.
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-3">Configuration des activités</h4>
+        <p class="text-sm text-slate-600 font-medium mb-3">Pour chacune des 6 activités, choisissez le <strong>nombre de questions</strong> à générer :</p>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3 text-sm py-1.5 border-b border-slate-50">
+            <span class="w-5 h-5 bg-blue-100 text-blue-600 rounded flex items-center justify-center flex-none"><i data-lucide="circle-help" class="w-3 h-3"></i></span>
+            <span class="flex-1 font-medium text-slate-700">Quiz QCM</span><span class="text-slate-400 text-xs">recommandé : 8–15</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm py-1.5 border-b border-slate-50">
+            <span class="w-5 h-5 bg-purple-100 text-purple-600 rounded flex items-center justify-center flex-none"><i data-lucide="link" class="w-3 h-3"></i></span>
+            <span class="flex-1 font-medium text-slate-700">Paires à relier</span><span class="text-slate-400 text-xs">recommandé : 6–10</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm py-1.5 border-b border-slate-50">
+            <span class="w-5 h-5 bg-orange-100 text-orange-600 rounded flex items-center justify-center flex-none"><i data-lucide="zap" class="w-3 h-3"></i></span>
+            <span class="flex-1 font-medium text-slate-700">Mission rapidité</span><span class="text-slate-400 text-xs">recommandé : 5–8</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm py-1.5 border-b border-slate-50">
+            <span class="w-5 h-5 bg-green-100 text-green-600 rounded flex items-center justify-center flex-none"><i data-lucide="pen-line" class="w-3 h-3"></i></span>
+            <span class="flex-1 font-medium text-slate-700">Compléter la phrase</span><span class="text-slate-400 text-xs">recommandé : 4–8</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm py-1.5 border-b border-slate-50">
+            <span class="w-5 h-5 bg-amber-100 text-amber-600 rounded flex items-center justify-center flex-none"><i data-lucide="search-x" class="w-3 h-3"></i></span>
+            <span class="flex-1 font-medium text-slate-700">Détection d'intrus</span><span class="text-slate-400 text-xs">recommandé : 4–6</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm py-1.5">
+            <span class="w-5 h-5 bg-indigo-100 text-indigo-600 rounded flex items-center justify-center flex-none"><i data-lucide="message-square" class="w-3 h-3"></i></span>
+            <span class="flex-1 font-medium text-slate-700">Questions ouvertes IA</span><span class="text-slate-400 text-xs">recommandé : 2–4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-2">Activités rejouables</h4>
+        <p class="text-sm text-slate-600 font-medium">Si cette option est cochée, les élèves peuvent recommencer une activité pour améliorer leur score. Décochez pour une évaluation en une seule tentative (comme un devoir).</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-2">Clé API Albert</h4>
+        <p class="text-sm text-slate-600 font-medium">Entrez votre clé API Albert (Étalab). Elle est utilisée pour générer les questions et évaluer les réponses ouvertes. Elle est stockée dans votre session sur votre Nuage personnel.</p>
+      </div>
+
+      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-800 font-medium flex items-start gap-2">
+        <i data-lucide="clock" class="w-4 h-4 mt-0.5 flex-none"></i>
+        <span>La génération prend <strong>30 à 90 secondes</strong> selon le nombre d'activités et la taille du corpus. Une barre de progression vous indique l'avancement activité par activité.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- C4 -->
+  <section id="c4" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">4</span>
+      Partager le lien aux élèves
+    </h2>
+    <p class="text-slate-600 font-medium mb-4">Une fois la session générée, deux informations sont à communiquer à vos élèves :</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-xl border-2 border-emerald-200 p-5 shadow-sm text-center">
+        <i data-lucide="link" class="w-8 h-8 text-emerald-500 mx-auto mb-2"></i>
+        <h4 class="font-black text-slate-800 mb-1">Le lien d'accès</h4>
+        <p class="text-xs text-slate-500 font-medium">URL vers <code class="bg-slate-100 px-1 rounded">eleve.html</code> avec la configuration encodée. À copier depuis le bouton <strong>"Copier"</strong>.</p>
+      </div>
+      <div class="bg-white rounded-xl border-2 border-indigo-200 p-5 shadow-sm text-center">
+        <i data-lucide="key-square" class="w-8 h-8 text-indigo-500 mx-auto mb-2"></i>
+        <h4 class="font-black text-slate-800 mb-1">Le code session</h4>
+        <p class="text-xs text-slate-500 font-medium">Format <code class="bg-slate-100 px-1 rounded font-mono">EXP-XXXX</code>. L'élève le saisit manuellement pour vérification.</p>
+      </div>
+    </div>
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-600 font-medium">
+      <strong>Comment partager ?</strong> Via votre ENT, Pronote, un message de classe, un QR code généré depuis le lien, ou simplement en projetant le code au tableau.
+    </div>
+  </section>
+
+  <!-- C5 -->
+  <section id="c5" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">5</span>
+      Consulter les résultats
+    </h2>
+    <p class="text-slate-600 font-medium mb-4">Dès qu'un élève a soumis ses résultats, ils apparaissent dans l'onglet de la session.</p>
+
+    <div class="space-y-3">
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="percent" class="w-5 h-5 text-indigo-400 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Score global automatique</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Moyenne des pourcentages de réussite de chaque activité. Calculé sans aucune action du professeur.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="layout-list" class="w-5 h-5 text-indigo-400 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Détail par activité</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Score et pourcentage pour chacune des 6 activités. Permet d'identifier les points faibles d'un élève.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="edit-3" class="w-5 h-5 text-indigo-400 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Note et appréciation (optionnel)</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Vous pouvez ajouter une note /20 et un commentaire. Ces informations sont sauvegardées sur votre Nuage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C6 -->
+  <section id="c6" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">6</span>
+      Les 6 activités auto-corrigées
+    </h2>
+    <div class="space-y-3">
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="circle-help" class="w-4 h-4"></i></span>
+        <div><strong class="text-slate-800">Quiz QCM</strong> — Questions à 4 choix. Correction immédiate avec explication. <em class="text-slate-400 text-xs">Correction : comparaison à la bonne réponse.</em></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="link" class="w-4 h-4"></i></span>
+        <div><strong class="text-slate-800">Paires à relier</strong> — Associer termes et définitions. <em class="text-slate-400 text-xs">Correction : vérification des associations.</em></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="zap" class="w-4 h-4"></i></span>
+        <div><strong class="text-slate-800">Mission rapidité</strong> — QCM avec chrono 10s. Bonus de points pour la rapidité. <em class="text-slate-400 text-xs">Correction : QCM + bonus temps.</em></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="pen-line" class="w-4 h-4"></i></span>
+        <div><strong class="text-slate-800">Compléter la phrase</strong> — Trouver le mot manquant dans une phrase. Tolérance aux fautes légères. <em class="text-slate-400 text-xs">Correction : distance de Levenshtein.</em></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="search-x" class="w-4 h-4"></i></span>
+        <div><strong class="text-slate-800">Détection d'intrus</strong> — Parmi 4 affirmations, repérer la fausse. <em class="text-slate-400 text-xs">Correction : comparaison à l'indice de la fausse affirmation.</em></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="message-square" class="w-4 h-4"></i></span>
+        <div><strong class="text-slate-800">Questions ouvertes IA</strong> — Réponse libre, notée par Albert sur 10 avec justification. <em class="text-slate-400 text-xs">Correction : évaluation par l'IA Albert via le corpus de référence.</em></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C7 -->
+  <section id="c7" class="mb-12">
+    <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
+      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">7</span>
+      Confidentialité & RGPD
+    </h2>
+    <div class="space-y-3">
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-emerald-800 font-medium flex items-start gap-2">
+        <i data-lucide="shield-check" class="w-4 h-4 mt-0.5 flex-none"></i>
+        <span>Aucune donnée personnelle n'est collectée par l'application. Les données sont stockées <strong>uniquement sur votre espace Nuage personnel</strong> (apps.education.fr).</span>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-sm text-slate-600 font-medium">
+        Les élèves s'identifient avec un <strong>identifiant libre</strong> (pas de nom, pas d'email, pas de connexion SSO). C'est vous qui choisissez la convention (numéro élève, prénom, pseudo…).
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-sm text-slate-600 font-medium">
+        La clé API Albert et les identifiants Nuage sont transmis uniquement via le <strong>relais n8n de l'incubateur de l'Éducation Nationale</strong>. Ils ne transitent pas par des serveurs tiers.
+      </div>
+    </div>
+  </section>
+
+  <div class="border-t border-slate-100 pt-6 text-center text-sm text-slate-400 font-medium">
+    Experia — Forge des communs numériques éducatifs · Version 1.0
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>
