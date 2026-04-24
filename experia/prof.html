@@ -79,7 +79,7 @@
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL Proxy Albert (n8n)</label>
-            <input id="login-proxy" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat"
+            <input id="login-proxy" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/experia_albert"
               class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
           </div>
           <div>
@@ -393,11 +393,12 @@ async function callAlbert(messages) {
   const model  = document.getElementById('create-model').value;
   const res = await fetch(state.proxyUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({ model, messages, temperature: 0.3 })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages, temperature: 0.3, apiKey })
   });
-  if (!res.ok) throw new Error('Albert API erreur: ' + res.status);
+  if (!res.ok) throw new Error('Proxy Albert erreur HTTP ' + res.status);
   const data = await res.json();
+  if (data.error) throw new Error('Albert : ' + data.error);
   return data.choices?.[0]?.message?.content || '';
 }
 
