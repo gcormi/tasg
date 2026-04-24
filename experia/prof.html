@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experia — Espace Professeur</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Outfit', sans-serif; background: #f0f4ff; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.35s ease forwards; }
+    .activity-row { transition: all 0.2s; }
+    .progress-bar { transition: width 0.5s ease; }
+    input, textarea, select { font-family: 'Outfit', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-20 px-6 py-3 flex items-center justify-between">
+  <a href="index.html" class="flex items-center gap-2">
+    <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+      <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+    </div>
+    <span class="font-black text-slate-800 text-lg">Experia</span>
+    <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-1">Professeur</span>
+  </a>
+  <button id="btn-logout" onclick="logout()" class="hidden text-xs font-bold text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors">
+    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Déconnexion
+  </button>
+</header>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 1 : CONNEXION NUAGE                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="max-w-md mx-auto pt-16 px-6 pb-12 fade-up">
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+        <i data-lucide="cloud" class="w-7 h-7 text-white"></i>
+      </div>
+      <h2 class="text-2xl font-black text-slate-900">Connexion Nuage</h2>
+      <p class="text-sm text-slate-500 mt-1">Connectez votre espace apps.education.fr</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Serveur Nuage</label>
+        <input id="login-server" type="text" value="nuage.apps.education.fr"
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-mono text-sm transition-all">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Identifiant</label>
+        <input id="login-user" type="text" placeholder="prenom.nom@ac-..."
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+          Mot de passe d'application
+          <a href="https://nuage.apps.education.fr/settings/user/security" target="_blank" class="lowercase ml-2 text-indigo-500 hover:text-indigo-700">
+            <i data-lucide="external-link" class="w-3 h-3 inline"></i> générer
+          </a>
+        </label>
+        <input id="login-pass" type="password" placeholder="Mot de passe d'application Nextcloud"
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">URL Proxy Albert (n8n)</label>
+        <input id="login-proxy" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat"
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-mono text-xs transition-all">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">URL Stockage Experia (n8n)</label>
+        <input id="login-storage" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/experia_storage"
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-mono text-xs transition-all">
+      </div>
+
+      <div id="login-error" class="hidden text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 font-medium"></div>
+
+      <button onclick="doLogin()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
+        <i data-lucide="log-in" class="w-5 h-5"></i>
+        <span id="login-btn-text">Se connecter</span>
+      </button>
+    </div>
+    <p class="text-center text-xs text-slate-400 mt-4 font-medium">Aucune donnée personnelle stockée. Conforme RGPD.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 2 : TABLEAU DE BORD                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen">
+  <div class="max-w-3xl mx-auto px-6 py-10">
+    <div class="flex items-center justify-between mb-8 fade-up">
+      <div>
+        <h2 class="text-2xl font-black text-slate-900">Mes sessions</h2>
+        <p id="dash-user" class="text-sm text-slate-500 font-medium"></p>
+      </div>
+      <button onclick="showScreen('create')" class="bg-indigo-600 text-white font-bold px-5 py-3 rounded-2xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-200">
+        <i data-lucide="plus" class="w-4 h-4"></i> Nouvelle session
+      </button>
+    </div>
+
+    <div id="sessions-list" class="space-y-3 fade-up">
+      <div class="text-center py-16 text-slate-400">
+        <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-50"></i>
+        <p class="font-medium">Aucune session pour le moment</p>
+        <p class="text-sm mt-1">Créez votre première session ci-dessus</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 3 : CRÉER UNE SESSION               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-create" class="screen">
+  <div class="max-w-2xl mx-auto px-6 py-10 fade-up">
+
+    <div class="flex items-center gap-3 mb-8">
+      <button onclick="showScreen('dashboard')" class="p-2 hover:bg-white rounded-xl transition-colors text-slate-500">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h2 class="text-2xl font-black text-slate-900">Nouvelle session</h2>
+        <p class="text-sm text-slate-500 font-medium">L'IA génère les questions à partir de votre corpus</p>
+      </div>
+    </div>
+
+    <div class="space-y-5">
+
+      <!-- Titre -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Titre de la session</label>
+        <input id="create-title" type="text" placeholder="Ex: La vie de Mozart, Cycle 4 Technologie..."
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none font-medium transition-all">
+      </div>
+
+      <!-- Corpus -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Corpus / Contenu de référence</label>
+        <textarea id="create-corpus" rows="8" placeholder="Collez ici votre texte, cours, description de programme..."
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm font-medium transition-all resize-y"></textarea>
+        <div class="flex items-center gap-3 mt-3">
+          <label class="flex items-center gap-2 cursor-pointer bg-slate-50 hover:bg-indigo-50 border-2 border-slate-100 hover:border-indigo-300 rounded-xl px-4 py-2 text-sm font-bold text-slate-600 transition-all">
+            <i data-lucide="upload" class="w-4 h-4"></i> Importer PDF/TXT
+            <input type="file" accept=".pdf,.txt" class="hidden" onchange="importFile(this)">
+          </label>
+          <span id="file-name" class="text-xs text-slate-400 font-medium"></span>
+        </div>
+      </div>
+
+      <!-- Configuration des activités -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Configuration des activités</h3>
+        <div class="space-y-3" id="activities-config">
+          <!-- injecté par JS -->
+        </div>
+      </div>
+
+      <!-- Config Albert -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Configuration IA</h3>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5">Clé API Albert</label>
+            <input id="create-apikey" type="password" placeholder="sk-..."
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5">Modèle</label>
+            <select id="create-model" class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
+              <option value="albert-medium">Albert Moyen (Mistral 24B)</option>
+              <option value="albert-small">Albert Rapide (8B)</option>
+              <option value="albert-large">Albert Grand (120B)</option>
+              <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paramètres élèves -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Paramètres élèves</h3>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="create-retryable" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
+          <div>
+            <span class="font-bold text-slate-700 text-sm">Activités rejouables</span>
+            <p class="text-xs text-slate-400 font-medium">L'élève peut recommencer une activité autant de fois que souhaité</p>
+          </div>
+        </label>
+      </div>
+
+      <div id="create-error" class="hidden text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 font-medium"></div>
+
+      <button onclick="startGeneration()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
+        <i data-lucide="sparkles" class="w-5 h-5"></i> Générer les activités avec Albert
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 4 : GÉNÉRATION EN COURS              -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-generating" class="screen">
+  <div class="max-w-md mx-auto px-6 py-20 text-center fade-up">
+    <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-200 animate-pulse">
+      <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
+    </div>
+    <h2 class="text-2xl font-black text-slate-900 mb-2">Albert génère les activités</h2>
+    <p class="text-slate-500 text-sm font-medium mb-8" id="gen-subtitle">Patience, cela peut prendre quelques secondes...</p>
+
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-left space-y-3">
+      <div id="gen-steps" class="space-y-3">
+        <!-- injecté par JS -->
+      </div>
+    </div>
+
+    <div class="mt-6 bg-slate-100 rounded-full h-2 overflow-hidden">
+      <div id="gen-progress-bar" class="bg-indigo-500 h-2 rounded-full progress-bar" style="width:0%"></div>
+    </div>
+    <p id="gen-progress-text" class="text-xs text-slate-400 font-bold mt-2">0 / 6 activités</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 5 : DÉTAIL SESSION                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-session" class="screen">
+  <div class="max-w-3xl mx-auto px-6 py-10">
+
+    <div class="flex items-center gap-3 mb-6 fade-up">
+      <button onclick="showScreen('dashboard'); loadSessions();" class="p-2 hover:bg-white rounded-xl transition-colors text-slate-500">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div class="flex-1 min-w-0">
+        <h2 id="sess-title" class="text-2xl font-black text-slate-900 truncate"></h2>
+        <p id="sess-date" class="text-sm text-slate-400 font-medium"></p>
+      </div>
+      <button onclick="deleteCurrentSession()" class="p-2 hover:bg-red-50 rounded-xl transition-colors text-slate-400 hover:text-red-500">
+        <i data-lucide="trash-2" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Lien de partage -->
+    <div class="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-5 mb-6 fade-up">
+      <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 flex items-center gap-2">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Lien à partager avec les élèves
+      </p>
+      <div class="flex gap-2">
+        <input id="sess-link" type="text" readonly
+          class="flex-1 bg-white border border-indigo-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-600 outline-none">
+        <button onclick="copyLink()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all flex items-center gap-1.5">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span id="copy-btn-text">Copier</span>
+        </button>
+      </div>
+      <p class="text-xs text-indigo-400 font-medium mt-2">Code session : <strong id="sess-code" class="text-indigo-700 font-black"></strong></p>
+    </div>
+
+    <!-- Résultats élèves -->
+    <div class="fade-up">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-black text-slate-800">Résultats des élèves</h3>
+        <button onclick="loadSessionResults()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+          <i data-lucide="refresh-cw" class="w-3 h-3"></i> Actualiser
+        </button>
+      </div>
+      <div id="results-list" class="space-y-3">
+        <div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100">
+          <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p class="font-medium text-sm">En attente des premiers élèves...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 6 : DÉTAIL RÉSULTAT ÉLÈVE            -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-result" class="screen">
+  <div class="max-w-2xl mx-auto px-6 py-10 fade-up">
+
+    <div class="flex items-center gap-3 mb-6">
+      <button onclick="showScreen('session')" class="p-2 hover:bg-white rounded-xl transition-colors text-slate-500">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h2 id="result-student" class="text-2xl font-black text-slate-900"></h2>
+        <p id="result-date" class="text-sm text-slate-400 font-medium"></p>
+      </div>
+    </div>
+
+    <!-- Score global -->
+    <div class="bg-indigo-600 text-white rounded-3xl p-6 mb-5 text-center">
+      <p class="text-indigo-200 text-sm font-bold uppercase tracking-wider mb-1">Score global</p>
+      <div id="result-global" class="text-6xl font-black">—</div>
+      <p class="text-indigo-200 text-sm font-medium mt-1">auto-corrigé par l'IA</p>
+    </div>
+
+    <!-- Détail par activité -->
+    <div id="result-details" class="space-y-3 mb-6"></div>
+
+    <!-- Note prof -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Note & appréciation du professeur (optionnel)</h3>
+      <div class="flex gap-3 mb-3">
+        <div class="flex-1">
+          <label class="text-xs font-bold text-slate-400 mb-1 block">Note /20</label>
+          <input id="teacher-grade" type="number" min="0" max="20" step="0.5"
+            class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none font-bold text-lg">
+        </div>
+      </div>
+      <label class="text-xs font-bold text-slate-400 mb-1 block">Appréciation</label>
+      <textarea id="teacher-comment" rows="3" placeholder="Votre commentaire..."
+        class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-3 outline-none text-sm font-medium resize-none"></textarea>
+      <button onclick="saveTeacherNote()" class="mt-3 w-full bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-900 transition-all flex items-center justify-center gap-2">
+        <i data-lucide="save" class="w-4 h-4"></i> Sauvegarder la note
+      </button>
+      <div id="note-saved" class="hidden text-center text-emerald-600 font-bold text-sm mt-2 flex items-center justify-center gap-1">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Note sauvegardée
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ─── ÉTAT ───────────────────────────────────────────────────────────────────
+const state = {
+  nuageUser: '', nuagePass: '', nuageServer: 'nuage.apps.education.fr',
+  storageUrl: '', proxyUrl: '',
+  manifest: [], sessions: [],
+  currentSession: null, currentResult: null
+};
+
+const ACTIVITIES = [
+  { id: 'qcm',          label: 'Quiz QCM',               icon: 'circle-help',     color: 'blue',   default: 10 },
+  { id: 'paires',       label: 'Paires à relier',         icon: 'link',            color: 'purple', default: 8  },
+  { id: 'rapidite',     label: 'Mission rapidité',         icon: 'zap',             color: 'orange', default: 8  },
+  { id: 'completer',    label: 'Compléter la phrase',     icon: 'pen-line',        color: 'green',  default: 5  },
+  { id: 'intrus',       label: 'Détection d\'intrus',     icon: 'search-x',        color: 'amber',  default: 5  },
+  { id: 'questions_ia', label: 'Questions ouvertes IA',   icon: 'message-square',  color: 'indigo', default: 3  }
+];
+
+const COLOR_MAP = {
+  blue: 'text-blue-600 bg-blue-50', purple: 'text-purple-600 bg-purple-50',
+  orange: 'text-orange-600 bg-orange-50', green: 'text-green-600 bg-green-50',
+  amber: 'text-amber-600 bg-amber-50', indigo: 'text-indigo-600 bg-indigo-50'
+};
+
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('btn-logout').classList.toggle('hidden', id === 'login');
+}
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+async function storage(params) {
+  const res = await fetch(state.storageUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...params, username: state.nuageUser, password: state.nuagePass, server: state.nuageServer })
+  });
+  if (!res.ok) throw new Error('Erreur réseau: ' + res.status);
+  return await res.json();
+}
+
+// ─── ALBERT ──────────────────────────────────────────────────────────────────
+async function callAlbert(messages) {
+  const apiKey = document.getElementById('create-apikey').value.trim();
+  const model  = document.getElementById('create-model').value;
+  const res = await fetch(state.proxyUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ model, messages, temperature: 0.3 })
+  });
+  if (!res.ok) throw new Error('Albert API erreur: ' + res.status);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+async function generateActivity(type, count, corpus) {
+  const prompts = {
+    qcm: `Génère exactement ${count} QCM en français basés UNIQUEMENT sur ce corpus.\nJSON uniquement, sans markdown :\n[{"q":"...","choices":["...","...","...","..."],"correct":0,"expl":"..."}]\ncorrect = index 0-3 de la bonne réponse.\n\nCorpus:\n${corpus}`,
+    paires: `Génère exactement ${count} paires terme/définition en français basées UNIQUEMENT sur ce corpus.\nJSON uniquement, sans markdown :\n[{"term":"...","def":"..."}]\n\nCorpus:\n${corpus}`,
+    rapidite: `Génère exactement ${count} QCM courts et simples en français basés UNIQUEMENT sur ce corpus (pour un défi de rapidité).\nJSON uniquement, sans markdown :\n[{"q":"...","choices":["...","...","...","..."],"correct":0}]\n\nCorpus:\n${corpus}`,
+    completer: `Génère exactement ${count} phrases à trous en français basées UNIQUEMENT sur ce corpus. Un seul mot ou groupe nominal manquant par phrase, remplacé par "_____".\nJSON uniquement, sans markdown :\n[{"phrase":"... _____ ...","answer":"..."}]\n\nCorpus:\n${corpus}`,
+    intrus: `Génère exactement ${count} groupes de 4 affirmations en français dont UNE SEULE est fausse, basés UNIQUEMENT sur ce corpus.\nJSON uniquement, sans markdown :\n[{"statements":["...","...","...","..."],"intrus":2,"expl":"..."}]\nintrus = index 0-3 de la fausse affirmation.\n\nCorpus:\n${corpus}`,
+    questions_ia: `Génère exactement ${count} questions ouvertes en français basées UNIQUEMENT sur ce corpus, qui nécessitent une réponse développée.\nJSON uniquement, sans markdown :\n[{"q":"..."}]\n\nCorpus:\n${corpus}`
+  };
+
+  const content = await callAlbert([
+    { role: 'system', content: 'Tu es un générateur de questions pédagogiques expert. Réponds UNIQUEMENT avec du JSON valide, sans balises markdown, sans texte avant ou après le JSON.' },
+    { role: 'user', content: prompts[type] }
+  ]);
+
+  const match = content.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error(`Pas de JSON valide pour ${type}: ${content.substring(0, 100)}`);
+  return JSON.parse(match[0]);
+}
+
+// ─── IMPORT FICHIER ──────────────────────────────────────────────────────────
+async function importFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('file-name').textContent = file.name;
+
+  if (file.type === 'application/pdf') {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(s => s.str).join(' ') + '\n';
+      }
+      document.getElementById('create-corpus').value = text.trim();
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    const reader = new FileReader();
+    reader.onload = (e) => { document.getElementById('create-corpus').value = e.target.result; };
+    reader.readAsText(file, 'UTF-8');
+  }
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const user    = document.getElementById('login-user').value.trim();
+  const pass    = document.getElementById('login-pass').value.trim();
+  const server  = document.getElementById('login-server').value.trim();
+  const proxy   = document.getElementById('login-proxy').value.trim();
+  const storage = document.getElementById('login-storage').value.trim();
+
+  if (!user || !pass) { showLoginError('Identifiant et mot de passe requis.'); return; }
+  if (!proxy || !storage) { showLoginError('Les URLs n8n sont requises.'); return; }
+
+  const btn = document.getElementById('login-btn-text');
+  btn.textContent = 'Connexion en cours...';
+
+  state.nuageUser = user; state.nuagePass = pass; state.nuageServer = server;
+  state.proxyUrl = proxy; state.storageUrl = storage;
+
+  try {
+    const res = await fetch(state.storageUrl, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'test', username: user, password: pass, server })
+    });
+    const data = await res.json();
+    if (!data.success) { showLoginError(data.error || 'Erreur de connexion.'); btn.textContent = 'Se connecter'; return; }
+
+    document.getElementById('dash-user').textContent = user;
+    showScreen('dashboard');
+    loadSessions();
+  } catch (e) {
+    showLoginError('Impossible de joindre le serveur n8n: ' + e.message);
+  }
+  btn.textContent = 'Se connecter';
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function logout() {
+  state.nuageUser = ''; state.nuagePass = '';
+  showScreen('login');
+}
+
+// ─── INIT ACTIVITÉS CONFIG ────────────────────────────────────────────────────
+function initActivitiesConfig() {
+  const container = document.getElementById('activities-config');
+  container.innerHTML = ACTIVITIES.map(a => `
+    <div class="activity-row flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center ${COLOR_MAP[a.color]}">
+        <i data-lucide="${a.icon}" class="w-4 h-4"></i>
+      </div>
+      <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
+      <div class="flex items-center gap-2">
+        <label class="text-xs text-slate-400 font-medium">Questions</label>
+        <input type="number" id="act-${a.id}" value="${a.default}" min="2" max="20"
+          class="w-16 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+// ─── CHARGEMENT SESSIONS ──────────────────────────────────────────────────────
+async function loadSessions() {
+  const container = document.getElementById('sessions-list');
+  container.innerHTML = `<div class="text-center py-8 text-slate-400"><i data-lucide="loader" class="w-6 h-6 mx-auto mb-2 animate-spin"></i><p class="text-sm font-medium">Chargement...</p></div>`;
+  lucide.createIcons();
+
+  try {
+    const res = await storage({ action: 'list' });
+    state.manifest = res.files ? res.files.map(f => f.name) : [];
+    const sessionFiles = state.manifest.filter(n => n.startsWith('session_'));
+
+    if (sessionFiles.length === 0) {
+      container.innerHTML = `<div class="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-100">
+        <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-50"></i>
+        <p class="font-medium">Aucune session pour le moment</p>
+        <p class="text-sm mt-1">Créez votre première session ci-dessus</p>
+      </div>`;
+      lucide.createIcons();
+      return;
+    }
+
+    const sessions = [];
+    for (const fn of sessionFiles) {
+      const r = await storage({ action: 'read', filename: fn });
+      if (r.success && r.content) sessions.push(r.content);
+    }
+    sessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    state.sessions = sessions;
+
+    container.innerHTML = sessions.map(s => {
+      const date = new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+      const nbActivities = Object.keys(s.questions || {}).length;
+      return `<div onclick="openSession('${s.id}')" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer flex items-center gap-4">
+        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center flex-none">
+          <i data-lucide="folder-open" class="w-5 h-5 text-indigo-600"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="font-black text-slate-800 truncate">${s.title}</h3>
+          <p class="text-xs text-slate-400 font-medium">${date} · ${nbActivities} activités · Code: <strong class="text-slate-600">${s.code}</strong></p>
+        </div>
+        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 flex-none"></i>
+      </div>`;
+    }).join('');
+    lucide.createIcons();
+
+  } catch (e) {
+    container.innerHTML = `<div class="text-red-500 bg-red-50 rounded-2xl p-5 text-sm font-medium">Erreur: ${e.message}</div>`;
+  }
+}
+
+// ─── OUVRIR SESSION ───────────────────────────────────────────────────────────
+async function openSession(id) {
+  const session = state.sessions.find(s => s.id === id);
+  if (!session) return;
+  state.currentSession = session;
+
+  document.getElementById('sess-title').textContent = session.title;
+  document.getElementById('sess-date').textContent = new Date(session.createdAt).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('sess-code').textContent = session.code;
+
+  const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
+    storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
+    nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
+    sessionId: session.id, apiKey: session.apiKey, model: session.model
+  }))))}`;
+  document.getElementById('sess-link').value = link;
+
+  showScreen('session');
+  loadSessionResults();
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(document.getElementById('sess-link').value).then(() => {
+    const btn = document.getElementById('copy-btn-text');
+    btn.textContent = 'Copié !';
+    setTimeout(() => btn.textContent = 'Copier', 2000);
+  });
+}
+
+// ─── RÉSULTATS SESSION ────────────────────────────────────────────────────────
+async function loadSessionResults() {
+  if (!state.currentSession) return;
+  const container = document.getElementById('results-list');
+  container.innerHTML = `<div class="text-center py-6 text-slate-400"><i data-lucide="loader" class="w-5 h-5 mx-auto animate-spin"></i></div>`;
+  lucide.createIcons();
+
+  try {
+    const res = await storage({ action: 'list' });
+    const manifest = res.files ? res.files.map(f => f.name) : [];
+    const resultFiles = manifest.filter(n => n.startsWith(`result_${state.currentSession.id}_`));
+
+    if (resultFiles.length === 0) {
+      container.innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100">
+        <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+        <p class="font-medium text-sm">En attente des premiers élèves...</p>
+      </div>`;
+      lucide.createIcons(); return;
+    }
+
+    const results = [];
+    for (const fn of resultFiles) {
+      const r = await storage({ action: 'read', filename: fn });
+      if (r.success && r.content) results.push(r.content);
+    }
+
+    container.innerHTML = results.map(r => {
+      const pct = Math.round(r.globalPct || 0);
+      const color = pct >= 70 ? 'emerald' : pct >= 50 ? 'amber' : 'red';
+      const date = new Date(r.completedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+      return `<div onclick="openResult('${r.studentId}')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:border-indigo-200 transition-all cursor-pointer flex items-center gap-4">
+        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center flex-none">
+          <i data-lucide="user" class="w-5 h-5 text-slate-500"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h4 class="font-black text-slate-800">${r.studentId}</h4>
+          <p class="text-xs text-slate-400 font-medium">${date}</p>
+        </div>
+        <div class="text-right flex-none">
+          <div class="text-xl font-black text-${color}-600">${pct}%</div>
+          <p class="text-xs text-slate-400 font-medium">score global</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 flex-none"></i>
+      </div>`;
+    }).join('');
+    // stocker pour ouverture
+    window._sessionResults = results;
+    lucide.createIcons();
+  } catch(e) {
+    container.innerHTML = `<div class="text-red-500 text-sm font-medium p-4">${e.message}</div>`;
+  }
+}
+
+async function openResult(studentId) {
+  const r = (window._sessionResults || []).find(x => x.studentId === studentId);
+  if (!r) return;
+  state.currentResult = r;
+
+  document.getElementById('result-student').textContent = studentId;
+  document.getElementById('result-date').textContent = new Date(r.completedAt).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('result-global').textContent = Math.round(r.globalPct || 0) + '%';
+
+  const details = document.getElementById('result-details');
+  details.innerHTML = ACTIVITIES.filter(a => r.scores?.[a.id]).map(a => {
+    const sc = r.scores[a.id];
+    const pct = Math.round((sc.score / sc.max) * 100);
+    const bar = Math.max(0, Math.min(100, pct));
+    return `<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center ${COLOR_MAP[a.color]}">
+          <i data-lucide="${a.icon}" class="w-4 h-4"></i>
+        </div>
+        <span class="font-bold text-slate-700 flex-1">${a.label}</span>
+        <span class="font-black text-slate-800">${sc.score}/${sc.max}</span>
+        <span class="text-sm font-bold text-slate-400">(${pct}%)</span>
+      </div>
+      <div class="bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div class="bg-indigo-500 h-1.5 rounded-full" style="width:${bar}%"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('teacher-grade').value = r.teacherGrade || '';
+  document.getElementById('teacher-comment').value = r.teacherComment || '';
+  document.getElementById('note-saved').classList.add('hidden');
+  lucide.createIcons();
+  showScreen('result');
+}
+
+async function saveTeacherNote() {
+  if (!state.currentResult || !state.currentSession) return;
+  state.currentResult.teacherGrade = document.getElementById('teacher-grade').value;
+  state.currentResult.teacherComment = document.getElementById('teacher-comment').value;
+
+  const filename = `result_${state.currentSession.id}_${state.currentResult.studentId}.json`;
+  const res = await storage({ action: 'write', filename, content: state.currentResult, manifest: state.manifest });
+  if (res.success) {
+    document.getElementById('note-saved').classList.remove('hidden');
+    setTimeout(() => document.getElementById('note-saved').classList.add('hidden'), 3000);
+  }
+}
+
+// ─── SUPPRIMER SESSION ────────────────────────────────────────────────────────
+async function deleteCurrentSession() {
+  if (!state.currentSession) return;
+  if (!confirm(`Supprimer la session "${state.currentSession.title}" ? Cette action est irréversible.`)) return;
+  await storage({ action: 'delete', filename: `session_${state.currentSession.id}.json` });
+  state.currentSession = null;
+  showScreen('dashboard');
+  loadSessions();
+}
+
+// ─── GÉNÉRATION DES ACTIVITÉS ─────────────────────────────────────────────────
+async function startGeneration() {
+  const title  = document.getElementById('create-title').value.trim();
+  const corpus = document.getElementById('create-corpus').value.trim();
+  const apiKey = document.getElementById('create-apikey').value.trim();
+
+  const errEl = document.getElementById('create-error');
+  errEl.classList.add('hidden');
+
+  if (!title)  { errEl.textContent = 'Le titre est requis.'; errEl.classList.remove('hidden'); return; }
+  if (!corpus) { errEl.textContent = 'Le corpus est requis.'; errEl.classList.remove('hidden'); return; }
+  if (!apiKey) { errEl.textContent = 'La clé API Albert est requise.'; errEl.classList.remove('hidden'); return; }
+
+  const config = {};
+  ACTIVITIES.forEach(a => { config[a.id] = parseInt(document.getElementById('act-' + a.id).value) || a.default; });
+  const retryable = document.getElementById('create-retryable').checked;
+  const model = document.getElementById('create-model').value;
+
+  // Préparer l'écran de génération
+  const stepsContainer = document.getElementById('gen-steps');
+  stepsContainer.innerHTML = ACTIVITIES.map(a => `
+    <div id="step-${a.id}" class="flex items-center gap-3">
+      <div id="step-icon-${a.id}" class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center flex-none">
+        <div class="w-2 h-2 rounded-full bg-slate-300"></div>
+      </div>
+      <span class="text-sm font-medium text-slate-500">${a.label} <span class="text-slate-300">(${config[a.id]} questions)</span></span>
+    </div>
+  `).join('');
+
+  showScreen('generating');
+  lucide.createIcons();
+
+  const questions = {};
+  let done = 0;
+
+  for (const activity of ACTIVITIES) {
+    const stepIcon = document.getElementById(`step-icon-${activity.id}`);
+    stepIcon.innerHTML = '<div class="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>';
+
+    try {
+      questions[activity.id] = await generateActivity(activity.id, config[activity.id], corpus);
+      stepIcon.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>';
+      document.getElementById(`step-${activity.id}`).querySelector('span').classList.replace('text-slate-500','text-slate-700');
+    } catch(e) {
+      stepIcon.innerHTML = '<i data-lucide="x" class="w-3 h-3 text-red-400"></i>';
+      console.error(`Erreur ${activity.id}:`, e);
+    }
+
+    done++;
+    document.getElementById('gen-progress-bar').style.width = `${(done / ACTIVITIES.length) * 100}%`;
+    document.getElementById('gen-progress-text').textContent = `${done} / ${ACTIVITIES.length} activités`;
+    lucide.createIcons();
+  }
+
+  // Construire et sauvegarder la session
+  const sessionId = 'session_' + Date.now();
+  const code = 'EXP-' + Math.random().toString(36).substring(2,6).toUpperCase();
+  const session = {
+    id: sessionId, code, title, corpus, createdAt: new Date().toISOString(),
+    config, retryable, questions, model, apiKey
+  };
+
+  document.getElementById('gen-subtitle').textContent = 'Sauvegarde sur Nuage...';
+  const saveRes = await storage({ action: 'write', filename: `${sessionId}.json`, content: session, manifest: state.manifest });
+  if (!saveRes.success) {
+    showScreen('create');
+    document.getElementById('create-error').textContent = 'Erreur sauvegarde Nuage : ' + (saveRes.error || 'Vérifiez que le dossier "experia" existe sur votre Nuage.');
+    document.getElementById('create-error').classList.remove('hidden');
+    return;
+  }
+
+  state.currentSession = session;
+  state.sessions.unshift(session);
+
+  // Afficher la session créée
+  document.getElementById('sess-title').textContent = title;
+  document.getElementById('sess-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('sess-code').textContent = code;
+
+  const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
+    storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
+    nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
+    sessionId, apiKey, model
+  }))))}`;
+  document.getElementById('sess-link').value = link;
+  document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
+  lucide.createIcons();
+  showScreen('session');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+initActivitiesConfig();
+lucide.createIcons();
+</script>
+</body>
+</html>
