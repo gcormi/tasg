@@ -401,8 +401,9 @@ const ACTIVITIES = [
 
 const COLOR_MAP = {
   blue: 'text-blue-600 bg-blue-50', purple: 'text-purple-600 bg-purple-50',
-  orange: 'text-orange-600 bg-orange-50', green: 'text-green-600 bg-green-50',
-  amber: 'text-amber-600 bg-amber-50', indigo: 'text-indigo-600 bg-indigo-50'
+  rose: 'text-rose-600 bg-rose-50', orange: 'text-orange-600 bg-orange-50',
+  green: 'text-green-600 bg-green-50', amber: 'text-amber-600 bg-amber-50',
+  indigo: 'text-indigo-600 bg-indigo-50'
 };
 
 // ─── NAVIGATION ─────────────────────────────────────────────────────────────
@@ -847,10 +848,9 @@ async function duplicateCurrentSession() {
   if (!state.currentSession) return;
   const newTitle = prompt('Titre pour la nouvelle session :', state.currentSession.title + ' — Copie');
   if (!newTitle || !newTitle.trim()) return;
-  const codeInput = prompt('Code d\'accès pour cette session :', state.currentSession.code + '-2');
+  const codeInput = prompt('Code d\'accès pour cette session :', state.currentSession.code);
   if (!codeInput || !codeInput.trim()) return;
-  const code = codeInput.trim().replace(/\s+/g, '-').toLowerCase();
-  if (state.sessions.some(s => s.code === code)) { alert(`Le code "${code}" est déjà utilisé.`); return; }
+  const code = codeInput.trim().replace(/\s+/g, '-').toUpperCase();
 
   const sessionId = 'session_' + Date.now();
   const duplicate = {
@@ -929,12 +929,8 @@ async function startGeneration() {
   if (!corpus) { errEl.textContent = 'Le corpus est requis.'; errEl.classList.remove('hidden'); return; }
   if (!apiKey) { errEl.textContent = 'La clé API Albert est requise.'; errEl.classList.remove('hidden'); return; }
 
-  // Normaliser le code : trim, espaces → tirets, minuscules
-  const customCode = codeRaw.trim().replace(/\s+/g, '-').toLowerCase();
-
-  // Vérifier unicité
-  const exists = state.sessions.some(s => s.code === customCode);
-  if (exists) { errEl.textContent = `Le code "${customCode}" est déjà utilisé par une autre session.`; errEl.classList.remove('hidden'); return; }
+  // Normaliser le code : trim, espaces → tirets, majuscules
+  const customCode = codeRaw.trim().replace(/\s+/g, '-').toUpperCase();
 
   const config = {};
   const scoring = {};
