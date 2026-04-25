@@ -605,6 +605,9 @@ function showLoginError(msg) {
 
 function logout() {
   state.nuageUser = ''; state.nuagePass = '';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  saveConfig();
   showScreen('login');
 }
 
