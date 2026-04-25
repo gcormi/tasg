@@ -1,0 +1,60 @@
+{
+  "name": "Experia Storage — Nuage apps.edu",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "experia_storage",
+        "responseMode": "responseNode",
+        "options": { "allowedOrigins": "*" }
+      },
+      "id": "exp-0001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst { action, username, password, filename, content, manifest } = body;\nconst server = (body.server || 'nuage03.apps.education.fr').replace(/^https?:\\/\\//, '').replace(/\\/$/, '');\n\nif (!username || !password) {\n  return [{ json: { success: false, error: 'Identifiants manquants' } }];\n}\n\nconst baseUrl = `https://${server}/remote.php/dav/files/${encodeURIComponent(username)}/experia/`;\nconst manifestUrl = baseUrl + 'manifest.json';\nconst auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');\n\nconst doGet = async (url) => {\n  return await this.helpers.httpRequest({\n    method: 'GET', url,\n    headers: { 'Authorization': auth },\n    returnFullResponse: true,\n    ignoreHttpStatusErrors: true\n  });\n};\n\nconst doPut = async (url, data) => {\n  return await this.helpers.httpRequest({\n    method: 'PUT', url,\n    headers: { 'Authorization': auth, 'Content-Type': 'application/octet-stream' },\n    body: data,\n    returnFullResponse: true,\n    ignoreHttpStatusErrors: true\n  });\n};\n\nconst doMkcol = async (url) => {\n  return await this.helpers.httpRequest({\n    method: 'MKCOL', url,\n    headers: { 'Authorization': auth },\n    returnFullResponse: true,\n    ignoreHttpStatusErrors: true\n  });\n};\n\nconst doDelete = async (url) => {\n  return await this.helpers.httpRequest({\n    method: 'DELETE', url,\n    headers: { 'Authorization': auth },\n    returnFullResponse: true,\n    ignoreHttpStatusErrors: true\n  });\n};\n\nconst readManifest = async () => {\n  const r = await doGet(manifestUrl);\n  if (r.statusCode !== 200) return [];\n  try {\n    const p = typeof r.body === 'string' ? JSON.parse(r.body) : r.body;\n    return Array.isArray(p) ? p : [];\n  } catch { return []; }\n};\n\nconst writeManifest = async (mf) => {\n  await doPut(manifestUrl, JSON.stringify(mf));\n};\n\ntry {\n\n  // ── TEST connexion ──────────────────────────────────────────────────────────\n  if (action === 'test') {\n    const ocsUrl = `https://${server}/ocs/v1.php/cloud/user?format=json`;\n    const r = await this.helpers.httpRequest({\n      method: 'GET', url: ocsUrl,\n      headers: { 'Authorization': auth, 'OCS-APIREQUEST': 'true' },\n      returnFullResponse: true, ignoreHttpStatusErrors: true\n    });\n    if (r.statusCode === 401 || r.statusCode === 403)\n      return [{ json: { success: false, error: \"Identifiants invalides — vérifiez votre mot de passe d'application.\" } }];\n    if (r.statusCode !== 200)\n      return [{ json: { success: false, error: 'Erreur OCS: ' + r.statusCode + ' — vérifiez votre serveur Nuage.' } }];\n    // Créer le dossier experia/ si nécessaire\n    await doMkcol(baseUrl);\n    return [{ json: { success: true, action: 'test', server, username } }];\n  }\n\n  // ── LIST fichiers ───────────────────────────────────────────────────────────\n  if (action === 'list') {\n    const mf = await readManifest();\n    return [{ json: { success: true, files: mf.map(n => ({ name: n })) } }];\n  }\n\n  // ── READ fichier ────────────────────────────────────────────────────────────\n  if (action === 'read') {\n    if (!filename) return [{ json: { success: false, error: 'Nom de fichier manquant' } }];\n    const r = await doGet(baseUrl + encodeURIComponent(filename));\n    if (r.statusCode === 404) return [{ json: { success: false, error: 'Fichier introuvable' } }];\n    if (r.statusCode === 401) return [{ json: { success: false, error: 'Session expirée' } }];\n    if (r.statusCode >= 400) return [{ json: { success: false, error: 'Erreur lecture (code ' + r.statusCode + ')' } }];\n    try {\n      const parsed = typeof r.body === 'string' ? JSON.parse(r.body) : r.body;\n      return [{ json: { success: true, content: parsed } }];\n    } catch(e) {\n      return [{ json: { success: false, error: 'Fichier corrompu : ' + e.message } }];\n    }\n  }\n\n  // ── WRITE fichier ───────────────────────────────────────────────────────────\n  if (action === 'write') {\n    if (!filename) return [{ json: { success: false, error: 'Nom de fichier manquant' } }];\n    const fileContent = typeof content === 'string' ? content : JSON.stringify(content, null, 2);\n    const putUrl = baseUrl + encodeURIComponent(filename);\n\n    // Premier essai\n    let putRes = await doPut(putUrl, fileContent);\n\n    // Si le dossier n'existe pas encore → MKCOL puis retry\n    if ([404, 405, 409].includes(putRes.statusCode)) {\n      await doMkcol(baseUrl);\n      putRes = await doPut(putUrl, fileContent);\n    }\n\n    if (putRes.statusCode >= 400)\n      return [{ json: { success: false, error: 'Erreur écriture (code ' + putRes.statusCode + ')' } }];\n\n    // Mettre à jour manifest.json\n    let mf = await readManifest();\n    if (!mf.includes(filename)) mf.push(filename);\n    await writeManifest(mf);\n\n    return [{ json: { success: true, action: 'write' } }];\n  }\n\n  // ── DELETE fichier ──────────────────────────────────────────────────────────\n  if (action === 'delete') {\n    if (!filename) return [{ json: { success: false, error: 'Nom de fichier manquant' } }];\n    await doDelete(baseUrl + encodeURIComponent(filename));\n    let mf = await readManifest();\n    await writeManifest(mf.filter(n => n !== filename));\n    return [{ json: { success: true, action: 'delete' } }];\n  }\n\n  return [{ json: { success: false, error: 'Action inconnue : ' + action } }];\n\n} catch(e) {\n  return [{ json: { success: false, error: e.message } }];\n}"
+      },
+      "id": "exp-0002",
+      "name": "Code Experia",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              { "name": "Access-Control-Allow-Origin", "value": "*" },
+              { "name": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
+              { "name": "Access-Control-Allow-Headers", "value": "Content-Type" },
+              { "name": "Content-Type", "value": "application/json" }
+            ]
+          }
+        }
+      },
+      "id": "exp-0003",
+      "name": "Répondre",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [720, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook":      { "main": [[{ "node": "Code Experia", "type": "main", "index": 0 }]] },
+    "Code Experia": { "main": [[{ "node": "Répondre",     "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "experia-storage-v2",
+  "id": "experia-storage-v2",
+  "tags": []
+}

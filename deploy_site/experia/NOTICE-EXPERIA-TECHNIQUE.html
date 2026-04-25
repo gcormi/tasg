@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notice technique — Experia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Outfit', sans-serif; background: #f0f4ff; }
+    h2 { font-size: 1.4rem; font-weight: 800; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    h3 { font-size: 1.05rem; font-weight: 700; color: #334155; margin: 1.2rem 0 0.4rem; }
+    p, li { color: #475569; line-height: 1.7; }
+    ul { list-style: disc; padding-left: 1.4rem; }
+    li { margin-bottom: 0.3rem; }
+    code { background: #e8edff; color: #4338ca; padding: 0.15rem 0.5rem; border-radius: 0.35rem; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.82rem; }
+    pre { background: #1e293b; color: #e2e8f0; border-radius: 0.75rem; padding: 1.2rem 1.5rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.7; margin: 0.8rem 0; }
+    pre code { background: transparent; color: inherit; padding: 0; font-size: inherit; }
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; border-radius: 9999px; padding: 0.2rem 0.7rem; font-size: 0.72rem; font-weight: 700; }
+    .badge-green { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    .badge-amber { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .node-box { border-left: 4px solid #6366f1; background: #f8f9ff; border-radius: 0 0.5rem 0.5rem 0; padding: 0.75rem 1rem; margin: 0.5rem 0; }
+    .arrow { text-align: center; color: #94a3b8; font-size: 1.2rem; margin: 0.25rem 0; }
+  </style>
+</head>
+<body class="p-6 md:p-10">
+
+  <div class="max-w-3xl mx-auto mb-10">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+        <i data-lucide="zap" class="w-7 h-7 text-white"></i>
+      </div>
+      <div>
+        <h1 class="text-3xl font-black text-slate-900 leading-none">Experia</h1>
+        <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Notice technique — v1.0</p>
+      </div>
+    </div>
+    <p class="text-slate-400 text-sm mt-3 font-medium">Documentation destinée aux administrateurs, déployeurs et développeurs souhaitant comprendre, installer ou faire évoluer Experia.</p>
+  </div>
+
+  <div class="max-w-3xl mx-auto space-y-8">
+
+    <!-- ═══ ARCHITECTURE ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="layers" class="w-5 h-5 text-indigo-500"></i> Architecture générale</h2>
+      <p>Experia est une application 100 % front-end (HTML/CSS/JS vanilla) sans serveur propre. Elle repose sur trois services externes souverains :</p>
+
+      <div class="mt-5 grid grid-cols-1 gap-3">
+        <div class="rounded-2xl border border-slate-100 p-4 flex gap-4 items-start">
+          <div class="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i data-lucide="globe" class="w-5 h-5 text-indigo-500"></i>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 text-sm">Forge des Communs Numériques Éducatifs (GitLab Pages)</p>
+            <p class="text-sm text-slate-500">Héberge les fichiers statiques. Déploiement automatique via CI/CD à chaque push sur <code>main</code>.</p>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-slate-100 p-4 flex gap-4 items-start">
+          <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i data-lucide="server" class="w-5 h-5 text-emerald-500"></i>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 text-sm">Nuage apps.education.fr (Nextcloud / WebDAV)</p>
+            <p class="text-sm text-slate-500">Stockage des sessions et résultats. Chaque professeur utilise son propre compte. Dossier cible : <code>/experia/</code> dans le Nuage personnel.</p>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-slate-100 p-4 flex gap-4 items-start">
+          <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 text-sm">Albert API — Étalab (IA générative souveraine)</p>
+            <p class="text-sm text-slate-500">Génère les questions et corrige les réponses ouvertes. Deux proxys n8n distincts : <code>experia_storage</code> (WebDAV) et <code>experia_albert</code> (IA). Contournement CORS navigateur.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Flux de données</h3>
+      <div class="bg-slate-50 rounded-2xl p-4 text-sm text-slate-600 font-mono space-y-1 leading-relaxed">
+        <p><span class="text-indigo-600 font-bold">Professeur</span> → <code>prof.html</code> → n8n experia_albert → Albert API → questions JSON → n8n experia_storage → Nuage (session JSON)</p>
+        <p><span class="text-indigo-600 font-bold">Professeur</span> ← lien partagé (<code>eleve.html#config=BASE64</code>)</p>
+        <p><span class="text-emerald-600 font-bold">Élève</span> → <code>eleve.html</code> → décode config → n8n experia_storage → Nuage (lit session) → joue → n8n experia_storage → Nuage (écrit résultats partiels + final)</p>
+        <p><span class="text-indigo-600 font-bold">Professeur</span> → tableau résultats → n8n experia_storage → Nuage (lit result_*.json)</p>
+      </div>
+    </div>
+
+    <!-- ═══ STRUCTURE FICHIERS ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="folder-tree" class="w-5 h-5 text-indigo-500"></i> Structure des fichiers</h2>
+
+      <h3>Dépôt GitLab (source)</h3>
+      <pre><code>experia/
+├── index.html                      ← Page d'accueil
+├── prof.html                       ← Interface professeur (SPA multi-écrans)
+├── eleve.html                      ← Interface élève (6 activités + synthèse)
+├── NOTICE-EXPERIA-PROF.html        ← Guide d'utilisation professeur
+├── NOTICE-EXPERIA-TECHNIQUE.html   ← Ce document
+├── ROADMAP-EXPERIA.html            ← État d'avancement
+├── experia_storage.json            ← Workflow n8n WebDAV à importer
+├── experia_albert.json             ← Workflow n8n Albert IA à importer
+└── .gitlab-ci.yml                  ← Pipeline CI/CD GitLab Pages</code></pre>
+
+      <h3>Nuage — dossier <code>/experia/</code> (par professeur)</h3>
+      <pre><code>experia/
+├── manifest.json                              ← Index de tous les fichiers
+├── session_&lt;timestamp&gt;.json                  ← Données de session (questions + barème)
+└── result_&lt;sessionId&gt;_&lt;studentId&gt;.json      ← Résultats d'un élève (partiel ou final)</code></pre>
+
+      <h3>Format session JSON</h3>
+      <pre><code>{
+  "id": "session_1748000000000",
+  "code": "energies-5e1",           // code choisi par le prof
+  "title": "Les énergies renouvelables",
+  "corpus": "Le soleil est...",
+  "createdAt": "2025-09-01T10:00:00Z",
+  "config": { "qcm": 10, "paires": 8, "rapidite": 8, "completer": 5, "intrus": 5, "questions_ia": 3 },
+  "scoring": { "qcm": 10, "paires": 8, "rapidite": 8, "completer": 5, "intrus": 5, "questions_ia": 20 },
+  "retryable": false,
+  "model": "openai/gpt-oss-120b",
+  "apiKey": "sk-...",
+  "questions": {
+    "qcm":       [{ "q": "...", "choices": ["...", "...", "...", "..."], "correct": 0, "expl": "..." }],
+    "paires":    [{ "term": "...", "def": "..." }],
+    "rapidite":  [{ "q": "...", "choices": ["...", "...", "...", "..."], "correct": 0 }],
+    "completer": [{ "phrase": "... _____ ...", "answer": "..." }],
+    "intrus":    [{ "statements": ["...", "...", "...", "..."], "intrus": 2, "expl": "..." }],
+    "questions_ia": [{ "q": "..." }]
+  }
+}</code></pre>
+
+      <h3>Format résultat JSON</h3>
+      <pre><code>{
+  "sessionId": "session_1748000000000",
+  "sessionTitle": "Les énergies renouvelables",
+  "studentId": "marie.dupont",
+  "completedAt": "2025-09-01T10:35:00Z",
+  "partial": false,           // true si l'élève n'a pas tout terminé
+  "activitiesDone": 6,
+  "activitiesTotal": 6,
+  "globalPct": 78,
+  "scores": {
+    "qcm": { "score": 7.5, "max": 10, "rawScore": 8, "rawMax": 10 }
+    // score = barème prof, rawScore = score brut
+  },
+  "teacherGrade": "",         // note ajoutée manuellement par le prof
+  "teacherComment": ""
+}</code></pre>
+
+      <p class="text-sm mt-2">Les résultats partiels (<code>partial: true</code>) sont écrits automatiquement après chaque activité terminée. Le fichier est ensuite écrasé (même nom) lors de la soumission finale ou des activités suivantes.</p>
+    </div>
+
+    <!-- ═══ WORKFLOWS N8N ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="workflow" class="w-5 h-5 text-indigo-500"></i> Workflows n8n</h2>
+      <p>Deux workflows distincts sont nécessaires. Les deux ont la même structure : Webhook → Code → Répondre.</p>
+
+      <h3>1. experia_storage — Proxy WebDAV</h3>
+      <p class="text-sm">Traduit les requêtes POST navigateur en requêtes WebDAV authentifiées vers Nuage (contournement CORS).</p>
+      <div class="space-y-1 my-3">
+        <div class="node-box"><p class="font-bold text-slate-800 text-sm">① Webhook</p><p class="text-sm text-slate-500">POST, chemin <code>experia_storage</code>, CORS <code>*</code></p></div>
+        <div class="arrow">↓</div>
+        <div class="node-box"><p class="font-bold text-slate-800 text-sm">② Code Experia</p><p class="text-sm text-slate-500">Dispatche selon <code>action</code> : <code>test</code> / <code>list</code> / <code>read</code> / <code>write</code> / <code>delete</code>. Basic Auth WebDAV avec <code>username</code> + <code>password</code>. URL base : <code>https://&lt;server&gt;/remote.php/dav/files/&lt;username&gt;/experia/</code></p></div>
+        <div class="arrow">↓</div>
+        <div class="node-box"><p class="font-bold text-slate-800 text-sm">③ Répondre</p><p class="text-sm text-slate-500"><code>JSON.stringify($json)</code>, Content-Type <code>application/json</code>, headers CORS complets</p></div>
+      </div>
+
+      <pre><code>// Corps de requête attendu
+{
+  "action":   "test" | "list" | "read" | "write" | "delete",
+  "username": "gcormi",
+  "password": "mot-de-passe-application",
+  "server":   "nuage03.apps.education.fr",
+  "filename": "session_abc.json",    // requis pour read/write/delete
+  "content":  { ... }                // requis pour write
+}</code></pre>
+
+      <h3>2. experia_albert — Proxy Albert IA</h3>
+      <p class="text-sm">Transmet les requêtes à l'API Albert avec la clé API fournie dans le corps de la requête.</p>
+      <div class="space-y-1 my-3">
+        <div class="node-box"><p class="font-bold text-slate-800 text-sm">① Webhook</p><p class="text-sm text-slate-500">POST, chemin <code>experia_albert</code>, CORS <code>*</code></p></div>
+        <div class="arrow">↓</div>
+        <div class="node-box"><p class="font-bold text-slate-800 text-sm">② Code Albert</p><p class="text-sm text-slate-500">Lit <code>{ action, messages, model, apiKey, temperature }</code> depuis le body. Si <code>action === 'listModels'</code> : GET sur <code>/v1/models</code>. Sinon : POST sur <code>/v1/chat/completions</code>. Header : <code>Authorization: Bearer ${apiKey}</code></p></div>
+        <div class="arrow">↓</div>
+        <div class="node-box"><p class="font-bold text-slate-800 text-sm">③ Répondre</p><p class="text-sm text-slate-500">Même structure que experia_storage</p></div>
+      </div>
+
+      <pre><code>// Corps de requête — génération de contenu
+{
+  "model": "openai/gpt-oss-120b",
+  "messages": [
+    { "role": "system", "content": "Tu es un générateur pédagogique..." },
+    { "role": "user",   "content": "Génère 10 QCM sur ce corpus..." }
+  ],
+  "temperature": 0.3,
+  "apiKey": "sk-..."
+}
+
+// Corps de requête — liste des modèles
+{ "action": "listModels", "apiKey": "sk-..." }</code></pre>
+
+      <h3>Import des workflows</h3>
+      <ol class="list-decimal pl-5 space-y-1.5 text-sm text-slate-600">
+        <li>Connectez-vous à votre instance n8n</li>
+        <li>Menu <strong>Workflows → Import from File</strong></li>
+        <li>Importez <code>experia_storage.json</code> puis <code>experia_albert.json</code></li>
+        <li>Activez les deux workflows</li>
+        <li>Les URLs seront : <code>https://&lt;instance&gt;/webhook/experia_storage</code> et <code>.../webhook/experia_albert</code></li>
+      </ol>
+    </div>
+
+    <!-- ═══ ALBERT API ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i> Intégration Albert API</h2>
+
+      <h3>Modèle utilisé</h3>
+      <p class="text-sm">Le modèle par défaut est <code>openai/gpt-oss-120b</code> (Albert Grand). C'est le nom réel de l'API Étalab. Les noms comme <code>albert-small</code> ou <code>albert-large</code> ne sont pas valides.</p>
+      <p class="text-sm mt-2">La liste des modèles disponibles peut être chargée dynamiquement depuis le formulaire de création via le bouton <strong>"Charger modèles"</strong>.</p>
+
+      <h3>Paramètres de génération</h3>
+      <pre><code>{
+  "model": "openai/gpt-oss-120b",
+  "messages": [...],
+  "temperature": 0.3,    // faible pour des questions précises et factuelles
+  "max_tokens": 3000
+}</code></pre>
+
+      <h3>Les 6 types d'activités générées</h3>
+      <div class="overflow-x-auto mt-3">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-600">
+              <th class="text-left p-2 font-bold border-b border-slate-200">Type</th>
+              <th class="text-left p-2 font-bold border-b border-slate-200">Format JSON attendu</th>
+              <th class="text-left p-2 font-bold border-b border-slate-200">Correction</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr><td class="p-2 font-medium">qcm</td><td class="p-2 text-slate-500"><code>[{q, choices:[4], correct:index, expl}]</code></td><td class="p-2">Automatique (index)</td></tr>
+            <tr><td class="p-2 font-medium">paires</td><td class="p-2 text-slate-500"><code>[{term, def}]</code></td><td class="p-2">Automatique + pénalité erreurs (−0,5/erreur)</td></tr>
+            <tr><td class="p-2 font-medium">rapidite</td><td class="p-2 text-slate-500"><code>[{q, choices:[4], correct:index}]</code></td><td class="p-2">Automatique + bonus temps restant</td></tr>
+            <tr><td class="p-2 font-medium">completer</td><td class="p-2 text-slate-500"><code>[{phrase:"… _____ …", answer}]</code></td><td class="p-2">Levenshtein ≤ 20% de tolérance</td></tr>
+            <tr><td class="p-2 font-medium">intrus</td><td class="p-2 text-slate-500"><code>[{statements:[4], intrus:index, expl}]</code></td><td class="p-2">Automatique (index)</td></tr>
+            <tr><td class="p-2 font-medium">questions_ia</td><td class="p-2 text-slate-500"><code>[{q}]</code></td><td class="p-2">Albert (score 0–10 + feedback)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Barème proportionnel</h3>
+      <pre><code>// Score élève converti sur le barème du prof
+const profMax = session.scoring[activity];   // barème défini par le prof
+const profScore = Math.round((rawScore / rawMax) * profMax * 10) / 10;</code></pre>
+
+      <h3>Parsing de la réponse Albert</h3>
+      <pre><code>// Albert peut renvoyer du JSON enveloppé dans des balises markdown
+const cleaned = content.replace(/```json/gi, '').replace(/```/g, '').trim();
+const match = cleaned.match(/\[[\s\S]*\]/);   // extraire le tableau JSON
+if (!match) throw new Error('JSON invalide');</code></pre>
+    </div>
+
+    <!-- ═══ GESTION DE LA PROGRESSION ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="save" class="w-5 h-5 text-emerald-500"></i> Sauvegarde progressive &amp; reprise</h2>
+
+      <h3>Auto-save après chaque activité</h3>
+      <p class="text-sm"><code>autoSaveProgress()</code> est appelée à chaque fois qu'un élève termine une activité (<code>saveScore()</code>). Elle écrit silencieusement un fichier résultat partiel sur le Nuage avec <code>partial: true</code>. Si la sauvegarde échoue, l'erreur est ignorée (l'élève n'est pas bloqué).</p>
+
+      <h3>Reprise de session</h3>
+      <p class="text-sm">À la connexion, <code>doConnect()</code> cherche un fichier résultat existant pour cet élève sur cette session. Si trouvé, les scores sont rechargés dans <code>E.scores</code> avant d'afficher le dashboard. L'élève retrouve ses activités déjà complétées marquées "terminé" et peut continuer les restantes.</p>
+      <pre><code>// Reprise — lecture du résultat partiel existant
+const filename = `result_${session.id}_${studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
+const prev = await storage({ action: 'read', filename });
+if (prev.success && prev.content?.scores) {
+  E.scores = prev.content.scores;   // restaurer les scores
+  E._resuming = true;
+}</code></pre>
+
+      <p class="text-sm mt-2"><strong>Condition de reprise :</strong> l'élève doit saisir exactement le même identifiant (sensible à la casse) que lors de sa première connexion.</p>
+    </div>
+
+    <!-- ═══ IMPORT FICHIER HTML ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="file-code" class="w-5 h-5 text-violet-500"></i> Import de fichier HTML comme corpus</h2>
+      <p class="text-sm">Lorsqu'un fichier <code>.html</code> ou <code>.htm</code> est importé, le texte est extrait via un élément DOM temporaire :</p>
+      <pre><code>const tmp = document.createElement('div');
+tmp.innerHTML = htmlContent;
+// Supprimer les éléments non textuels
+tmp.querySelectorAll('script, style, noscript, svg, img, head').forEach(el => el.remove());
+// Extraire le texte bloc par bloc
+const text = Array.from(tmp.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td, th, div, br'))
+  .map(el => el.textContent.trim())
+  .filter(t => t.length > 0)
+  .join('\n');</code></pre>
+      <p class="text-sm mt-2">Le texte résultant ne contient aucune balise HTML, attribut, CSS ou JavaScript. Seul le contenu textuel visible est conservé, avec des sauts de ligne entre les blocs.</p>
+    </div>
+
+    <!-- ═══ PERSISTANCE CONFIG ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="database" class="w-5 h-5 text-slate-500"></i> Persistance locale (localStorage)</h2>
+      <p class="text-sm">Seuls trois champs sont mémorisés dans <code>localStorage</code> sous la clé <code>experia_config</code> :</p>
+      <pre><code>{ "user": "gcormi", "pass": "mot-de-passe-app", "apiKey": "sk-..." }</code></pre>
+      <p class="text-sm mt-2">Les URLs n8n et le serveur Nuage ne sont <strong>jamais</strong> sauvegardés — ils conservent leurs valeurs par défaut à chaque chargement. Cela évite que d'anciennes URLs incorrectes soient restaurées.</p>
+    </div>
+
+    <!-- ═══ DÉPLOIEMENT ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="git-branch" class="w-5 h-5 text-orange-500"></i> Déploiement — Forge GitLab</h2>
+
+      <h3>Pipeline CI/CD (<code>.gitlab-ci.yml</code>)</h3>
+      <pre><code>pages:
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp -r * public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main</code></pre>
+
+      <p class="text-sm">Tout push sur <code>main</code> déclenche le déploiement automatique. L'application est disponible en ~2 min sur l'URL GitLab Pages.</p>
+
+      <h3>Procédure de mise à jour</h3>
+      <ol class="list-decimal pl-5 space-y-1.5 text-sm text-slate-600">
+        <li>Modifier les fichiers HTML localement</li>
+        <li><code>git add . &amp;&amp; git commit -m "Description" &amp;&amp; git push</code></li>
+        <li>Attendre 1–2 min (CI/CD)</li>
+        <li>Vider le cache navigateur si nécessaire (<kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>R</kbd>)</li>
+      </ol>
+    </div>
+
+    <!-- ═══ SÉCURITÉ ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Sécurité &amp; RGPD</h2>
+
+      <h3>Credentials dans le lien élève</h3>
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800">
+        <p><strong>Point d'attention :</strong> Les identifiants Nuage (login + mot de passe d'application), la clé Albert et les URLs n8n sont encodés en Base64 dans le hash URL du lien élève. Base64 n'est pas un chiffrement.</p>
+        <p class="mt-2"><strong>Mitigation :</strong> Utiliser un mot de passe d'application (portée limitée, révocable) et non le mot de passe principal. Le lien doit être traité comme confidentiel.</p>
+      </div>
+
+      <h3>Données élèves</h3>
+      <ul class="text-sm">
+        <li>Les élèves s'identifient avec leur identifiant ENT — aucune donnée supplémentaire collectée</li>
+        <li>Les résultats sont stockés uniquement dans le Nuage du professeur (hébergement EN)</li>
+        <li>Aucune donnée ne quitte le périmètre de l'Éducation Nationale</li>
+        <li>Pas de cookies, pas de tracking, pas d'analytics tiers</li>
+      </ul>
+
+      <h3>Suppression des données</h3>
+      <p class="text-sm">La suppression d'une session depuis <code>prof.html</code> efface le fichier session <strong>et tous les fichiers résultats élèves</strong> associés sur le Nuage. Aucune donnée résiduelle.</p>
+    </div>
+
+    <!-- ═══ DÉPENDANCES ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="package" class="w-5 h-5 text-violet-500"></i> Dépendances front-end</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-600">
+              <th class="text-left p-2 font-bold border-b border-slate-200">Bibliothèque</th>
+              <th class="text-left p-2 font-bold border-b border-slate-200">Source (CDN)</th>
+              <th class="text-left p-2 font-bold border-b border-slate-200">Usage</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr><td class="p-2 font-medium">Tailwind CSS</td><td class="p-2 text-slate-500"><code>cdn.tailwindcss.com</code></td><td class="p-2">CSS utilitaire</td></tr>
+            <tr><td class="p-2 font-medium">Lucide Icons</td><td class="p-2 text-slate-500"><code>unpkg.com/lucide@latest</code></td><td class="p-2">Icônes SVG</td></tr>
+            <tr><td class="p-2 font-medium">Google Fonts (Outfit)</td><td class="p-2 text-slate-500"><code>fonts.googleapis.com</code></td><td class="p-2">Typographie</td></tr>
+            <tr><td class="p-2 font-medium">PDF.js</td><td class="p-2 text-slate-500"><code>cdnjs.cloudflare.com</code></td><td class="p-2">Extraction texte PDF (prof.html uniquement)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-slate-400 mt-3">Aucune installation npm, aucun build step. L'application fonctionne en ouvrant les fichiers HTML directement depuis un serveur HTTPS.</p>
+
+      <h3>Compatibilité navigateurs</h3>
+      <ul class="text-sm">
+        <li>Tout navigateur moderne (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)</li>
+        <li>Pas de support IE11 (usage de <code>async/await</code>, <code>fetch</code>, <code>btoa/atob</code>)</li>
+        <li>Mobile : interface responsive, testée iOS Safari et Android Chrome</li>
+        <li>Obligatoirement servi depuis HTTPS — les requêtes <code>fetch</code> cross-origin sont bloquées depuis <code>file://</code></li>
+      </ul>
+    </div>
+
+    <!-- ═══ PROBLÈMES CONNUS ═══ -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
+      <h2><i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500"></i> Problèmes connus &amp; solutions</h2>
+      <div class="space-y-4">
+
+        <div class="border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="bg-slate-50 px-4 py-2 flex items-center gap-2">
+            <span class="badge" style="background:#f1f5f9;color:#64748b;border-color:#cbd5e1">Info</span>
+            <p class="font-bold text-slate-700 text-sm">Mot de passe d'application obligatoire</p>
+          </div>
+          <div class="p-4 text-sm text-slate-600">
+            <p>L'authentification WebDAV doit utiliser un mot de passe d'application généré dans <em>Nuage → Paramètres → Sécurité</em>. Le mot de passe principal ENT est rejeté si l'authentification à deux facteurs est activée.</p>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="bg-slate-50 px-4 py-2 flex items-center gap-2">
+            <span class="badge" style="background:#f1f5f9;color:#64748b;border-color:#cbd5e1">Info</span>
+            <p class="font-bold text-slate-700 text-sm">Serveur Nuage variable selon l'académie</p>
+          </div>
+          <div class="p-4 text-sm text-slate-600">
+            <p>Le serveur Nuage par défaut est <code>nuage03.apps.education.fr</code> mais certains profs sont sur <code>nuage01</code>, <code>nuage02</code>, etc. Vérifiable dans <em>Nuage → Fichiers → Paramètres WebDAV</em>. Modifiable via "Paramètres avancés" dans l'écran de connexion.</p>
+          </div>
+        </div>
+
+        <div class="border border-amber-200 rounded-2xl overflow-hidden">
+          <div class="bg-amber-50 px-4 py-2 flex items-center gap-2">
+            <span class="badge badge-amber">Attention</span>
+            <p class="font-bold text-amber-800 text-sm">Failed to fetch — ouverture locale</p>
+          </div>
+          <div class="p-4 text-sm text-slate-600">
+            <p><strong>Symptôme :</strong> <em>"Impossible de joindre le serveur n8n: Failed to fetch"</em> en ouvrant les HTML localement.</p>
+            <p class="mt-1"><strong>Cause :</strong> Navigateur bloque les requêtes cross-origin depuis <code>file://</code>.</p>
+            <p class="mt-1"><strong>Fix :</strong> Toujours utiliser l'URL GitLab Pages (HTTPS).</p>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="bg-slate-50 px-4 py-2 flex items-center gap-2">
+            <span class="badge" style="background:#f1f5f9;color:#64748b;border-color:#cbd5e1">Info</span>
+            <p class="font-bold text-slate-700 text-sm">Reprise de session — identifiant sensible à la casse</p>
+          </div>
+          <div class="p-4 text-sm text-slate-600">
+            <p>Le nom du fichier résultat est construit à partir de l'identifiant élève. Si l'élève saisit <code>Marie.Dupont</code> la première fois et <code>marie.dupont</code> la suivante, le système considère un nouvel élève. Recommander une convention uniforme dans la classe.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bg-indigo-600 rounded-3xl p-7 text-white">
+      <h2 class="text-white"><i data-lucide="code-2" class="w-5 h-5 text-indigo-200"></i> Contribuer</h2>
+      <p class="text-indigo-100 text-sm">Experia est un projet open-source hébergé sur la Forge des Communs Numériques Éducatifs. Contributions, retours et signalements de bugs bienvenus via les Issues GitLab du projet.</p>
+      <p class="text-indigo-200 text-sm mt-3 font-mono">Forge des Communs Numériques Éducatifs · Éducation Nationale</p>
+    </div>
+
+  </div>
+
+  <footer class="max-w-3xl mx-auto mt-10 text-center text-xs text-slate-300 font-medium pb-6">
+    Experia v1.0 — Notice technique — Forge des Communs Numériques Éducatifs
+  </footer>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

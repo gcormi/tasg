@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentoria — Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <style>
+        :root {
+            --teal: #0d9488; --teal-dark: #0f766e; --teal-light: #f0fdfa;
+            --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b; --bg: #f1f5f9;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        .sb-scroll::-webkit-scrollbar { width: 4px; }
+        .sb-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .cfg-scroll::-webkit-scrollbar { width: 4px; }
+        .cfg-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .collapsible-content { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; }
+        .hidden-section { max-height: 0; opacity: 0; }
+        .open-section { max-height: 5000px; opacity: 1; }
+        .input-field {
+            width: 100%; background: white; border: 1px solid var(--border);
+            border-radius: 6px; padding: 8px 12px; font-size: 12.5px;
+            font-family: 'Inter', sans-serif; color: var(--text); outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12); }
+        .input-field::placeholder { color: #94a3b8; }
+        .label { display: block; font-size: 10.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; user-select: none; transition: background 0.15s; }
+        .section-hdr:hover { background: #f8fafc; }
+        .section-body { padding: 14px; border-top: 1px solid var(--border); }
+        .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+        .btn-teal { background: var(--teal); color: white; border-color: var(--teal-dark); }
+        .btn-teal:hover { background: var(--teal-dark); }
+        .btn-green { background: #16a34a; color: white; border-color: #15803d; }
+        .btn-green:hover { background: #15803d; }
+        .btn-ghost { background: white; color: var(--text); border-color: var(--border); }
+        .btn-ghost:hover { background: #f8fafc; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+        .btn-danger:hover { background: #fecaca; }
+        .source-btn { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: white; color: var(--text-muted); }
+        .source-btn.active { background: var(--teal); color: white; border-color: var(--teal-dark); }
+        .source-btn:first-child { border-radius: 6px 0 0 6px; }
+        .source-btn:last-child { border-radius: 0 6px 6px 0; }
+        .source-btn:not(:last-child) { border-right: 0; }
+        .preset-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid; transition: all 0.15s; }
+        .preset-tag:hover { transform: translateY(-1px); }
+        .tab-btn { padding: 5px 10px; font-size: 11px; font-weight: 600; border-radius: 5px; cursor: pointer; transition: all 0.15s; color: var(--text-muted); }
+        .tab-btn.active { background: var(--teal); color: white; }
+        .tab-btn:not(.active):hover { background: #f1f5f9; }
+        @keyframes pulse-soft { 0%,100%{opacity:1}50%{opacity:0.6} }
+        .ai-loading { animation: pulse-soft 2s infinite; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
+        .slide-in { animation: slideIn 0.35s ease-out forwards; }
+        .bot-item { border-radius: 7px; padding: 9px 10px; cursor: pointer; transition: background 0.15s; }
+        .bot-item:hover { background: #1e293b; }
+        .bot-item.active { background: #1e293b; border-left: 2px solid var(--teal); }
+        .preview-bg { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        .rule-chip { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 7px; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; }
+        .rule-chip:hover { border-color: var(--teal); background: var(--teal-light); }
+        .rule-chip input[type="checkbox"] { accent-color: var(--teal); margin-top: 2px; }
+
+        /* Tooltips in-app */
+        .tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: #e2e8f0; color: #64748b; font-size: 9px; font-weight: 700; cursor: help; position: relative; flex-shrink: 0; vertical-align: middle; margin-left: 4px; }
+        .tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 7px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 400; white-space: pre-line; width: 240px; text-align: left; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 500; line-height: 1.5; box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+        .tip:hover::after { opacity: 1; }
+        .tip-left::after { left: auto; right: 0; transform: none; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+<!-- ══════════════════════════════════════
+     ÉCRAN DE DÉMARRAGE
+══════════════════════════════════════ -->
+<div id="startup-screen" class="fixed inset-0 z-[200] flex items-center justify-center" style="background: linear-gradient(135deg, #0f172a 0%, #134e4a 50%, #0d9488 100%);">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <div class="relative w-full max-w-lg mx-4">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-2xl mb-4 border border-white/20 overflow-hidden shadow-2xl">
+                <img src="mentoria_hero.png" class="w-full h-full object-cover" alt="Mentoria" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div style="display:none" class="w-full h-full items-center justify-center text-3xl">🎓</div>
+            </div>
+            <h1 class="text-3xl font-bold text-white tracking-tight">Mentoria</h1>
+            <p class="text-teal-200 text-sm mt-1" style="color:#99f6e4">Studio · Assistants pédagogiques souverains</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-900 text-sm">Où sont stockés vos assistants ?</h2>
+                <p class="text-gray-400 text-xs mt-0.5">Vos données restent sous votre contrôle.</p>
+            </div>
+            <!-- Nuage apps.edu — option principale -->
+            <div class="p-5 border-b border-gray-100" style="background:#f0f9ff">
+                <div class="flex items-start gap-4">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-none mt-0.5" style="background:#e0f2fe">
+                        <svg class="w-5 h-5" style="color:#0369a1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <p class="font-semibold text-gray-900 text-sm">☁️ Nuage apps.education.fr</p>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:#dbeafe;color:#1d4ed8">RECOMMANDÉ</span>
+                        </div>
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Accessible depuis n'importe quel PC. Aucune installation.</p>
+                        <div class="space-y-2">
+                            <input id="nuage-username" type="text" placeholder="Identifiant apps.edu (ex: p.dupont)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
+                            <div class="flex gap-2">
+                                <input id="nuage-password" type="password" placeholder="Mot de passe d'application" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
+                                <button onclick="connectNuage()" class="px-4 py-2 text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap" style="background:#0369a1">Se connecter</button>
+                            </div>
+                            <input id="nuage-server" type="text" placeholder="Instance Nuage (ex: nuage03.apps.education.fr)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono text-gray-500">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="remember-nuage">
+                                <span class="text-[10px] text-gray-500">Rester connecté sur ce PC</span>
+                            </label>
+                        </div>
+                        <p class="text-[10px] mt-2" style="color:#0369a1">
+                            💡 <strong>Mot de passe d'application :</strong> dans votre Nuage → Paramètres → Sécurité → <em>Créer un nouveau mot de passe d'application</em><br>
+                            💡 <strong>Instance :</strong> laisser vide par défaut. Si erreur 405, indiquez votre URL Nuage (visible dans l'adresse de votre navigateur sur apps.edu).
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- USB -->
+            <div class="p-5 border-b border-gray-100">
+                <div class="flex items-start gap-4">
+                    <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center flex-none mt-0.5">
+                        <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900 text-sm">💾 Clé USB / Dossier local</p>
+                        <p class="text-gray-400 text-xs mt-0.5 mb-3">Fonctionne sans internet. Chrome/Edge requis.</p>
+                        <button onclick="connectFolder()" class="w-full py-2 border-2 border-dashed border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg hover:bg-emerald-50 transition-all">
+                            📁 Choisir mon dossier Mentoria...
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Forge — mode avancé replié -->
+            <div>
+                <button onclick="toggleForgeSection()" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-gray-50 transition-colors">
+                    <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Mode avancé (La Forge / GitLab EN)</span>
+                    <svg id="forge-chevron" class="w-3.5 h-3.5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div id="forge-section" class="hidden border-t border-gray-100">
+                    <div class="p-5" style="background:#fffbf0">
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-none mt-0.5" style="background:#fff7ed">
+                                <svg class="w-5 h-5" style="color:#c2410c" fill="currentColor" viewBox="0 0 24 24"><path d="M22.65 14.39L20.31 7.24L19.5 4.78C19.4 4.47 19.11 4.26 18.78 4.26C18.46 4.26 18.17 4.47 18.06 4.78L17.25 7.24H6.75L5.94 4.78C5.83 4.47 5.54 4.26 5.22 4.26C4.89 4.26 4.6 4.47 4.5 4.78L3.69 7.24L1.35 14.39C1.21 14.83 1.37 15.31 1.74 15.58L12 23L22.26 15.58C22.63 15.31 22.79 14.83 22.65 14.39Z"/></svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 text-sm">🦊 La Forge (GitLab EN)</p>
+                                <p class="text-gray-400 text-xs mt-0.5 mb-3">Pour les enseignants avec un compte Forge. Synchronisation sur votre dépôt GitLab.</p>
+                                <div class="space-y-2">
+                                    <input id="forge-token" type="password" placeholder="Jeton d'accès (Badge)" class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono">
+                                    <div class="flex gap-2">
+                                        <input id="forge-project-id" type="text" placeholder="Projet (ex: gcormi/frojet)" class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-2 outline-none font-mono" value="gcormi/frojet">
+                                        <button onclick="connectForge()" class="px-4 py-2 text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap" style="background:#c2410c">Se connecter</button>
+                                    </div>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="remember-forge">
+                                        <span class="text-[10px] text-gray-500">Rester connecté sur ce PC</span>
+                                    </label>
+                                </div>
+                                <a href="https://forge.apps.education.fr/-/user_settings/personal_access_tokens?name=Mentoria&scopes=api" target="_blank" class="text-[10px] font-semibold mt-2 flex items-center gap-1" style="color:#c2410c">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    Obtenir mon badge d'accès
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="text-center text-[10px] mt-4" style="color:#5eead4">🔒 Aucune donnée transmise à Google ou tiers · RGPD · Éducation Nationale</p>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="status-toast" class="hidden fixed top-5 right-5 z-[100] max-w-xs w-full bg-white shadow-xl rounded-xl p-4 border border-gray-100 border-l-4 slide-in" style="border-left-color: var(--teal)">
+    <div class="flex gap-3 items-start">
+        <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-none" style="color:var(--teal)"></i>
+        <div class="flex-1">
+            <p id="status-title" class="font-semibold text-gray-900 text-sm"></p>
+            <p id="status-msg" class="text-xs text-gray-500 mt-0.5"></p>
+        </div>
+        <button onclick="hideToast()" class="text-gray-300 hover:text-gray-500"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS GLOBAUX
+══════════════════════════════════════ -->
+<script>
+    window.toggleSection = (id) => {
+        const section = document.getElementById(id);
+        if (!section) return;
+        const isHidden = section.classList.contains('hidden-section');
+        const iconId = id.replace('section-', 'icon-');
+        const icon = document.getElementById(iconId);
+        document.querySelectorAll('.collapsible-content').forEach(s => { s.classList.add('hidden-section'); s.classList.remove('open-section'); });
+        document.querySelectorAll('[id^="icon-"]').forEach(i => i.style.transform = 'rotate(0deg)');
+        if (isHidden) {
+            section.classList.remove('hidden-section'); section.classList.add('open-section');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
+        if (window.lucide) lucide.createIcons();
+    };
+    window.showToast = (title, msg) => {
+        const t = document.getElementById('status-toast');
+        if (!t) return;
+        document.getElementById('status-title').textContent = title;
+        document.getElementById('status-msg').textContent = msg;
+        t.classList.remove('hidden');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => t.classList.add('hidden'), 4000);
+    };
+    window.hideToast = () => document.getElementById('status-toast')?.classList.add('hidden');
+    window.closeModal = () => document.getElementById('publish-modal')?.classList.add('hidden');
+    window.closePreviewModal = () => document.getElementById('preview-modal')?.classList.add('hidden');
+    window.closeSuiviModal = () => {
+        document.getElementById('suivi-modal')?.classList.add('hidden');
+        clearInterval(window._suiviInterval);
+    };
+
+    // Drag de la fenêtre suivi
+    (function() {
+        let drag = false, sx, sy, sl, st;
+        document.addEventListener('mousedown', e => {
+            const handle = document.getElementById('suivi-drag-handle');
+            if (!handle || !handle.contains(e.target) || e.target.closest('button')) return;
+            const win = document.getElementById('suivi-window');
+            drag = true; sx = e.clientX; sy = e.clientY;
+            win.style.transform = 'none';
+            const r = win.getBoundingClientRect();
+            sl = r.left; st = r.top;
+            win.style.left = sl + 'px'; win.style.top = st + 'px';
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', e => {
+            if (!drag) return;
+            const win = document.getElementById('suivi-window');
+            win.style.left = (sl + e.clientX - sx) + 'px';
+            win.style.top  = (st + e.clientY - sy) + 'px';
+        });
+        document.addEventListener('mouseup', () => { drag = false; document.body.style.userSelect = ''; });
+    })();
+
+    window.handleThumbnail = (input) => {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            // Redimensionne l'image à max 128x128 pour garder le lien léger
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 128;
+                const ratio = Math.min(MAX / tempImg.width, MAX / tempImg.height, 1);
+                canvas.width = Math.round(tempImg.width * ratio);
+                canvas.height = Math.round(tempImg.height * ratio);
+                canvas.getContext('2d').drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+                const small = canvas.toDataURL('image/jpeg', 0.82);
+                const img = document.getElementById('vignette-preview');
+                const ph = document.getElementById('vignette-placeholder');
+                if (img) { img.src = small; img.classList.remove('hidden'); }
+                if (ph) ph.classList.add('hidden');
+                updatePreviews(); updateBotWeight();
+            };
+            tempImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    window.updateBotWeight = () => {
+        const vigImg = document.getElementById('vignette-preview');
+        const hasVig = vigImg && vigImg.src && vigImg.src !== window.location.href && !vigImg.classList.contains('hidden');
+        const corpus = document.getElementById('bot-corpus-text')?.value || '';
+        const vignette = hasVig ? vigImg.src : '';
+        const approxKo = Math.round((corpus.length + vignette.length + 2000) / 1024);
+        const bar = document.getElementById('bot-weight-bar');
+        const label = document.getElementById('bot-weight-label');
+        const indicator = document.getElementById('bot-weight-indicator');
+        if (!bar || !label) return;
+        const MAX = 300;
+        bar.style.width = Math.min(100, (approxKo / MAX) * 100) + '%';
+        label.textContent = approxKo < 1 ? '< 1 Ko' : approxKo + ' Ko';
+        if (approxKo < 100) { bar.style.background = '#22c55e'; label.style.color = '#64748b'; if (indicator) indicator.title = 'Poids estimé : OK'; }
+        else if (approxKo < 200) { bar.style.background = '#f59e0b'; label.style.color = '#b45309'; if (indicator) indicator.title = 'Poids estimé : attention, lien bientôt lourd'; }
+        else { bar.style.background = '#ef4444'; label.style.color = '#b91c1c'; if (indicator) indicator.title = 'Poids estimé : lien trop lourd — réduisez le corpus ou l\'avatar'; }
+    };
+
+    window.updatePreviews = () => {
+        const title = document.getElementById('bot-title')?.value || 'Titre du Projet';
+        const name = document.getElementById('bot-name')?.value || 'Assistant Albert';
+        const vigImg = document.getElementById('vignette-preview');
+        const hasImg = vigImg && vigImg.src && vigImg.src !== window.location.href && !vigImg.classList.contains('hidden');
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        const toggle = (id, hidden) => { const el = document.getElementById(id); if (el) el.classList.toggle('hidden', hidden); };
+        const setSrc = (id, src) => { const el = document.getElementById(id); if (el) el.src = src; };
+        // mini preview
+        set('mini-preview-title', title); set('mini-preview-name', name);
+        toggle('mini-preview-img', !hasImg); toggle('mini-preview-icon', hasImg);
+        if (hasImg) setSrc('mini-preview-img', vigImg.src);
+        // full preview modal
+        set('preview-bot-title', title); set('preview-bot-desc', 'Bonjour ! Je suis ' + name + '.');
+        set('preview-bot-name-top', name);
+        toggle('preview-bot-icon', !hasImg); toggle('preview-bot-icon-placeholder', hasImg);
+        toggle('preview-bot-avatar-large', !hasImg); toggle('preview-bot-avatar-placeholder', hasImg);
+        if (hasImg) { setSrc('preview-bot-icon', vigImg.src); setSrc('preview-bot-avatar-large', vigImg.src); }
+        updateBotWeight();
+    };
+
+    window.toggleForgeSection = () => {
+        const s = document.getElementById('forge-section');
+        const c = document.getElementById('forge-chevron');
+        const open = s.classList.toggle('hidden');
+        if (c) c.style.transform = open ? '' : 'rotate(180deg)';
+    };
+
+    // ── FORGE ──
+    let forgeToken = null, forgeProjectId = null, forgePath = 'mentoria';
+
+    window.connectForge = async () => {
+        forgeToken = document.getElementById('forge-token').value.trim();
+        let pid = document.getElementById('forge-project-id').value.trim();
+        forgeProjectId = encodeURIComponent(pid);
+        if (!forgeToken || !pid) { alert('Jeton et ID Projet requis.'); return; }
+        storageMode = 'forge';
+        try {
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, {
+                headers: { 'PRIVATE-TOKEN': forgeToken }
+            });
+            if (!res.ok && res.status !== 404) throw new Error('Accès refusé. Vérifiez votre jeton.');
+            if (document.getElementById('remember-forge').checked) {
+                localStorage.setItem('mentoria_forge_token', forgeToken);
+                localStorage.setItem('mentoria_forge_pid', pid);
+            } else {
+                localStorage.removeItem('mentoria_forge_token');
+                localStorage.removeItem('mentoria_forge_pid');
+            }
+            document.getElementById('startup-screen').style.display = 'none';
+            updateStorageBadge(`🦊 ${pid}`);
+            showToast('🦊 Connecté', 'Dépôt GitLab synchronisé.');
+            await loadLibrary();
+        } catch(e) { alert('Connexion impossible :\n' + e.message); storageMode = null; }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedToken = localStorage.getItem('mentoria_forge_token');
+        const savedPid = localStorage.getItem('mentoria_forge_pid');
+        const url = window.location.href;
+        let detectedPid = null;
+        if (url.includes('.forge.apps.education.fr')) {
+            const user = url.split('.forge.')[0].split('//')[1];
+            const repo = url.split('.fr/')[1].split('/')[0];
+            detectedPid = user + '/' + repo;
+        }
+        if (savedToken) { document.getElementById('forge-token').value = savedToken; document.getElementById('remember-forge').checked = true; }
+        document.getElementById('forge-project-id').value = savedPid || detectedPid || 'gcormi/frojet';
+    });
+
+    window.disconnectStorage = () => {
+        if (!confirm('Changer de mode de stockage ?\n\nVos identifiants mémorisés seront conservés.')) return;
+        storageMode = null; folderHandle = null;
+        nuageUsername = null; nuagePassword = null; nuageServer = null;
+        forgeToken = null; forgeProjectId = null;
+        library = {}; currentBotId = null;
+        updateStorageBadge('Stockage');
+        updateLibraryUI();
+        document.getElementById('startup-screen').style.display = 'flex';
+    };
+
+    // ── DOSSIER LOCAL ──
+    window.connectFolder = async () => {
+        if (!window.showDirectoryPicker) { alert('Utilisez Google Chrome ou Microsoft Edge.'); return; }
+        try {
+            folderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            storageMode = 'folder';
+            document.getElementById('startup-screen').style.display = 'none';
+            updateStorageBadge('💾 ' + folderHandle.name);
+            showToast('💾 Dossier connecté', folderHandle.name);
+            await loadLibrary();
+        } catch(e) { if (e.name !== 'AbortError') alert('Erreur : ' + e.message); }
+    };
+
+    // ── NUAGE apps.edu ──
+    const NUAGE_PROXY_URL = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage';
+    let nuageUsername = null, nuagePassword = null, nuageServer = null;
+
+    async function callNuage(action, options = {}) {
+        const res = await fetch(NUAGE_PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, username: nuageUsername, password: nuagePassword, server: nuageServer, ...options })
+        });
+        if (!res.ok) throw new Error('Proxy erreur ' + res.status);
+        const data = await res.json();
+        if (!data.success) {
+            const debugInfo = data.debug ? '\n\nDébug: ' + JSON.stringify(data.debug) : '';
+            throw new Error((data.error || 'Erreur inconnue') + debugInfo);
+        }
+        return data;
+    }
+
+    window.connectNuage = async () => {
+        const u = document.getElementById('nuage-username')?.value.trim();
+        const p = document.getElementById('nuage-password')?.value.trim();
+        const s = document.getElementById('nuage-server')?.value.trim() || 'nuage.apps.education.fr';
+        if (!u || !p) { alert('Identifiant et mot de passe requis.'); return; }
+        nuageUsername = u; nuagePassword = p; nuageServer = s;
+        storageMode = 'nuage';
+        try {
+            showToast('⏳ Connexion…', 'Vérification du Nuage apps.edu…');
+            await callNuage('test');
+            if (document.getElementById('remember-nuage')?.checked) {
+                localStorage.setItem('mentoria_nuage_user', u);
+                localStorage.setItem('mentoria_nuage_pass', p);
+                localStorage.setItem('mentoria_nuage_server', s);
+            } else {
+                localStorage.removeItem('mentoria_nuage_user');
+                localStorage.removeItem('mentoria_nuage_pass');
+                localStorage.removeItem('mentoria_nuage_server');
+            }
+            document.getElementById('startup-screen').style.display = 'none';
+            updateStorageBadge('☁️ Nuage : ' + u);
+            showToast('☁️ Connecté', 'Nuage apps.edu synchronisé.');
+            await loadLibrary();
+        } catch(e) {
+            storageMode = null; nuageUsername = null; nuagePassword = null;
+            alert('Connexion impossible :\n' + e.message);
+        }
+    };
+
+    // Auto-remplissage Nuage mémorisé
+    window.addEventListener('DOMContentLoaded', () => {
+        const su = localStorage.getItem('mentoria_nuage_user');
+        const sp = localStorage.getItem('mentoria_nuage_pass');
+        const ss = localStorage.getItem('mentoria_nuage_server');
+        if (su) {
+            document.getElementById('nuage-username').value = su;
+            document.getElementById('nuage-password').value = sp || '';
+            if (ss && ss !== 'nuage.apps.education.fr') document.getElementById('nuage-server').value = ss;
+            document.getElementById('remember-nuage').checked = true;
+        }
+    });
+
+    function updateStorageBadge(label) {
+        const b = document.getElementById('storage-label'); if (b) b.textContent = label;
+    }
+    window.setSync = (active) => {
+        const s = document.getElementById('sync-indicator'); if (s) s.classList.toggle('hidden', !active);
+    };
+
+    // ── API FICHIERS ──
+    let storageMode = null, folderHandle = null;
+
+    async function readBotFile(filename) {
+        if (storageMode === 'forge') {
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${encodeURIComponent(forgePath + '/' + filename)}/raw?ref=main`, { headers: { 'PRIVATE-TOKEN': forgeToken } });
+            return res.ok ? await res.json() : null;
+        } else if (storageMode === 'nuage') {
+            const data = await callNuage('read', { filename });
+            return data.content || null;
+        } else if (storageMode === 'folder') {
+            try { const fh = await folderHandle.getFileHandle(filename); return JSON.parse(await (await fh.getFile()).text()); } catch { return null; }
+        }
+    }
+    async function writeBotFile(filename, data, allFilenames = null) {
+        const content = JSON.stringify(data, null, 2);
+        if (storageMode === 'forge') {
+            const filePath = encodeURIComponent(forgePath + '/' + filename);
+            const check = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}?ref=main`, { headers: { 'PRIVATE-TOKEN': forgeToken } });
+            const method = check.ok ? 'PUT' : 'POST';
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}`, {
+                method, headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ branch: 'main', content, commit_message: `Update ${filename} via Mentoria Studio` })
+            });
+            if (!res.ok) throw new Error('GitLab API ' + res.status);
+        } else if (storageMode === 'nuage') {
+            await callNuage('write', { filename, content, manifest: allFilenames });
+        } else if (storageMode === 'folder') {
+            const fh = await folderHandle.getFileHandle(filename, { create: true });
+            const w = await fh.createWritable(); await w.write(content); await w.close();
+        }
+    }
+    async function deleteBotFile(filename) {
+        if (storageMode === 'forge') {
+            const filePath = encodeURIComponent(forgePath + '/' + filename);
+            await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/files/${filePath}`, {
+                method: 'DELETE', headers: { 'PRIVATE-TOKEN': forgeToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ branch: 'main', commit_message: `Delete ${filename} via Mentoria Studio` })
+            });
+        } else if (storageMode === 'nuage') {
+            await callNuage('delete', { filename });
+        } else if (storageMode === 'folder') {
+            try { await folderHandle.removeEntry(filename); } catch {}
+        }
+    }
+    async function listBotFiles() {
+        if (storageMode === 'forge') {
+            const res = await fetch(`https://forge.apps.education.fr/api/v4/projects/${forgeProjectId}/repository/tree?path=${forgePath}&ref=main`, { headers: { 'PRIVATE-TOKEN': forgeToken } });
+            if (!res.ok) return [];
+            return (await res.json()).map(f => f.name).filter(n => n.startsWith('bot_') && n.endsWith('.json'));
+        } else if (storageMode === 'nuage') {
+            const data = await callNuage('list');
+            return (data.files || []).map(f => f.name);
+        } else if (storageMode === 'folder') {
+            const files = [];
+            for await (const [name] of folderHandle.entries()) { if (name.startsWith('bot_') && name.endsWith('.json')) files.push(name); }
+            return files;
+        }
+        return [];
+    }
+</script>
+
+<!-- ══════════════════════════════════════
+     HEADER
+══════════════════════════════════════ -->
+<header class="flex-none bg-white border-b border-gray-200 z-20">
+    <div class="h-1" style="background: linear-gradient(90deg, var(--teal), #6366f1)"></div>
+    <div class="flex items-center justify-between px-5 py-2.5">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background:var(--teal)">
+                <i data-lucide="graduation-cap" class="w-4.5 h-4.5"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="font-bold text-gray-900 text-sm leading-none">Mentoria</h1>
+                    <span class="px-1.5 py-0.5 text-[8px] font-bold rounded border" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4">v2.7</span>
+                </div>
+                <p class="text-[10px] text-gray-400 leading-none mt-0.5">Studio · par Gilles Cormi</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div id="sync-indicator" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full border ai-loading text-[10px] font-bold uppercase tracking-wider" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4">
+                <i data-lucide="refresh-cw" class="w-3 h-3 animate-spin"></i> Synchro...
+            </div>
+            <button id="storage-badge" onclick="disconnectStorage()" title="Cliquer pour changer de mode de stockage" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-medium cursor-pointer transition-all" style="background:#f8fafc;border-color:var(--border);color:var(--text-muted)">
+                <i data-lucide="database" class="w-3 h-3"></i>
+                <span id="storage-label">Stockage</span>
+                <i data-lucide="refresh-cw" class="w-2.5 h-2.5 opacity-40"></i>
+            </button>
+            <div class="w-px h-5 bg-gray-200"></div>
+            <button onclick="resetForm()" class="btn btn-ghost py-1.5 text-xs"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouveau</button>
+            <button onclick="saveCurrentBot()" class="btn btn-teal py-1.5 text-xs"><i data-lucide="save" class="w-3.5 h-3.5"></i> Enregistrer</button>
+            <button onclick="publishBot()" class="btn btn-green py-1.5 text-xs"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> Publier</button>
+            <button onclick="openSuiviModal()" class="btn btn-ghost py-1.5 text-xs" style="color:#6366f1;border-color:#e0e7ff"><i data-lucide="users" class="w-3.5 h-3.5"></i> Suivi</button>
+            <div class="w-px h-5 bg-gray-200"></div>
+            <div class="relative" id="help-menu-wrapper">
+                <button onclick="toggleHelpMenu()" class="btn btn-ghost py-1.5 text-xs" title="Documentation"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Aide</button>
+                <div id="help-menu" class="hidden absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1">
+                    <a href="NOTICE-MENTORIA-PROF.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-blue-500"></i> Guide enseignant
+                    </a>
+                    <a href="NOTICE-MENTORIA-TECHNIQUE.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        <i data-lucide="settings" class="w-3.5 h-3.5 text-teal-500"></i> Documentation technique
+                    </a>
+                    <a href="ROADMAPS-MENTORIA.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        <i data-lucide="map" class="w-3.5 h-3.5 text-indigo-500"></i> Feuille de route
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     LAYOUT PRINCIPAL
+══════════════════════════════════════ -->
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR BIBLIOTHÈQUE (sombre) -->
+    <aside class="w-56 flex-none flex flex-col overflow-hidden" style="background:#0f172a">
+        <div class="px-4 pt-4 pb-2">
+            <p class="text-[9px] font-bold uppercase tracking-widest" style="color:#475569">Mes assistants</p>
+        </div>
+        <div id="bot-library-list" class="flex-1 overflow-y-auto sb-scroll px-2 pb-4">
+            <p class="text-xs italic text-center py-6 mt-2" style="color:#475569">Connectez-vous<br>pour voir vos bots</p>
+        </div>
+        <div class="p-3 border-t space-y-1.5" style="border-color:#1e293b">
+            <button onclick="resetForm()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors" style="background:#1e293b;color:#94a3b8" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nouvel assistant
+            </button>
+            <button onclick="exportBotJson()" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-colors" style="background:#1e293b;color:#64748b" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'" title="Télécharger l'assistant courant en .json">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Exporter .json
+            </button>
+            <label class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors" style="background:#1e293b;color:#64748b" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'" title="Importer un assistant depuis un fichier .json">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Importer .json
+                <input type="file" accept=".json" class="hidden" onchange="importBotJson(this)">
+            </label>
+        </div>
+    </aside>
+
+    <!-- PANNEAU DE CONFIGURATION -->
+    <main class="flex-1 flex flex-col overflow-hidden" style="background:var(--bg)">
+
+        <!-- MINI APERÇU (barre supérieure) -->
+        <div class="flex-none flex items-center gap-4 px-5 py-3 bg-white border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-gray-100 flex items-center justify-center flex-none" style="background:#f0fdfa">
+                    <img id="mini-preview-img" class="hidden w-full h-full object-cover" src="">
+                    <i id="mini-preview-icon" data-lucide="bot" class="w-5 h-5" style="color:var(--teal)"></i>
+                </div>
+                <div>
+                    <p id="mini-preview-title" class="text-sm font-semibold text-gray-900 leading-none">Titre du projet</p>
+                    <p id="mini-preview-name" class="text-xs text-gray-400 mt-0.5">Nom de l'assistant</p>
+                </div>
+            </div>
+            <div class="ml-auto flex items-center gap-3">
+                <div id="bot-weight-indicator" class="flex items-center gap-1.5" title="Poids estimé du bot">
+                    <span class="text-[9px] text-gray-400 hidden sm:block">Poids</span>
+                    <div class="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="bot-weight-bar" class="h-full rounded-full transition-all duration-300" style="width:0%;background:#22c55e"></div>
+                    </div>
+                    <span id="bot-weight-label" class="text-[9px] text-gray-400 w-10">0 Ko</span>
+                </div>
+                <button onclick="openPreviewModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all" style="background:#f0fdfa;color:var(--teal);border-color:#99f6e4" onmouseover="this.style.background='#ccfbf1'" onmouseout="this.style.background='#f0fdfa'">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> Prévisualiser
+                </button>
+            </div>
+        </div>
+
+        <!-- FORMULAIRE SCROLLABLE -->
+        <div class="flex-1 overflow-y-auto cfg-scroll p-5 space-y-3">
+
+            <!-- SECTION 1 : IDENTITÉ -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-identity')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:var(--teal)">1</span>
+                        Identité & Présentation
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-identity" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-identity" class="collapsible-content open-section">
+                    <div class="section-body space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 overflow-hidden cursor-pointer flex-none transition-all hover:border-teal-400 group" onclick="document.getElementById('vignette-input').click()" style="background:#f8fafc">
+                                <img id="vignette-preview" class="hidden absolute inset-0 w-full h-full object-cover">
+                                <div id="vignette-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-1" style="color:#cbd5e1">
+                                    <i data-lucide="image-plus" class="w-5 h-5"></i>
+                                </div>
+                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center rounded-xl" style="background:rgba(13,148,136,0.15)">
+                                    <i data-lucide="camera" class="w-4 h-4" style="color:var(--teal)"></i>
+                                </div>
+                                <input type="file" id="vignette-input" class="hidden" accept="image/png,image/jpeg,image/avif,image/webp,image/gif" onchange="handleThumbnail(this)">
+                            </div>
+                            <div class="flex-1">
+                                <label class="label">Avatar de l'assistant</label>
+                                <p class="text-[10px] text-gray-400">PNG, JPG, AVIF, WebP<br>Affiché à l'élève dans le compagnon.</p>
+                                <button onclick="document.getElementById('vignette-input').click()" class="mt-1.5 text-[10px] font-semibold px-2 py-1 rounded border transition-colors" style="color:var(--teal);border-color:#99f6e4;background:#f0fdfa">Choisir une image</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label">Titre du projet</label>
+                                <input type="text" id="bot-title" class="input-field" placeholder="Ex: Maths 3e" oninput="updatePreviews()">
+                            </div>
+                            <div>
+                                <label class="label">Nom de l'assistant</label>
+                                <input type="text" id="bot-name" class="input-field" placeholder="Ex: MathBot" oninput="updatePreviews()">
+                            </div>
+                            <div>
+                                <label class="label">Thème / Discipline</label>
+                                <input type="text" id="bot-theme" class="input-field" placeholder="Ex: Histoire">
+                            </div>
+                            <div>
+                                <label class="label">Âge / Niveau</label>
+                                <input type="text" id="bot-target-age" class="input-field" placeholder="Ex: 4e, 14 ans">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="label">Message de bienvenue</label>
+                            <textarea id="bot-welcome" class="input-field" rows="2" placeholder="Ex: Bonjour ! Prêt à explorer ce chapitre ?"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2 : PÉDAGOGIE & CORPUS -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-pedagogy')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:var(--teal)">2</span>
+                        Pédagogie & Corpus
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-pedagogy" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-pedagogy" class="collapsible-content hidden-section">
+                    <div class="section-body space-y-4">
+
+                        <!-- Instructions -->
+                        <div>
+                            <label class="label">Instructions pour l'IA <span class="tip" data-tip="Décrivez le rôle de l'IA en quelques phrases.&#10;&#10;⚠️ Limite : 200 mots max. Au-delà, Albert dilue son attention et ignore certaines consignes.&#10;&#10;Modèle efficace : &quot;Tu es un professeur de [discipline]. Tu t'adresses à des [niveau]. Tu guides sans donner les réponses directement.&quot;">?</span></label>
+                            <textarea id="bot-instructions" class="input-field" rows="3" placeholder="Ex: Tu es un tuteur de mathématiques. Tu guides les élèves sans donner les réponses directement…" oninput="updateBotWeight()"></textarea>
+                        </div>
+
+                        <!-- Niveau de difficulté -->
+                        <div>
+                            <label class="label">Niveau de difficulté <span class="tip" data-tip="🌱 Débutant : vocabulaire simple, exemples concrets, très encourageant.&#10;&#10;📚 Standard : adapté au niveau indiqué dans le profil.&#10;&#10;🎯 Avancé : vocabulaire précis, rigueur exigée, l'élève est mis au défi.">?</span></label>
+                            <div class="flex" id="difficulty-selector">
+                                <button class="source-btn" data-diff="beginner" onclick="setDifficulty('beginner')">🌱 Débutant</button>
+                                <button class="source-btn active" data-diff="standard" onclick="setDifficulty('standard')">📚 Standard</button>
+                                <button class="source-btn" data-diff="advanced" onclick="setDifficulty('advanced')">🎯 Avancé</button>
+                            </div>
+                            <p id="diff-hint" class="text-[10px] mt-1.5 italic text-gray-400">Adapte le vocabulaire et les exigences au niveau réel de vos élèves.</p>
+                        </div>
+
+                        <!-- Source des réponses -->
+                        <div>
+                            <label class="label">Source des réponses <span class="tip" data-tip="📄 Corpus seul : l'IA répond uniquement depuis vos documents. Très strict.&#10;&#10;⚖️ Les deux (recommandé) : corpus en priorité + culture générale d'Albert si besoin.&#10;&#10;🤖 Albert seul : ignore vos documents, connaissances générales uniquement.">?</span></label>
+                            <div class="flex" id="source-selector">
+                                <button class="source-btn" data-source="corpus" onclick="setAnswerSource('corpus')">📄 Corpus seul</button>
+                                <button class="source-btn active" data-source="both" onclick="setAnswerSource('both')">⚖️ Les deux</button>
+                                <button class="source-btn" data-source="albert" onclick="setAnswerSource('albert')">🤖 Albert seul</button>
+                            </div>
+                            <p id="source-hint" class="text-[10px] mt-1.5 italic text-gray-400">L'IA utilise le corpus ET ses connaissances générales.</p>
+                        </div>
+
+                        <!-- Règles pédagogiques -->
+                        <div>
+                            <label class="label">Règles pédagogiques</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="REPLY_CONCISE"><span class="text-[11px] text-gray-700">Réponses concises</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="MAIEUTIC"><span class="text-[11px] text-gray-700">Maïeutique</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="TONE_ENCOURAGE"><span class="text-[11px] text-gray-700">Ton encourageant</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="INSTANT_FEEDBACK"><span class="text-[11px] text-gray-700">Feedback instantané</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CREATIVITY"><span class="text-[11px] text-gray-700">Encourager la créativité</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="PATIENCE"><span class="text-[11px] text-gray-700">Guidage pas à pas</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CELEBRATE"><span class="text-[11px] text-gray-700">Célébrer les victoires</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="SHORT_TEXTS"><span class="text-[11px] text-gray-700">Textes courts</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="CRITICAL_THINKING"><span class="text-[11px] text-gray-700">Stimuler la pensée critique</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="INTERACTIVE"><span class="text-[11px] text-gray-700">Conversation interactive</span></label>
+                                <label class="rule-chip"><input type="checkbox" class="rule-toggle" value="FUN"><span class="text-[11px] text-gray-700">Atmosphère ludique</span></label>
+                            </div>
+                        </div>
+
+                        <!-- Interdictions -->
+                        <div class="p-3 rounded-lg" style="background:#fff1f2;border:1px solid #fecdd3">
+                            <label class="label" style="color:#be123c">🚫 Interdictions & Restrictions</label>
+                            <div class="space-y-2 mt-2">
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="REDIRECT_OFF_TOPIC" style="accent-color:#e11d48">
+                                    <span class="text-[11px] text-gray-700">Hors sujet → rediriger vers le thème (ne pas répondre)</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_DIRECT_ANSWER">
+                                    <span class="text-[11px] text-gray-700">Ne jamais donner la réponse directement</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_EXTERNAL_TOOLS">
+                                    <span class="text-[11px] text-gray-700">Ne pas suggérer d'autres sites, outils ou IA</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_INAPPROPRIATE">
+                                    <span class="text-[11px] text-gray-700">Refuser tout contenu inapproprié ou offensant</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_SPOILERS">
+                                    <span class="text-[11px] text-gray-700">Ne pas révéler les réponses aux exercices/évaluations</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_LONG_REPLY">
+                                    <span class="text-[11px] text-gray-700">Réponses courtes (150 mots max) — laisser la parole à l'élève</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_VALIDATE_WRONG">
+                                    <span class="text-[11px] text-gray-700">Ne jamais valider une réponse incorrecte de l'élève</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_JARGON">
+                                    <span class="text-[11px] text-gray-700">Pas de jargon sans explication immédiate</span>
+                                </label>
+                                <label class="rule-chip" style="border-color:#fecdd3">
+                                    <input type="checkbox" class="rule-toggle" value="NO_ADULT_CONTENT">
+                                    <span class="text-[11px] text-gray-700">Refuser les sujets non scolaires (réseaux sociaux, jeux…)</span>
+                                </label>
+                            </div>
+                            <div class="mt-3">
+                                <label class="label" style="color:#be123c">Thème strict (optionnel)</label>
+                                <input type="text" id="bot-strict-theme" class="input-field" style="border-color:#fecdd3" placeholder="Ex: La technologie au collège cycle 4">
+                                <p class="text-[9px] mt-1 italic" style="color:#e11d48">Précise le thème autorisé si vous avez coché "Hors sujet → rediriger".</p>
+                            </div>
+                        </div>
+
+                        <!-- Règle inventée par l'enseignant -->
+                        <div class="p-3 rounded-lg border-2 border-dashed" style="border-color:#c7d2fe;background:#eef2ff">
+                            <label class="label" style="color:#4338ca">✏️ Votre propre règle</label>
+                            <p class="text-[10px] mb-2" style="color:#6366f1">Décrivez librement une règle que vous inventez — l'IA l'appliquera comme les autres.</p>
+                            <textarea id="bot-custom-rules" class="input-field" rows="3" placeholder="Ex: Commence toujours ta réponse par une question de relance.&#10;Ex: Utilise uniquement des exemples liés au quotidien des collégiens.&#10;Ex: Termine chaque réponse par un emoji encourageant."></textarea>
+                        </div>
+
+                        <!-- Corpus -->
+                        <div>
+                            <label class="label flex items-center justify-between">
+                                <span>Corpus de connaissance <span class="tip tip-left" data-tip="Documents que l'IA lira pour répondre.&#10;&#10;⚠️ Max 5 fichiers · 200 Ko total&#10;&#10;Conseils :&#10;• Privilégiez le cours du jour, pas le manuel entier&#10;• Format TXT > PDF (plus léger, mieux lu)&#10;• Un corpus ciblé est plus efficace qu'un gros document">?</span></span>
+                                <div class="flex items-center gap-2">
+                                    <span id="corpus-size-indicator" class="font-normal text-gray-400 text-[10px]"></span>
+                                    <span id="file-count" class="font-normal text-gray-400">0 / 5 fichiers</span>
+                                    <button onclick="clearCorpus()" title="Vider le corpus" class="text-red-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                                </div>
+                            </label>
+                            <button onclick="document.getElementById('corpus-input').click()" class="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:text-teal-600 transition-all flex items-center justify-center gap-2" style="--hover-border: var(--teal)">
+                                <i data-lucide="file-plus" class="w-4 h-4"></i> Ajouter PDF ou TXT (max 5)
+                            </button>
+                            <input type="file" id="corpus-input" class="hidden" multiple accept=".pdf,.txt,.md" onchange="handleCorpusFiles(this)">
+                            <div id="file-status-list" class="mt-2 space-y-1"></div>
+                            <!-- URLs de référence -->
+                            <div class="mt-2">
+                                <label class="label text-[10px]">🌐 URLs de référence (contenu importé automatiquement)</label>
+                                <div id="url-list" class="space-y-1 mb-1"></div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="corpus-url-input" placeholder="https://fr.wikipedia.org/wiki/..." class="input-field text-xs flex-1">
+                                    <button onclick="addCorpusUrl()" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-white" style="background:var(--teal)">+ Ajouter</button>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1 italic">Pages web HTML uniquement — pas de PDF (utilisez le bouton "Ajouter PDF" pour les fichiers PDF). Max 5 URLs.</p>
+                            </div>
+                            <textarea id="bot-corpus-text" class="hidden"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3 : BOUTONS RAPIDES -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-quick-replies')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <i data-lucide="zap" class="w-4 h-4" style="color:#f59e0b"></i>
+                        Boutons de réponse rapide
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span id="qr-count-badge" class="hidden px-1.5 py-0.5 text-white text-[9px] font-bold rounded-full" style="background:var(--teal)">0</span>
+                        <i data-lucide="chevron-down" id="icon-quick-replies" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+                </div>
+                <div id="section-quick-replies" class="collapsible-content hidden-section">
+                    <div class="section-body space-y-4">
+
+                        <!-- Bibliothèque pré-configurée -->
+                        <div>
+                            <label class="label">Bibliothèque pré-configurée</label>
+                            <!-- Onglets catégories -->
+                            <div class="flex gap-1 mb-3 p-1 rounded-lg" style="background:#f1f5f9">
+                                <button class="tab-btn active" onclick="showPresetCategory('aide', this)">💡 Aide</button>
+                                <button class="tab-btn" onclick="showPresetCategory('approfondissement', this)">🔭 Approfondir</button>
+                                <button class="tab-btn" onclick="showPresetCategory('evaluation', this)">✅ Évaluation</button>
+                                <button class="tab-btn" onclick="showPresetCategory('navigation', this)">🗺️ Navigation</button>
+                            </div>
+                            <!-- Boutons preset par catégorie -->
+                            <div id="preset-aide" class="preset-panel flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Donne-moi un indice','Donne-moi un indice pour avancer sans me donner la réponse directement.')">+ Donne-moi un indice</button>
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Je ne comprends pas','Je n\'ai pas compris. Peux-tu expliquer autrement, avec d\'autres mots ou un exemple ?')">+ Je ne comprends pas</button>
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Explique autrement','Peux-tu expliquer ce point d\'une façon différente ?')">+ Explique autrement</button>
+                                <button class="preset-tag" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8" onclick="addPreset('Aide-moi à démarrer','Je ne sais pas par où commencer. Aide-moi à démarrer.')">+ Aide-moi à démarrer</button>
+                            </div>
+                            <div id="preset-approfondissement" class="preset-panel hidden flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('En savoir plus','Peux-tu approfondir ce point ?')">+ En savoir plus</button>
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('Un exemple concret','Donne-moi un exemple concret pour mieux comprendre.')">+ Un exemple concret</button>
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('Points essentiels','Quels sont les points essentiels à retenir ?')">+ Points essentiels</button>
+                                <button class="preset-tag" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d" onclick="addPreset('Pour aller plus loin','Que puis-je lire ou faire pour aller plus loin sur ce sujet ?')">+ Pour aller plus loin</button>
+                            </div>
+                            <div id="preset-evaluation" class="preset-panel hidden flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Pose-moi une question','Pose-moi une question pour vérifier que j\'ai bien compris.')">+ Pose-moi une question</button>
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Évalue ma réponse','Évalue ma compréhension et dis-moi ce que j\'ai bien saisi ou manqué.')">+ Évalue ma réponse</button>
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Quiz rapide','Fais-moi un quiz rapide sur ce qu\'on vient de voir.')">+ Quiz rapide</button>
+                                <button class="preset-tag" style="background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce" onclick="addPreset('Résume notre échange','Résume les points importants de notre échange.')">+ Résume notre échange</button>
+                            </div>
+                            <div id="preset-navigation" class="preset-panel hidden flex flex-wrap gap-2">
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Retour au sujet','Revenons au sujet principal.')">+ Retour au sujet</button>
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Que dois-je retenir ?','Que dois-je absolument retenir de ce qu\'on a vu ?')">+ Que dois-je retenir ?</button>
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Passons à la suite','Passons à la prochaine notion ou étape.')">+ Passons à la suite</button>
+                                <button class="preset-tag" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c" onclick="addPreset('Récapitulatif','Fais un récapitulatif clair de tout ce qu\'on a abordé.')">+ Récapitulatif</button>
+                            </div>
+                        </div>
+
+                        <!-- Boutons actifs -->
+                        <div>
+                            <label class="label">Boutons actifs sur le compagnon</label>
+                            <div id="quick-replies-list" class="space-y-2 mb-2"></div>
+                            <button onclick="addQuickReply()" class="btn btn-ghost w-full text-[11px] py-1.5 justify-center">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un bouton personnalisé
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4 : API -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-discovery')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:var(--teal)">4</span>
+                        Sécurité & API
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-discovery" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-discovery" class="collapsible-content hidden-section">
+                    <div class="section-body space-y-3">
+                        <div>
+                            <label class="label"><i data-lucide="key" class="w-3 h-3 inline mr-1"></i>Clé API Albert (Etalab)</label>
+                            <input type="password" id="api-key" class="input-field font-mono" placeholder="sk-..." oninput="saveApiKeyLocally()">
+                            <div id="api-key-reused" class="hidden mt-1.5 flex items-center gap-1.5 text-[10px] font-medium" style="color:var(--teal)">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i>
+                                Clé précédente réutilisée — <button onclick="clearApiKey()" class="underline ml-0.5" style="color:#64748b">Changer</button>
+                            </div>
+                        </div>
+                        <button onclick="saveCurrentBot()" class="btn btn-teal w-full text-xs py-2 justify-center">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Valider et Enregistrer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5 : TEMPLATES DE POSTURE -->
+            <div class="card">
+                <div class="section-hdr" onclick="toggleSection('section-templates')">
+                    <span class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded text-white flex items-center justify-center text-[9px] font-bold" style="background:#8b5cf6">★</span>
+                        Templates de posture
+                    </span>
+                    <i data-lucide="chevron-down" id="icon-templates" class="w-4 h-4 text-gray-400"></i>
+                </div>
+                <div id="section-templates" class="collapsible-content hidden-section">
+                    <div class="section-body">
+                        <p class="text-[10px] text-gray-400 mb-3">Pré-configurez instantanément l'assistant selon un profil pédagogique. Les instructions et règles actuelles seront remplacées.</p>
+                        <div class="space-y-2">
+                            <button onclick="applyTemplate('socratic')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🧠 Le Socratique</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Guide par les questions. Ne donne jamais la réponse directement.</p>
+                            </button>
+                            <button onclick="applyTemplate('coach')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🏋️ Le Coach</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Motivant, célèbre les progrès. Idéal pour les élèves en difficulté.</p>
+                            </button>
+                            <button onclick="applyTemplate('debater')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🗣️ L'Animateur de débat</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Présente plusieurs angles, joue l'avocat du diable, stimule la réflexion.</p>
+                            </button>
+                            <button onclick="applyTemplate('tutor')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">📖 Le Tuteur de révision</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Concis, feedback immédiat, ne révèle jamais les réponses. Mode exam.</p>
+                            </button>
+                            <button onclick="applyTemplate('challenger')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all">
+                                <span class="font-semibold text-xs text-gray-800">🎯 Le Challenger</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Exigeant et rigoureux. Pour les élèves avancés qui veulent aller plus loin.</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- fin scroll -->
+    </main>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL PRÉVISUALISATION
+══════════════════════════════════════ -->
+<div id="preview-modal" class="hidden fixed inset-0 z-[115] flex items-center justify-center p-6" style="background:rgba(15,23,42,0.7)">
+    <div class="relative w-full max-w-[400px] flex flex-col rounded-2xl overflow-hidden shadow-2xl slide-in" style="max-height:85vh">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-white border-b border-gray-100">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Aperçu élève</span>
+            <button onclick="closePreviewModal()" class="text-gray-300 hover:text-gray-600 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="flex flex-col flex-1 overflow-hidden" style="min-height:0">
+            <!-- topbar -->
+            <div class="h-11 flex items-center px-4 gap-2.5 flex-none" style="background:var(--teal)">
+                <div class="w-6 h-6 rounded flex items-center justify-center overflow-hidden" style="background:rgba(255,255,255,0.2)">
+                    <img id="preview-bot-icon" src="default_avatar.png" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                    <i id="preview-bot-icon-placeholder" data-lucide="bot" class="hidden w-3.5 h-3.5 text-white"></i>
+                </div>
+                <div id="preview-bot-name-top" class="font-semibold text-white text-sm">Assistant</div>
+                <div class="ml-auto flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-green-300 rounded-full"></span>
+                    <span class="text-[9px] text-white/70">En ligne</span>
+                </div>
+            </div>
+            <!-- body -->
+            <div class="flex-1 preview-bg flex flex-col items-center justify-center text-center p-8 overflow-hidden">
+                <div class="slide-in flex flex-col items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center text-white shadow-lg overflow-hidden border-2 border-white" style="background:var(--teal)">
+                        <img id="preview-bot-avatar-large" src="default_avatar.png" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                        <i id="preview-bot-avatar-placeholder" data-lucide="graduation-cap" class="hidden w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h3 id="preview-bot-title" class="font-bold text-gray-900 text-lg mb-1">Titre du Projet</h3>
+                        <p id="preview-bot-desc" class="text-gray-500 text-sm max-w-[240px] mx-auto">Configurez l'assistant pour voir l'aperçu.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-[11px] text-gray-400 bg-white border border-gray-200 px-3 py-2 rounded-lg shadow-sm">
+                        <i data-lucide="info" class="w-3 h-3"></i> Cliquez sur « Publier » pour partager
+                    </div>
+                </div>
+            </div>
+            <!-- input bar -->
+            <div class="h-12 border-t border-gray-100 flex items-center px-3 gap-2 bg-white flex-none">
+                <div class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-400">Saisir un message…</div>
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white flex-none" style="background:var(--teal)">
+                    <i data-lucide="send" class="w-3 h-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL PUBLICATION
+══════════════════════════════════════ -->
+<div id="publish-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4" style="background:rgba(15,23,42,0.7)">
+    <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden slide-in border border-gray-100">
+        <div class="h-1" style="background:linear-gradient(90deg,var(--teal),#6366f1)"></div>
+        <div class="flex justify-between items-center p-5 border-b border-gray-100">
+            <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Partager l'assistant</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Copiez ce lien et partagez-le à vos élèves.</p>
+            </div>
+            <button onclick="closeModal()" class="text-gray-300 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-5 space-y-4">
+            <div>
+                <label class="label">Lien élève</label>
+                <div class="flex gap-2">
+                    <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="Cliquez sur Publier…">
+                    <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+                </div>
+            </div>
+            <!-- Jauge de poids du lien -->
+            <div class="p-3 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-semibold text-gray-600">Poids du lien élève (encodé)</span>
+                    <span id="publish-weight-label" class="text-[10px] font-bold text-gray-700">—</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="publish-weight-bar" class="h-full rounded-full transition-all" style="width:0%;background:#22c55e"></div>
+                </div>
+                <p id="publish-weight-warn" class="hidden mt-1.5 text-[10px] text-amber-600">⚠️ Lien lourd — certains ENT ou emails peuvent tronquer les URLs longues. Réduisez le corpus ou retirez l'avatar.</p>
+                <p id="publish-weight-alert" class="hidden mt-1.5 text-[10px] font-semibold text-red-600">🚨 Lien trop lourd (&gt; 200 Ko) — risque de rejet par certaines plateformes. Réduisez impérativement le corpus et/ou l'avatar.</p>
+            </div>
+            <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca">
+                👥 <strong>Code de groupe :</strong> <span id="share-class-key" class="font-mono font-black text-lg tracking-widest">—</span>
+                <span class="block mt-1 text-[10px] text-indigo-400">Notez ce code — il vous permettra de retrouver cette classe dans le suivi. Chaque publication génère un code différent.</span>
+            </div>
+            <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d">
+                🔒 <strong>Souverain :</strong> Lien auto-contenu. Aucun compte élève. Aucune donnée transmise à un tiers.
+            </div>
+        </div>
+        <div class="p-5 border-t border-gray-100 flex justify-end">
+            <button onclick="closeModal()" class="btn btn-teal">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL SUIVI DE CLASSE
+══════════════════════════════════════ -->
+<div id="suivi-modal" class="hidden fixed inset-0 z-[120]" style="background:rgba(15,23,42,0.5)">
+    <div id="suivi-window" class="bg-white rounded-xl shadow-2xl border border-gray-100 absolute" style="display:flex;flex-direction:column;width:680px;height:80vh;min-width:400px;min-height:300px;resize:both;overflow:auto;top:50%;left:50%;transform:translate(-50%,-50%)">
+        <div class="h-1 flex-none rounded-tl-xl rounded-tr-xl" style="background:linear-gradient(90deg,#6366f1,var(--teal))"></div>
+        <div id="suivi-drag-handle" class="flex justify-between items-center p-5 border-b border-gray-100 flex-none cursor-move select-none">
+            <div>
+                <h3 class="font-semibold text-gray-900 text-sm flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Suivi de classe
+                    <span id="suivi-bot-name" class="text-gray-400 font-normal"></span>
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">Conversations des élèves — actualisation toutes les 30 s</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="refreshSuivi()" title="Actualiser" class="text-gray-400 hover:text-indigo-500 transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                <button onclick="closeSuiviModal()" class="text-gray-300 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+        </div>
+        <!-- SÉLECTEUR DE GROUPE -->
+        <div class="flex items-center gap-2 px-5 py-2 border-b border-gray-100 bg-slate-50 flex-none">
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex-none">Groupe</span>
+            <select id="suivi-group-select" onchange="suiviSelectedStudent=null; refreshSuivi()" class="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1 font-mono font-bold text-indigo-600 bg-white"></select>
+            <button onclick="copySuiviGroupLink()" title="Copier le lien de ce groupe pour le redistribuer" class="flex-none text-[10px] font-semibold px-2 py-1 rounded-lg border border-indigo-200 text-indigo-500 hover:bg-indigo-50 transition-colors whitespace-nowrap">
+                <i data-lucide="link" class="w-3 h-3 inline-block mr-1"></i>Copier lien
+            </button>
+        </div>
+        <!-- LISTE ÉLÈVES -->
+        <div id="suivi-student-list" class="flex-none border-b border-gray-100 overflow-y-auto" style="max-height:200px">
+            <div class="p-4 text-xs text-gray-400 text-center">Chargement…</div>
+        </div>
+        <!-- CONVERSATION SÉLECTIONNÉE -->
+        <div id="suivi-conversation" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
+            <p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>
+        </div>
+        <!-- FOOTER -->
+        <div class="p-4 border-t border-gray-100 flex items-center justify-between flex-none">
+            <button onclick="deleteAllLogs()" class="btn btn-ghost text-xs text-red-400 hover:text-red-600">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Supprimer tous les logs
+            </button>
+            <button onclick="closeSuiviModal()" class="btn btn-teal text-xs">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MOTEUR PRINCIPAL
+══════════════════════════════════════ -->
+<script>
+    const rulesMap = {
+        'REPLY_CONCISE': 'Réponds en 2-3 phrases MAXIMUM. Ne dépasse jamais 200 mots. Pas de listes à puces, pas de titres, pas de développement long. Si tu dois développer, dis-le et attends que l\'élève demande.',
+        'MAIEUTIC': "Conseille l'élève, mais ne donne pas la réponse directement. Guide-le par la maïeutique.",
+        'TONE_ENCOURAGE': 'Utilise un ton encourageant et bienveillant.',
+        'INSTANT_FEEDBACK': "Offre des commentaires instantanés sur les réponses de l'élève.",
+        'CREATIVITY': 'Encourage la créativité dans la résolution de problèmes.',
+        'PATIENCE': "Reste patient et guide l'élève à travers les défis, pas à pas.",
+        'CELEBRATE': "Célèbre les petites victoires et les progrès de l'élève.",
+        'SHORT_TEXTS': "Utilise des textes courts pour favoriser l'engagement.",
+        'CRITICAL_THINKING': "Pose des questions pour stimuler la pensée critique de l'élève.",
+        'INTERACTIVE': "Maintiens la conversation interactive et engageante.",
+        'FUN': "Crée une atmosphère ludique et positive — apprendre doit être amusant !",
+        'REDIRECT_OFF_TOPIC': "INTERDIT : Si l'élève pose une question hors sujet, ne réponds pas. Redirige-le poliment vers le thème principal en expliquant que tu ne peux traiter que ce sujet.",
+        'NO_DIRECT_ANSWER': "INTERDIT : Ne donne jamais la réponse directement. Guide toujours l'élève pour qu'il trouve par lui-même.",
+        'NO_EXTERNAL_TOOLS': "INTERDIT : Ne suggère jamais d'autres sites web, outils numériques ou intelligences artificielles.",
+        'NO_INAPPROPRIATE': "INTERDIT : Refuse immédiatement toute demande de contenu violent, offensant ou inapproprié pour un contexte scolaire.",
+        'NO_SPOILERS': "INTERDIT : Ne révèle jamais les réponses aux exercices, évaluations ou devoirs. Aide l'élève à trouver, sans donner la solution.",
+        'NO_LONG_REPLY': "INTERDIT : Ne fais jamais de longs monologues. Chaque réponse doit être courte (150 mots max) et laisser la parole à l'élève.",
+        'NO_VALIDATE_WRONG': "INTERDIT : Ne valide jamais une réponse incorrecte de l'élève, même partiellement. Signale l'erreur avec bienveillance.",
+        'NO_JARGON': "INTERDIT : N'utilise pas de termes techniques ou de jargon sans les expliquer immédiatement avec des mots simples.",
+        'NO_ADULT_CONTENT': "INTERDIT : Refuse toute discussion sur des sujets non scolaires (réseaux sociaux, jeux vidéo, vie privée). Redirige vers l'apprentissage."
+    };
+
+    const sourceHints = {
+        'corpus': "L'IA répondra UNIQUEMENT à partir du corpus fourni. Si l'information n'y est pas, elle le signalera.",
+        'both': "L'IA utilise le corpus ET ses connaissances générales.",
+        'albert': "L'IA utilise uniquement ses connaissances générales (le corpus est ignoré)."
+    };
+
+    let library = {}, currentBotId = null, uploadedFiles = [], quickReplies = [];
+    let currentAnswerSource = 'both';
+    let currentDifficulty = 'standard';
+    let activePresetCategory = 'aide';
+
+    document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
+
+    // ── SOURCE DES RÉPONSES ──
+    window.setAnswerSource = (source) => {
+        currentAnswerSource = source;
+        document.querySelectorAll('.source-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.source === source);
+        });
+        const hint = document.getElementById('source-hint');
+        if (hint) hint.textContent = sourceHints[source] || '';
+    };
+
+    // ── NIVEAU DE DIFFICULTÉ ──
+    window.setDifficulty = (d) => {
+        currentDifficulty = d;
+        document.querySelectorAll('#difficulty-selector .source-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.diff === d);
+        });
+        const hints = {
+            'beginner': 'Langage simple, exemples concrets et familiers, progression pas à pas, beaucoup d\'encouragements.',
+            'standard': 'Adapte le vocabulaire et les exigences au niveau indiqué dans le profil élève.',
+            'advanced': 'Vocabulaire précis, rigueur exigée, raisonnement poussé — l\'élève est mis au défi.'
+        };
+        const hint = document.getElementById('diff-hint');
+        if (hint) hint.textContent = hints[d] || '';
+    };
+
+    // ── TEMPLATES DE POSTURE ──
+    const TEMPLATES = {
+        'socratic': {
+            instructions: "Tu es un tuteur pédagogique socratique. Tu ne donnes jamais les réponses directement. Tu guides l'élève par des questions de relance successives qui l'amènent à trouver lui-même. Tu valides les raisonnements corrects avec encouragement et corriges les erreurs avec bienveillance.",
+            rules: ['MAIEUTIC', 'NO_DIRECT_ANSWER', 'TONE_ENCOURAGE', 'INTERACTIVE', 'CRITICAL_THINKING'],
+            difficulty: 'standard'
+        },
+        'coach': {
+            instructions: "Tu es un coach pédagogique bienveillant et motivant. Tu célèbres chaque progrès, même petit. Tu adaptes ton langage au niveau de l'élève, tu le rassures et l'encourages à persévérer. Tes réponses sont courtes et positives. Tu utilises des exemples du quotidien.",
+            rules: ['TONE_ENCOURAGE', 'CELEBRATE', 'PATIENCE', 'SHORT_TEXTS', 'FUN'],
+            difficulty: 'beginner'
+        },
+        'debater': {
+            instructions: "Tu es un animateur de débat pédagogique. Tu présentes systématiquement plusieurs points de vue sur chaque sujet. Tu joues l'avocat du diable pour pousser l'élève à argumenter et défendre sa position. Tu ne prends jamais parti toi-même.",
+            rules: ['CRITICAL_THINKING', 'INTERACTIVE', 'REPLY_CONCISE'],
+            difficulty: 'standard'
+        },
+        'tutor': {
+            instructions: "Tu es un tuteur de révision efficace. Tu fournis un feedback immédiat et précis sur chaque réponse. Tu ne révèles jamais les réponses aux exercices — tu pointes les erreurs et guides vers la bonne piste. Tes réponses sont courtes et ciblées.",
+            rules: ['INSTANT_FEEDBACK', 'NO_SPOILERS', 'REPLY_CONCISE', 'NO_VALIDATE_WRONG', 'SHORT_TEXTS'],
+            difficulty: 'standard'
+        },
+        'challenger': {
+            instructions: "Tu es un tuteur exigeant pour élèves avancés. Tu utilises un vocabulaire précis et technique. Tu attends des réponses justifiées et nuancées. Tu soulèves des contre-exemples et remets en question les réponses superficielles pour pousser l'élève à approfondir.",
+            rules: ['CRITICAL_THINKING', 'NO_DIRECT_ANSWER', 'NO_VALIDATE_WRONG', 'INTERACTIVE'],
+            difficulty: 'advanced'
+        }
+    };
+
+    window.applyTemplate = (key) => {
+        const t = TEMPLATES[key];
+        if (!t || !confirm('Appliquer ce template ?\n\nLes instructions et règles actuelles seront remplacées.')) return;
+        const instrEl = document.getElementById('bot-instructions');
+        if (instrEl) instrEl.value = t.instructions;
+        document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = t.rules.includes(cb.value); });
+        setDifficulty(t.difficulty || 'standard');
+        updateBotWeight();
+        // Ouvrir la section pédagogie pour que l'enseignant voie le résultat
+        const pedSection = document.getElementById('section-pedagogy');
+        if (pedSection && pedSection.classList.contains('hidden-section')) toggleSection('section-pedagogy');
+        showToast('✅ Template appliqué', 'Vérifiez les instructions et règles dans la section Pédagogie & Corpus.');
+    };
+
+    // ── EXPORT / IMPORT UNITAIRE ──
+    window.exportBotJson = () => {
+        if (!currentBotId || !library[currentBotId]) { showToast('⚠️ Aucun assistant', 'Ouvrez ou enregistrez un assistant avant d\'exporter.'); return; }
+        const bot = library[currentBotId];
+        const blob = new Blob([JSON.stringify(bot, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = currentBotId + '.json';
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+        showToast('📤 Exporté', currentBotId + '.json téléchargé.');
+    };
+
+    window.importBotJson = async (input) => {
+        const file = input.files[0]; if (!file) return;
+        input.value = '';
+        try {
+            const text = await file.text();
+            const bot = JSON.parse(text);
+            if (!bot.id || !bot.config?.title) throw new Error('Structure invalide — champ id ou config.title manquant.');
+            if (!storageMode) { showToast('⚠️ Non connecté', 'Connectez-vous d\'abord à un stockage.'); return; }
+            if (library[bot.id] && !confirm(`Un assistant "${bot.config.title}" existe déjà (id: ${bot.id}).\nL'écraser ?`)) return;
+            setSync(true);
+            library[bot.id] = bot;
+            const allFilenames = Object.keys(library).map(id => id + '.json');
+            await writeBotFile(bot.id + '.json', bot, allFilenames);
+            showToast('📥 Importé', '"' + bot.config.title + '" ajouté à votre bibliothèque.');
+            updateLibraryUI();
+        } catch(e) { showToast('❌ Erreur import', e.message); }
+        finally { setSync(false); }
+    };
+
+    // ── BIBLIOTHÈQUE PRESET ──
+    window.showPresetCategory = (cat, btn) => {
+        activePresetCategory = cat;
+        document.querySelectorAll('.preset-panel').forEach(p => p.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const panel = document.getElementById('preset-' + cat);
+        if (panel) panel.classList.remove('hidden');
+        if (btn) btn.classList.add('active');
+    };
+
+    window.addPreset = (label, prompt) => {
+        if (quickReplies.some(qr => qr.label === label)) {
+            showToast('Déjà ajouté', '"' + label + '" est déjà dans la liste.');
+            return;
+        }
+        quickReplies.push({ label, prompt });
+        renderQuickReplies();
+        showToast('✅ Ajouté', '"' + label + '" ajouté aux boutons.');
+    };
+
+    // ── BOUTONS RAPIDES ──
+    window.addQuickReply = (label = '', prompt = '') => {
+        quickReplies.push({ label, prompt });
+        renderQuickReplies();
+    };
+    window.removeQuickReply = (idx) => { quickReplies.splice(idx, 1); renderQuickReplies(); };
+    window.renderQuickReplies = () => {
+        const list = document.getElementById('quick-replies-list');
+        const badge = document.getElementById('qr-count-badge');
+        if (badge) {
+            const count = quickReplies.length;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        }
+        if (!list) return;
+        list.innerHTML = quickReplies.map((qr, i) => `
+            <div class="flex flex-col gap-1.5 p-3 rounded-lg border" style="background:#f8fafc;border-color:var(--border)">
+                <div class="flex items-center justify-between">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Bouton ${i+1}</span>
+                    <button onclick="removeQuickReply(${i})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+                <input type="text" class="input-field py-1.5 px-2 text-[11px] font-bold" placeholder="Label (affiché sur le bouton)" value="${qr.label.replace(/"/g,'&quot;')}" oninput="quickReplies[${i}].label = this.value; renderQuickReplies()">
+                <textarea class="input-field py-1.5 px-2 text-[10px]" placeholder="Prompt envoyé à l'IA" rows="2" oninput="quickReplies[${i}].prompt = this.value">${qr.prompt}</textarea>
+            </div>
+        `).join('');
+        if (window.lucide) lucide.createIcons();
+    };
+    window.getQuickRepliesData = () => quickReplies.filter(qr => qr.label.trim() && qr.prompt.trim());
+
+    // ── APERÇU MODAL ──
+    window.openPreviewModal = () => {
+        updatePreviews();
+        document.getElementById('preview-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // ── BIBLIOTHÈQUE ──
+    window.loadLibrary = async () => {
+        library = {};
+        setSync(true);
+        try {
+            const files = await listBotFiles();
+            let missing = 0;
+            for (const filename of files) {
+                try {
+                    const bot = await readBotFile(filename);
+                    if (bot && bot.id) library[bot.id] = bot;
+                    else missing++;
+                } catch { missing++; }
+            }
+            if (missing > 0) showToast('⚠️ Fichiers introuvables', `${missing} bot(s) référencé(s) dans le manifest mais absent(s) du Nuage — ignoré(s).`);
+        } catch(e) { showToast('⚠️ Erreur', 'Lecture impossible : ' + e.message); }
+        finally { setSync(false); }
+        updateLibraryUI();
+    };
+
+    window.updateLibraryUI = () => {
+        const list = document.getElementById('bot-library-list');
+        if (!list) return;
+        const bots = Object.values(library);
+        if (bots.length === 0) {
+            list.innerHTML = '<p class="text-xs italic text-center py-6" style="color:#475569">Aucun assistant.<br>Créez le premier !</p>';
+            return;
+        }
+        bots.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+        list.innerHTML = bots.map(bot => `
+            <div class="bot-item flex items-center justify-between mb-1 ${bot.id === currentBotId ? 'active' : ''}" onclick="loadBot('${bot.id}')">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <div class="w-6 h-6 rounded flex items-center justify-center flex-none" style="background:#1e293b">
+                        <i data-lucide="graduation-cap" class="w-3 h-3" style="color:var(--teal)"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold truncate" style="color:#e2e8f0">${bot.config.title}</p>
+                        <p class="text-[9px] truncate" style="color:#64748b">${bot.config.theme || 'Thème libre'}</p>
+                    </div>
+                </div>
+                <button onclick="event.stopPropagation(); deleteBot('${bot.id}')" class="p-1 flex-none opacity-30 hover:opacity-100 transition-opacity" style="color:#475569" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#475569'">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
+            </div>
+        `).join('');
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // ── SAUVEGARDE ──
+    function slugify(str) {
+        return str.toLowerCase()
+            .normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_|_$/g, '')
+            .substring(0, 40) || 'bot';
+    }
+
+    window.saveCurrentBot = async () => {
+        if (!storageMode) { showToast('⚠️ Non connecté', 'Choisissez un mode de stockage.'); return; }
+        const title = document.getElementById('bot-title')?.value?.trim();
+        if (!title) { showToast('⚠️ Titre manquant', 'Renseignez le titre (section 1).'); return; }
+        if (!currentBotId) {
+            const slug = slugify(title);
+            let candidate = 'bot_' + slug;
+            let n = 2;
+            while (library[candidate]) { candidate = 'bot_' + slug + '_' + n++; }
+            currentBotId = candidate;
+        }
+        const vigImg = document.getElementById('vignette-preview');
+        const hasVig = vigImg && vigImg.src && vigImg.src !== window.location.href && !vigImg.classList.contains('hidden');
+        const selectedRules = Array.from(document.querySelectorAll('.rule-toggle:checked')).map(cb => rulesMap[cb.value]);
+        const botData = {
+            id: currentBotId, updatedAt: new Date().toISOString(),
+            config: {
+                title,
+                instructions: document.getElementById('bot-instructions')?.value || '',
+                name: document.getElementById('bot-name')?.value || '',
+                targetAge: document.getElementById('bot-target-age')?.value || '',
+                theme: document.getElementById('bot-theme')?.value || '',
+                welcomeMessage: document.getElementById('bot-welcome')?.value || '',
+                pedagogicRules: selectedRules,
+                strictTheme: document.getElementById('bot-strict-theme')?.value || '',
+                customRules: document.getElementById('bot-custom-rules')?.value || '',
+                quickReplies: getQuickRepliesData(),
+                answerSource: currentAnswerSource,
+                difficulty: currentDifficulty
+            },
+            corpus: document.getElementById('bot-corpus-text')?.value || '',
+            corpusUrls,
+            apiKey: (() => { const k = document.getElementById('api-key')?.value || ''; if (k) localStorage.setItem('mentoria_api_key', k); return k; })(),
+            proxyUrl: '',
+            vignette: hasVig ? vigImg.src : null,
+            loggingConfig: (storageMode === 'nuage' && nuageUsername) ? {
+                username: nuageUsername,
+                password: nuagePassword,
+                server: nuageServer || 'nuage.apps.education.fr'
+            } : null
+        };
+        try {
+            setSync(true);
+            // Fetch le contenu des URLs et l'ajoute au corpus
+            const urlText = await fetchUrlContents();
+            if (urlText) botData.corpus = (botData.corpus ? botData.corpus + '\n\n' : '') + urlText;
+            library[currentBotId] = botData;
+            const allFilenames = Object.keys(library).map(id => id + '.json');
+            await writeBotFile(currentBotId + '.json', botData, allFilenames);
+            showToast('✅ Enregistré', 'Assistant sauvegardé.');
+            updateLibraryUI();
+        } catch(e) { showToast('❌ Erreur', e.message); }
+        finally { setSync(false); }
+    };
+
+    // ── CHARGEMENT ──
+    window.loadBot = (id) => {
+        const bot = library[id]; if (!bot) return;
+        currentBotId = id;
+        const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val || ''; };
+        set('bot-title', bot.config.title); set('bot-instructions', bot.config.instructions);
+        set('bot-name', bot.config.name); set('bot-target-age', bot.config.targetAge);
+        set('bot-theme', bot.config.theme); set('bot-welcome', bot.config.welcomeMessage);
+        set('bot-strict-theme', bot.config.strictTheme); set('bot-custom-rules', bot.config.customRules);
+        set('bot-corpus-text', bot.corpus);
+        set('api-key', bot.apiKey || localStorage.getItem('mentoria_api_key') || '');
+        document.getElementById('api-key-reused')?.classList.add('hidden');
+        document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = (bot.config.pedagogicRules || []).includes(rulesMap[cb.value]); });
+        setAnswerSource(bot.config.answerSource || 'both');
+        setDifficulty(bot.config.difficulty || 'standard');
+        const vigImg = document.getElementById('vignette-preview');
+        const ph = document.getElementById('vignette-placeholder');
+        if (bot.vignette && vigImg) { vigImg.src = bot.vignette; vigImg.classList.remove('hidden'); if (ph) ph.classList.add('hidden'); }
+        else if (vigImg) { vigImg.classList.add('hidden'); if (ph) ph.classList.remove('hidden'); }
+        uploadedFiles = bot.corpus ? [{ name: 'Corpus enregistré', content: bot.corpus }] : [];
+        corpusUrls = bot.corpusUrls || [];
+        renderUrlList();
+        quickReplies = bot.config.quickReplies || [];
+        updateFileUI(); renderQuickReplies(); updatePreviews();
+        showToast('Chargé', bot.config.title);
+        updateLibraryUI();
+    };
+
+    // ── SUPPRESSION ──
+    window.deleteBot = async (id) => {
+        if (!confirm('Supprimer cet assistant ?')) return;
+        try {
+            await deleteBotFile(id + '.json');
+            delete library[id];
+            if (currentBotId === id) resetForm();
+            updateLibraryUI();
+            showToast('Supprimé', 'Assistant retiré.');
+        } catch(e) { showToast('❌ Erreur', e.message); }
+    };
+
+    // ── CLÉ API PERSISTANTE ──
+    window.saveApiKeyLocally = () => {
+        const k = document.getElementById('api-key')?.value;
+        if (k) localStorage.setItem('mentoria_api_key', k);
+        document.getElementById('api-key-reused')?.classList.add('hidden');
+    };
+    window.clearApiKey = () => {
+        const el = document.getElementById('api-key');
+        if (el) { el.value = ''; el.focus(); }
+        localStorage.removeItem('mentoria_api_key');
+        document.getElementById('api-key-reused')?.classList.add('hidden');
+    };
+    function restoreSavedApiKey() {
+        const saved = localStorage.getItem('mentoria_api_key');
+        const el = document.getElementById('api-key');
+        const hint = document.getElementById('api-key-reused');
+        if (saved && el && !el.value) {
+            el.value = saved;
+            if (hint) hint.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+    }
+
+    // ── RESET ──
+    window.resetForm = () => {
+        currentBotId = null;
+        ['bot-title','bot-instructions','bot-name','bot-target-age','bot-theme','bot-welcome','bot-custom-rules','bot-corpus-text','bot-strict-theme'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        document.querySelectorAll('.rule-toggle').forEach(cb => cb.checked = false);
+        setDifficulty('standard');
+        // Règles cochées par défaut sur un nouveau bot
+        ['TONE_ENCOURAGE', 'NO_INAPPROPRIATE', 'INTERACTIVE', 'REDIRECT_OFF_TOPIC'].forEach(key => {
+            const cb = document.querySelector(`.rule-toggle[value="${key}"]`);
+            if (cb) cb.checked = true;
+        });
+        setAnswerSource('both');
+        uploadedFiles = []; quickReplies = []; corpusUrls = []; renderUrlList();
+        updateFileUI(); renderQuickReplies();
+        const vi = document.getElementById('vignette-preview'), ph = document.getElementById('vignette-placeholder');
+        if (vi) vi.classList.add('hidden'); if (ph) ph.classList.remove('hidden');
+        // Restaurer la clé API précédente
+        const apiEl = document.getElementById('api-key');
+        if (apiEl) apiEl.value = '';
+        restoreSavedApiKey();
+        updatePreviews();
+        updateLibraryUI();
+    };
+
+    // ── PUBLICATION ──
+    window.publishBot = async () => {
+        await saveCurrentBot();
+        const bot = library[currentBotId]; if (!bot) return;
+        // Générer un code de groupe unique à chaque publication
+        const classKey = Math.random().toString(36).slice(2, 6).toUpperCase();
+        const botForShare = JSON.parse(JSON.stringify(bot));
+        if (botForShare.loggingConfig) botForShare.loggingConfig.classKey = classKey;
+        const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(botForShare));
+        const base = window.location.href.replace(/index\.html.*$/, '');
+        const link = base + 'compagnion.html#config=' + encoded;
+        // Mémoriser le groupe dans localStorage pour le suivi
+        const groupsKey = 'mentoria_groups_' + currentBotId;
+        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+        groups.unshift({ classKey, date: new Date().toLocaleDateString('fr-FR'), link });
+        if (groups.length > 20) groups.pop();
+        localStorage.setItem(groupsKey, JSON.stringify(groups));
+        document.getElementById('share-link').value = link;
+        const keyEl = document.getElementById('share-class-key');
+        if (keyEl) keyEl.textContent = classKey;
+        // Jauge de poids du lien
+        const urlKo = Math.round(encoded.length / 1024);
+        const wBar = document.getElementById('publish-weight-bar');
+        const wLabel = document.getElementById('publish-weight-label');
+        const wWarn = document.getElementById('publish-weight-warn');
+        const wAlert = document.getElementById('publish-weight-alert');
+        if (wBar && wLabel) {
+            wBar.style.width = Math.min(100, (urlKo / 300) * 100) + '%';
+            wLabel.textContent = urlKo < 1 ? '< 1 Ko' : urlKo + ' Ko';
+            if (urlKo < 100) {
+                wBar.style.background = '#22c55e';
+                wWarn?.classList.add('hidden'); wAlert?.classList.add('hidden');
+            } else if (urlKo < 200) {
+                wBar.style.background = '#f59e0b';
+                wWarn?.classList.remove('hidden'); wAlert?.classList.add('hidden');
+            } else {
+                wBar.style.background = '#ef4444';
+                wWarn?.classList.add('hidden'); wAlert?.classList.remove('hidden');
+            }
+        }
+        document.getElementById('publish-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // ── SUIVI DE CLASSE ──
+    let suiviSelectedStudent = null;
+
+    function getSuiviClassKey() {
+        return document.getElementById('suivi-group-select')?.value || 'default';
+    }
+
+    window.copySuiviGroupLink = () => {
+        const classKey = getSuiviClassKey();
+        const groupsKey = 'mentoria_groups_' + currentBotId;
+        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+        const group = groups.find(g => g.classKey === classKey);
+        if (group?.link) {
+            navigator.clipboard.writeText(group.link).then(() => showToast('✅ Lien copié', 'Redistribuez ce lien à votre classe.'));
+        } else {
+            showToast('⚠️ Lien introuvable', 'Republiez le bot pour régénérer le lien.');
+        }
+    };
+
+    async function callNuageSuivi(action, extra = {}) {
+        if (storageMode !== 'nuage' || !nuageUsername) return null;
+        return callNuage(action, { botId: currentBotId, classKey: getSuiviClassKey(), ...extra });
+    }
+
+    window.openSuiviModal = async () => {
+        if (!currentBotId) { showToast('⚠️ Aucun bot', 'Ouvrez ou créez un assistant.'); return; }
+        if (storageMode !== 'nuage') { showToast('⚠️ Nuage requis', 'Le suivi nécessite le mode Nuage.'); return; }
+        document.getElementById('suivi-bot-name').textContent = '— ' + (library[currentBotId]?.config?.title || currentBotId);
+        // Charger les groupes connus pour ce bot
+        const groupsKey = 'mentoria_groups_' + currentBotId;
+        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+        const sel = document.getElementById('suivi-group-select');
+        if (sel) {
+            sel.innerHTML = groups.map(g => `<option value="${g.classKey}">${g.classKey} — ${g.date}</option>`).join('');
+            if (!groups.length) sel.innerHTML = '<option value="default">default</option>';
+        }
+        document.getElementById('suivi-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+        suiviSelectedStudent = null;
+        await refreshSuivi();
+        clearInterval(window._suiviInterval);
+        window._suiviInterval = setInterval(refreshSuivi, 30000);
+    };
+
+    window.refreshSuivi = async () => {
+        const listEl = document.getElementById('suivi-student-list');
+        const data = await callNuageSuivi('get_logs');
+        if (!data?.sessions) {
+            listEl.innerHTML = '<div class="p-4 text-xs text-gray-400 text-center">Aucun élève connecté.</div>';
+            suiviSelectedStudent = null;
+            document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>';
+            return;
+        }
+        const sessions = data.sessions;
+        const students = Object.keys(sessions);
+        if (!students.length) {
+            listEl.innerHTML = '<div class="p-4 text-xs text-gray-400 text-center">Aucun élève connecté.</div>';
+            suiviSelectedStudent = null;
+            document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>';
+            return;
+        }
+        // Si l'élève sélectionné n'est plus dans la liste, on réinitialise
+        if (suiviSelectedStudent && !students.includes(suiviSelectedStudent)) {
+            suiviSelectedStudent = null;
+            document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>';
+        }
+        listEl.innerHTML = students.map(sid => {
+            const s = sessions[sid];
+            const lastTs = new Date(s.lastActivity || 0).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            const firstTs = s.firstActivity ? new Date(s.firstActivity).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : lastTs;
+            const count = s.messageCount || s.msgCount || 0;
+            const preview = s.lastMessage ? s.lastMessage.slice(0, 60) + (s.lastMessage.length > 60 ? '…' : '') : '';
+            const isSelected = sid === suiviSelectedStudent;
+            const roleIcon = s.lastRole === 'assistant' ? '🤖' : '🧑';
+            return `<div onclick="selectSuiviStudent('${sid}')" class="px-4 py-3 cursor-pointer hover:bg-indigo-50 transition-colors border-b border-gray-50 ${isSelected ? 'bg-indigo-50 border-l-2 border-indigo-500' : 'border-l-2 border-transparent'}">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 flex-none"></span>
+                        <span class="text-xs font-bold text-gray-800">${sid}</span>
+                        <span class="text-[10px] text-gray-400">${count} échanges · ${firstTs}→${lastTs}</span>
+                    </div>
+                    <button onclick="event.stopPropagation(); banSuiviStudent('${sid}')" title="Expulser" class="text-gray-300 hover:text-red-500 transition-colors">
+                        <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+                ${preview ? `<p class="text-[10px] text-gray-400 pl-4 truncate">${roleIcon} ${preview}</p>` : ''}
+            </div>`;
+        }).join('');
+        if (window.lucide) lucide.createIcons();
+        if (suiviSelectedStudent) await loadSuiviConversation(suiviSelectedStudent);
+    };
+
+    window.selectSuiviStudent = async (sid) => {
+        suiviSelectedStudent = sid;
+        await loadSuiviConversation(sid);
+        document.querySelectorAll('#suivi-student-list > div').forEach(el => {
+            const isThis = el.querySelector('.font-bold')?.textContent?.trim() === sid;
+            el.classList.toggle('bg-indigo-50', isThis);
+            el.classList.toggle('border-indigo-500', isThis);
+            el.classList.toggle('border-transparent', !isThis);
+        });
+    };
+
+    async function loadSuiviConversation(sid) {
+        const convEl = document.getElementById('suivi-conversation');
+        convEl.innerHTML = '<p class="text-xs text-gray-400 text-center">Chargement…</p>';
+        const data = await callNuageSuivi('get_student_log', { studentId: sid });
+        const log = data?.log || [];
+        if (!log.length) {
+            convEl.innerHTML = '<p class="text-xs text-gray-400 text-center mt-4">Aucun message pour cet élève.</p>';
+            return;
+        }
+        convEl.innerHTML = log.map(entry => {
+            const isUser = entry.role === 'user';
+            const ts = new Date(entry.ts).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            return `<div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-[80%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${isUser ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-700'}">
+                    <div class="flex items-center gap-2 mb-1 ${isUser ? 'justify-end' : ''}">
+                        <span class="text-[9px] opacity-60">${isUser ? sid : 'Bot'} · ${ts}</span>
+                    </div>
+                    ${entry.text.replace(/[&<>'\"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t])).replace(/\n/g, '<br>')}
+                </div>
+            </div>`;
+        }).join('');
+        convEl.scrollTop = convEl.scrollHeight;
+    }
+
+    window.banSuiviStudent = async (sid) => {
+        if (!confirm(`Expulser ${sid} ? L'élève ne pourra plus accéder à ce bot.`)) return;
+        await callNuageSuivi('ban_student', { studentId: sid });
+        showToast('✅ Expulsé', `${sid} ne peut plus accéder à ce bot.`);
+        suiviSelectedStudent = null;
+        document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Élève expulsé.</p>';
+        await refreshSuivi();
+    };
+
+    window.deleteAllLogs = async () => {
+        if (!confirm('Supprimer tous les logs de ce bot ? Cette action est irréversible.')) return;
+        const result = await callNuageSuivi('delete_logs');
+        if (!result) { showToast('❌ Erreur', 'Non connecté au Nuage ou bot non sélectionné.'); return; }
+        suiviSelectedStudent = null;
+        showToast('✅ Logs supprimés', 'Tous les journaux ont été effacés.');
+        await refreshSuivi();
+    };
+
+    // ── CORPUS ──
+    window.handleCorpusFiles = async (input) => {
+        const files = Array.from(input.files);
+        if (uploadedFiles.length + files.length > 5) return showToast('Limite', 'Max 5 fichiers.');
+        for (const file of files) {
+            showToast('Lecture…', file.name);
+            let text;
+            if (file.type === 'application/pdf') {
+                const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+                text = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const pg = await pdf.getPage(i);
+                    text += (await pg.getTextContent()).items.map(x => x.str).join(' ') + '\n';
+                }
+            } else { text = await file.text(); }
+            uploadedFiles.push({ name: file.name, content: text });
+        }
+        updateFileUI(); input.value = '';
+    };
+
+    window.updateFileUI = () => {
+        const list = document.getElementById('file-status-list');
+        const count = document.getElementById('file-count');
+        if (count) count.textContent = uploadedFiles.length + ' / 5 fichiers';
+        if (list) {
+            list.innerHTML = uploadedFiles.map((f, i) => `
+                <div class="flex items-center justify-between p-2 rounded text-[10px]" style="background:#f0fdfa;border:1px solid #99f6e4">
+                    <span class="truncate flex-1 font-medium" style="color:var(--teal-dark)">${f.name}</span>
+                    <button onclick="removeFile(${i})" class="ml-2 text-gray-300 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+        const ct = document.getElementById('bot-corpus-text');
+        if (ct) ct.value = uploadedFiles.map(f => '--- SOURCE: ' + f.name + ' ---\n' + f.content).join('\n\n');
+        const sizeEl = document.getElementById('corpus-size-indicator');
+        if (sizeEl && ct) {
+            const kb = Math.round(ct.value.length / 1024);
+            sizeEl.textContent = kb > 0 ? `${kb} Ko` : '';
+            sizeEl.style.color = kb > 120 ? '#ef4444' : kb > 50 ? '#f59e0b' : '#94a3b8';
+        }
+        updateBotWeight();
+    };
+
+    window.removeFile = (idx) => { uploadedFiles.splice(idx, 1); updateFileUI(); };
+
+    window.clearCorpus = () => {
+        if (!confirm('Vider tout le corpus (fichiers + texte) ?')) return;
+        uploadedFiles = [];
+        const ct = document.getElementById('bot-corpus-text');
+        if (ct) ct.value = '';
+        updateFileUI();
+        showToast('✅ Corpus vidé', 'Réenregistrez le bot pour appliquer.');
+    };
+
+    // ── URLs DE RÉFÉRENCE ──
+    let corpusUrls = [];
+
+    window.addCorpusUrl = () => {
+        const input = document.getElementById('corpus-url-input');
+        const url = input?.value?.trim();
+        if (!url || !url.startsWith('http')) { showToast('⚠️ URL invalide', 'L\'URL doit commencer par http(s)://'); return; }
+        if (/\.pdf(\?.*)?$/i.test(url)) { showToast('⚠️ PDF non supporté', 'Les URLs de référence ne fonctionnent qu\'avec des pages web (HTML). Importez le PDF directement via le bouton "Ajouter PDF".'); return; }
+        if (corpusUrls.includes(url)) { showToast('⚠️ Déjà ajoutée', 'Cette URL est déjà dans la liste.'); return; }
+        if (corpusUrls.length >= 5) { showToast('⚠️ Limite', 'Maximum 5 URLs de référence.'); return; }
+        corpusUrls.push(url);
+        if (input) input.value = '';
+        renderUrlList();
+    };
+
+    window.removeUrl = (idx) => { corpusUrls.splice(idx, 1); renderUrlList(); };
+
+    function renderUrlList() {
+        const list = document.getElementById('url-list');
+        if (!list) return;
+        list.innerHTML = corpusUrls.map((url, i) => `
+            <div class="flex items-center gap-2 text-[10px] bg-blue-50 rounded px-2 py-1">
+                <i data-lucide="globe" class="w-3 h-3 flex-none" style="color:#0369a1"></i>
+                <span class="truncate flex-1" style="color:#0369a1">${url}</span>
+                <button onclick="removeUrl(${i})" class="text-gray-300 hover:text-red-500"><i data-lucide="x" class="w-3 h-3"></i></button>
+            </div>
+        `).join('');
+        if (window.lucide) lucide.createIcons();
+    }
+
+    async function fetchUrlContents() {
+        if (!corpusUrls.length) return '';
+        showToast('⏳ Import URLs…', 'Récupération du contenu des pages…');
+        let texts = [];
+        for (const url of corpusUrls) {
+            try {
+                const result = await callNuage('fetch_url', { url });
+                if (result.text) texts.push('--- SOURCE: ' + url + ' ---\n' + result.text);
+            } catch(e) {
+                showToast('⚠️ URL ignorée', url + ' : ' + e.message);
+            }
+        }
+        return texts.join('\n\n');
+    }
+
+    window.copyToClipboard = (id) => {
+        const el = document.getElementById(id); el.select();
+        document.execCommand('copy');
+        showToast('✅ Copié', 'Lien copié dans le presse-papiers !');
+    };
+
+    window.toggleHelpMenu = () => {
+        const menu = document.getElementById('help-menu');
+        menu.classList.toggle('hidden');
+    };
+    document.addEventListener('click', (e) => {
+        const wrapper = document.getElementById('help-menu-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            document.getElementById('help-menu')?.classList.add('hidden');
+        }
+    });
+</script>
+</body>
+</html>

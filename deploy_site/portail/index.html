@@ -88,6 +88,15 @@
             border-radius: 0 2px 2px 0;
         }
 
+        /* ===================== CUSTOM SCROLLBAR ===================== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        html.dark-mode ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        html.dark-mode ::-webkit-scrollbar-thumb { background: #475569; }
+        html.dark-mode ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
         /* ===================== BODY & BACKGROUND ===================== */
         body {
             font-family: 'Inter', sans-serif;
@@ -159,6 +168,45 @@
         }
         .share-modal-overlay.active .share-modal-card { transform: scale(1); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ===================== CALCULATOR ===================== */
+        .calc-modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+        }
+        .calc-modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+        .calc-container {
+            background: white; border-radius: 24px; padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); width: 320px;
+            transform: scale(0.95); transition: transform 0.2s;
+        }
+        html.dark-mode .calc-container { background: #1e293b; border: 1px solid #334155; }
+        .calc-modal-overlay.active .calc-container { transform: scale(1); }
+        .calc-display {
+            background: #f8fafc; border-radius: 16px; padding: 20px; margin-bottom: 20px;
+            text-align: right; font-family: 'Inter', monospace;
+            border: 1px solid #e2e8f0;
+        }
+        html.dark-mode .calc-display { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+        .calc-display-prev { font-size: 0.875rem; color: #94a3b8; min-height: 1.25rem; margin-bottom: 4px; }
+        .calc-display-curr { font-size: 2.25rem; font-weight: 700; color: #0f172a; overflow-x: auto; scrollbar-width: none; }
+        html.dark-mode .calc-display-curr { color: white; }
+        .calc-btn {
+            background: #f1f5f9; border: none; border-radius: 16px; font-size: 1.25rem;
+            font-weight: 600; color: #334155; cursor: pointer; transition: all 0.1s;
+            display: flex; align-items: center; justify-content: center; height: 56px;
+        }
+        .calc-btn:hover { background: #e2e8f0; transform: scale(0.95); }
+        .calc-btn:active { transform: scale(0.9); }
+        html.dark-mode .calc-btn { background: #334155; color: #f1f5f9; }
+        html.dark-mode .calc-btn:hover { background: #475569; }
+        .calc-btn.op { background: #e0e7ff; color: #4f46e5; }
+        html.dark-mode .calc-btn.op { background: rgba(79, 70, 229, 0.2); color: #818cf8; }
+        .calc-btn.equals { background: #4f46e5; color: white; grid-column: span 2; }
+        html.dark-mode .calc-btn.equals { background: #4f46e5; color: white; }
+        .calc-btn.clear { background: #ffe4e6; color: #e11d48; }
+        html.dark-mode .calc-btn.clear { background: rgba(225, 29, 72, 0.2); color: #fb7185; }
 
         .bg-decor {
             position: fixed;
@@ -1998,7 +2046,7 @@
             
             <!-- NOUVEAU BOUTON MES LIENS -->
             <button id="sidebar-fav-toggle" class="sidebar-fav-btn" aria-label="Ouvrir mes favoris" onclick="window.openDrawer ? window.openDrawer() : console.error('openDrawer non défini')">
-                <div class="version-badge">V2.5</div>
+                <div class="version-badge">V3.0</div>
                 <div class="sidebar-fav-btn-icon">
                     <i class="fas fa-star"></i>
                 </div>
@@ -2027,6 +2075,11 @@
                 <i class="fas fa-plus"></i> Ajouter un lien
             </button>
 
+            <!-- OUTIL CALCULATRICE -->
+            <button onclick="document.getElementById('calc-modal').classList.add('active')" class="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all text-xs font-bold uppercase tracking-wide dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700">
+                <i class="fas fa-calculator"></i> Calculatrice
+            </button>
+
             <!-- PARTAGER MON L'ACCES -->
             <button id="share-access-btn" class="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md hover:shadow-lg text-xs font-bold uppercase tracking-wide">
                 <i class="fas fa-share-nodes"></i> Partager l'accès
@@ -2045,13 +2098,13 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
                     </span>
-                    <span class="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em]">Bienvenue sur le portail v4.0.0</span>
+                    <span class="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em]">Bienvenue sur le portail v3.0</span>
                 </div>
 
                 <!-- Titre Principal -->
                 <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-8 leading-[1.1] tracking-tight">
-                    Votre Écosystème de Travail <span class="text-indigo-600 relative inline-block">
-                        Augmenté
+                    Pédagogie Augmentée par <span class="text-indigo-600 relative inline-block">
+                        l'IA
                         <svg class="absolute -bottom-2 left-0 w-full h-3 text-indigo-200/60" viewBox="0 0 100 10" preserveAspectRatio="none">
                             <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round"/>
                         </svg>
@@ -2060,7 +2113,7 @@
 
                 <!-- Paragraphe -->
                 <p class="text-xl text-slate-600 mb-10 leading-relaxed font-medium max-w-2xl">
-                    Optimisez votre quotidien avec un portail centralisé et évolutif. Des outils <strong>d'intelligence artificielle</strong> aux <strong>utilitaires système</strong>, regroupez vos indispensables et vos raccourcis en un seul endroit pour une efficacité maximale.
+                    L'humain souverain dans l'intention, l'IA experte dans l'exécution. Explorez des outils conçus pour l'excellence pédagogique.
                 </p>
 
                 <!-- Boutons CTA & Badges -->
@@ -2094,34 +2147,60 @@
             </div>
         </div>
 
-        <!-- Stats Section (GLASSED) -->
+        <!-- Stats Section (GLASSED & PREMIUM) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 fade-in-up">
-            <div class="glass-morphism rounded-3xl p-8 border border-white/50 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group text-center">
-                <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mb-5 mx-auto group-hover:scale-110 transition-transform"><i class="fas fa-cube text-xl"></i></div>
-                <div class="text-4xl font-black text-indigo-600 mb-1"><span class="counter">22</span></div>
-                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Outils Disponibles</div>
+            <!-- Stat 1 -->
+            <div class="relative group rounded-3xl p-[1px] overflow-hidden bg-gradient-to-br from-indigo-500/30 via-transparent to-transparent shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative bg-white/80 backdrop-blur-xl rounded-[23px] p-8 h-full flex flex-col items-center justify-center border border-white/50">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-indigo-500/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                        <i class="fas fa-layer-group text-xl"></i>
+                    </div>
+                    <div class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 mb-1">
+                        <span class="counter">20</span>+
+                    </div>
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 text-center">Apps Pédagogiques</div>
+                </div>
             </div>
-            <div class="glass-morphism rounded-3xl p-8 border border-white/50 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group text-center">
-                <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 mb-5 mx-auto group-hover:scale-110 transition-transform"><i class="fas fa-circle-check text-xl"></i></div>
-                <div class="text-4xl font-black text-emerald-600 mb-1"><span class="counter">100</span>%</div>
-                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Gratuit &amp; Libre</div>
+
+            <!-- Stat 2 -->
+            <div class="relative group rounded-3xl p-[1px] overflow-hidden bg-gradient-to-br from-emerald-500/30 via-transparent to-transparent shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative bg-white/80 backdrop-blur-xl rounded-[23px] p-8 h-full flex flex-col items-center justify-center border border-white/50">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white mb-5 shadow-lg shadow-emerald-500/30 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
+                        <i class="fas fa-shield-halved text-xl"></i>
+                    </div>
+                    <div class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 mb-1">
+                        <span class="counter">100</span>%
+                    </div>
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 text-center">Souverain & RGPD</div>
+                </div>
             </div>
-            <div class="glass-morphism rounded-3xl p-8 border border-white/50 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group text-center">
-                <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 mb-5 mx-auto group-hover:scale-110 transition-transform"><i class="fas fa-lightbulb text-xl"></i></div>
-                <div class="text-4xl font-black text-amber-600 mb-1"><span class="counter">6</span></div>
-                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Piliers Philosophiques</div>
+
+            <!-- Stat 3 -->
+            <div class="relative group rounded-3xl p-[1px] overflow-hidden bg-gradient-to-br from-amber-500/30 via-transparent to-transparent shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative bg-white/80 backdrop-blur-xl rounded-[23px] p-8 h-full flex flex-col items-center justify-center border border-white/50">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white mb-5 shadow-lg shadow-amber-500/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                        <i class="fas fa-wand-magic-sparkles text-xl"></i>
+                    </div>
+                    <div class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500 mb-1">
+                        IA
+                    </div>
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 text-center">Inclusion & Innovation</div>
+                </div>
             </div>
         </div>
 
         <!-- Search & Filter Section -->
         <section class="mb-12 fade-in-up">
             <div class="mb-8">
-                <div class="search-container mb-6 relative">
-                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
-                    <input type="text" id="search-input" placeholder="Rechercher un outil..." aria-label="Rechercher un outil">
+                <div class="search-container mb-6 relative group cursor-pointer" onclick="openSpotlight()">
+                    <i class="fas fa-search search-icon group-hover:text-indigo-500 transition-colors" aria-hidden="true"></i>
+                    <input type="text" id="search-input" readonly placeholder="Rechercher un outil (ou appuyez sur Ctrl+K)..." aria-label="Rechercher un outil" class="cursor-pointer group-hover:border-indigo-400 shadow-sm group-hover:shadow-md transition-all !pr-24" style="caret-color: transparent;">
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1.5 pointer-events-none">
-                        <span class="kbd-key shadow-none border-slate-200 text-[10px] py-0.5 px-1.5 opacity-40">Ctrl</span>
-                        <span class="kbd-key shadow-none border-slate-200 text-[10px] py-0.5 px-1.5 opacity-40">K</span>
+                        <span class="kbd-key shadow-none border-slate-200 text-[11px] py-1 px-2 text-slate-500 group-hover:border-indigo-200 group-hover:text-indigo-600 transition-colors">Ctrl</span>
+                        <span class="kbd-key shadow-none border-slate-200 text-[11px] py-1 px-2 text-slate-500 group-hover:border-indigo-200 group-hover:text-indigo-600 transition-colors">K</span>
                     </div>
                     <button class="clear-btn" id="clear-search" aria-label="Effacer la recherche"></button>
                 </div>
@@ -2161,6 +2240,60 @@
             <!-- Cards Grid -->
             <div class="cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+                <!-- Mentoria -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper"
+                         data-category="ia,creation"
+                         data-name="Mentoria Studio IA Souverain"
+                         aria-label="Mentoria">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-lg">
+                            <i class="fas fa-robot" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-violet-50 text-violet-600 border border-violet-100/60">
+                            <i class="fas fa-shield-halved text-[9px]" aria-hidden="true"></i> IA Souveraine
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Mentoria</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Studio de création d'assistants pédagogiques IA souverains. Créez des assistants personnalisés pour vos élèves sans collecte de données (RGPD by design).</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">IA Souveraine</span>
+                        <span class="keyword-tag">Studio</span>
+                        <span class="keyword-tag">RGPD</span>
+                    </div>
+                    <a href="../mentoria/index.html"
+                       class="card-cta-small bg-violet-50 text-violet-700 border-violet-100 hover:bg-violet-500 hover:text-white hover:border-violet-500">
+                        <span>Lancer le studio</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
+                <!-- Experia (GAMIA) -->
+                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-2 card-wrapper"
+                         data-category="jeu,ia"
+                         data-name="Experia GAMIA Apprentissage Gamifié Mémorisation IA"
+                         aria-label="Experia">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-lg">
+                            <i class="fas fa-gamepad" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-pill bg-fuchsia-50 text-fuchsia-600 border border-fuchsia-100/60">
+                            <i class="fas fa-bolt text-[9px]" aria-hidden="true"></i> Jeu & IA
+                        </span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">Experia</h3>
+                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Gagner, Apprendre et Mémoriser avec l'IA. Plateforme gamifiée proposant quiz, flashcards et missions générées par l'IA pour réviser n'importe quel sujet.</p>
+                    <div class="flex flex-wrap gap-1.5 mb-5">
+                        <span class="keyword-tag">Gamification</span>
+                        <span class="keyword-tag">Révisions</span>
+                        <span class="keyword-tag">Mini-jeux</span>
+                    </div>
+                    <a href="../experia/index.html"
+                       class="card-cta-small bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100 hover:bg-fuchsia-500 hover:text-white hover:border-fuchsia-500">
+                        <span>Lancer le jeu</span>
+                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
+                    </a>
+                </article>
+
                 <!-- 1. Assistant de Conception -->
                 <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-1 card-wrapper"
                          data-category="ia"
@@ -2193,7 +2326,6 @@
                          data-category="ia,creation"
                          data-name="Master Technologie Cours Complet Ressources Pédagogiques"
                          aria-label="Master Technologie">
-                    <span class="badge-new">Nouveau</span>
                     <div class="flex items-start justify-between mb-5">
                         <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-lg">
                             <i class="fas fa-laptop-code" aria-hidden="true"></i>
@@ -2271,68 +2403,12 @@
                     </a>
                 </article>
 
-                <!-- 5. Bloc-note (Nouveau) -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-5 card-wrapper"
-                         data-category="orga,creation"
-                         data-name="Bloc-note Notes Onglets Captures"
-                         aria-label="Bloc-note Enrichi">
-                    <span class="badge-new bg-indigo-500">Nouveau</span>
-                    <div class="flex items-start justify-between mb-5">
-                        <div class="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-lg">
-                            <i class="fas fa-book-open" aria-hidden="true"></i>
-                        </div>
-                        <span class="category-pill bg-indigo-50 text-indigo-600 border border-indigo-100/60">
-                            <i class="fas fa-edit text-[9px]" aria-hidden="true"></i> Prise de notes
-                        </span>
-                    </div>
-                    <h3 class="text-base font-bold text-slate-900 mb-3">Bloc-note Enrichi</h3>
-                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Prise de notes & Documentation - Un carnet numérique avec onglets, texte mis en forme et insertion rapide de captures d'écran via Ctrl+V.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-5">
-                        <span class="keyword-tag">Onglets</span>
-                        <span class="keyword-tag">Captures TV</span>
-                        <span class="keyword-tag">Sync Cloud</span>
-                    </div>
-                    <a href="blocnote.html"
-                       class="card-cta-small bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-500 hover:text-white hover:border-indigo-500">
-                        <span>Lancer le carnet</span>
-                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
-                    </a>
-                </article>
-
-                <!-- Favoris IA (Nouveau) -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-5 card-wrapper"
-                         data-category="orga,ia"
-                         data-name="Favoris IA Marque-pages Veille Cloud AI"
-                         aria-label="Favoris IA">
-                    <span class="badge-new text-purple-600 bg-purple-100 border-purple-200">Nouveau</span>
-                    <div class="flex items-start justify-between mb-5">
-                        <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-lg">
-                            <i class="fas fa-bookmark" aria-hidden="true"></i>
-                        </div>
-                        <span class="category-pill bg-purple-50 text-purple-600 border border-purple-100/60">
-                            <i class="fas fa-microchip text-[9px]" aria-hidden="true"></i> IA & Orga
-                        </span>
-                    </div>
-                    <h3 class="text-base font-bold text-slate-900 mb-3">Favoris IA</h3>
-                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Sauvegardez vos liens web. L'IA génère automatiquement un résumé de la page cible. Interface en glisser-déposer.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-5">
-                        <span class="keyword-tag">Signets</span>
-                        <span class="keyword-tag">IA</span>
-                        <span class="keyword-tag">Sync Cloud</span>
-                    </div>
-                    <a href="favoris.html"
-                       class="card-cta-small bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-600 hover:text-white hover:border-purple-600">
-                        <span>Gérer mes favoris</span>
-                        <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
-                    </a>
-                </article>
 
                 <!-- 7. Dépôt Tampon (Drive) -->
                 <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-7 card-wrapper"
                          data-category="orga"
                          data-name="Dépôt Tampon Drive Transfert Fichiers Lourd"
                          aria-label="Dépôt Tampon (Drive)">
-                    <span class="badge-new bg-teal-100 text-teal-600 border-teal-200">Nouveau</span>
                     <div class="flex items-start justify-between mb-5">
                         <div class="w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 text-lg">
                             <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
@@ -2579,7 +2655,6 @@
                          data-category="ia,creation"
                          data-name="EduSlide Générateur Prompt Premium Présentations Pédagogiques NotebookLM"
                          aria-label="EduSlide">
-                    <span class="badge-new">Nouveau</span>
                     <div class="flex items-start justify-between mb-5">
                         <div class="w-11 h-11 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-lg">
                             <i class="fas fa-desktop" aria-hidden="true"></i>
@@ -2607,7 +2682,6 @@
                          data-category="jeu,ia"
                          data-name="Super Générateur de Jeux Pédagogiques HTML Prompt Parcours"
                          aria-label="Générateur de Jeux">
-                    <span class="badge-new">Nouveau</span>
                     <div class="flex items-start justify-between mb-5">
                         <div class="w-11 h-11 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-lg">
                             <i class="fas fa-cubes" aria-hidden="true"></i>
@@ -2635,7 +2709,6 @@
                          data-category="creation,ia"
                          data-name="Générateur d'Activités Pédagogiques HTML QCM Synthèse"
                          aria-label="Générateur d'Activités">
-                    <span class="badge-new">Nouveau</span>
                     <div class="flex items-start justify-between mb-5">
                         <div class="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-lg">
                             <i class="fas fa-tasks" aria-hidden="true"></i>
@@ -2663,7 +2736,6 @@
                          data-category="orga"
                          data-name="Veille Stratégique Pro RSS Favoris Cloud"
                          aria-label="Veille Stratégique">
-                    <span class="badge-new">Nouveau</span>
                     <div class="flex items-start justify-between mb-5">
                         <div class="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-lg">
                             <i class="fas fa-satellite-dish" aria-hidden="true"></i>
@@ -2686,32 +2758,7 @@
                     </a>
                 </article>
 
-                <!-- 16. YouTube EduSync -->
-                <article class="card-soft rounded-2xl p-8 flex flex-col h-full fade-in-up stagger-12 card-wrapper"
-                         data-category="orga"
-                         data-name="YouTube EduSync Vidéos Favoris Zéro Distraction"
-                         aria-label="YouTube EduSync">
-                    <span class="badge-new bg-red-100 text-red-600 border-red-200">Nouveau</span>
-                    <div class="flex items-start justify-between mb-5">
-                        <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-lg shadow-sm">
-                            <i class="fab fa-youtube" aria-hidden="true"></i>
-                        </div>
-                        <span class="category-pill bg-cyan-50 text-cyan-600 border border-cyan-100/60">
-                            <i class="fas fa-folder-tree text-[9px]" aria-hidden="true"></i> Organisation
-                        </span>
-                    </div>
-                    <h3 class="text-base font-bold text-slate-900 mb-3">YouTube EduSync</h3>
-                    <p class="text-sm text-slate-500 mb-5 leading-relaxed flex-grow">Votre veille vidéo personnelle. Lisez immédiatement les publications éducatives de vos propres abonnements YouTube sans les recommandations parasites de l'algorithme.</p>
-                    <div class="flex flex-wrap gap-1.5 mb-5">
-                        <span class="keyword-tag">YouTube API</span>
-                        <span class="keyword-tag bg-emerald-50 text-emerald-600 border-emerald-100">Zéro Distraction</span>
-                    </div>
-                    <a href="youtube_veille.html" target="_blank" rel="noopener"
-                       class="card-cta-small bg-red-50 text-red-700 border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600">
-                        <span>Ouvrir l'outil</span>
-                        <i class="fas fa-play text-xs" aria-hidden="true"></i>
-                    </a>
-                </article>
+
 
 
                 <!-- CARTE APPLICATION: EDITEURHTML -->
@@ -2905,12 +2952,12 @@
 
     <!-- ============================== MODAL: PHILOSOPHIE DU PROJET ============================== -->
     <div id="philosophy-modal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <!-- Modal Header -->
             <div class="modal-header">
                 <div class="modal-header-content">
-                    <h2>Philosophie du Projet</h2>
-                    <p>Vision d'une suite d'outils au service de l'enseignant</p>
+                    <h2>Vision & Posture Stratégique</h2>
+                    <p>L'IA au service de l'enseignant, jamais en remplacement.</p>
                 </div>
                 <button class="modal-close-btn" aria-label="Fermer la modale" id="modal-close">
                     <i class="fas fa-times" aria-hidden="true"></i>
@@ -2919,142 +2966,49 @@
 
             <!-- Modal Body -->
             <div class="modal-body">
-                <div class="modal-vision-box">
-                    <strong>Vision centrale :</strong> Démocratiser l'accès à des ressources pédagogiques de qualité professionnelle en mettant l'intelligence artificielle au service de l'enseignant, sans jamais le remplacer. L'IA n'est pas le pédagogue : <em>elle est l'assistant qui prépare le terrain, l'enseignant reste l'architecte</em>.
+                <!-- Highlight Box -->
+                <div class="modal-vision-box" style="background: linear-gradient(to right bottom, #eef2ff, #fff); border: 1px solid #e0e7ff; padding: 1.5rem; border-radius: 1rem; margin-bottom: 2rem;">
+                    <h3 style="color: #312e81; font-weight: 900; font-size: 1.25rem; margin-bottom: 0.5rem; line-height: 1.4;">« Plus l'IA devient autonome dans l'exécution, plus l'humain doit être souverain dans l'intention. »</h3>
+                    <p style="color: #3730a3; margin: 0; line-height: 1.6;">Je ne conçois pas de simples contenus, j'industrialise l'excellence pédagogique. Mon métier est de garantir que la technologie réponde strictement aux cadres institutionnels et cognitifs.</p>
                 </div>
 
-                <h3><i class="fas fa-lightbulb"></i> Genèse & Contexte</h3>
-                <p>L'Assistant Pédagogique Moderne est né d'une observation terrain : les enseignants manquent de temps pour créer des supports pédagogiques variés, adaptés et esthétiquement engageants. Face à l'émergence des IA génératives, il devenait urgent de concevoir une <strong>interface de médiation</strong> entre ces outils puissants mais complexes et les besoins concrets de l'enseignant.</p>
-                <p>Plutôt que de se perdre dans des prompts mal structurés ou de produire du contenu générique, cette suite d'outils propose une <strong>ingénierie pédagogique encapsulée</strong> : chaque générateur intègre les bonnes pratiques didactiques, les référentiels officiels (programmes de l'Éducation Nationale) et une exigence de qualité alignée sur celle d'un éditeur scolaire.</p>
-
-                <h3><i class="fas fa-columns"></i> Les Six Piliers Philosophiques</h3>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🎯</div>
-                    <div class="modal-pillar-content">
-                        <strong>L'enseignant au centre</strong>
-                        <p>L'outil ne génère jamais de contenu "clé en main" sans validation humaine. Il produit des prompts structurés ou des bases de travail que l'enseignant enrichit, adapte et valide.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-left">
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                        <h3 class="flex items-center gap-2 text-base font-bold text-slate-800 mb-2"><i class="fas fa-shield-halved text-emerald-500"></i> Souveraineté & RGPD</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed m-0">L'innovation n'a de sens que si elle s'enracine dans le respect des données. L'expertise vise des architectures locales ou souveraines, sans collecte de données, à l'image des initiatives de l'Éducation Nationale.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                        <h3 class="flex items-center gap-2 text-base font-bold text-slate-800 mb-2"><i class="fas fa-chalkboard-teacher text-indigo-500"></i> Légitimité Terrain</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed m-0">Une double culture rare : une compréhension intime des contraintes du terrain, hybridée avec une maîtrise des modèles d'IA. L'IA génère du probable, l'Expert produit de la structure.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                        <h3 class="flex items-center gap-2 text-base font-bold text-slate-800 mb-2"><i class="fas fa-universal-access text-amber-500"></i> Inclusion & Accessibilité</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed m-0">Connaissance absolue des attendus en matière d'inclusion (DYS, TDAH). L'IA est exploitée pour adapter et personnaliser les parcours afin qu'aucun élève ne soit laissé de côté.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                        <h3 class="flex items-center gap-2 text-base font-bold text-slate-800 mb-2"><i class="fas fa-microchip text-rose-500"></i> Anticipation & R&D</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed m-0">Un laboratoire expérimental (+20 outils) pour éprouver les protocoles anti-hallucinatoires et garantir des investissements durables et respectueux des écosystèmes éducatifs.</p>
                     </div>
                 </div>
 
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">⚡</div>
-                    <div class="modal-pillar-content">
-                        <strong>Gain de temps, pas de qualité perdue</strong>
-                        <p>L'automatisation vise les tâches chronophages (structuration, mise en page, diversité de formats), libérant du temps pour la personnalisation et l'innovation pédagogique.</p>
+                <!-- Integration of the link to gcormi.fr -->
+                <div class="bg-gradient-to-r from-slate-900 to-indigo-900 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden text-left mt-8">
+                    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 20px 20px;"></div>
+                    <div class="relative z-10">
+                        <h4 class="text-white font-black text-xl mb-2">Gilles Cormi</h4>
+                        <p class="text-indigo-200 text-sm max-w-md m-0">Consultant Stratégique IA & Éducation. Accompagnement, audits et conception d'architectures d'apprentissage souveraines pour les institutions et acteurs EdTech.</p>
                     </div>
+                    <a href="https://gcormi.fr" target="_blank" rel="noopener" class="relative z-10 shrink-0 px-6 py-3 bg-white text-indigo-900 hover:bg-indigo-50 font-bold rounded-xl transition-all shadow-lg hover:scale-105 flex items-center gap-2" style="text-decoration: none;">
+                        Découvrir mon expertise <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
 
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🔄</div>
-                    <div class="modal-pillar-content">
-                        <strong>Flexibilité & Diversité</strong>
-                        <p>Un même contenu peut être décliné en cours DOCX, page HTML interactive, exercice Moodle XML, infographie visuelle ou jeu pédagogique, selon le besoin et le public.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🌐</div>
-                    <div class="modal-pillar-content">
-                        <strong>Compatibilité ENT</strong>
-                        <p>Intégration facilitée avec les Environnements Numériques de Travail : exports prêts à l'emploi pour outils de création assistée (PNG), Tests Moodle (XML), ou pages HTML interactives.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🎨</div>
-                    <div class="modal-pillar-content">
-                        <strong>Esthétique & Engagement</strong>
-                        <p>Refus des interfaces austères. Chaque générateur embarque des principes de design moderne (palettes de couleurs, typographie soignée, animations CSS) pour produire des supports qui donnent envie.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">📚</div>
-                    <div class="modal-pillar-content">
-                        <strong>Rigueur Pédagogique</strong>
-                        <p>Alignement strict sur les programmes officiels, intégration du Socle Commun, structuration par compétences. L'IA est guidée pour produire des contenus conformes aux exigences institutionnelles.</p>
-                    </div>
-                </div>
-
-                <h3><i class="fas fa-sitemap"></i> Architecture de l'Écosystème</h3>
-                <p>L'application se décompose en <strong>six familles fonctionnelles complémentaires</strong> :</p>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">📖</div>
-                    <div class="modal-pillar-content">
-                        <strong>A. Générateurs de Cours Disciplinaires</strong>
-                        <p>Sciences (Technologie, SVT, Physique-Chimie, Mathématiques), Sciences Humaines (Histoire, Géographie, EMC), Langues & Arts (Français, Anglais, Espagnol, Italien, LCC, Arts Plastiques, Éducation Musicale), Lycée (SNT, SES)</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🛠️</div>
-                    <div class="modal-pillar-content">
-                        <strong>B. Boîte à Outils (Édition & Conversion)</strong>
-                        <p>Éditeur visuel HTML (WYSIWYG), Amélioration de design HTML via prompt, Amélioration de textes DOCX via IA, Convertisseur HTML → PDF</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">🎮</div>
-                    <div class="modal-pillar-content">
-                        <strong>C. Activités Interactives & Ludiques</strong>
-                        <p>Générateurs de parcours d'activités multi-onglets, Escape Games / Scénarios à choix, Ateliers cognitifs (Memory, Mots Croisés, Mots Mêlés, Association)</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">✏️</div>
-                    <div class="modal-pillar-content">
-                        <strong>D. Exercices & Évaluations</strong>
-                        <p>Exercices visuels (PNG pour Création Assistée Léia), Exercices auto-corrigés (XML Moodle), Infographies pédagogiques (Accroche, Résumé, Synthèse)</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">&#129427;</div>
-                    <div class="modal-pillar-content">
-                        <strong>E. Inclusion &amp; Accessibilit&eacute; TAS</strong>
-                        <p>Deux outils d&eacute;di&eacute;s aux &eacute;l&egrave;ves pr&eacute;sentant des Troubles des Apprentissages Sp&eacute;cifiques (DYS, TDAH, dyspraxie&hellip;) : <strong>Adaptation Inclusive</strong> pour reformater n&rsquo;importe quelle ressource p&eacute;dagogique, et <strong>Lecteur Adaptatif</strong> pour une lecture bionique, audio et &eacute;pur&eacute;e. Le z&egrave;bre &#129427;, symbole des profils neuroatypiques, rappelle qu&rsquo;aucun &eacute;l&egrave;ve ne se ressemble &mdash; et qu&rsquo;aucun ne doit &ecirc;tre laiss&eacute; de c&ocirc;t&eacute;.</p>
-                    </div>
-                </div>
-
-                <div class="modal-pillar">
-                    <div class="modal-pillar-icon">☁️</div>
-                    <div class="modal-pillar-content">
-                        <strong>F. Veille & Organisation</strong>
-                        <p>Outils de veille pédagogique garantis "Zéro Distraction" (Veille Pro, YouTube EduSync) et d'accès centralisé aux espaces académiques et assistants de nouvelle génération (Hub Personnel & IA).</p>
-                    </div>
-                </div>
-
-                <h3><i class="fas fa-cogs"></i> Principes de Conception Technique</h3>
-                <p><strong>Autonomie & Légèreté :</strong> Tous les outils fonctionnent côté client (HTML/CSS/JavaScript), sans serveur backend. L'enseignant garde la main sur ses données, rien n'est envoyé à un serveur tiers (hors appel IA si mode API activé).</p>
-                <p><strong>Transparence & Modifiabilité des Prompts :</strong> L'application ne "cache" jamais ce qu'elle envoie à l'IA. Le prompt généré est toujours visible, modifiable et pédagogique : il explicite les exigences (structure, format, compétences visées). <em>Toutes les informations et prompts sont facilement modifiables et améliorables</em> selon les besoins spécifiques de chaque enseignant.</p>
-                <p><strong>Modularité :</strong> Chaque outil est une page HTML autonome et réutilisable. Un enseignant peut adapter ou dupliquer un générateur pour ses besoins spécifiques sans dépendances complexes.</p>
-
-                <h3><i class="fas fa-heart"></i> Posture Éthique & Pédagogique</h3>
-                <p><strong>L'IA comme co-pilote, jamais comme pilote :</strong> Les outils n'encouragent pas la délégation aveugle à l'IA, mais une collaboration consciente. L'enseignant doit :</p>
-                <ul>
-                    <li>Paramétrer ses besoins (niveau, thème, objets d'étude, plan imposé)</li>
-                    <li>Vérifier systématiquement les contenus générés (mention explicite dans le footer de chaque page)</li>
-                    <li>Adapter le contenu à sa classe, son contexte, ses élèves</li>
-                </ul>
-                <p><strong>Accompagnement à la maîtrise des outils numériques :</strong> En affichant les prompts et en expliquant les mécanismes (structure d'un cours, critères d'un bon exercice), l'application forme implicitement l'enseignant à l'ingénierie pédagogique et à l'usage raisonné de l'IA.</p>
-
-                <h3><i class="fas fa-globe"></i> Modèle Économique & Accessibilité</h3>
-                <p>L'application est diffusée sous <strong>licence Creative Commons BY-NC-ND 4.0</strong> : gratuite pour un usage non commercial, l'auteur doit être crédité, et aucune modification n'est autorisée. Ce choix affirme une volonté de <strong>démocratisation</strong> : tout enseignant, quelle que soit son académie ou son établissement, peut bénéficier de ces outils.</p>
-                <p>Le mode <strong>API optionnel</strong> (connexion Gemini ou OpenRouter) permet une automatisation complète, mais l'application reste pleinement fonctionnelle en mode "générateur de prompts" : l'enseignant copie le prompt produit et l'utilise dans l'IA de son choix (gratuite ou payante).</p>
-
-                <h3><i class="fas fa-rocket"></i> Conclusion : Vers une Pédagogie Augmentée</h3>
-                <p>L'Assistant Pédagogique Moderne ne cherche pas à "remplacer" le travail de l'enseignant, mais à le <strong>réorienter</strong> : moins de temps sur la mise en forme, plus de temps sur la personnalisation, l'accompagnement et l'innovation. En structurant l'usage de l'IA par des cadres pédagogiques rigoureux, il transforme un outil généraliste en un <strong>partenaire d'expertise disciplinaire</strong>.</p>
-                <p>La philosophie sous-jacente est celle d'une <strong>pédagogie augmentée</strong> : l'humain (enseignant et élève) reste au cœur, la machine sert d'amplificateur de créativité et de productivité, jamais de substitut à la réflexion et au lien humain.</p>
             </div>
 
             <!-- Modal Footer -->
             <div class="modal-footer">
                 <div class="modal-footer-text">
-                    © 2026 Gilles Cormi · Licence <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="modal-footer-link">CC BY-NC-ND 4.0</a>
+                    © 2026 Gilles Cormi · Consultant Stratégique IA & Éducation
                 </div>
                 <button id="modal-close-footer" class="philosophy-btn text-xs">
                     <i class="fas fa-check" aria-hidden="true"></i>
@@ -4171,6 +4125,117 @@
                 `;
             }).join('');
         });
+    </script>
+
+    <!-- ============================== MODAL: CALCULATRICE ============================== -->
+    <div id="calc-modal" class="calc-modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+        <div class="calc-container">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <i class="fas fa-calculator text-indigo-500"></i> Calculatrice
+                </h3>
+                <button onclick="document.getElementById('calc-modal').classList.remove('active')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="calc-display">
+                <div class="calc-display-prev" id="calc-prev"></div>
+                <div class="calc-display-curr" id="calc-curr">0</div>
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+                <button class="calc-btn clear" onclick="calcClear()">C</button>
+                <button class="calc-btn op" onclick="calcDel()"><i class="fas fa-backspace"></i></button>
+                <button class="calc-btn op" onclick="calcOp('%')">%</button>
+                <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+
+                <button class="calc-btn" onclick="calcNum('7')">7</button>
+                <button class="calc-btn" onclick="calcNum('8')">8</button>
+                <button class="calc-btn" onclick="calcNum('9')">9</button>
+                <button class="calc-btn op" onclick="calcOp('*')">×</button>
+
+                <button class="calc-btn" onclick="calcNum('4')">4</button>
+                <button class="calc-btn" onclick="calcNum('5')">5</button>
+                <button class="calc-btn" onclick="calcNum('6')">6</button>
+                <button class="calc-btn op" onclick="calcOp('-')">−</button>
+
+                <button class="calc-btn" onclick="calcNum('1')">1</button>
+                <button class="calc-btn" onclick="calcNum('2')">2</button>
+                <button class="calc-btn" onclick="calcNum('3')">3</button>
+                <button class="calc-btn op" onclick="calcOp('+')">+</button>
+
+                <button class="calc-btn" onclick="calcNum('0')">0</button>
+                <button class="calc-btn" onclick="calcNum('.')">.</button>
+                <button class="calc-btn equals" onclick="calcEquals()">=</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let calcCurrent = '0';
+        let calcPrevious = '';
+        let calcOperation = undefined;
+
+        const updateCalcDisplay = () => {
+            document.getElementById('calc-curr').innerText = calcCurrent;
+            if (calcOperation != null) {
+                document.getElementById('calc-prev').innerText = `${calcPrevious} ${calcOperation.replace('*', '×').replace('/', '÷').replace('-', '−')}`;
+            } else {
+                document.getElementById('calc-prev').innerText = '';
+            }
+        };
+
+        const calcClear = () => {
+            calcCurrent = '0';
+            calcPrevious = '';
+            calcOperation = undefined;
+            updateCalcDisplay();
+        };
+
+        const calcDel = () => {
+            if (calcCurrent === '0') return;
+            calcCurrent = calcCurrent.toString().slice(0, -1);
+            if (calcCurrent === '') calcCurrent = '0';
+            updateCalcDisplay();
+        };
+
+        const calcNum = (number) => {
+            if (number === '.' && calcCurrent.includes('.')) return;
+            if (calcCurrent === '0' && number !== '.') {
+                calcCurrent = number;
+            } else {
+                calcCurrent = calcCurrent.toString() + number.toString();
+            }
+            updateCalcDisplay();
+        };
+
+        const calcOp = (op) => {
+            if (calcCurrent === '0' && calcPrevious === '') return;
+            if (calcPrevious !== '') {
+                calcEquals();
+            }
+            calcOperation = op;
+            calcPrevious = calcCurrent;
+            calcCurrent = '0';
+            updateCalcDisplay();
+        };
+
+        const calcEquals = () => {
+            let computation;
+            const prev = parseFloat(calcPrevious);
+            const current = parseFloat(calcCurrent);
+            if (isNaN(prev) || isNaN(current)) return;
+            switch (calcOperation) {
+                case '+': computation = prev + current; break;
+                case '-': computation = prev - current; break;
+                case '*': computation = prev * current; break;
+                case '/': computation = prev / current; break;
+                case '%': computation = prev % current; break;
+                default: return;
+            }
+            calcCurrent = computation.toString();
+            calcOperation = undefined;
+            calcPrevious = '';
+            updateCalcDisplay();
+        };
     </script>
 </body>
 </html>
