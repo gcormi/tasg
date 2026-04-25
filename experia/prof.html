@@ -393,6 +393,7 @@ const ACTIVITIES = [
   { id: 'qcm',          label: 'Quiz QCM',               icon: 'circle-help',     color: 'blue',   default: 10, defaultPts: 10 },
   { id: 'paires',       label: 'Paires à relier',         icon: 'link',            color: 'purple', default: 8,  defaultPts: 8  },
   { id: 'motsmeles',    label: 'Mots mêlés',              icon: 'grid-3x3',        color: 'rose',   default: 8,  defaultPts: 8  },
+  { id: 'motscroises',  label: 'Mots croisés',            icon: 'layout-grid',     color: 'cyan',   default: 8,  defaultPts: 8  },
   { id: 'rapidite',     label: 'Mission rapidité',         icon: 'zap',             color: 'orange', default: 8,  defaultPts: 8  },
   { id: 'completer',    label: 'Compléter la phrase',     icon: 'pen-line',        color: 'green',  default: 5,  defaultPts: 5  },
   { id: 'intrus',       label: 'Détection d\'intrus',     icon: 'search-x',        color: 'amber',  default: 5,  defaultPts: 5  },
@@ -403,7 +404,7 @@ const COLOR_MAP = {
   blue: 'text-blue-600 bg-blue-50', purple: 'text-purple-600 bg-purple-50',
   rose: 'text-rose-600 bg-rose-50', orange: 'text-orange-600 bg-orange-50',
   green: 'text-green-600 bg-green-50', amber: 'text-amber-600 bg-amber-50',
-  indigo: 'text-indigo-600 bg-indigo-50'
+  indigo: 'text-indigo-600 bg-indigo-50', cyan: 'text-cyan-600 bg-cyan-50'
 };
 
 // ─── NAVIGATION ─────────────────────────────────────────────────────────────
@@ -466,6 +467,7 @@ async function generateActivity(type, count, corpus, level = "Non spécifié") {
     qcm: `Génère exactement ${count} QCM en français sur le sujet ou texte de référence suivant.\nSi le texte fourni est court (un simple thème), utilise tes connaissances expertes pour inventer le contenu. Si c'est un texte long, base-toi UNIQUEMENT dessus.\nAdapte le vocabulaire et la complexité pour le niveau : ${level}.\nJSON uniquement, sans markdown :\n[{"q":"...","choices":["...","...","...","..."],"correct":0,"expl":"..."}]\ncorrect = index 0-3 de la bonne réponse.\n\nSujet / Texte de référence:\n${corpus}`,
     paires: `Génère exactement ${count} paires terme/définition en français sur le sujet ou texte de référence suivant.\nSi le texte fourni est court (un simple thème), utilise tes connaissances expertes. Si c'est un texte long, base-toi UNIQUEMENT dessus.\nAdapte le vocabulaire et la complexité pour le niveau : ${level}.\nJSON uniquement, sans markdown :\n[{"term":"...","def":"..."}]\n\nSujet / Texte de référence:\n${corpus}`,
     motsmeles: `Génère exactement ${count} mots clés uniques en français liés au sujet ou texte de référence suivant.\nCes mots doivent être des mots simples, sans espaces ni caractères spéciaux, d'au maximum 12 lettres. Mets-les tous en MAJUSCULES sans accents.\nJSON uniquement, sans markdown :\n[{"word":"MOTUN"},{"word":"MOTDEUX"}]\n\nSujet / Texte de référence:\n${corpus}`,
+    motscroises: `Génère exactement ${count} paires mot/définition en français liés au sujet ou texte de référence suivant, pour créer des mots croisés.\nLe mot doit être simple, sans espaces ni tirets, d'au maximum 12 lettres. Mets le mot en MAJUSCULES sans accents. La définition doit être claire, courte, adaptée au niveau ${level}.\nJSON uniquement :\n[{"word":"MOTUN", "def":"Définition du mot."}]\n\nSujet / Texte de référence:\n${corpus}`,
     rapidite: `Génère exactement ${count} QCM courts et simples en français sur le sujet ou texte de référence suivant (pour un défi de rapidité).\nSi le texte fourni est court (un simple thème), utilise tes connaissances expertes. Si c'est un texte long, base-toi UNIQUEMENT dessus.\nAdapte le vocabulaire et la complexité pour le niveau : ${level}.\nJSON uniquement, sans markdown :\n[{"q":"...","choices":["...","...","...","..."],"correct":0}]\n\nSujet / Texte de référence:\n${corpus}`,
     completer: `Génère exactement ${count} phrases à trous en français sur le sujet ou texte de référence suivant.\nSi le texte fourni est court (un simple thème), utilise tes connaissances expertes. Si c'est un texte long, base-toi UNIQUEMENT dessus.\nUn seul mot ou groupe nominal manquant par phrase, remplacé par "_____".\nAdapte le vocabulaire et la complexité pour le niveau : ${level}.\nJSON uniquement, sans markdown :\n[{"phrase":"... _____ ...","answer":"..."}]\n\nSujet / Texte de référence:\n${corpus}`,
     intrus: `Génère exactement ${count} groupes de 4 affirmations en français dont UNE SEULE est fausse, sur le sujet ou texte de référence suivant.\nSi le texte fourni est court (un simple thème), utilise tes connaissances expertes. Si c'est un texte long, base-toi UNIQUEMENT dessus.\nAdapte le vocabulaire et la complexité pour le niveau : ${level}.\nJSON uniquement, sans markdown :\n[{"statements":["...","...","...","..."],"intrus":2,"expl":"..."}]\nintrus = index 0-3 de la fausse affirmation.\n\nSujet / Texte de référence:\n${corpus}`,

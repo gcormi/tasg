@@ -246,6 +246,50 @@
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN JEU : MOTS CROISÉS                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-motscroises" class="screen">
+  <div class="max-w-xl mx-auto w-full px-6 py-8 flex-1 flex flex-col">
+    <div class="flex items-center gap-3 mb-6 fade-up">
+      <button onclick="backToDashboard()" class="p-2 hover:bg-white rounded-xl transition-colors text-slate-500">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div class="flex-1">
+        <p class="text-xs font-bold text-cyan-600 uppercase tracking-wider">Mots Croisés</p>
+        <div class="flex items-center gap-2 mt-1">
+          <div class="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div id="mc-bar" class="bg-cyan-500 h-1.5 rounded-full transition-all duration-300" style="width:0%"></div>
+          </div>
+          <span id="mc-progress" class="text-xs font-bold text-slate-400"></span>
+        </div>
+      </div>
+      <div class="text-right">
+        <div id="mc-score" class="font-black text-cyan-600 text-xl">0</div>
+        <div class="text-xs text-slate-400 font-bold">mots</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4 fade-up flex-1 flex flex-col overflow-hidden relative">
+      <p id="mc-def-text" class="text-center text-sm font-bold text-cyan-700 bg-cyan-50 rounded-xl p-3 mb-4 min-h-[3rem] flex items-center justify-center border border-cyan-100">
+        Sélectionnez une case pour voir la définition.
+      </p>
+      <div class="overflow-auto flex-1 bg-slate-50 p-2 rounded-xl border border-slate-100 touch-pan-x touch-pan-y relative" id="mc-scroll-area">
+        <div id="mc-grid-container" class="grid gap-[1px] select-none mx-auto w-fit" style="touch-action: pan-x pan-y;"></div>
+      </div>
+    </div>
+    
+    <div id="mc-feedback" class="hidden mt-4 rounded-2xl px-5 py-3 text-sm font-bold text-center"></div>
+    <div id="mc-end" class="hidden text-center mt-8 fade-up">
+      <div class="text-5xl font-black text-cyan-500 mb-2" id="mc-final-score"></div>
+      <p class="text-slate-500 font-medium mb-4">Score Mots Croisés</p>
+      <button onclick="backToDashboard()" class="bg-cyan-600 text-white font-black px-8 py-3 rounded-2xl hover:bg-cyan-700 transition-all">
+        Retour aux activités
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
 <!-- ÉCRAN JEU : RAPIDITÉ                        -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-rapidite" class="screen">
@@ -485,6 +529,7 @@ const ACTIVITIES = [
   { id:'qcm',          label:'Quiz QCM',             icon:'circle-help',    color:'blue'   },
   { id:'paires',       label:'Paires à relier',       icon:'link',           color:'purple' },
   { id:'motsmeles',    label:'Mots mêlés',            icon:'grid-3x3',       color:'rose'   },
+  { id:'motscroises',  label:'Mots croisés',          icon:'layout-grid',    color:'cyan'   },
   { id:'rapidite',     label:'Mission rapidité',       icon:'zap',            color:'orange' },
   { id:'completer',    label:'Compléter la phrase',   icon:'pen-line',       color:'green'  },
   { id:'intrus',       label:'Détection d\'intrus',   icon:'search-x',       color:'amber'  },
@@ -495,6 +540,7 @@ const COLORS = {
   blue:  { bg:'bg-blue-50',   text:'text-blue-600',   btn:'bg-blue-600 hover:bg-blue-700' },
   purple:{ bg:'bg-purple-50', text:'text-purple-600', btn:'bg-purple-600 hover:bg-purple-700' },
   rose:  { bg:'bg-rose-50',   text:'text-rose-600',   btn:'bg-rose-500 hover:bg-rose-600' },
+  cyan:  { bg:'bg-cyan-50',   text:'text-cyan-600',   btn:'bg-cyan-500 hover:bg-cyan-600' },
   orange:{ bg:'bg-orange-50', text:'text-orange-600', btn:'bg-orange-500 hover:bg-orange-600' },
   green: { bg:'bg-green-50',  text:'text-green-600',  btn:'bg-green-500 hover:bg-green-600' },
   amber: { bg:'bg-amber-50',  text:'text-amber-600',  btn:'bg-amber-500 hover:bg-amber-600' },
@@ -648,7 +694,7 @@ function startActivity(id) {
   E.gameData = [...(E.session.questions[id] || [])].sort(() => Math.random() - 0.5);
 
   const launchers = {
-    qcm: initQCM, paires: initPaires, motsmeles: initMotsMeles, rapidite: initRapidite,
+    qcm: initQCM, paires: initPaires, motsmeles: initMotsMeles, motscroises: initMotsCroises, rapidite: initRapidite,
     completer: initCompleter, intrus: initIntrus, questions_ia: initIA
   };
   if (launchers[id]) launchers[id]();
@@ -978,6 +1024,270 @@ function mmCellClick(r, c) {
         saveScore('motsmeles', E.gameScore, raw);
       }, 500);
     }
+  }
+}
+
+// ══════════════════════════════════════════════
+// JEU X : MOTS CROISÉS
+// ══════════════════════════════════════════════
+let mcState = { grid: [], words: [], placements: [], width: 0, height: 0, activeCell: null, activeDir: 'H', foundCount: 0 };
+
+function initMotsCroises() {
+  document.getElementById('mc-end').classList.add('hidden');
+  document.getElementById('mc-feedback').classList.add('hidden');
+  document.getElementById('mc-score').textContent = '0';
+  document.getElementById('mc-def-text').textContent = "Sélectionnez une case pour voir la définition.";
+  mcState.activeCell = null;
+  mcState.foundCount = 0;
+  E.gameScore = 0;
+  
+  generateCrosswordGrid();
+  renderMotsCroises();
+}
+
+function generateCrosswordGrid() {
+  const words = E.gameData.map(d => ({ word: (d.word||'').toUpperCase().replace(/[^A-Z]/g, ''), def: d.def })).filter(w => w.word.length >= 2).sort((a,b) => b.word.length - a.word.length);
+  const GRID_SIZE = 40;
+  let grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''));
+  let placements = [];
+  
+  if (words.length === 0) return;
+  const first = words[0];
+  let startR = 20;
+  let startC = 20 - Math.floor(first.word.length / 2);
+  for (let i = 0; i < first.word.length; i++) grid[startR][startC + i] = first.word[i];
+  placements.push({ word: first.word, r: startR, c: startC, dir: 'H', def: first.def, number: 1, found: false });
+  
+  let unplaced = [];
+  
+  for (let i = 1; i < words.length; i++) {
+    const w = words[i].word;
+    let bestPlacement = null;
+    let maxScore = -1;
+    
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        for (const dir of ['H', 'V']) {
+          let intersects = 0;
+          let valid = true;
+          
+          if (dir === 'H' && c + w.length > GRID_SIZE) valid = false;
+          if (dir === 'V' && r + w.length > GRID_SIZE) valid = false;
+          if (!valid) continue;
+          
+          for (let j = 0; j < w.length; j++) {
+            const cr = r + (dir === 'V' ? j : 0);
+            const cc = c + (dir === 'H' ? j : 0);
+            
+            if (grid[cr][cc] === w[j]) {
+              intersects++;
+            } else if (grid[cr][cc] !== '') {
+              valid = false; break;
+            } else {
+              if (dir === 'H') {
+                if (cr > 0 && grid[cr-1][cc] !== '') { valid = false; break; }
+                if (cr < GRID_SIZE-1 && grid[cr+1][cc] !== '') { valid = false; break; }
+              } else {
+                if (cc > 0 && grid[cr][cc-1] !== '') { valid = false; break; }
+                if (cc < GRID_SIZE-1 && grid[cr][cc+1] !== '') { valid = false; break; }
+              }
+            }
+          }
+          
+          if (valid) {
+            if (dir === 'H') {
+              if (c > 0 && grid[r][c-1] !== '') valid = false;
+              if (c + w.length < GRID_SIZE && grid[r][c + w.length] !== '') valid = false;
+            } else {
+              if (r > 0 && grid[r-1][c] !== '') valid = false;
+              if (r + w.length < GRID_SIZE && grid[r + w.length][c] !== '') valid = false;
+            }
+          }
+          
+          if (valid && intersects > 0) {
+            const score = intersects * 100 - (Math.abs(20 - r) + Math.abs(20 - c));
+            if (score > maxScore) {
+              maxScore = score;
+              bestPlacement = { word: w, r, c, dir, def: words[i].def };
+            }
+          }
+        }
+      }
+    }
+    
+    if (bestPlacement) {
+      const { word: w, r, c, dir } = bestPlacement;
+      for (let j = 0; j < w.length; j++) {
+        grid[r + (dir === 'V' ? j : 0)][c + (dir === 'H' ? j : 0)] = w[j];
+      }
+      bestPlacement.number = placements.length + 1;
+      bestPlacement.found = false;
+      placements.push(bestPlacement);
+    } else {
+      unplaced.push(words[i]);
+    }
+  }
+  
+  let minR = GRID_SIZE, maxR = 0, minC = GRID_SIZE, maxC = 0;
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (grid[r][c] !== '') {
+        if (r < minR) minR = r;
+        if (r > maxR) maxR = r;
+        if (c < minC) minC = c;
+        if (c > maxC) maxC = c;
+      }
+    }
+  }
+  
+  if (minR > maxR) {
+    mcState.grid = []; mcState.width = 0; mcState.height = 0; mcState.placements = []; return;
+  }
+  
+  mcState.height = maxR - minR + 1;
+  mcState.width = maxC - minC + 1;
+  mcState.grid = [];
+  for (let r = minR; r <= maxR; r++) {
+    mcState.grid.push(grid[r].slice(minC, maxC + 1));
+  }
+  
+  for (let p of placements) {
+    p.r -= minR;
+    p.c -= minC;
+  }
+  mcState.placements = placements;
+}
+
+function renderMotsCroises() {
+  document.getElementById('mc-bar').style.width = `${(mcState.foundCount / mcState.placements.length)*100}%`;
+  document.getElementById('mc-progress').textContent = `${mcState.foundCount}/${mcState.placements.length}`;
+  
+  const gc = document.getElementById('mc-grid-container');
+  gc.style.gridTemplateColumns = `repeat(${mcState.width}, minmax(0, 1fr))`;
+  
+  let html = '';
+  for (let r = 0; r < mcState.height; r++) {
+    for (let c = 0; c < mcState.width; c++) {
+      const char = mcState.grid[r][c];
+      if (char === '') {
+        html += `<div class="w-8 h-8 sm:w-10 sm:h-10 bg-transparent"></div>`;
+      } else {
+        const starts = mcState.placements.filter(p => p.r === r && p.c === c);
+        const numberHtml = starts.length > 0 ? `<div class="absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-black text-slate-500 z-10 leading-none">${starts.map(s=>s.number).join(',')}</div>` : '';
+        
+        html += `<div class="relative w-8 h-8 sm:w-10 sm:h-10">
+          ${numberHtml}
+          <input type="text" maxlength="1" id="mc-input-${r}-${c}" 
+            onfocus="mcCellFocus(${r}, ${c})" oninput="mcCellInput(event, ${r}, ${c})" onkeydown="mcCellKeyDown(event, ${r}, ${c})"
+            class="w-full h-full text-center font-black text-lg sm:text-xl uppercase bg-white border border-slate-300 rounded focus:bg-cyan-50 focus:border-cyan-400 outline-none transition-colors shadow-sm text-slate-700 relative z-0" 
+            data-r="${r}" data-c="${c}" />
+        </div>`;
+      }
+    }
+  }
+  gc.innerHTML = html;
+}
+
+function mcCellFocus(r, c) {
+  const words = mcState.placements.filter(p => {
+    if (p.dir === 'H') return p.r === r && c >= p.c && c < p.c + p.word.length;
+    else return p.c === c && r >= p.r && r < p.r + p.word.length;
+  });
+  if (words.length === 0) return;
+  
+  let activeWord = null;
+  if (words.length === 1) {
+    activeWord = words[0];
+    mcState.activeDir = activeWord.dir;
+  } else {
+    if (mcState.activeCell && mcState.activeCell.r === r && mcState.activeCell.c === c) {
+      mcState.activeDir = mcState.activeDir === 'H' ? 'V' : 'H';
+    }
+    activeWord = words.find(w => w.dir === mcState.activeDir) || words[0];
+    mcState.activeDir = activeWord.dir;
+  }
+  mcState.activeCell = { r, c };
+  
+  document.querySelectorAll('input[id^="mc-input-"]').forEach(el => el.classList.remove('bg-cyan-100', 'border-cyan-400'));
+  for (let i = 0; i < activeWord.word.length; i++) {
+    const ir = activeWord.r + (activeWord.dir === 'V' ? i : 0);
+    const ic = activeWord.c + (activeWord.dir === 'H' ? i : 0);
+    const el = document.getElementById(`mc-input-${ir}-${ic}`);
+    if (el && !el.readOnly) el.classList.add('bg-cyan-100', 'border-cyan-400');
+  }
+  
+  document.getElementById('mc-def-text').innerHTML = `<span class="bg-cyan-600 text-white font-black px-2 py-0.5 rounded mr-2">${activeWord.number}</span> ${activeWord.def}`;
+}
+
+function mcCellInput(e, r, c) {
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+  if (e.target.value !== '') {
+    const nr = r + (mcState.activeDir === 'V' ? 1 : 0);
+    const nc = c + (mcState.activeDir === 'H' ? 1 : 0);
+    const nextEl = document.getElementById(`mc-input-${nr}-${nc}`);
+    if (nextEl && !nextEl.readOnly) nextEl.focus();
+  }
+  mcCheckBoard();
+}
+
+function mcCellKeyDown(e, r, c) {
+  if (e.key === 'Backspace' && e.target.value === '') {
+    const nr = r - (mcState.activeDir === 'V' ? 1 : 0);
+    const nc = c - (mcState.activeDir === 'H' ? 1 : 0);
+    const prevEl = document.getElementById(`mc-input-${nr}-${nc}`);
+    if (prevEl && !prevEl.readOnly) prevEl.focus();
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    let nr = r, nc = c;
+    if (e.key === 'ArrowUp') nr--;
+    if (e.key === 'ArrowDown') nr++;
+    if (e.key === 'ArrowLeft') nc--;
+    if (e.key === 'ArrowRight') nc++;
+    const nextEl = document.getElementById(`mc-input-${nr}-${nc}`);
+    if (nextEl) {
+      if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && mcState.activeDir !== 'V') mcState.activeDir = 'V';
+      if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && mcState.activeDir !== 'H') mcState.activeDir = 'H';
+      nextEl.focus();
+    }
+  }
+}
+
+function mcCheckBoard() {
+  mcState.foundCount = 0;
+  for (let p of mcState.placements) {
+    let correct = true;
+    for (let i = 0; i < p.word.length; i++) {
+      const cr = p.r + (p.dir === 'V' ? i : 0);
+      const cc = p.c + (p.dir === 'H' ? i : 0);
+      const el = document.getElementById(`mc-input-${cr}-${cc}`);
+      if (!el || el.value.toUpperCase() !== p.word[i]) {
+        correct = false; break;
+      }
+    }
+    if (correct && !p.found) {
+      p.found = true;
+      for (let i = 0; i < p.word.length; i++) {
+        const cr = p.r + (p.dir === 'V' ? i : 0);
+        const cc = p.c + (p.dir === 'H' ? i : 0);
+        const el = document.getElementById(`mc-input-${cr}-${cc}`);
+        el.classList.remove('bg-cyan-100', 'border-cyan-400');
+        el.classList.add('text-emerald-700', 'bg-emerald-100', 'border-emerald-400');
+        el.readOnly = true;
+      }
+    }
+    if (p.found) mcState.foundCount++;
+  }
+  
+  document.getElementById('mc-score').textContent = mcState.foundCount;
+  document.getElementById('mc-bar').style.width = `${(mcState.foundCount / mcState.placements.length)*100}%`;
+  document.getElementById('mc-progress').textContent = `${mcState.foundCount}/${mcState.placements.length}`;
+  
+  if (mcState.foundCount >= mcState.placements.length && mcState.placements.length > 0) {
+    setTimeout(() => {
+      document.getElementById('mc-final-score').textContent = `${mcState.foundCount}/${mcState.placements.length}`;
+      document.getElementById('mc-end').classList.remove('hidden');
+      saveScore('motscroises', mcState.foundCount, mcState.placements.length);
+    }, 500);
   }
 }
 
