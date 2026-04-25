@@ -235,11 +235,18 @@
             <option value="rose">Bonbon (Rose pastel)</option>
           </select>
         </div>
-        <label class="flex items-center gap-3 cursor-pointer">
+        <label class="flex items-center gap-3 cursor-pointer mb-4">
           <input type="checkbox" id="create-retryable" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
           <div>
             <span class="font-bold text-slate-700 text-sm">Activités rejouables</span>
             <p class="text-xs text-slate-400 font-medium">L'élève peut recommencer une activité autant de fois que souhaité</p>
+          </div>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="create-show-correction" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
+          <div>
+            <span class="font-bold text-slate-700 text-sm">Afficher la correction après chaque question</span>
+            <p class="text-xs text-slate-400 font-medium">Si décoché, l'élève voit uniquement ✓ ou ✗ sans la bonne réponse. Recommandé : décoché — la correction complète est disponible à la fin de session.</p>
           </div>
         </label>
       </div>
@@ -978,6 +985,7 @@ async function startGeneration() {
     scoring[a.id] = parseInt(document.getElementById('pts-' + a.id).value)  || a.defaultPts;
   });
   const retryable = document.getElementById('create-retryable').checked;
+  const showCorrection = document.getElementById('create-show-correction').checked;
   const theme = document.getElementById('create-theme') ? document.getElementById('create-theme').value : 'classique';
   const level = document.getElementById('create-level') ? document.getElementById('create-level').value : "Non spécifié";
   const model = document.getElementById('create-model').value;
@@ -1034,7 +1042,7 @@ async function startGeneration() {
   const code = customCode;
   const session = {
     id: sessionId, code, title, corpus, createdAt: new Date().toISOString(),
-    config, scoring, retryable, theme, questions, model, apiKey
+    config, scoring, retryable, showCorrection, theme, questions, model, apiKey
   };
 
   document.getElementById('gen-subtitle').textContent = 'Sauvegarde sur Nuage...';

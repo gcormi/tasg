@@ -741,15 +741,23 @@ function answerQCM(idx) {
   const q = E.gameData[E.gameIdx];
   const btns = document.querySelectorAll('#qcm-choices button');
   const correct = idx === q.correct;
+  const showCorr = E.session.showCorrection;
   if (correct) { E.gameScore++; document.getElementById('qcm-score').textContent = E.gameScore; }
 
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.correct) btn.className = btn.className.replace('border-slate-100','border-emerald-400').replace('text-slate-700','text-emerald-700') + ' bg-emerald-50';
-    else if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50';
+    if (showCorr) {
+      // Mode correction : surligner la bonne réponse
+      if (i === q.correct) btn.className = btn.className.replace('border-slate-100','border-emerald-400').replace('text-slate-700','text-emerald-700') + ' bg-emerald-50';
+      else if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50';
+    } else {
+      // Mode sans correction : juste barrer la mauvaise, rien surligner
+      if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50 opacity-70';
+      if (i === idx && correct)  btn.className = btn.className.replace('border-slate-100','border-emerald-400') + ' bg-emerald-50';
+    }
   });
 
-  if (q.expl) {
+  if (showCorr && q.expl) {
     document.getElementById('qcm-explanation').textContent = q.expl;
     document.getElementById('qcm-explanation').classList.remove('hidden');
   }
@@ -1362,11 +1370,17 @@ function answerRap(idx) {
   clearInterval(rapTimer);
   const q = E.gameData[E.gameIdx];
   const correct = idx === q.correct;
+  const showCorr = E.session.showCorrection;
   const btns = document.querySelectorAll('#rap-choices button');
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.correct) btn.classList.add('border-emerald-400','bg-emerald-50');
-    else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    if (showCorr) {
+      if (i === q.correct) btn.classList.add('border-emerald-400','bg-emerald-50');
+      else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    } else {
+      if (i === idx && correct)  btn.classList.add('border-emerald-400','bg-emerald-50');
+      if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50','opacity-70');
+    }
   });
 
   if (correct) {
@@ -1436,6 +1450,7 @@ function checkCompleter() {
   const userAnswer = document.getElementById('comp-input').value.trim().toLowerCase();
   const correct = q.answer.trim().toLowerCase();
   const isCorrect = userAnswer === correct || levDistance(userAnswer, correct) <= Math.floor(correct.length * 0.2);
+  const showCorr = E.session.showCorrection;
   const fb = document.getElementById('comp-feedback');
 
   if (isCorrect) {
@@ -1444,7 +1459,8 @@ function checkCompleter() {
     fb.textContent = '✓ Correct !';
   } else {
     fb.className = 'rounded-2xl px-5 py-3 text-sm font-bold mb-4 bg-red-50 text-red-600';
-    fb.textContent = `✗ La réponse était : ${q.answer}`;
+    // Afficher la bonne réponse seulement si le prof l'a autorisé
+    fb.textContent = showCorr ? `✗ La réponse était : ${q.answer}` : '✗ Mauvaise réponse';
   }
   fb.classList.remove('hidden');
   document.getElementById('comp-input').disabled = true;
@@ -1504,18 +1520,24 @@ function renderIntrus() {
 function answerIntrus(idx) {
   const q = E.gameData[E.gameIdx];
   const correct = idx === q.intrus;
+  const showCorr = E.session.showCorrection;
   const btns = document.querySelectorAll('#int-statements button');
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.intrus) btn.classList.add('border-emerald-400','bg-emerald-50');
-    else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    if (showCorr) {
+      if (i === q.intrus) btn.classList.add('border-emerald-400','bg-emerald-50');
+      else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    } else {
+      if (i === idx && correct)  btn.classList.add('border-emerald-400','bg-emerald-50');
+      if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50','opacity-70');
+    }
   });
 
   if (correct) {
     E.gameScore++; document.getElementById('int-score').textContent = E.gameScore;
   }
 
-  if (q.expl) {
+  if (showCorr && q.expl) {
     document.getElementById('int-explanation').textContent = q.expl;
     document.getElementById('int-explanation').classList.remove('hidden');
   }
