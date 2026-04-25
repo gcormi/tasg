@@ -127,8 +127,16 @@
     </div>
 
     <button id="btn-submit" onclick="submitResults()" class="hidden mt-4 w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
-      <i data-lucide="send" class="w-5 h-5"></i> Envoyer mes résultats au professeur
+      <i data-lucide="send" class="w-5 h-5"></i> Rendre le travail au professeur
     </button>
+    <!-- Bouton Continuer plus tard -->
+    <button id="btn-save-later" onclick="saveLater()" class="hidden mt-3 w-full bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 rounded-2xl hover:border-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2 text-sm">
+      <i data-lucide="clock" class="w-4 h-4"></i> Continuer plus tard
+    </button>
+    <div id="save-later-msg" class="hidden mt-3 text-center text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 flex-none"></i>
+      Progression sauvegardée ! Tu peux fermer l'onglet et revenir plus tard avec le même lien.
+    </div>
   </div>
 </div>
 
@@ -521,9 +529,43 @@
     <div id="final-details" class="space-y-2 mb-6"></div>
 
     <div id="final-status" class="text-center text-sm font-medium text-slate-400 mb-4"></div>
-    <button id="btn-final-send" onclick="submitResults()" class="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2">
-      <i data-lucide="send" class="w-5 h-5"></i> Envoyer au professeur
+
+    <!-- Avertissement rendu définitif -->
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4 flex items-start gap-3">
+      <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 flex-none mt-0.5"></i>
+      <p class="text-xs font-bold text-amber-700">En rendant ton travail, tu ne pourras plus y accéder ni le modifier. Assure-toi d'avoir terminé toutes les activités souhaitées.</p>
+    </div>
+
+    <button id="btn-final-send" onclick="confirmSubmit()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 mb-3">
+      <i data-lucide="lock" class="w-5 h-5"></i> Rendre le travail au professeur
     </button>
+    <button onclick="saveLater()" class="w-full bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 rounded-2xl hover:border-slate-300 transition-all flex items-center justify-center gap-2 text-sm">
+      <i data-lucide="clock" class="w-4 h-4"></i> Continuer plus tard
+    </button>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════ -->
+<!-- ÉCRAN : TRAVAIL RENDU (VERROUILLÉ)           -->
+<!-- ═════════════════════════════════════════════ -->
+<div id="screen-submitted" class="screen">
+  <div class="max-w-md mx-auto w-full px-6 py-16 text-center fade-up">
+    <div class="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-200">
+      <i data-lucide="check-circle-2" class="w-10 h-10 text-white"></i>
+    </div>
+    <h2 class="text-2xl font-black text-slate-900 mb-2">Travail rendu !</h2>
+    <p id="submitted-student" class="text-slate-500 font-medium mb-6"></p>
+
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-6 text-left">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Ton score final</p>
+      <div id="submitted-score" class="text-4xl font-black text-indigo-600 mb-1">—</div>
+      <p class="text-sm text-slate-500 font-medium">Ton professeur peut désormais consulter et noter ton travail.</p>
+    </div>
+
+    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl px-4 py-3 flex items-start gap-3">
+      <i data-lucide="lock" class="w-4 h-4 text-indigo-400 flex-none mt-0.5"></i>
+      <p class="text-xs font-medium text-indigo-600">Cette session est maintenant fermée pour toi. Si tu as besoin d'y accéder à nouveau, contacte ton professeur.</p>
+    </div>
   </div>
 </div>
 
@@ -628,9 +670,22 @@ async function doConnect() {
     try {
       const filename = `result_${session.id}_${studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
       const prev = await storage({ action: 'read', filename });
-      if (prev.success && prev.content?.scores && Object.keys(prev.content.scores).length > 0) {
-        E.scores = prev.content.scores;
-        E._resuming = true;
+      if (prev.success && prev.content) {
+        // Vérifier si le travail a déjà été rendu définitivement
+        if (prev.content.submitted) {
+          showScreen('connect');
+          document.getElementById('connect-btn').textContent = 'Rejoindre';
+          errEl.textContent = `✅ Tu as déjà rendu ton travail pour cette session. Contacte ton professeur si tu as besoin d'y accéder.`;
+          errEl.className = 'text-sm text-emerald-700 bg-emerald-50 rounded-xl px-4 py-3 font-medium';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        if (prev.content.scores && Object.keys(prev.content.scores).length > 0) {
+          E.scores = prev.content.scores;
+          E._resuming = true;
+        } else {
+          E._resuming = false;
+        }
       } else {
         E._resuming = false;
       }
@@ -694,7 +749,13 @@ function setupDashboard() {
   const total = available.length;
   document.getElementById('dash-progress-bar').style.width = `${total ? (done/total)*100 : 0}%`;
   document.getElementById('dash-progress-text').textContent = `${done}/${total}`;
+  // Bouton "Rendre" : visible quand toutes les activités sont faites
   document.getElementById('btn-submit').classList.toggle('hidden', done < total);
+  // Bouton "Continuer plus tard" : visible dès qu'au moins une activité est faite
+  const laterBtn = document.getElementById('btn-save-later');
+  laterBtn.classList.toggle('hidden', done === 0);
+  // Cacher le message de confirmation si on revient au dashboard
+  document.getElementById('save-later-msg').classList.add('hidden');
   lucide.createIcons();
 }
 
@@ -1736,10 +1797,65 @@ function showFinalSummary() {
   document.getElementById('final-status').textContent = '';
 }
 
-// ─── SOUMETTRE RÉSULTATS ──────────────────────────────────────────────────────
+// ─── CONTINUER PLUS TARD ──────────────────────────────────────────────────────
+function saveLater() {
+  const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+  const done   = available.filter(a => E.scores[a.id]);
+  const notDone = available.filter(a => !E.scores[a.id]);
+
+  // Construire le message d'information
+  const doneList  = done.map(a  => `✅ ${a.label}`).join('\n');
+  const todoList  = notDone.map(a => `⚠️ ${a.label} (non terminée, à recommencer)`).join('\n');
+
+  const msg = [
+    '💾 Ce qui sera sauvegardé :',
+    doneList || '  (aucune activité complètement terminée)',
+    '',
+    notDone.length > 0 ? 'Les activités non terminées devront \u00eatre recommencées depuis le début :' : '',
+    todoList,
+    '',
+    'Tu peux fermer cet onglet et revenir plus tard avec le même lien.'
+  ].filter(l => l !== undefined && !(l === '' && !notDone.length)).join('\n');
+
+  alert(msg);
+
+  // Afficher le message de confirmation dans l'interface
+  const msgEl = document.getElementById('save-later-msg');
+  const hasDone = done.length > 0;
+  msgEl.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 flex-none"></i>
+    <span>
+      <strong>${done.length} activité${done.length > 1 ? 's' : ''} sauvegardée${done.length > 1 ? 's' : ''}</strong>
+      ${notDone.length > 0 ? `&nbsp;—&nbsp;<span class="text-amber-600">${notDone.length} à recommencer</span>` : ''}<br>
+      <span class="font-medium text-emerald-600 text-xs">Reviens avec le même lien pour continuer.</span>
+    </span>`;
+  document.getElementById('btn-save-later').classList.add('hidden');
+  document.getElementById('btn-submit').classList.add('hidden');
+  msgEl.classList.remove('hidden');
+  msgEl.classList.add('flex');
+  msgEl.classList.remove('text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
+  msgEl.classList.add(hasDone ? 'text-emerald-700' : 'text-amber-700',
+                      hasDone ? 'bg-emerald-50'   : 'bg-amber-50',
+                      hasDone ? 'border-emerald-200' : 'border-amber-200');
+  lucide.createIcons();
+}
+
+// ─── CONFIRMER LE RENDU DÉFINITIF ────────────────────────────────────────────
+function confirmSubmit() {
+  const total = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0).length;
+  const done = Object.keys(E.scores).length;
+  let msg = 'Rendre définitivement ton travail au professeur ?\n\nTu ne pourras plus y accéder ensuite.';
+  if (done < total) {
+    msg = `Attention : tu n'as terminé que ${done} activité sur ${total}.\n\nRendre quand même ? Tu ne pourras plus y accéder ensuite.`;
+  }
+  if (confirm(msg)) {
+    submitResults();
+  }
+}
+
+// ─── SOUMETTRE RÉSULTATS (RENDU DÉFINITIF) ──────────────────────────────────
 async function submitResults() {
   const btn = document.getElementById('btn-final-send');
-  btn.disabled = true; btn.textContent = 'Envoi en cours...';
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours...'; }
 
   const available = ACTIVITIES.filter(a => E.scores[a.id]);
   let totalScore = 0, totalMax = 0;
@@ -1749,23 +1865,31 @@ async function submitResults() {
   const result = {
     sessionId: E.session.id, sessionTitle: E.session.title,
     studentId: E.studentId, completedAt: new Date().toISOString(),
-    scores: E.scores, globalPct
+    scores: E.scores, globalPct,
+    submitted: true,  // verrou définitif
+    activitiesDone: available.length,
+    activitiesTotal: ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0).length
   };
 
   try {
-    // Lire le manifest actuel
     const listRes = await storage({ action: 'list' });
     const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
     const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-    await storage({ action: 'write', filename, content: result, manifest });
-    document.getElementById('final-status').textContent = 'Résultats envoyés au professeur !';
-    document.getElementById('final-status').className = 'text-center text-sm font-bold text-emerald-600 mb-4';
-    btn.textContent = 'Envoyé !';
-    btn.classList.replace('bg-emerald-500','bg-emerald-300');
+    const writeRes = await storage({ action: 'write', filename, content: result, manifest });
+    if (!writeRes?.success) throw new Error(writeRes?.error || 'Erreur serveur');
+
+    // Rediriger vers l'écran de confirmation de rendu
+    document.getElementById('submitted-student').textContent = E.studentId + ' — ' + E.session.title;
+    document.getElementById('submitted-score').textContent = globalPct + '%';
+    lucide.createIcons();
+    showScreen('submitted');
   } catch(e) {
-    document.getElementById('final-status').textContent = 'Erreur d\'envoi: ' + e.message;
-    document.getElementById('final-status').className = 'text-center text-sm font-medium text-red-500 mb-4';
-    btn.disabled = false; btn.textContent = 'Réessayer';
+    if (btn) { btn.disabled = false; btn.textContent = 'Réessayer'; }
+    const statusEl = document.getElementById('final-status');
+    if (statusEl) {
+      statusEl.textContent = 'Erreur d\'envoi: ' + e.message;
+      statusEl.className = 'text-center text-sm font-medium text-red-500 mb-4';
+    }
   }
 }
 
