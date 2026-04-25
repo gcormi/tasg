@@ -46,6 +46,11 @@
     <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-1">Élève</span>
   </div>
   <div id="header-progress" class="hidden text-xs font-bold text-slate-400"></div>
+  <!-- Indicateur de sync discret -->
+  <div id="sync-indicator" class="hidden items-center gap-1.5 text-xs font-bold">
+    <div id="sync-icon" class="w-4 h-4 flex items-center justify-center"></div>
+    <span id="sync-text"></span>
+  </div>
 </header>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1651,6 +1656,16 @@ function saveScore(activity, score, max) {
 }
 
 async function autoSaveProgress() {
+  const syncEl = document.getElementById('sync-indicator');
+  const syncIcon = document.getElementById('sync-icon');
+  const syncText = document.getElementById('sync-text');
+
+  // Afficher "en cours"
+  syncEl.classList.remove('hidden'); syncEl.classList.add('flex');
+  syncIcon.innerHTML = '<div class="w-3 h-3 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin"></div>';
+  syncText.textContent = 'Sauvegarde...';
+  syncText.className = 'text-slate-400';
+
   try {
     const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
     const done = Object.keys(E.scores).length;
@@ -1669,8 +1684,24 @@ async function autoSaveProgress() {
     const listRes = await storage({ action: 'list' });
     const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
     const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-    await storage({ action: 'write', filename, content: result, manifest });
-  } catch(e) { /* sauvegarde silencieuse */ }
+    const writeRes = await storage({ action: 'write', filename, content: result, manifest });
+
+    if (writeRes && writeRes.success) {
+      // Succès
+      syncIcon.innerHTML = '<svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>';
+      syncText.textContent = 'Sauvegardé';
+      syncText.className = 'text-emerald-500';
+    } else {
+      throw new Error(writeRes?.error || 'Réponse inattendue du serveur');
+    }
+    setTimeout(() => { syncEl.classList.add('hidden'); syncEl.classList.remove('flex'); }, 3000);
+  } catch(e) {
+    // Erreur visible
+    syncIcon.innerHTML = '<svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    syncText.textContent = 'Erreur sync Nuage';
+    syncText.className = 'text-red-500';
+    // Laisser l'erreur visible
+  }
 }
 
 // ─── RÉSUMÉ FINAL ─────────────────────────────────────────────────────────────
