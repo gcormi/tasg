@@ -670,10 +670,17 @@ async function storage(params) {
 
 async function callAlbert(messages) {
   const res = await fetch(E.config.proxyUrl, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${E.config.apiKey}` },
-    body: JSON.stringify({ model: E.config.model || 'albert-medium', messages, temperature: 0.2 })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      model: E.config.model || 'openai/gpt-oss-120b', 
+      messages, 
+      temperature: 0.2,
+      apiKey: E.config.apiKey
+    })
   });
   const data = await res.json();
+  if (data.error) throw new Error(data.error);
   return data.choices?.[0]?.message?.content || '';
 }
 
