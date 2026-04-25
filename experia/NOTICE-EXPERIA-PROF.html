@@ -132,7 +132,11 @@
         <p class="text-xs text-slate-400 font-medium mt-3">Les URLs n8n et le serveur Nuage sont pré-remplis avec les bonnes valeurs. Vous ne devriez pas avoir à les modifier (accessibles via le bouton "Paramètres avancés").</p>
         <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 mt-3 text-xs text-blue-700 font-medium">
           <i data-lucide="info" class="w-3.5 h-3.5 inline mr-1"></i>
-          <strong>Mémorisation automatique :</strong> après la première connexion, votre identifiant, mot de passe et clé Albert sont mémorisés dans le navigateur. Vous n'aurez pas à les ressaisir lors des prochaines connexions.
+          <strong>Mémorisation automatique :</strong> après la première connexion, votre identifiant, mot de passe et clé Albert sont mémorisés dans le navigateur. Vous n'aurez pas à les ressaisir lors des prochaines connexions sur le même PC.
+        </div>
+        <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 mt-3 text-xs text-indigo-700 font-medium">
+          <i data-lucide="link" class="w-3.5 h-3.5 inline mr-1"></i>
+          <strong>Lien de connexion rapide :</strong> sur l'écran de connexion, cliquez <strong>"Générer mon lien de connexion rapide"</strong> (sous le bouton Se connecter). Copiez et conservez ce lien (Post-it, notes perso). En ouvrant ce lien sur n'importe quel PC, vous êtes connecté automatiquement sans rien saisir. ⚠️ Ce lien contient vos identifiants — gardez-le pour vous.
         </div>
         <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mt-3 text-xs text-emerald-700 font-medium">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 inline mr-1"></i>
@@ -213,9 +217,12 @@
       </div>
 
       <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
-        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-indigo-400"></i> Activités rejouables & Thèmes</h4>
-        <p class="text-sm text-slate-600 font-medium mb-3">Si coché, les élèves peuvent recommencer une activité autant de fois qu'ils le souhaitent. Décochez pour une évaluation en une seule tentative.</p>
-        <p class="text-sm text-slate-600 font-medium"><strong>Thème visuel :</strong> Vous pouvez choisir l'ambiance colorée (Nature, Océan, Soleil, etc.) qui habillera l'interface de l'élève pour le plonger dans le sujet !</p>
+        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-indigo-400"></i> Paramètres pédagogiques</h4>
+        <ul class="space-y-2 text-sm text-slate-600 font-medium">
+          <li class="flex items-start gap-2"><i data-lucide="refresh-cw" class="w-4 h-4 text-indigo-400 mt-0.5 flex-none"></i><span><strong>Activités rejouables</strong> — si coché, l'élève peut recommencer une activité. Décochez pour une évaluation en une seule tentative.</span></li>
+          <li class="flex items-start gap-2"><i data-lucide="eye-off" class="w-4 h-4 text-indigo-400 mt-0.5 flex-none"></i><span><strong>Afficher la correction</strong> (décoché par défaut, recommandé) — si décoché, l'élève voit uniquement ✓ ou ✗ sans voir la bonne réponse. La correction complète reste disponible en fin de session. Cela force la réflexion et évite le tâtonnement aléatoire.</span></li>
+          <li class="flex items-start gap-2"><i data-lucide="palette" class="w-4 h-4 text-indigo-400 mt-0.5 flex-none"></i><span><strong>Thème visuel</strong> — choisissez la couleur d'ambiance de l'espace élève via les pastilles colorées (Classique, Nature, Océan, Soleil, Crépuscule, Bonbon).</span></li>
+        </ul>
       </div>
 
       <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-800 font-medium flex items-start gap-2">
@@ -268,8 +275,15 @@
       <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
         <i data-lucide="refresh-cw" class="w-5 h-5 text-indigo-400 mt-0.5 flex-none"></i>
         <div>
-          <strong class="text-slate-800 text-sm">Actualisation manuelle</strong>
-          <p class="text-xs text-slate-500 font-medium mt-0.5">Cliquez sur <strong>"Actualiser"</strong> pour charger les derniers résultats depuis le Nuage. Les résultats ne se mettent pas à jour automatiquement.</p>
+          <strong class="text-slate-800 text-sm">Actualisation automatique (30s)</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Dès que vous ouvrez une session, les résultats se rechargent automatiquement toutes les <strong>30 secondes</strong>. Un indicateur sous le titre affiche l'heure de la dernière mise à jour. Vous pouvez aussi cliquer <strong>"Actualiser"</strong> manuellement à tout moment.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="lock" class="w-5 h-5 text-emerald-400 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Travaux rendus vs en cours</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Un élève qui clique <strong>"Rendre le travail"</strong> transmet son devoir définitivement (champ <code>submitted: true</code> dans le JSON). Son accès à la session est verrouillé. Les élèves qui ont cliqué <strong>"Continuer plus tard"</strong> restent en état partiel et peuvent revenir la semaine suivante avec le même lien.</p>
         </div>
       </div>
       <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
@@ -282,8 +296,8 @@
       <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
         <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-400 mt-0.5 flex-none"></i>
         <div>
-          <strong class="text-slate-800 text-sm">Détail par activité</strong>
-          <p class="text-xs text-slate-500 font-medium mt-0.5">Score sur le barème que vous avez défini et pourcentage de réussite pour chaque activité. Permet d'identifier les points faibles.</p>
+          <strong class="text-slate-800 text-sm">Score en points réels</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Le score de l'élève est affiché en <strong>X / Y pts</strong> où Y est le total du barème de toutes les activités de la session. Les activités non faites comptent 0 pt et apparaissent en grisé.</p>
         </div>
       </div>
       <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
@@ -425,28 +439,74 @@
   <!-- C9 -->
   <section id="c9" class="mb-12">
     <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
-      <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">9</span>
+      <span class="w-8 h-8 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">9</span>
       Confidentialité &amp; RGPD
     </h2>
+
+    <!-- Badge conformité -->
+    <div class="bg-emerald-600 text-white rounded-2xl p-5 mb-5 flex items-center gap-4">
+      <i data-lucide="shield-check" class="w-10 h-10 flex-none"></i>
+      <div>
+        <p class="font-black text-lg">Application conforme au RGPD</p>
+        <p class="text-emerald-100 text-sm font-medium">Experia respecte pleinement le Règlement Général sur la Protection des Données (RGPD — Règlement UE 2016/679) et les recommandations de la CNIL pour les outils numériques scolaires.</p>
+      </div>
+    </div>
+
     <div class="space-y-3">
-      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-emerald-800 font-medium flex items-start gap-2">
-        <i data-lucide="shield-check" class="w-4 h-4 mt-0.5 flex-none"></i>
-        <span>Aucune donnée personnelle n'est collectée par l'application. Les données sont stockées <strong>uniquement sur votre espace Nuage personnel</strong> (apps.education.fr, hébergement EN).</span>
+      <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="database-zap" class="w-5 h-5 text-emerald-500 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Aucune collecte de données personnelles par l'application</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Experia ne dispose d'aucun serveur propre, d'aucune base de données tierce, d'aucun compte utilisateur. Il n'existe aucun point où des données sont collectées en dehors de votre propre espace Nuage.</p>
+        </div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-sm text-slate-600 font-medium">
-        Les élèves s'identifient avec leur <strong>identifiant ENT</strong>. C'est vous qui définissez la convention utilisée dans votre classe.
+      <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="server" class="w-5 h-5 text-emerald-500 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Stockage exclusivement sur le Nuage apps.education.fr</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Toutes les données (sessions, résultats élèves) sont stockées <strong>uniquement dans votre espace Nuage personnel</strong>, hébergé par le Ministère de l'Éducation Nationale sur des serveurs français. Vous êtes l'unique responsable de traitement de ces données.</p>
+        </div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-sm text-slate-600 font-medium">
-        Identifiants Nuage et clé API Albert ne transitent que via le <strong>relais n8n de l'incubateur de l'Éducation Nationale</strong> — aucun service tiers.
+      <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="user-x" class="w-5 h-5 text-emerald-500 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Données élèves minimisées (principe de minimisation)</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Les élèves ne saisissent que leur <strong>identifiant ENT</strong> (que vous définissez — prénom seul, initiales, code de classe...). Aucun e-mail, aucun mot de passe élève, aucune donnée biométrique ou sensible n'est collectée.</p>
+        </div>
       </div>
-      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-sm text-slate-600 font-medium">
-        Pas de cookies, pas de tracking, pas d'analytics. Identifiants mémorisés uniquement dans le <strong>localStorage de votre navigateur</strong>, jamais envoyés à un tiers.
+      <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="zap-off" class="w-5 h-5 text-emerald-500 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Pas de cookies, pas de tracking, pas d'analytics</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">L'application n'utilise aucun cookie de suivi, aucun pixel publicitaire, aucun outil d'analyse comportementale (Google Analytics, Matomo, etc.). Les identifiants professeur sont mémorisés uniquement dans le <code>localStorage</code> local au navigateur, jamais envoyés à un tiers.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="route" class="w-5 h-5 text-emerald-500 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Transit via relais souverain (n8n Éducation Nationale)</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Les requêtes transitent par un proxy n8n hébergé sur <code>n8n.incubateur.education.gouv.fr</code> — un service de l'Incubateur de l'Éducation Nationale. Aucun service tiers étranger n'est impliqué. L'IA Albert est également souveraine (Étalab / État français).</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm flex items-start gap-3">
+        <i data-lucide="trash-2" class="w-5 h-5 text-emerald-500 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800 text-sm">Droit à l'effacement garanti</strong>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">La suppression d'une session depuis l'interface professeur efface le fichier session <strong>et tous les résultats élèves associés</strong> du Nuage. Aucune donnée résiduelle. Vous pouvez également supprimer l'ensemble du dossier <code>experia/</code> depuis votre Nuage pour un effacement complet.</p>
+        </div>
+      </div>
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 font-medium flex items-start gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 flex-none"></i>
+        <div>
+          <strong>Votre responsabilité en tant qu'enseignant</strong>
+          <p class="text-xs mt-1">En utilisant Experia, vous êtes responsable de traitement des données de vos élèves stockées sur votre Nuage. Informez vos élèves que leurs résultats sont sauvegardés (obligation d'information RGPD — art. 13). Vous devez conserver ces données uniquement le temps nécessaire à l'évaluation, puis supprimer la session.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <div class="border-t border-slate-100 pt-6 text-center text-sm text-slate-400 font-medium">
-    Experia — Forge des Communs Numériques Éducatifs · v1.0
+    Experia — Forge des Communs Numériques Éducatifs · v1.1 — Mise à jour avril 2026
   </div>
 
 </div>
