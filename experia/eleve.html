@@ -164,6 +164,12 @@
       </div>
     </div>
 
+    <!-- Consigne QCM -->
+    <div class="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 mb-5 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">💡</span>
+      <p class="text-sm font-bold text-blue-700">Lis chaque question et choisis <strong>la seule bonne réponse</strong> parmi les propositions. Pas de retour en arrière possible.</p>
+    </div>
+
     <div id="qcm-question" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-5 fade-up">
       <p class="font-black text-slate-800 text-lg leading-snug" id="qcm-q-text"></p>
     </div>
@@ -199,6 +205,12 @@
         <div id="paires-score" class="font-black text-purple-600 text-xl">0</div>
         <div class="text-xs text-slate-400 font-bold">paires</div>
       </div>
+    </div>
+
+    <!-- Consigne Paires -->
+    <div class="bg-purple-50 border border-purple-100 rounded-2xl px-4 py-3 mb-5 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">💡</span>
+      <p class="text-sm font-bold text-purple-700">Clique sur un terme à gauche, puis sur sa définition à droite pour créer une paire. <strong>Attention : une mauvaise association est définitive !</strong></p>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
@@ -248,7 +260,11 @@
     </div>
 
     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4 fade-up">
-      <p class="text-center text-sm font-bold text-slate-500 mb-4">Trouvez les mots cachés (Cliquez sur la 1ère puis la dernière lettre)</p>
+      <!-- Consigne Mots Mêlés -->
+      <div class="bg-rose-50 border border-rose-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5">
+        <span class="text-base mt-0.5">💡</span>
+        <p class="text-sm font-bold text-rose-700">Retrouve tous les mots cachés dans la grille. <strong>Clique sur la première lettre, puis sur la dernière lettre</strong> du mot à trouver.</p>
+      </div>
       <div id="mm-word-list" class="flex flex-wrap gap-2 justify-center mb-4"></div>
       <div id="mm-grid-container" class="grid bg-slate-100 p-2 rounded-xl mx-auto w-fit gap-1 select-none" style="touch-action: none;"></div>
     </div>
@@ -289,6 +305,11 @@
     </div>
 
     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4 fade-up flex-1 flex flex-col overflow-hidden relative">
+      <!-- Consigne Mots Croisés -->
+      <div class="bg-cyan-50 border border-cyan-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5">
+        <span class="text-base mt-0.5">💡</span>
+        <p class="text-sm font-bold text-cyan-700"><strong>Clique sur une case</strong> de la grille pour voir la définition du mot à trouver, puis tape le mot directement dans les cases.</p>
+      </div>
       <p id="mc-def-text" class="text-center text-sm font-bold text-cyan-700 bg-cyan-50 rounded-xl p-3 mb-4 min-h-[3rem] flex items-center justify-center border border-cyan-100">
         Sélectionnez une case pour voir la définition.
       </p>
@@ -335,6 +356,12 @@
     </div>
     <p class="text-center text-xs font-bold text-slate-400 mb-4"><span id="rap-timer">10</span>s restantes</p>
 
+    <!-- Consigne Rapidité -->
+    <div class="bg-orange-50 border border-orange-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">⚡</span>
+      <p class="text-sm font-bold text-orange-700">Réponds avant que le temps soit écoulé ! <strong>Plus tu réponds vite, plus tu gagnes de points.</strong> Concentre-toi !</p>
+    </div>
+
     <div id="rap-question" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-4 fade-up">
       <p class="font-black text-slate-800 text-lg" id="rap-q-text"></p>
     </div>
@@ -372,6 +399,12 @@
         </div>
       </div>
       <div class="font-black text-green-600 text-xl"><span id="comp-score">0</span><span class="text-xs text-slate-400 font-bold ml-0.5">pts</span></div>
+    </div>
+
+    <!-- Consigne Compléter -->
+    <div class="bg-green-50 border border-green-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">💡</span>
+      <p class="text-sm font-bold text-green-700">Lis la phrase et <strong>tape le mot manquant</strong> dans le champ de réponse, puis valide avec Entrée ou le bouton OK.</p>
     </div>
 
     <div id="comp-question" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-4 fade-up">
@@ -426,7 +459,12 @@
       <div class="font-black text-amber-600 text-xl"><span id="int-score">0</span><span class="text-xs text-slate-400 font-bold ml-0.5">pts</span></div>
     </div>
 
-    <p class="text-sm font-bold text-slate-500 mb-3 fade-up">Quelle affirmation est <span class="text-red-500">FAUSSE</span> ?</p>
+    <!-- Consigne Intrus -->
+    <div class="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">🔍</span>
+      <p class="text-sm font-bold text-amber-700">Parmi les 4 affirmations proposées, <strong>une seule est fausse</strong>. Trouve l'intrus et clique dessus.</p>
+    </div>
+
     <div id="int-statements" class="space-y-3 fade-up"></div>
     <div id="int-explanation" class="hidden mt-4 bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 font-medium"></div>
     <button id="int-next" onclick="intrusNext()" class="hidden mt-4 w-full bg-amber-500 text-white font-black py-4 rounded-2xl hover:bg-amber-600 transition-all">
@@ -460,6 +498,18 @@
           <span id="ia-progress" class="text-xs font-bold text-slate-400"></span>
         </div>
       </div>
+    </div>
+
+    <!-- Consigne Questions IA -->
+    <div class="bg-indigo-50 border border-indigo-200 rounded-2xl px-4 py-4 mb-4 fade-up">
+      <div class="flex items-start gap-2.5 mb-2">
+        <span class="text-base mt-0.5">🤖</span>
+        <p class="text-sm font-black text-indigo-800">Questions ouvertes évaluées par l'IA Albert</p>
+      </div>
+      <p class="text-sm font-medium text-indigo-700 leading-relaxed pl-7">
+        Lis la question et <strong>rédige une réponse développée</strong> dans le champ ci-dessous. Il n'y a pas de QCM : tu dois formuler ta réponse avec tes propres mots, comme à l'écrit en classe.
+      </p>
+      <p class="text-xs font-bold text-indigo-400 mt-2 pl-7">💡 Albert (une IA pédagogique) lira ta réponse et te donnera un score + un commentaire. Sois précis et complet.</p>
     </div>
 
     <div id="ia-question-block" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-4 fade-up">
