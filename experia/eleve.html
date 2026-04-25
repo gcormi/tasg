@@ -856,13 +856,23 @@ function generateGrid() {
   const size = mmState.size;
   mmState.grid = Array(size).fill(null).map(() => Array(size).fill(''));
   const dirs = [ [0,1], [1,0], [1,1], [-1,1] ]; // Horizontal, Vertical, Diagonal 1, Diagonal 2
-  
+  const successfullyPlacedWords = [];
+  let wordIndex = 0;
   for (const word of mmState.words) {
     let placed = false;
     let attempts = 0;
-    while (!placed && attempts < 150) {
+    while (!placed && attempts < 2000) {
       attempts++;
-      const d = dirs[Math.floor(Math.random() * dirs.length)];
+      
+      let d;
+      if (wordIndex === 0 && attempts < 1000) {
+        d = [0, 1]; // Force Horizontal
+      } else if (wordIndex === 1 && attempts < 1000) {
+        d = [1, 0]; // Force Vertical
+      } else {
+        d = dirs[Math.floor(Math.random() * dirs.length)];
+      }
+      
       const finalWord = Math.random() > 0.5 ? word.split('').reverse().join('') : word;
       const r = Math.floor(Math.random() * size);
       const c = Math.floor(Math.random() * size);
@@ -883,7 +893,12 @@ function generateGrid() {
         placed = true;
       }
     }
+    if (placed) {
+      successfullyPlacedWords.push(word);
+      wordIndex++;
+    }
   }
+  mmState.words = successfullyPlacedWords;
   
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (let r = 0; r < size; r++) {
