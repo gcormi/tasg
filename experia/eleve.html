@@ -522,7 +522,8 @@
     <!-- Score global -->
     <div class="bg-indigo-600 text-white rounded-3xl p-6 mb-5 text-center">
       <p class="text-indigo-200 text-sm font-bold uppercase tracking-wider mb-1">Score global</p>
-      <div id="final-global" class="text-6xl font-black">—</div>
+      <div id="final-global" class="text-5xl font-black">—</div>
+      <p id="final-global-sub" class="text-indigo-300 text-xs font-bold mt-1"></p>
     </div>
 
     <!-- Détails -->
@@ -558,7 +559,8 @@
 
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-6 text-left">
       <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Ton score final</p>
-      <div id="submitted-score" class="text-4xl font-black text-indigo-600 mb-1">—</div>
+      <div id="submitted-score" class="text-4xl font-black text-indigo-600 mb-0.5">—</div>
+      <p id="submitted-score-sub" class="text-xs font-bold text-slate-400 mb-2"></p>
       <p class="text-sm text-slate-500 font-medium">Ton professeur peut désormais consulter et noter ton travail.</p>
     </div>
 
@@ -749,8 +751,8 @@ function setupDashboard() {
   const total = available.length;
   document.getElementById('dash-progress-bar').style.width = `${total ? (done/total)*100 : 0}%`;
   document.getElementById('dash-progress-text').textContent = `${done}/${total}`;
-  // Bouton "Rendre" : visible quand toutes les activités sont faites
-  document.getElementById('btn-submit').classList.toggle('hidden', done < total);
+  // Bouton "Rendre" : visible dès qu'au moins une activité est terminée
+  document.getElementById('btn-submit').classList.toggle('hidden', done === 0);
   // Bouton "Continuer plus tard" : visible dès qu'au moins une activité est faite
   const laterBtn = document.getElementById('btn-save-later');
   laterBtn.classList.toggle('hidden', done === 0);
@@ -1769,28 +1771,57 @@ async function autoSaveProgress() {
 function showFinalSummary() {
   document.getElementById('final-student-name').textContent = E.studentId;
 
-  const available = ACTIVITIES.filter(a => E.scores[a.id]);
-  let totalScore = 0, totalMax = 0;
-  available.forEach(a => {
-    const sc = E.scores[a.id];
-    totalScore += (sc.score / sc.max) * 100;
-    totalMax++;
-  });
-  const globalPct = Math.round(totalScore / (totalMax || 1));
-  document.getElementById('final-global').textContent = globalPct + '%';
+  // Toutes les activités de la session
+  const allSessionActivities = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+  const completed = ACTIVITIES.filter(a => E.scores[a.id]);
 
-  document.getElementById('final-details').innerHTML = available.map(a => {
-    const sc = E.scores[a.id];
-    const pct = Math.round((sc.score / sc.max) * 100);
-    return `<div class="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm border border-slate-100">
-      <div class="w-8 h-8 ${COLORS[a.color].bg} rounded-lg flex items-center justify-center flex-none">
-        <i data-lucide="${a.icon}" class="w-4 h-4 ${COLORS[a.color].text}"></i>
-      </div>
-      <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
-      <span class="font-black text-slate-800">${sc.score}/${sc.max}</span>
-      <span class="text-sm font-bold text-slate-400 w-10 text-right">${pct}%</span>
-    </div>`;
-  }).join('');
+  // Score obtenu = somme des pts par activité terminée
+  let totalPts = 0;
+  completed.forEach(a => { totalPts += E.scores[a.id].score; });
+  totalPts = Math.round(totalPts * 10) / 10;
+
+  // Score max = somme du barème de TOUTES les activités de la session
+  const maxPts = allSessionActivities.reduce((sum, a) => sum + (E.session.scoring?.[a.id] || 0), 0);
+
+  // Garder globalPct pour la sauvegarde
+  let pctSum = 0;
+  completed.forEach(a => { pctSum += (E.scores[a.id].score / E.scores[a.id].max) * 100; });
+  E._globalPct = Math.round(pctSum / (completed.length || 1));
+
+  // Afficher "X / Y pts"
+  document.getElementById('final-global').textContent = `${totalPts} / ${maxPts}`;
+  document.getElementById('final-global-sub').textContent =
+    completed.length < allSessionActivities.length
+      ? `points · ${allSessionActivities.length - completed.length} activité(s) non faite(s) = 0 pt`
+      : `points sur ${maxPts} au barème`;
+
+  // Détail : activités faites + activités non faites en grisé
+  document.getElementById('final-details').innerHTML = [
+    ...completed.map(a => {
+      const sc = E.scores[a.id];
+      const pct = Math.round((sc.score / sc.max) * 100);
+      return `<div class="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm border border-slate-100">
+        <div class="w-8 h-8 ${COLORS[a.color].bg} rounded-lg flex items-center justify-center flex-none">
+          <i data-lucide="${a.icon}" class="w-4 h-4 ${COLORS[a.color].text}"></i>
+        </div>
+        <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
+        <span class="font-black text-slate-800">${sc.score} / ${sc.max} pts</span>
+        <span class="text-xs font-bold text-slate-400 w-12 text-right">${pct}%</span>
+      </div>`;
+    }),
+    // Activités non faites = 0 pts, grisées
+    ...allSessionActivities.filter(a => !E.scores[a.id]).map(a => {
+      const maxA = E.session.scoring?.[a.id] || 0;
+      return `<div class="bg-slate-50 rounded-xl p-3 flex items-center gap-3 border border-dashed border-slate-200 opacity-60">
+        <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-none">
+          <i data-lucide="${a.icon}" class="w-4 h-4 text-slate-400"></i>
+        </div>
+        <span class="flex-1 font-bold text-slate-400 text-sm">${a.label}</span>
+        <span class="font-black text-slate-400">0 / ${maxA} pts</span>
+        <span class="text-xs font-bold text-slate-300 w-12 text-right">non fait</span>
+      </div>`;
+    })
+  ].join('');
 
   lucide.createIcons();
   showScreen('final');
@@ -1878,9 +1909,20 @@ async function submitResults() {
     const writeRes = await storage({ action: 'write', filename, content: result, manifest });
     if (!writeRes?.success) throw new Error(writeRes?.error || 'Erreur serveur');
 
+    // Calcul pts pour l'écran de rendu
+    const allActs = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+    let totalPtsR = 0;
+    available.forEach(a => { totalPtsR += E.scores[a.id].score; });
+    totalPtsR = Math.round(totalPtsR * 10) / 10;
+    const maxPtsR = allActs.reduce((sum, a) => sum + (E.session.scoring?.[a.id] || 0), 0);
+
     // Rediriger vers l'écran de confirmation de rendu
     document.getElementById('submitted-student').textContent = E.studentId + ' — ' + E.session.title;
-    document.getElementById('submitted-score').textContent = globalPct + '%';
+    document.getElementById('submitted-score').textContent = `${totalPtsR} / ${maxPtsR} pts`;
+    document.getElementById('submitted-score-sub').textContent =
+      available.length < allActs.length
+        ? `(${available.length}/${allActs.length} activités faites)`
+        : 'session complète';
     lucide.createIcons();
     showScreen('submitted');
   } catch(e) {

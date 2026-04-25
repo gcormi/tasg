@@ -225,15 +225,40 @@
           </select>
         </div>
         <div class="mb-5">
-          <label class="block text-xs font-bold text-slate-400 mb-1.5">Thème d'interface (couleur de fond pour l'élève)</label>
-          <select id="create-theme" class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
-            <option value="classique">Classique (Bleu clair)</option>
-            <option value="nature">Nature (Vert doux)</option>
-            <option value="ocean">Océan (Cyan apaisant)</option>
-            <option value="soleil">Soleil (Orange chaleureux)</option>
-            <option value="crepuscule">Crépuscule (Violet mystique)</option>
-            <option value="rose">Bonbon (Rose pastel)</option>
-          </select>
+          <label class="block text-xs font-bold text-slate-400 mb-2">Thème d'interface (couleur de l'espace élève)</label>
+          <input type="hidden" id="create-theme" value="classique">
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="selectTheme('classique')" id="theme-btn-classique"
+              class="theme-btn selected-theme flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-indigo-400 bg-indigo-50 transition-all">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-indigo-200 border border-indigo-200"></div>
+              <span class="text-xs font-bold text-slate-700">Classique</span>
+            </button>
+            <button type="button" onclick="selectTheme('nature')" id="theme-btn-nature"
+              class="theme-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-100 bg-slate-50 hover:border-emerald-300 transition-all">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-100 to-emerald-200 border border-emerald-200"></div>
+              <span class="text-xs font-bold text-slate-700">Nature</span>
+            </button>
+            <button type="button" onclick="selectTheme('ocean')" id="theme-btn-ocean"
+              class="theme-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-100 bg-slate-50 hover:border-cyan-300 transition-all">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-100 to-sky-200 border border-cyan-200"></div>
+              <span class="text-xs font-bold text-slate-700">Océan</span>
+            </button>
+            <button type="button" onclick="selectTheme('soleil')" id="theme-btn-soleil"
+              class="theme-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-100 bg-slate-50 hover:border-orange-300 transition-all">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-100 to-orange-200 border border-orange-200"></div>
+              <span class="text-xs font-bold text-slate-700">Soleil</span>
+            </button>
+            <button type="button" onclick="selectTheme('crepuscule')" id="theme-btn-crepuscule"
+              class="theme-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-100 bg-slate-50 hover:border-purple-300 transition-all">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-100 to-violet-200 border border-violet-200"></div>
+              <span class="text-xs font-bold text-slate-700">Crépuscule</span>
+            </button>
+            <button type="button" onclick="selectTheme('rose')" id="theme-btn-rose"
+              class="theme-btn flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-100 bg-slate-50 hover:border-pink-300 transition-all">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-100 to-rose-200 border border-rose-200"></div>
+              <span class="text-xs font-bold text-slate-700">Bonbon</span>
+            </button>
+          </div>
         </div>
         <label class="flex items-center gap-3 cursor-pointer mb-4">
           <input type="checkbox" id="create-retryable" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
@@ -406,6 +431,30 @@
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ─── SÉLECTEUR DE THÈME ───────────────────────────────────────────────────────
+const THEME_COLORS = {
+  classique:  { border: 'border-indigo-400', bg: 'bg-indigo-50' },
+  nature:     { border: 'border-emerald-400', bg: 'bg-emerald-50' },
+  ocean:      { border: 'border-cyan-400', bg: 'bg-cyan-50' },
+  soleil:     { border: 'border-orange-400', bg: 'bg-orange-50' },
+  crepuscule: { border: 'border-purple-400', bg: 'bg-purple-50' },
+  rose:       { border: 'border-pink-400', bg: 'bg-pink-50' },
+};
+
+function selectTheme(theme) {
+  document.getElementById('create-theme').value = theme;
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.className = btn.className
+      .replace(/border-\w+-400/g, 'border-slate-100')
+      .replace(/bg-\w+-50/g, 'bg-slate-50');
+  });
+  const btn = document.getElementById(`theme-btn-${theme}`);
+  const c = THEME_COLORS[theme];
+  btn.className = btn.className
+    .replace('border-slate-100', c.border)
+    .replace('bg-slate-50', c.bg);
+}
 
 // ─── ÉTAT ───────────────────────────────────────────────────────────────────
 const state = {
