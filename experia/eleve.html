@@ -1718,31 +1718,60 @@ async function validateIA() {
   document.getElementById('ia-validate-btn').classList.add('hidden');
   document.getElementById('ia-loading').classList.remove('hidden');
 
+  // Pré-filtre : réponse trop courte = 0 sans appel Albert
+  const NONSENSE_PATTERNS = /^[^a-zA-ZàâäéèêëîïôùûüçÀÂÄÉÈÊËÎÏÔÙÛÜÇ]{0,4}$|^\s*$/;
+  if (answer.length < 10 || NONSENSE_PATTERNS.test(answer)) {
+    iaScores.push(0);
+    E.gameScore += 0;
+    document.getElementById('ia-result-score').textContent = '0/10';
+    document.getElementById('ia-result-feedback').textContent = 'Ta réponse est trop courte ou vide pour être évaluée.';
+    document.getElementById('ia-result').classList.remove('hidden');
+    document.getElementById('ia-next').classList.remove('hidden');
+    document.getElementById('ia-loading').classList.add('hidden');
+    return;
+  }
+
   try {
-    const prompt = `Tu es un professeur EXIGEANT et STRICT qui évalue la réponse d'un élève sur 10 points.
-Question : ${q.q}
-Corpus de référence : ${E.session.corpus.substring(0, 2500)}
-Réponse de l'élève : ${answer}
+    const prompt = `Tu es un correcteur scolaire STRICT. Évalue si la réponse de l'élève répond RÉELLEMENT à la question en s'appuyant sur le corpus.
 
-CONSIGNES DE CORRECTION :
-1. Si la réponse est hors-sujet, vide, insultante ou n'apporte aucun élément technique du corpus, donne 0 (ZÉRO) point.
-2. Si la réponse est trop courte ou évasive (ex: "je sais pas", "il se débrouille"), donne 0 (ZÉRO) point.
-3. Ne donne pas la moyenne (5/10) par défaut. La moyenne n'est accordée que si au moins la moitié des points clés sont présents.
-4. Pour avoir 10/10, la réponse doit être précise, structurée et utiliser le vocabulaire du corpus.
-5. Sois ferme mais constructif dans ton feedback.
+QUESTION : ${q.q}
 
-Réponds UNIQUEMENT avec ce JSON valide :
-{"score":0,"feedback":"Ta réponse est hors-sujet et ne contient aucun des éléments techniques attendus."}
-score = entier entre 0 et 10.`;
+CORPUS DE RÉFÉRENCE :
+${E.session.corpus.substring(0, 2500)}
+
+RÉPONSE DE L'ÉLÈVE : "${answer}"
+
+BARÈME OBLIGATOIRE :
+- 0/10 : Réponse vide, hors-sujet, charabia, insulte, "je sais pas", mots inventés, ou aucun élément du corpus utilisé correctement.
+- 1-3/10 : Très vague ou très incomplet, un seul élément superficiel du corpus mentionné.
+- 4-6/10 : Partiellement correct, quelques éléments clés du corpus présents mais incomplets.
+- 7-9/10 : Bonne réponse, la plupart des éléments clés sont présents.
+- 10/10 : Réponse complète, précise, structurée.
+
+RÈGLES ABSOLUES :
+- N'attribue JAMAIS 5/10 par défaut ou par gentillesse.
+- Si la réponse ne cite aucun élément factuel du corpus, le score est 0.
+- Si la réponse répète la question sans y répondre, le score est 0.
+- Une réponse courte et vague ne dépasse pas 2/10.
+
+Réponds UNIQUEMENT avec ce JSON (rien d'autre avant ou après) :
+{"score": ENTIER_0_A_10, "feedback": "Feedback court en français"}`;
 
     const raw = await callAlbert([
-      { role: 'system', content: 'Tu es un correcteur pédagogique. Réponds UNIQUEMENT avec du JSON valide.' },
+      { role: 'system', content: 'Tu es un correcteur pédagogique STRICT. Tu donnes 0 pour toute réponse hors-sujet ou sans lien avec le corpus. Réponds UNIQUEMENT avec du JSON valide, sans aucun texte autour.' },
       { role: 'user', content: prompt }
     ]);
 
     const match = raw.match(/\{[\s\S]*?\}/);
     const result = match ? JSON.parse(match[0]) : { score: 0, feedback: 'Évaluation technique indisponible.' };
-    const score = Math.max(0, Math.min(10, result.score || 0));
+    let score = Math.max(0, Math.min(10, typeof result.score === 'number' ? result.score : 0));
+
+    // Post-validation : score suspect si réponse très courte
+    if (answer.length < 30 && score > 3) score = Math.floor(score / 2);
+
+    // Post-validation : feedback négatif mais score élevé = incohérence, on force à 0
+    const negativeFeedback = /hors.sujet|hors sujet|ne répond pas|aucun élément|charabia|incompréhensible|nonsense|vide|inventé/i;
+    if (negativeFeedback.test(result.feedback || '') && score > 2) score = 0;
     iaScores.push(score);
     E.gameScore += score;
 
