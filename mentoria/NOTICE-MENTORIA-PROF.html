@@ -318,6 +318,10 @@
                 <li><a href="#section-9">9. Bonnes pratiques pédagogiques</a></li>
                 <li><a href="#section-10">10. Contacts & Communauté</a></li>
             </ul>
+            <div style="margin-top: 1.5rem; padding: 0.75rem; background: #fef3c7; border-radius: 0.5rem; font-size: 0.8rem;">
+                <strong>📋 Exemples concrets</strong><br>
+                <a href="EXEMPLES-BOTS-MENTORIA.html" style="color: #92400e;">→ Fiche Exemples de Bots</a>
+            </div>
         </nav>
     </aside>
 
@@ -550,6 +554,8 @@
             <h3>Déployer en classe</h3>
             <ol>
                 <li>Cliquez sur <strong>Publier</strong>.</li>
+                <li>Un modal s'ouvre. Saisissez votre <strong>Code de classe</strong> dans le champ prévu (ex : <code>5eA</code>, <code>4eB</code>, <code>LUNDI1</code>…). Ce code est libre, il vous permet de retrouver vos classes dans le suivi.</li>
+                <li>Cliquez sur <strong>Générer le lien</strong>.</li>
                 <li>Vérifiez la <strong>jauge de poids</strong> — elle affiche le poids réel du lien encodé :
                     <ul>
                         <li>🟢 <em>&lt; 100 Ko :</em> lien léger, peut être collé partout.</li>
@@ -558,9 +564,13 @@
                     </ul>
                 </li>
                 <li>Copiez le long lien généré (<code>https://.../compagnion.html#config=...</code>).</li>
-                <li>Notez le <strong>Code de Groupe</strong> (ex: <code>X7M9</code>) affiché. Il est indispensable pour suivre cette classe spécifique.</li>
                 <li>Distribuez le lien via le cahier de texte de l'ENT, un document partagé, ou un QR Code (si le lien est trop long pour l'ENT).</li>
             </ol>
+
+            <div class="callout callout-info">
+                <h4>💡 Un code de classe par groupe</h4>
+                <p>Publiez autant de fois que nécessaire avec des codes différents : <code>5eA</code>, <code>5eB</code>, <code>4eA</code>… Chaque lien génère ses propres logs de suivi, indépendants des autres classes. Dans la console de Suivi, sélectionnez le code de la classe que vous souhaitez surveiller.</p>
+            </div>
 
             <div class="callout callout-warning">
                 <h4>⚠️ Règle d'Or de la Modification</h4>
@@ -653,6 +663,20 @@
             <h2>8. Dépannage & FAQ Technique</h2>
 
             <div class="callout callout-warning">
+                <h4>Problème : "Albert API 500 — Workflow execution failed"</h4>
+                <p><strong>Cause :</strong> Le proxy par défaut (n8n de l'incubateur EN) est surchargé ou indisponible, ou la clé API Albert n'est pas renseignée dans le bot.</p>
+                <p><strong>Solution recommandée :</strong> Déployez votre propre proxy Cloudflare Worker (gratuit, 5 minutes) :</p>
+                <ol>
+                    <li>Créez un compte sur <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a> (avec votre Gmail personnel).</li>
+                    <li>Créez un Worker nommé <code>mentoria-proxy</code> via "Start with Hello World!".</li>
+                    <li>Dans "Edit code", remplacez tout le code par le contenu du fichier <code>worker.js</code> fourni dans le dossier Mentoria.</li>
+                    <li>Cliquez sur "Deploy". Votre URL Worker ressemble à : <code>https://mentoria-proxy.votre-compte.workers.dev</code></li>
+                    <li>Cette URL est désormais le proxy par défaut dans <code>compagnion.html</code> — aucune configuration supplémentaire requise.</li>
+                </ol>
+                <p>Ce Worker supporte facilement <strong>50 élèves simultanés</strong> et ne stocke aucune donnée (transit pur).</p>
+            </div>
+
+            <div class="callout callout-warning">
                 <h4>Problème : "Erreur 405 lors de la connexion au Nuage"</h4>
                 <p><strong>Cause :</strong> Le Studio Mentoria essaie de se connecter au serveur Nuage général, mais
                     votre compte académique est assigné à un serveur spécifique.</p>
@@ -697,14 +721,29 @@
 
             <ul>
                 <li><strong>Corpus ciblé :</strong> Donnez le cours du jour, pas le manuel entier. Un corpus de 2-3 pages ciblées est bien plus efficace qu'un document de 80 pages.</li>
+                <li><strong>Corpus de discipline :</strong> Pour un assistant généraliste (ex : TechBot Cycle 4), vous pouvez consolider toutes les séquences du programme dans un seul corpus en supprimant les redondances — organisez-le par thème plutôt que par séquence. Le fichier <code>corpus_techbot_cycle4.txt</code> fourni dans le dossier Mentoria est un exemple opérationnel pour la Technologie collège (5e–3e, 18 Ko compressé).</li>
                 <li><strong>Format TXT de préférence :</strong> Exportez vos cours en TXT plutôt qu'en PDF — plus léger et mieux lu par Albert.</li>
                 <li><strong>Tester avant diffusion :</strong> Ouvrez le lien élève vous-même et posez quelques questions avant de le distribuer en classe.</li>
-                <li><strong>Un assistant par séquence :</strong> Créez un assistant différent pour chaque chapitre ou séance plutôt qu'un bot généraliste.</li>
+                <li><strong>Un assistant par séquence ou par niveau :</strong> Créez un assistant différent pour chaque chapitre ou séance plutôt qu'un bot généraliste. Exception : un bot disciplinaire avec un corpus complet (ex : TechBot Cycle 4) peut fonctionner pour toute l'année.</li>
+                <li><strong>Distinguer explication et exercice dans les instructions :</strong> Configurez le bot pour qu'il explique librement quand l'élève cherche à comprendre, mais guide sans donner la réponse quand l'élève est en situation d'exercice. Ajoutez un MODE TEST dans les instructions pour que les élèves puissent demander des QCM ou des questions de révision.</li>
                 <li><strong>Activer "Hors sujet → rediriger" :</strong> Indispensable pour cadrer les échanges et éviter les dérives.</li>
-                <li><strong>Maïeutique :</strong> Activez "Ne jamais donner la réponse directement" pour forcer l'élève à réfléchir — c'est la posture pédagogique la plus efficace.</li>
+                <li><strong>Maïeutique + Guidage pas à pas :</strong> Activez ces deux règles ensemble — c'est la posture pédagogique la plus efficace pour ne pas donner les réponses tout en restant utile.</li>
                 <li><strong>Instructions courtes :</strong> Restez sous 200 mots dans le champ Instructions. Au-delà, Albert commence à ignorer une partie des consignes.</li>
-                <li><strong>Conseil RGPD :</strong> Si vous utilisez le mode "pseudonyme" (sans suivi de classe), demandez aux élèves d'utiliser un identifiant neutre — évitez nom + prénom + classe combinés.</li>
+                <li><strong>Un code de classe par groupe :</strong> Utilisez des codes lisibles (ex : <code>5eA</code>, <code>4eB</code>) plutôt que les codes aléatoires. Vous pourrez vider les logs d'une seule classe sans affecter les autres.</li>
+                <li><strong>Suppression de bot :</strong> Le bouton de suppression est discret (visible seulement au survol) et demande confirmation avec le nom du bot. Ne le confondez pas avec le bouton "Supprimer tous les logs" qui efface uniquement les conversations d'une classe.</li>
+                <li><strong>Conseil RGPD :</strong> Purgez les logs en fin de séquence via le bouton "Supprimer tous les logs" dans la console Suivi. Les conversations sont conservées dans votre Nuage personnel — elles ne quittent pas l'infrastructure de l'État.</li>
             </ul>
+
+            <div class="callout callout-success">
+                <h4>Exemple : TechBot — Assistant Technologie Cycle 4</h4>
+                <p>Voici la configuration complète d'un bot disciplinaire opérationnel :</p>
+                <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li><strong>Instructions IA :</strong> "Tu es TechBot, assistant pédagogique en Technologie pour collégiens (5e-3e). Tu guides sans jamais donner les réponses directement. Pour les questions de cours → explique clairement. Pour les exercices/mots croisés → donne 2 indices max. MODE TEST : si l'élève demande un quiz, pose les questions une par une (QCM 4 choix, questions ouvertes, Vrai/Faux). Bilan après 5 questions."</li>
+                    <li><strong>Règles cochées :</strong> Maïeutique, Ton encourageant, Guidage pas à pas, Stimuler la pensée critique, Conversation interactive, Ne jamais donner la réponse directement, Ne pas révéler les réponses aux évaluations, Réponses courtes (150 mots max), Ne jamais valider une réponse incorrecte, Pas de jargon sans explication, Hors sujet → rediriger, Refuser tout contenu inapproprié.</li>
+                    <li><strong>Corpus :</strong> Fichier <code>corpus_techbot_cycle4.txt</code> (18 Ko — toutes les notions du programme Cycle 4 consolidées par thème).</li>
+                    <li><strong>Proxy :</strong> Cloudflare Worker (<code>mentoria-proxy.gilles-cormi.workers.dev</code>) — robuste pour 50 élèves simultanés.</li>
+                </ul>
+            </div>
         </section>
 
         <!-- SECTION 10 -->
@@ -743,6 +782,7 @@
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.875rem;">
             <a href="index.html">← Retour au Studio</a>
             <a href="NOTICE-MENTORIA-TECHNIQUE.html">⚙️ Documentation technique</a>
+            <a href="EXEMPLES-BOTS-MENTORIA.html">📋 Exemples de bots</a>
             <a href="ROADMAPS-MENTORIA.html">🗺️ Feuille de route</a>
         </div>
 

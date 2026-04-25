@@ -192,11 +192,15 @@
                 <li><a href="#section-1">1. Souveraineté & Institutions</a></li>
                 <li><a href="#section-2">2. Conformité RGPD By Design</a></li>
                 <li><a href="#section-3">3. Moteurs de Stockage</a></li>
-                <li><a href="#section-4">4. Le Relais Souverain (Proxy n8n)</a></li>
+                <li><a href="#section-4">4. Les Proxys (CORS) — Cloudflare Worker & n8n</a></li>
                 <li><a href="#section-5">5. Architecture du Lien Élève (Base64)</a></li>
                 <li><a href="#section-6">6. Traitement IA & Prompts</a></li>
                 <li><a href="#section-7">7. Contacts & Crédits</a></li>
             </ul>
+            <div style="margin-top: 1.5rem; padding: 0.75rem; background: #fef3c7; border-radius: 0.5rem; font-size: 0.8rem;">
+                <strong>📋 Exemples concrets</strong><br>
+                <a href="EXEMPLES-BOTS-MENTORIA.html" style="color: #92400e;">→ Fiche Exemples de Bots</a>
+            </div>
         </nav>
     </aside>
 
@@ -244,7 +248,8 @@
                 <ul>
                     <li><strong>Principe de minimisation (Sans compte) :</strong> L'élève n'a pas de compte à créer. L'authentification se fait de manière purement déclarative par l'élève (via son identifiant ENT de type <code>prenom.nom</code>) à l'ouverture du lien, minimisant ainsi la collecte de données au strict nécessaire.</li>
                     <li><strong>Absence de Base de Données Tiers :</strong> Il n'y a aucune base de données commerciale (SQL/NoSQL) centralisant les bots, les requêtes ou les élèves. Tout est géré sous forme de fichiers plats hébergés au sein du cloud académique souverain de l'enseignant.</li>
-                    <li><strong>Durée de vie et purge des logs :</strong> Les interactions entre l'élève et l'IA (le "Suivi de classe") sont stockées de façon éphémère dans l'espace Nextcloud personnel de l'enseignant. Elles ont une finalité strictement pédagogique. L'interface offre un outil de purge permettant à l'enseignant de supprimer définitivement ces logs à la fin de la séance, respectant ainsi le droit à l'effacement.</li>
+                    <li><strong>Transit Cloudflare (proxy chat) :</strong> Les messages des élèves transitent par un Cloudflare Worker déployé par l'enseignant. Ce Worker ne stocke aucune donnée (pas de log, pas de base de données, pas de cookie). Le transit seul ne constitue pas un traitement de données au sens RGPD — c'est le même principe qu'un routeur réseau. Niveau de conformité comparable aux outils ENT existants (Pronote, Genially, etc.).</li>
+                    <li><strong>Durée de vie et purge des logs :</strong> Les interactions entre l'élève et l'IA (le "Suivi de classe") sont stockées de façon éphémère dans l'espace Nextcloud personnel de l'enseignant. Elles ont une finalité strictement pédagogique. L'interface offre un outil de purge par classe permettant à l'enseignant de supprimer définitivement ces logs à la fin de la séance, respectant ainsi le droit à l'effacement. La purge est sélective : chaque code de classe (ex : <code>5eA</code>, <code>4eB</code>) dispose de ses propres logs indépendants.</li>
                 </ul>
             </div>
         </section>
@@ -288,21 +293,35 @@
 
         <!-- SECTION 4 -->
         <section id="section-4">
-            <h2>4. Le Relais Souverain (Proxy n8n)</h2>
-            <p>Pour des raisons de sécurité, les navigateurs web appliquent des politiques <strong>CORS (Cross-Origin Resource Sharing)</strong>. Les serveurs de l'API Albert et de Nuage apps.education.fr n'autorisent pas nativement les requêtes directes depuis une page web externe.</p>
-            
-            <p>La solution architecturale, validée suite aux sollicitations des correspondants techniques ministériels, repose sur des flux <strong>n8n</strong> hébergés de manière sécurisée sur les serveurs de l'incubateur de l'Éducation Nationale :</p>
+            <h2>4. Les Proxys (Résolution CORS)</h2>
+            <p>Pour des raisons de sécurité, les navigateurs web appliquent des politiques <strong>CORS (Cross-Origin Resource Sharing)</strong>. Les serveurs de l'API Albert et de Nuage apps.education.fr n'autorisent pas nativement les requêtes directes depuis une page web externe. Deux proxys distincts sont utilisés selon leur usage :</p>
 
-            <h3>Webhook 1 : <code>mentoria_chat</code> (Proxy Albert)</h3>
+            <h3>Proxy 1 — Chat Albert : Cloudflare Worker (recommandé)</h3>
+            <p>Depuis la v2.7, le proxy par défaut pour les conversations élèves est un <strong>Cloudflare Worker</strong> déployé par l'enseignant lui-même :</p>
             <ul>
-                <li><strong>Rôle :</strong> Recevoir la requête de l'élève (Modèle, Température, Historique), injecter les headers CORS manquants, et relayer la requête vers <code>https://albert.api.etalab.gouv.fr/v1/chat/completions</code> avec le Token Bearer de l'enseignant.</li>
+                <li><strong>Fichier source :</strong> <code>worker.js</code> (fourni dans le dossier Mentoria).</li>
+                <li><strong>Déploiement :</strong> Compte Cloudflare gratuit → Workers → "Start with Hello World" → coller le code → Deploy.</li>
+                <li><strong>Rôle :</strong> Recevoir la requête de l'élève, injecter les headers CORS, et relayer vers <code>https://albert.api.etalab.gouv.fr/v1/chat/completions</code> avec le Bearer Token de l'enseignant.</li>
+                <li><strong>Stockage :</strong> Aucun. Transit pur — ni logs, ni base de données.</li>
+                <li><strong>Capacité :</strong> Plan gratuit Cloudflare = 100 000 requêtes/jour. Largement suffisant pour une classe entière (50 élèves simultanés).</li>
+                <li><strong>RGPD :</strong> Cloudflare est américain (Cloud Act) mais ne stocke rien. Niveau de risque équivalent à un réseau Wi-Fi d'école — le transit ne constitue pas un traitement de données au sens RGPD.</li>
             </ul>
 
-            <h3>Webhook 2 : <code>mentoria_storage</code> (Proxy Nuage & Logs)</h3>
+            <div style="background:#f1f5f9;padding:0.75rem;border-radius:6px;font-size:0.85rem;margin-bottom:1rem;">
+<strong>Architecture du Worker :</strong><br>
+Élève → <code>compagnion.html</code> (navigateur) → <strong>Cloudflare Worker</strong> → Albert API (Etalab) → réponse
+            </div>
+
+            <p><em>Fallback :</em> Si l'enseignant ne déploie pas de Worker, le proxy n8n de l'incubateur EN (<code>https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat</code>) peut être utilisé, mais il n'est pas dimensionné pour des classes entières et peut être indisponible.</p>
+
+            <h3>Proxy 2 — Stockage & Logs : n8n incubateur EN</h3>
+            <p>Le proxy n8n reste utilisé exclusivement pour les opérations de stockage Nuage et de suivi de classe :</p>
             <ul>
+                <li><strong>Webhook :</strong> <code>mentoria_storage</code> (<code>https://n8n.incubateur.education.gouv.fr/webhook/mentoria_storage</code>).</li>
                 <li><strong>Rôle :</strong> Transformer les requêtes JSON simples de l'application en requêtes WebDAV complexes pour interagir avec Nextcloud.</li>
-                <li><strong>Fonctions :</strong> <code>list</code>, <code>read</code>, <code>write</code>, <code>delete</code>, <code>test</code>.</li>
-                <li><strong>Suivi de classe :</strong> Gère l'écriture séquentielle des logs d'interaction de la classe, avec gestion des verrous pour éviter la corruption de fichiers lors d'écritures simultanées de multiples élèves.</li>
+                <li><strong>Fonctions :</strong> <code>list</code>, <code>read</code>, <code>write</code>, <code>delete</code>, <code>test</code>, <code>log_message</code>, <code>get_student_log</code>, <code>check_banned</code>, <code>delete_logs</code>.</li>
+                <li><strong>Suivi de classe :</strong> Gère l'écriture séquentielle des logs d'interaction, avec gestion des verrous pour éviter la corruption de fichiers lors d'écritures simultanées.</li>
+                <li><strong>Hébergement :</strong> Serveurs de l'incubateur de l'Éducation Nationale — infrastructure française souveraine.</li>
             </ul>
         </section>
 
@@ -440,6 +459,7 @@
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.875rem;">
             <a href="index.html">← Retour au Studio</a>
             <a href="NOTICE-MENTORIA-PROF.html">🎓 Guide enseignant</a>
+            <a href="EXEMPLES-BOTS-MENTORIA.html">📋 Exemples de bots</a>
             <a href="ROADMAPS-MENTORIA.html">🗺️ Feuille de route</a>
         </div>
 

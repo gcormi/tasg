@@ -661,24 +661,26 @@ function showScreen(id) {
 
 // ─── STORAGE / ALBERT ─────────────────────────────────────────────────────────
 async function storage(params) {
-  const res = await fetch(E.config.storageUrl, {
+  const res = await fetch(E.config.workerUrl, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...params, username: E.config.nuageUser, password: E.config.nuagePass, server: E.config.nuageServer || 'nuage.apps.education.fr' })
+    body: JSON.stringify(params)
   });
+  if (!res.ok) throw new Error('Erreur réseau Worker : ' + res.status);
   return await res.json();
 }
 
 async function callAlbert(messages) {
-  const res = await fetch(E.config.proxyUrl, {
+  const res = await fetch(E.config.workerUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      model: E.config.model || 'openai/gpt-oss-120b', 
-      messages, 
-      temperature: 0.2,
-      apiKey: E.config.apiKey
+    body: JSON.stringify({
+      action: 'albert',
+      model: E.config.model || 'openai/gpt-oss-120b',
+      messages,
+      temperature: 0.2
     })
   });
+  if (!res.ok) throw new Error('Erreur Worker : ' + res.status);
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data.choices?.[0]?.message?.content || '';
@@ -695,7 +697,7 @@ async function doConnect() {
   if (!studentId) { errEl.textContent = 'Ton identifiant est requis.'; errEl.classList.remove('hidden'); return; }
   if (!codeInput) { errEl.textContent = 'Le code de session est requis.'; errEl.classList.remove('hidden'); return; }
 
-  // Si config dans URL hash (lien prof)
+  // Config dans URL hash (lien prof) — ne contient que workerUrl, sessionId, model
   const hash = location.hash.replace('#config=', '');
   if (hash && hash.length > 10) {
     try {
@@ -707,12 +709,16 @@ async function doConnect() {
     errEl.textContent = 'Utilise le lien fourni par ton professeur.'; errEl.classList.remove('hidden'); return;
   }
 
+  if (!E.config.workerUrl || !E.config.sessionId) {
+    errEl.textContent = 'Lien de session incomplet ou obsolète.'; errEl.classList.remove('hidden'); return;
+  }
+
   E.studentId = studentId;
   document.getElementById('connect-btn').textContent = 'Chargement...';
   showScreen('loading');
 
   try {
-    const res = await storage({ action: 'read', filename: `${E.config.sessionId}.json` });
+    const res = await storage({ action: 'readSession', sessionId: E.config.sessionId });
     if (!res.success || !res.content) throw new Error('Session introuvable.');
 
     const session = res.content;
@@ -728,8 +734,7 @@ async function doConnect() {
 
     // Reprendre la progression existante si disponible
     try {
-      const filename = `result_${session.id}_${studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-      const prev = await storage({ action: 'read', filename });
+      const prev = await storage({ action: 'readResult', sessionId: session.id, studentId });
       if (prev.success && prev.content) {
         // Vérifier si le travail a déjà été rendu définitivement
         if (prev.content.submitted) {
@@ -1838,13 +1843,9 @@ async function autoSaveProgress() {
       scores: E.scores, globalPct,
       partial: done < total, activitiesDone: done, activitiesTotal: total
     };
-    const listRes = await storage({ action: 'list' });
-    const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
-    const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-    const writeRes = await storage({ action: 'write', filename, content: result, manifest });
+    const writeRes = await storage({ action: 'writeResult', sessionId: E.session.id, studentId: E.studentId, data: result });
 
     if (writeRes && writeRes.success) {
-      // Succès
       syncIcon.innerHTML = '<svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>';
       syncText.textContent = 'Sauvegardé';
       syncText.className = 'text-emerald-500';
@@ -1997,10 +1998,7 @@ async function submitResults() {
   };
 
   try {
-    const listRes = await storage({ action: 'list' });
-    const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
-    const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-    const writeRes = await storage({ action: 'write', filename, content: result, manifest });
+    const writeRes = await storage({ action: 'writeResult', sessionId: E.session.id, studentId: E.studentId, data: result });
     if (!writeRes?.success) throw new Error(writeRes?.error || 'Erreur serveur');
 
     // Calcul pts pour l'écran de rendu

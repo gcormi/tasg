@@ -1026,28 +1026,35 @@
             <button onclick="closeModal()" class="text-gray-300 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         <div class="p-5 space-y-4">
-            <div>
-                <label class="label">Lien élève</label>
-                <div class="flex gap-2">
-                    <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="Cliquez sur Publier…">
-                    <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+            <!-- Code de classe personnalisé -->
+            <div class="p-3 rounded-lg" style="background:#eef2ff;border:1px solid #c7d2fe">
+                <label class="label" style="color:#4338ca">👥 Code de classe <span class="normal-case font-normal text-indigo-400">(ex : 5eA, 4eB, Lundi1…)</span></label>
+                <div class="flex gap-2 mt-1">
+                    <input id="class-key-input" type="text" maxlength="10" class="input-field flex-1 font-mono font-black text-base tracking-widest uppercase" placeholder="5eA" style="color:#4338ca;letter-spacing:0.15em" oninput="this.value=this.value.toUpperCase()">
+                    <button onclick="generateShareLink()" class="btn btn-teal whitespace-nowrap"><i data-lucide="link" class="w-3.5 h-3.5"></i> Générer le lien</button>
                 </div>
+                <p class="text-[10px] text-indigo-400 mt-1.5">Ce code vous permettra de retrouver cette classe dans le suivi élèves.</p>
             </div>
-            <!-- Jauge de poids du lien -->
-            <div class="p-3 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-[10px] font-semibold text-gray-600">Poids du lien élève (encodé)</span>
-                    <span id="publish-weight-label" class="text-[10px] font-bold text-gray-700">—</span>
+            <div id="share-link-section" class="hidden space-y-3">
+                <div>
+                    <label class="label">Lien élève</label>
+                    <div class="flex gap-2">
+                        <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="">
+                        <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+                    </div>
                 </div>
-                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div id="publish-weight-bar" class="h-full rounded-full transition-all" style="width:0%;background:#22c55e"></div>
+                <!-- Jauge de poids du lien -->
+                <div class="p-3 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-semibold text-gray-600">Poids du lien élève (encodé)</span>
+                        <span id="publish-weight-label" class="text-[10px] font-bold text-gray-700">—</span>
+                    </div>
+                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="publish-weight-bar" class="h-full rounded-full transition-all" style="width:0%;background:#22c55e"></div>
+                    </div>
+                    <p id="publish-weight-warn" class="hidden mt-1.5 text-[10px] text-amber-600">⚠️ Lien lourd — certains ENT ou emails peuvent tronquer les URLs longues. Réduisez le corpus ou retirez l'avatar.</p>
+                    <p id="publish-weight-alert" class="hidden mt-1.5 text-[10px] font-semibold text-red-600">🚨 Lien trop lourd (&gt; 200 Ko) — risque de rejet par certaines plateformes. Réduisez impérativement le corpus et/ou l'avatar.</p>
                 </div>
-                <p id="publish-weight-warn" class="hidden mt-1.5 text-[10px] text-amber-600">⚠️ Lien lourd — certains ENT ou emails peuvent tronquer les URLs longues. Réduisez le corpus ou retirez l'avatar.</p>
-                <p id="publish-weight-alert" class="hidden mt-1.5 text-[10px] font-semibold text-red-600">🚨 Lien trop lourd (&gt; 200 Ko) — risque de rejet par certaines plateformes. Réduisez impérativement le corpus et/ou l'avatar.</p>
-            </div>
-            <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca">
-                👥 <strong>Code de groupe :</strong> <span id="share-class-key" class="font-mono font-black text-lg tracking-widest">—</span>
-                <span class="block mt-1 text-[10px] text-indigo-400">Notez ce code — il vous permettra de retrouver cette classe dans le suivi. Chaque publication génère un code différent.</span>
             </div>
             <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d">
                 🔒 <strong>Souverain :</strong> Lien auto-contenu. Aucun compte élève. Aucune donnée transmise à un tiers.
@@ -1505,8 +1512,19 @@
     window.publishBot = async () => {
         await saveCurrentBot();
         const bot = library[currentBotId]; if (!bot) return;
-        // Générer un code de groupe unique à chaque publication
-        const classKey = Math.random().toString(36).slice(2, 6).toUpperCase();
+        // Ouvrir le modal et laisser le prof saisir son code de classe
+        document.getElementById('share-link-section').classList.add('hidden');
+        document.getElementById('class-key-input').value = '';
+        document.getElementById('publish-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => document.getElementById('class-key-input').focus(), 100);
+    };
+
+    window.generateShareLink = () => {
+        const bot = library[currentBotId]; if (!bot) return;
+        const classKey = document.getElementById('class-key-input').value.trim().toUpperCase();
+        if (!classKey) { document.getElementById('class-key-input').focus(); document.getElementById('class-key-input').style.borderColor='#ef4444'; return; }
+        document.getElementById('class-key-input').style.borderColor='';
         const botForShare = JSON.parse(JSON.stringify(bot));
         if (botForShare.loggingConfig) botForShare.loggingConfig.classKey = classKey;
         const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(botForShare));
@@ -1519,8 +1537,7 @@
         if (groups.length > 20) groups.pop();
         localStorage.setItem(groupsKey, JSON.stringify(groups));
         document.getElementById('share-link').value = link;
-        const keyEl = document.getElementById('share-class-key');
-        if (keyEl) keyEl.textContent = classKey;
+        document.getElementById('share-link-section').classList.remove('hidden');
         // Jauge de poids du lien
         const urlKo = Math.round(encoded.length / 1024);
         const wBar = document.getElementById('publish-weight-bar');
@@ -1541,7 +1558,6 @@
                 wWarn?.classList.add('hidden'); wAlert?.classList.remove('hidden');
             }
         }
-        document.getElementById('publish-modal').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
     };
 
