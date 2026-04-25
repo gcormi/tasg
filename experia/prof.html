@@ -214,6 +214,82 @@
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN : CONFIGURATION TECHNIQUE            -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-config" class="screen">
+  <div class="max-w-2xl mx-auto px-6 py-10 fade-up">
+    <div class="flex items-center gap-3 mb-8">
+      <button onclick="showScreen('dashboard')" class="p-2 hover:bg-white rounded-xl transition-colors text-slate-500">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h2 class="text-2xl font-black text-slate-900">Paramètres techniques</h2>
+        <p class="text-sm text-slate-500 font-medium">Configuration des services IA et Stockage</p>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Section IA -->
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-2 mb-4 text-indigo-600">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+          <h3 class="font-black uppercase tracking-wider text-xs">Intelligence Artificielle Albert</h3>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Clé API Albert</label>
+            <div class="flex gap-2">
+              <input id="config-apikey" type="password" placeholder="sk-..."
+                class="flex-1 bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+              <button onclick="syncConfigFrom('config-apikey', 'create-apikey')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-indigo-700 transition-all">
+                OK
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Modèle par défaut</label>
+            <select id="config-model" class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
+              <option value="openai/gpt-oss-120b">Albert Grand (gpt-oss-120b)</option>
+              <option value="openai/gpt-oss-20b">Albert Moyen (gpt-oss-20b)</option>
+              <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">URL Proxy Albert (n8n)</label>
+            <input id="config-proxy" type="text"
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Stockage -->
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-2 mb-4 text-emerald-600">
+          <i data-lucide="cloud" class="w-5 h-5"></i>
+          <h3 class="font-black uppercase tracking-wider text-xs">Stockage Nuage (apps.education.fr)</h3>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">URL Stockage Experia (n8n)</label>
+            <input id="config-storage" type="text"
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+          </div>
+          <div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+            <p class="text-[11px] text-amber-700 font-medium leading-relaxed">
+              <strong>Note :</strong> Ces réglages sont sauvegardés localement dans votre navigateur. Pour les modifier définitivement, mettez à jour votre lien de connexion rapide.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="applyAndSaveConfig()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-black transition-all shadow-lg flex items-center justify-center gap-2">
+        <i data-lucide="save" class="w-5 h-5"></i> Enregistrer les paramètres
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
 <!-- ÉCRAN 3 : CRÉER UNE SESSION               -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-create" class="screen">
@@ -635,6 +711,15 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   document.getElementById('btn-logout').classList.toggle('hidden', id === 'login');
+  
+  // Remplir l'écran config si besoin
+  if (id === 'config') {
+    document.getElementById('config-apikey').value = document.getElementById('create-apikey').value;
+    document.getElementById('config-model').value = document.getElementById('create-model').value;
+    document.getElementById('config-proxy').value = state.proxyUrl || document.getElementById('login-proxy').value;
+    document.getElementById('config-storage').value = state.storageUrl || document.getElementById('login-storage').value;
+  }
+
   // Stopper l'auto-refresh si on quitte l'écran session
   if (id !== 'session') stopResultsAutoRefresh();
 }
@@ -758,7 +843,18 @@ function loadSavedConfig() {
   if (cfg.user)   document.getElementById('login-user').value   = cfg.user;
   if (cfg.pass)   document.getElementById('login-pass').value   = cfg.pass;
   if (cfg.server) document.getElementById('login-server').value = cfg.server;
-  if (cfg.apiKey) document.getElementById('create-apikey').value = cfg.apiKey;
+  if (cfg.apiKey) {
+    document.getElementById('create-apikey').value = cfg.apiKey;
+    if (document.getElementById('config-apikey')) document.getElementById('config-apikey').value = cfg.apiKey;
+  }
+  if (cfg.proxy) {
+    if (document.getElementById('login-proxy')) document.getElementById('login-proxy').value = cfg.proxy;
+    if (document.getElementById('config-proxy')) document.getElementById('config-proxy').value = cfg.proxy;
+  }
+  if (cfg.storage) {
+    if (document.getElementById('login-storage')) document.getElementById('login-storage').value = cfg.storage;
+    if (document.getElementById('config-storage')) document.getElementById('config-storage').value = cfg.storage;
+  }
   if (cfg.theme)  applyGlobalTheme(cfg.theme);
 }
 
@@ -776,9 +872,37 @@ function saveConfig() {
     pass:   document.getElementById('login-pass').value.trim(),
     server: document.getElementById('login-server').value.trim(),
     apiKey: document.getElementById('create-apikey').value.trim(),
+    proxy:  document.getElementById('login-proxy').value.trim(),
+    storage: document.getElementById('login-storage').value.trim(),
     theme:  document.body.className.match(/theme-(\w+)/)?.[1] || 'classique'
   };
   localStorage.setItem('experia_config', JSON.stringify(cfg));
+}
+
+function syncConfigFrom(fromId, toId) {
+  const val = document.getElementById(fromId).value.trim();
+  document.getElementById(toId).value = val;
+  saveConfig();
+  alert('Paramètre synchronisé !');
+}
+
+function applyAndSaveConfig() {
+  const apiKey = document.getElementById('config-apikey').value.trim();
+  const model  = document.getElementById('config-model').value;
+  const proxy  = document.getElementById('config-proxy').value.trim();
+  const storageUrl = document.getElementById('config-storage').value.trim();
+
+  state.proxyUrl = proxy;
+  state.storageUrl = storageUrl;
+  
+  document.getElementById('create-apikey').value = apiKey;
+  document.getElementById('create-model').value = model;
+  document.getElementById('login-proxy').value = proxy;
+  document.getElementById('login-storage').value = storageUrl;
+
+  saveConfig();
+  showScreen('dashboard');
+  lucide.createIcons();
 }
 
 // Ajouter des écouteurs pour sauvegarder automatiquement dès qu'un champ change
