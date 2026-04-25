@@ -1734,7 +1734,7 @@ score = entier entre 0 et 10.`;
     ]);
 
     const match = raw.match(/\{[\s\S]*?\}/);
-    const result = match ? JSON.parse(match[0]) : { score: 5, feedback: 'Évaluation indisponible.' };
+    const result = match ? JSON.parse(match[0]) : { score: 0, feedback: 'Évaluation technique indisponible.' };
     const score = Math.max(0, Math.min(10, result.score || 0));
     iaScores.push(score);
     E.gameScore += score;
