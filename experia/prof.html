@@ -17,6 +17,17 @@
     .activity-row { transition: all 0.2s; }
     .progress-bar { transition: width 0.5s ease; }
     input, textarea, select { font-family: 'Outfit', sans-serif; }
+    
+    /* Thèmes visuels */
+    body { transition: background-color 0.5s ease; }
+    body.theme-classique { background: #f0f4ff; }
+    body.theme-nature { background: #f0fdf4; }
+    body.theme-ocean { background: #ecfeff; }
+    body.theme-soleil { background: #fff7ed; }
+    body.theme-crepuscule { background: #faf5ff; }
+    body.theme-rose { background: #fdf2f8; }
+    
+    .theme-btn.selected-theme { transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
   </style>
 </head>
 <body class="min-h-screen">
@@ -345,9 +356,25 @@
       <button onclick="duplicateCurrentSession()" title="Dupliquer pour une autre classe" class="p-2 hover:bg-indigo-50 rounded-xl transition-colors text-slate-400 hover:text-indigo-500">
         <i data-lucide="copy-plus" class="w-5 h-5"></i>
       </button>
+      <button onclick="changeCurrentTheme()" title="Changer le thème visuel" class="p-2 hover:bg-indigo-50 rounded-xl transition-colors text-slate-400 hover:text-indigo-500">
+        <i data-lucide="palette" class="w-5 h-5"></i>
+      </button>
       <button onclick="deleteCurrentSession()" class="p-2 hover:bg-red-50 rounded-xl transition-colors text-slate-400 hover:text-red-500">
         <i data-lucide="trash-2" class="w-5 h-5"></i>
       </button>
+    </div>
+
+    <!-- Sélecteur de thème rapide (caché par défaut) -->
+    <div id="quick-theme-selector" class="hidden mb-6 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 fade-up">
+      <p class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Changer le thème de cette session</p>
+      <div class="grid grid-cols-6 gap-2">
+        <button onclick="updateSessionTheme('classique')" class="w-full h-8 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-200 border border-indigo-200" title="Classique"></button>
+        <button onclick="updateSessionTheme('nature')" class="w-full h-8 rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 border border-emerald-200" title="Nature"></button>
+        <button onclick="updateSessionTheme('ocean')" class="w-full h-8 rounded-lg bg-gradient-to-br from-cyan-100 to-sky-200 border border-cyan-200" title="Océan"></button>
+        <button onclick="updateSessionTheme('soleil')" class="w-full h-8 rounded-lg bg-gradient-to-br from-yellow-100 to-orange-200 border border-orange-200" title="Soleil"></button>
+        <button onclick="updateSessionTheme('crepuscule')" class="w-full h-8 rounded-lg bg-gradient-to-br from-purple-100 to-violet-200 border border-violet-200" title="Crépuscule"></button>
+        <button onclick="updateSessionTheme('rose')" class="w-full h-8 rounded-lg bg-gradient-to-br from-pink-100 to-rose-200 border border-rose-200" title="Bonbon"></button>
+      </div>
     </div>
 
     <!-- Lien de partage -->
@@ -463,16 +490,55 @@ const THEME_COLORS = {
 
 function selectTheme(theme) {
   document.getElementById('create-theme').value = theme;
+  
+  // Appliquer le thème au body pour un aperçu temps réel
+  document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+  document.body.classList.add('theme-' + theme);
+
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.className = btn.className
       .replace(/border-\w+-400/g, 'border-slate-100')
-      .replace(/bg-\w+-50/g, 'bg-slate-50');
+      .replace(/bg-\w+-50/g, 'bg-slate-50')
+      .replace('selected-theme', '');
   });
   const btn = document.getElementById(`theme-btn-${theme}`);
   const c = THEME_COLORS[theme];
   btn.className = btn.className
     .replace('border-slate-100', c.border)
     .replace('bg-slate-50', c.bg);
+  btn.classList.add('selected-theme');
+}
+
+function changeCurrentTheme() {
+  const el = document.getElementById('quick-theme-selector');
+  el.classList.toggle('hidden');
+}
+
+async function updateSessionTheme(theme) {
+  if (!state.currentSession) return;
+  state.currentSession.theme = theme;
+  
+  // Appliquer localement
+  document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+  document.body.classList.add('theme-' + theme);
+
+  // Sauvegarder sur le Nuage
+  try {
+    const filename = state.currentSession.id.startsWith('session_') ? state.currentSession.id + '.json' : `session_${state.currentSession.id}.json`;
+    await storage({ action: 'write', filename, content: state.currentSession, manifest: state.manifest });
+    
+    // Mettre à jour le lien de partage
+    const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
+      storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
+      nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
+      sessionId: state.currentSession.id, apiKey: state.currentSession.apiKey, model: state.currentSession.model
+    }))))}`;
+    document.getElementById('sess-link').value = link;
+    
+    document.getElementById('quick-theme-selector').classList.add('hidden');
+  } catch(e) {
+    alert('Erreur lors de la mise à jour du thème : ' + e.message);
+  }
 }
 
 // ─── ÉTAT ───────────────────────────────────────────────────────────────────
