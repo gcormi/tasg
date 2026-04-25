@@ -83,6 +83,7 @@
         <span id="connect-btn">Rejoindre</span>
       </button>
     </div>
+    <p class="text-center text-[10px] text-slate-300 mt-4 font-black uppercase tracking-widest">Albert version Professeur Sévère activée</p>
   </div>
 </div>
 
@@ -1711,13 +1712,20 @@ async function validateIA() {
   document.getElementById('ia-loading').classList.remove('hidden');
 
   try {
-    const prompt = `Tu es un professeur qui évalue la réponse d'un élève sur 10 points.
+    const prompt = `Tu es un professeur EXIGEANT et STRICT qui évalue la réponse d'un élève sur 10 points.
 Question : ${q.q}
-Corpus de référence : ${E.session.corpus.substring(0, 2000)}
+Corpus de référence : ${E.session.corpus.substring(0, 2500)}
 Réponse de l'élève : ${answer}
 
-Réponds UNIQUEMENT avec ce JSON valide (sans markdown) :
-{"score":7,"feedback":"Une phrase d'explication courte."}
+CONSIGNES DE CORRECTION :
+1. Si la réponse est hors-sujet, vide, insultante ou n'apporte aucun élément technique du corpus, donne 0 (ZÉRO) point.
+2. Si la réponse est trop courte ou évasive (ex: "je sais pas", "il se débrouille"), donne 0 (ZÉRO) point.
+3. Ne donne pas la moyenne (5/10) par défaut. La moyenne n'est accordée que si au moins la moitié des points clés sont présents.
+4. Pour avoir 10/10, la réponse doit être précise, structurée et utiliser le vocabulaire du corpus.
+5. Sois ferme mais constructif dans ton feedback.
+
+Réponds UNIQUEMENT avec ce JSON valide :
+{"score":0,"feedback":"Ta réponse est hors-sujet et ne contient aucun des éléments techniques attendus."}
 score = entier entre 0 et 10.`;
 
     const raw = await callAlbert([
