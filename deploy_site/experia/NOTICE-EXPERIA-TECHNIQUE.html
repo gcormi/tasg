@@ -138,8 +138,9 @@
   "sessionTitle": "Les énergies renouvelables",
   "studentId": "marie.dupont",
   "completedAt": "2025-09-01T10:35:00Z",
+  "submitted": true,          // true = rendu définitif (accès verrouillé pour l'élève)
   "partial": false,           // true si l'élève n'a pas tout terminé
-  "activitiesDone": 8,
+  "activitiesDone": 6,
   "activitiesTotal": 8,
   "globalPct": 78,
   "scores": {
@@ -150,7 +151,7 @@
   "teacherComment": ""
 }</code></pre>
 
-      <p class="text-sm mt-2">Les résultats partiels (<code>partial: true</code>) sont écrits automatiquement après chaque activité terminée. Le fichier est ensuite écrasé (même nom) lors de la soumission finale ou des activités suivantes.</p>
+      <p class="text-sm mt-2">Les résultats partiels (<code>partial: true</code>) sont écrits automatiquement après chaque activité terminée. Le fichier est ensuite écrasé (même nom) lors de la soumission finale. Lorsque <code>submitted: true</code>, la reconnexion élève est bloquée avec un message de confirmation de rendu.</p>
     </div>
 
     <!-- ═══ WORKFLOWS N8N ═══ -->
@@ -302,9 +303,21 @@ const text = Array.from(tmp.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td,
     <!-- ═══ PERSISTANCE CONFIG ═══ -->
     <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
       <h2><i data-lucide="database" class="w-5 h-5 text-slate-500"></i> Persistance locale (localStorage)</h2>
-      <p class="text-sm">Seuls trois champs sont mémorisés dans <code>localStorage</code> sous la clé <code>experia_config</code> :</p>
+      <p class="text-sm">Seuls quatre champs sont mémorisés dans <code>localStorage</code> sous la clé <code>experia_config</code> :</p>
       <pre><code>{ "user": "gcormi", "pass": "mot-de-passe-app", "apiKey": "sk-...", "server": "nuage03..." }</code></pre>
       <p class="text-sm mt-2">La déconnexion depuis l'interface vide explicitement ces champs (sécurité pour ordinateurs partagés).</p>
+
+      <h3>Lien de connexion rapide (#login=BASE64)</h3>
+      <p class="text-sm">Un bouton "Générer mon lien de connexion rapide" encode toutes les credentials en JSON puis Base64 dans le hash URL :</p>
+      <pre><code>// Génération
+const config = { user, pass, server, proxy, storage, apiKey };
+const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
+const url = `${location.origin}${location.pathname}#login=${encoded}`;
+
+// Lecture au chargement
+const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(7)))));
+// Pré-remplissage des champs + doLogin() automatique après 300ms</code></pre>
+      <p class="text-sm mt-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3"><strong>⚠️ Sécurité :</strong> Ce lien contient le mot de passe d'application en Base64 (non chiffré). Il doit être traité comme un secret personnel. Recommander l'usage d'un mot de passe d'application (portee limitée, révocable) et non du mot de passe ENT principal.</p>
     </div>
 
     <!-- ═══ DÉPLOIEMENT ═══ -->
@@ -337,6 +350,26 @@ const text = Array.from(tmp.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td,
     <!-- ═══ SÉCURITÉ ═══ -->
     <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
       <h2><i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Sécurité &amp; RGPD</h2>
+
+      <!-- Badge conformité -->
+      <div class="bg-emerald-600 text-white rounded-2xl p-4 mb-5 flex items-center gap-3">
+        <i data-lucide="shield-check" class="w-8 h-8 flex-none"></i>
+        <div>
+          <p class="font-black">Application conforme au RGPD (Règlement UE 2016/679)</p>
+          <p class="text-emerald-100 text-sm">Conformé CNIL pour outils numériques éducatifs. Aucune donnée personnelle ne quitte le périmètre de l'Éducation Nationale.</p>
+        </div>
+      </div>
+
+      <h3>Analyse point par point</h3>
+      <ul class="text-sm space-y-2">
+        <li><strong>Pas de serveur propre :</strong> Experia est 100% statique. Aucune base de données, aucun compte utilisateur côté application.</li>
+        <li><strong>Stockage souverain :</strong> Toutes les données (sessions, résultats) résident exclusivement sur le Nuage <code>apps.education.fr</code> — serveurs EN français.</li>
+        <li><strong>Données élèves minimisées :</strong> Identifiant ENT uniquement (prénom, initiales ou code classe selon convention du prof). Aucun e-mail, téléphone, donnée biométrique.</li>
+        <li><strong>Pas de cookies, tracking ou analytics :</strong> Zéro pixel publicitaire, zéro Google Analytics, zéro Matomo. localStorage uniquement pour les credentials prof (local au navigateur).</li>
+        <li><strong>Transit souverain :</strong> Proxy n8n sur <code>n8n.incubateur.education.gouv.fr</code>. Albert sur <code>albert.api.etalab.gouv.fr</code>. Aucun service tiers étranger.</li>
+        <li><strong>Droit à l'effacement :</strong> Suppression de session = effacement complet des résultats associés sur le Nuage. Aucune rétention.</li>
+        <li><strong>Responsable de traitement :</strong> Le professeur, via son espace Nuage personnel. Pas l'application ni son auteur.</li>
+      </ul>
 
       <h3>Credentials dans le lien élève</h3>
       <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800">
@@ -446,7 +479,7 @@ const text = Array.from(tmp.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td,
   </div>
 
   <footer class="max-w-3xl mx-auto mt-10 text-center text-xs text-slate-300 font-medium pb-6">
-    Experia v1.0 — Notice technique — Forge des Communs Numériques Éducatifs
+    Experia v1.1 — Notice technique — Forge des Communs Numériques Éducatifs — Mise à jour avril 2026
   </footer>
 
   <script>lucide.createIcons();</script>

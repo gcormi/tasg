@@ -36,7 +36,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-black text-slate-900 leading-none">Experia — Roadmap</h1>
-        <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">État d'avancement · Avril 2025</p>
+        <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">État d'avancement · Avril 2026</p>
       </div>
     </div>
     <p class="text-slate-400 text-sm mt-3 font-medium">Vision d'ensemble de ce qui est fait, en cours et à venir.</p>
@@ -106,12 +106,16 @@
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
-          <div><p class="font-semibold text-slate-700">Tableau de résultats</p><p class="text-slate-400">Lecture de tous les <code>result_*.json</code>, tableau récapitulatif par élève avec scores par activité et total</p></div>
+          <div><p class="font-semibold text-slate-700">Lien de connexion rapide Prof</p><p class="text-slate-400">Génération d'un lien <code>prof.html#login=BASE64</code> pour une reconnexion instantanée sur n'importe quel poste</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Tableau de résultats (Live)</p><p class="text-slate-400">Lecture de tous les <code>result_*.json</code>, **Auto-polling (30s)**, indicateur de rendu définitif (submitted), affichage des points réels sur barème</p></div>
         </div>
       </div>
 
       <!-- Interface élève -->
-      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Interface élève (<code>eleve.html</code>) — 6 activités</p>
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Interface élève (<code>eleve.html</code>) — 8 activités</p>
       <div class="space-y-0 mb-5">
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
@@ -119,7 +123,15 @@
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
-          <div><p class="font-semibold text-slate-700">Paires — Associer les termes</p><p class="text-slate-400">Cliquer pour sélectionner puis associer, états visuels : sélectionné / associé / erreur</p></div>
+          <div><p class="font-semibold text-slate-700">Paires — Associer les termes</p><p class="text-slate-400">Cliquer pour sélectionner puis associer, pénalité de points par erreur</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Mots Mêlés — Grille dynamique</p><p class="text-slate-400">Génération de grille, sélection par clic (1ère et dernière lettre)</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Mots Croisés — Grille interactive</p><p class="text-slate-400">Croisement automatique des mots, définitions dynamiques, validation visuelle</p></div>
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
@@ -139,7 +151,11 @@
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
-          <div><p class="font-semibold text-slate-700">Synthèse finale + envoi résultats</p><p class="text-slate-400">Récapitulatif des scores, soumission automatique vers le Nuage du professeur</p></div>
+          <div><p class="font-semibold text-slate-700">Workflow de rendu & Reprise</p><p class="text-slate-400">Boutons "Rendre le travail" (verrouillage) et "Continuer plus tard" (sauvegarde partielle), gestion automatique de la reprise au retour</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Synthèse finale + barème réel</p><p class="text-slate-400">Récapitulatif des scores sur X points (barème prof), soumission vers le Nuage</p></div>
         </div>
       </div>
 
@@ -320,26 +336,26 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
         <div class="bg-white/10 rounded-2xl p-4 text-center">
-          <p class="text-4xl font-black text-white">~85%</p>
+          <p class="text-4xl font-black text-white">95%</p>
           <p class="text-indigo-200 text-sm font-medium mt-1">des fonctionnalités v1.0 codées</p>
         </div>
         <div class="bg-white/10 rounded-2xl p-4 text-center">
-          <p class="text-4xl font-black text-white">6/6</p>
+          <p class="text-4xl font-black text-white">8/8</p>
           <p class="text-indigo-200 text-sm font-medium mt-1">activités élève implémentées</p>
         </div>
         <div class="bg-white/10 rounded-2xl p-4 text-center">
-          <p class="text-4xl font-black text-white">1</p>
-          <p class="text-indigo-200 text-sm font-medium mt-1">test end-to-end à valider</p>
+          <p class="text-4xl font-black text-white">0</p>
+          <p class="text-indigo-200 text-sm font-medium mt-1">bloqueur restant</p>
         </div>
       </div>
 
-      <p class="text-indigo-100 text-sm mt-5">L'application est fonctionnellement complète. Le seul verrou restant avant une utilisation en classe est la validation du parcours complet depuis la Forge (création de session → résultats), notamment la vérification que la correction du serveur Nuage (<code>nuage03</code>) résout définitivement les erreurs 405. Une fois ce test réalisé, l'application peut être utilisée en v1.0 beta.</p>
+      <p class="text-indigo-100 text-sm mt-5">L'application est mature et prête pour un usage en classe. Les 8 activités sont fonctionnelles, le système de rendu et de reprise est robuste, et le tableau de bord professeur permet un suivi en temps réel grâce à l'auto-polling. La v1.1 marque le passage au statut de production.</p>
     </div>
 
   </div>
 
   <footer class="max-w-3xl mx-auto mt-10 text-center text-xs text-slate-300 font-medium pb-6">
-    Experia — Forge des Communs Numériques Éducatifs · Éducation Nationale · Avril 2025
+    Experia — Forge des Communs Numériques Éducatifs · Éducation Nationale · Avril 2026
   </footer>
 
   <script>lucide.createIcons();</script>

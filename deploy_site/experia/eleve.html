@@ -46,6 +46,11 @@
     <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-1">Élève</span>
   </div>
   <div id="header-progress" class="hidden text-xs font-bold text-slate-400"></div>
+  <!-- Indicateur de sync discret -->
+  <div id="sync-indicator" class="hidden items-center gap-1.5 text-xs font-bold">
+    <div id="sync-icon" class="w-4 h-4 flex items-center justify-center"></div>
+    <span id="sync-text"></span>
+  </div>
 </header>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -122,8 +127,16 @@
     </div>
 
     <button id="btn-submit" onclick="submitResults()" class="hidden mt-4 w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
-      <i data-lucide="send" class="w-5 h-5"></i> Envoyer mes résultats au professeur
+      <i data-lucide="send" class="w-5 h-5"></i> Rendre le travail au professeur
     </button>
+    <!-- Bouton Continuer plus tard -->
+    <button id="btn-save-later" onclick="saveLater()" class="hidden mt-3 w-full bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 rounded-2xl hover:border-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2 text-sm">
+      <i data-lucide="clock" class="w-4 h-4"></i> Continuer plus tard
+    </button>
+    <div id="save-later-msg" class="hidden mt-3 text-center text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 flex-none"></i>
+      Progression sauvegardée ! Tu peux fermer l'onglet et revenir plus tard avec le même lien.
+    </div>
   </div>
 </div>
 
@@ -149,6 +162,12 @@
         <div id="qcm-score" class="font-black text-blue-600 text-xl">0</div>
         <div class="text-xs text-slate-400 font-bold">pts</div>
       </div>
+    </div>
+
+    <!-- Consigne QCM -->
+    <div class="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 mb-5 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">💡</span>
+      <p class="text-sm font-bold text-blue-700">Lis chaque question et choisis <strong>la seule bonne réponse</strong> parmi les propositions. Pas de retour en arrière possible.</p>
     </div>
 
     <div id="qcm-question" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-5 fade-up">
@@ -186,6 +205,12 @@
         <div id="paires-score" class="font-black text-purple-600 text-xl">0</div>
         <div class="text-xs text-slate-400 font-bold">paires</div>
       </div>
+    </div>
+
+    <!-- Consigne Paires -->
+    <div class="bg-purple-50 border border-purple-100 rounded-2xl px-4 py-3 mb-5 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">💡</span>
+      <p class="text-sm font-bold text-purple-700">Clique sur un terme à gauche, puis sur sa définition à droite pour créer une paire. <strong>Attention : une mauvaise association est définitive !</strong></p>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
@@ -235,7 +260,11 @@
     </div>
 
     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4 fade-up">
-      <p class="text-center text-sm font-bold text-slate-500 mb-4">Trouvez les mots cachés (Cliquez sur la 1ère puis la dernière lettre)</p>
+      <!-- Consigne Mots Mêlés -->
+      <div class="bg-rose-50 border border-rose-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5">
+        <span class="text-base mt-0.5">💡</span>
+        <p class="text-sm font-bold text-rose-700">Retrouve tous les mots cachés dans la grille. <strong>Clique sur la première lettre, puis sur la dernière lettre</strong> du mot à trouver.</p>
+      </div>
       <div id="mm-word-list" class="flex flex-wrap gap-2 justify-center mb-4"></div>
       <div id="mm-grid-container" class="grid bg-slate-100 p-2 rounded-xl mx-auto w-fit gap-1 select-none" style="touch-action: none;"></div>
     </div>
@@ -276,6 +305,11 @@
     </div>
 
     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4 fade-up flex-1 flex flex-col overflow-hidden relative">
+      <!-- Consigne Mots Croisés -->
+      <div class="bg-cyan-50 border border-cyan-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5">
+        <span class="text-base mt-0.5">💡</span>
+        <p class="text-sm font-bold text-cyan-700"><strong>Clique sur une case</strong> de la grille pour voir la définition du mot à trouver, puis tape le mot directement dans les cases.</p>
+      </div>
       <p id="mc-def-text" class="text-center text-sm font-bold text-cyan-700 bg-cyan-50 rounded-xl p-3 mb-4 min-h-[3rem] flex items-center justify-center border border-cyan-100">
         Sélectionnez une case pour voir la définition.
       </p>
@@ -322,6 +356,12 @@
     </div>
     <p class="text-center text-xs font-bold text-slate-400 mb-4"><span id="rap-timer">10</span>s restantes</p>
 
+    <!-- Consigne Rapidité -->
+    <div class="bg-orange-50 border border-orange-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">⚡</span>
+      <p class="text-sm font-bold text-orange-700">Réponds avant que le temps soit écoulé ! <strong>Plus tu réponds vite, plus tu gagnes de points.</strong> Concentre-toi !</p>
+    </div>
+
     <div id="rap-question" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-4 fade-up">
       <p class="font-black text-slate-800 text-lg" id="rap-q-text"></p>
     </div>
@@ -359,6 +399,12 @@
         </div>
       </div>
       <div class="font-black text-green-600 text-xl"><span id="comp-score">0</span><span class="text-xs text-slate-400 font-bold ml-0.5">pts</span></div>
+    </div>
+
+    <!-- Consigne Compléter -->
+    <div class="bg-green-50 border border-green-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">💡</span>
+      <p class="text-sm font-bold text-green-700">Lis la phrase et <strong>tape le mot manquant</strong> dans le champ de réponse, puis valide avec Entrée ou le bouton OK.</p>
     </div>
 
     <div id="comp-question" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-4 fade-up">
@@ -413,7 +459,12 @@
       <div class="font-black text-amber-600 text-xl"><span id="int-score">0</span><span class="text-xs text-slate-400 font-bold ml-0.5">pts</span></div>
     </div>
 
-    <p class="text-sm font-bold text-slate-500 mb-3 fade-up">Quelle affirmation est <span class="text-red-500">FAUSSE</span> ?</p>
+    <!-- Consigne Intrus -->
+    <div class="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2.5 fade-up">
+      <span class="text-base mt-0.5">🔍</span>
+      <p class="text-sm font-bold text-amber-700">Parmi les 4 affirmations proposées, <strong>une seule est fausse</strong>. Trouve l'intrus et clique dessus.</p>
+    </div>
+
     <div id="int-statements" class="space-y-3 fade-up"></div>
     <div id="int-explanation" class="hidden mt-4 bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 font-medium"></div>
     <button id="int-next" onclick="intrusNext()" class="hidden mt-4 w-full bg-amber-500 text-white font-black py-4 rounded-2xl hover:bg-amber-600 transition-all">
@@ -447,6 +498,18 @@
           <span id="ia-progress" class="text-xs font-bold text-slate-400"></span>
         </div>
       </div>
+    </div>
+
+    <!-- Consigne Questions IA -->
+    <div class="bg-indigo-50 border border-indigo-200 rounded-2xl px-4 py-4 mb-4 fade-up">
+      <div class="flex items-start gap-2.5 mb-2">
+        <span class="text-base mt-0.5">🤖</span>
+        <p class="text-sm font-black text-indigo-800">Questions ouvertes évaluées par l'IA Albert</p>
+      </div>
+      <p class="text-sm font-medium text-indigo-700 leading-relaxed pl-7">
+        Lis la question et <strong>rédige une réponse développée</strong> dans le champ ci-dessous. Il n'y a pas de QCM : tu dois formuler ta réponse avec tes propres mots, comme à l'écrit en classe.
+      </p>
+      <p class="text-xs font-bold text-indigo-400 mt-2 pl-7">💡 Albert (une IA pédagogique) lira ta réponse et te donnera un score + un commentaire. Sois précis et complet.</p>
     </div>
 
     <div id="ia-question-block" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-4 fade-up">
@@ -509,16 +572,52 @@
     <!-- Score global -->
     <div class="bg-indigo-600 text-white rounded-3xl p-6 mb-5 text-center">
       <p class="text-indigo-200 text-sm font-bold uppercase tracking-wider mb-1">Score global</p>
-      <div id="final-global" class="text-6xl font-black">—</div>
+      <div id="final-global" class="text-5xl font-black">—</div>
+      <p id="final-global-sub" class="text-indigo-300 text-xs font-bold mt-1"></p>
     </div>
 
     <!-- Détails -->
     <div id="final-details" class="space-y-2 mb-6"></div>
 
     <div id="final-status" class="text-center text-sm font-medium text-slate-400 mb-4"></div>
-    <button id="btn-final-send" onclick="submitResults()" class="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2">
-      <i data-lucide="send" class="w-5 h-5"></i> Envoyer au professeur
+
+    <!-- Avertissement rendu définitif -->
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4 flex items-start gap-3">
+      <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 flex-none mt-0.5"></i>
+      <p class="text-xs font-bold text-amber-700">En rendant ton travail, tu ne pourras plus y accéder ni le modifier. Assure-toi d'avoir terminé toutes les activités souhaitées.</p>
+    </div>
+
+    <button id="btn-final-send" onclick="confirmSubmit()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 mb-3">
+      <i data-lucide="lock" class="w-5 h-5"></i> Rendre le travail au professeur
     </button>
+    <button onclick="saveLater()" class="w-full bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 rounded-2xl hover:border-slate-300 transition-all flex items-center justify-center gap-2 text-sm">
+      <i data-lucide="clock" class="w-4 h-4"></i> Continuer plus tard
+    </button>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════ -->
+<!-- ÉCRAN : TRAVAIL RENDU (VERROUILLÉ)           -->
+<!-- ═════════════════════════════════════════════ -->
+<div id="screen-submitted" class="screen">
+  <div class="max-w-md mx-auto w-full px-6 py-16 text-center fade-up">
+    <div class="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-200">
+      <i data-lucide="check-circle-2" class="w-10 h-10 text-white"></i>
+    </div>
+    <h2 class="text-2xl font-black text-slate-900 mb-2">Travail rendu !</h2>
+    <p id="submitted-student" class="text-slate-500 font-medium mb-6"></p>
+
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-6 text-left">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Ton score final</p>
+      <div id="submitted-score" class="text-4xl font-black text-indigo-600 mb-0.5">—</div>
+      <p id="submitted-score-sub" class="text-xs font-bold text-slate-400 mb-2"></p>
+      <p class="text-sm text-slate-500 font-medium">Ton professeur peut désormais consulter et noter ton travail.</p>
+    </div>
+
+    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl px-4 py-3 flex items-start gap-3">
+      <i data-lucide="lock" class="w-4 h-4 text-indigo-400 flex-none mt-0.5"></i>
+      <p class="text-xs font-medium text-indigo-600">Cette session est maintenant fermée pour toi. Si tu as besoin d'y accéder à nouveau, contacte ton professeur.</p>
+    </div>
   </div>
 </div>
 
@@ -623,9 +722,22 @@ async function doConnect() {
     try {
       const filename = `result_${session.id}_${studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
       const prev = await storage({ action: 'read', filename });
-      if (prev.success && prev.content?.scores && Object.keys(prev.content.scores).length > 0) {
-        E.scores = prev.content.scores;
-        E._resuming = true;
+      if (prev.success && prev.content) {
+        // Vérifier si le travail a déjà été rendu définitivement
+        if (prev.content.submitted) {
+          showScreen('connect');
+          document.getElementById('connect-btn').textContent = 'Rejoindre';
+          errEl.textContent = `✅ Tu as déjà rendu ton travail pour cette session. Contacte ton professeur si tu as besoin d'y accéder.`;
+          errEl.className = 'text-sm text-emerald-700 bg-emerald-50 rounded-xl px-4 py-3 font-medium';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        if (prev.content.scores && Object.keys(prev.content.scores).length > 0) {
+          E.scores = prev.content.scores;
+          E._resuming = true;
+        } else {
+          E._resuming = false;
+        }
       } else {
         E._resuming = false;
       }
@@ -689,7 +801,13 @@ function setupDashboard() {
   const total = available.length;
   document.getElementById('dash-progress-bar').style.width = `${total ? (done/total)*100 : 0}%`;
   document.getElementById('dash-progress-text').textContent = `${done}/${total}`;
-  document.getElementById('btn-submit').classList.toggle('hidden', done < total);
+  // Bouton "Rendre" : visible dès qu'au moins une activité est terminée
+  document.getElementById('btn-submit').classList.toggle('hidden', done === 0);
+  // Bouton "Continuer plus tard" : visible dès qu'au moins une activité est faite
+  const laterBtn = document.getElementById('btn-save-later');
+  laterBtn.classList.toggle('hidden', done === 0);
+  // Cacher le message de confirmation si on revient au dashboard
+  document.getElementById('save-later-msg').classList.add('hidden');
   lucide.createIcons();
 }
 
@@ -741,15 +859,23 @@ function answerQCM(idx) {
   const q = E.gameData[E.gameIdx];
   const btns = document.querySelectorAll('#qcm-choices button');
   const correct = idx === q.correct;
+  const showCorr = E.session.showCorrection;
   if (correct) { E.gameScore++; document.getElementById('qcm-score').textContent = E.gameScore; }
 
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.correct) btn.className = btn.className.replace('border-slate-100','border-emerald-400').replace('text-slate-700','text-emerald-700') + ' bg-emerald-50';
-    else if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50';
+    if (showCorr) {
+      // Mode correction : surligner la bonne réponse
+      if (i === q.correct) btn.className = btn.className.replace('border-slate-100','border-emerald-400').replace('text-slate-700','text-emerald-700') + ' bg-emerald-50';
+      else if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50';
+    } else {
+      // Mode sans correction : juste barrer la mauvaise, rien surligner
+      if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50 opacity-70';
+      if (i === idx && correct)  btn.className = btn.className.replace('border-slate-100','border-emerald-400') + ' bg-emerald-50';
+    }
   });
 
-  if (q.expl) {
+  if (showCorr && q.expl) {
     document.getElementById('qcm-explanation').textContent = q.expl;
     document.getElementById('qcm-explanation').classList.remove('hidden');
   }
@@ -807,7 +933,8 @@ function escHtml(s) { return String(s).replace(/'/g, '\\\'').replace(/"/g, '&quo
 
 function selectPairItem(type, idx, value) {
   const el = document.getElementById(`${type}-${idx}`);
-  if (el.classList.contains('matched')) return;
+  // Bloquer les cartes déjà appariées (bonnes ou mauvaises)
+  if (el.classList.contains('matched') || el.classList.contains('wrong')) return;
 
   if (type === 'term') {
     // Désélectionner ancien
@@ -864,20 +991,35 @@ function checkPair() {
     }
   } else {
     pairesState.wrongAttempts++;
+    pairesState.wrongPairs = (pairesState.wrongPairs || 0) + 1;
     pairesState.selectedTerm = null;
     pairesState.selectedDef  = null;
 
-    termEl.classList.add('wrong'); defEl.classList.add('wrong');
-    setTimeout(() => {
-      termEl.classList.remove('wrong', 'selected');
-      defEl.classList.remove('wrong', 'selected');
-    }, 800);
+    // Les cartes restent bloquées en rouge — impossible de les remodifier
+    termEl.classList.remove('selected'); termEl.classList.add('wrong');
+    defEl.classList.remove('selected');  defEl.classList.add('wrong');
+    termEl.style.cursor = 'not-allowed';
+    defEl.style.cursor  = 'not-allowed';
 
     const fb = document.getElementById('paires-feedback');
     fb.className = 'mt-4 text-center text-sm font-bold rounded-xl px-4 py-3 bg-red-50 text-red-500';
-    fb.textContent = '✗ Mauvaise association — réessaie !';
+    fb.textContent = '✗ Mauvaise association — cette paire est bloquée !';
     fb.classList.remove('hidden');
-    setTimeout(() => fb.classList.add('hidden'), 1200);
+    setTimeout(() => fb.classList.add('hidden'), 1800);
+
+    // Si toutes les cartes restantes sont bloquées → fin forcée
+    const remainingTerms = document.querySelectorAll('#paires-terms .pair-card:not(.matched):not(.wrong)').length;
+    const remainingDefs  = document.querySelectorAll('#paires-defs  .pair-card:not(.matched):not(.wrong)').length;
+    if (remainingTerms === 0 || remainingDefs === 0) {
+      setTimeout(() => {
+        const raw = pairesState.total;
+        const penalty = Math.floor(pairesState.wrongAttempts * 0.5);
+        const finalScore = Math.max(0, raw - penalty);
+        document.getElementById('paires-final-score').textContent = `${finalScore}/${raw}`;
+        document.getElementById('paires-end').classList.remove('hidden');
+        saveScore('paires', finalScore, raw);
+      }, 1200);
+    }
   }
 
   pairesState.selectedTerm = null;
@@ -1346,11 +1488,17 @@ function answerRap(idx) {
   clearInterval(rapTimer);
   const q = E.gameData[E.gameIdx];
   const correct = idx === q.correct;
+  const showCorr = E.session.showCorrection;
   const btns = document.querySelectorAll('#rap-choices button');
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.correct) btn.classList.add('border-emerald-400','bg-emerald-50');
-    else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    if (showCorr) {
+      if (i === q.correct) btn.classList.add('border-emerald-400','bg-emerald-50');
+      else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    } else {
+      if (i === idx && correct)  btn.classList.add('border-emerald-400','bg-emerald-50');
+      if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50','opacity-70');
+    }
   });
 
   if (correct) {
@@ -1420,6 +1568,7 @@ function checkCompleter() {
   const userAnswer = document.getElementById('comp-input').value.trim().toLowerCase();
   const correct = q.answer.trim().toLowerCase();
   const isCorrect = userAnswer === correct || levDistance(userAnswer, correct) <= Math.floor(correct.length * 0.2);
+  const showCorr = E.session.showCorrection;
   const fb = document.getElementById('comp-feedback');
 
   if (isCorrect) {
@@ -1428,7 +1577,8 @@ function checkCompleter() {
     fb.textContent = '✓ Correct !';
   } else {
     fb.className = 'rounded-2xl px-5 py-3 text-sm font-bold mb-4 bg-red-50 text-red-600';
-    fb.textContent = `✗ La réponse était : ${q.answer}`;
+    // Afficher la bonne réponse seulement si le prof l'a autorisé
+    fb.textContent = showCorr ? `✗ La réponse était : ${q.answer}` : '✗ Mauvaise réponse';
   }
   fb.classList.remove('hidden');
   document.getElementById('comp-input').disabled = true;
@@ -1488,18 +1638,24 @@ function renderIntrus() {
 function answerIntrus(idx) {
   const q = E.gameData[E.gameIdx];
   const correct = idx === q.intrus;
+  const showCorr = E.session.showCorrection;
   const btns = document.querySelectorAll('#int-statements button');
   btns.forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.intrus) btn.classList.add('border-emerald-400','bg-emerald-50');
-    else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    if (showCorr) {
+      if (i === q.intrus) btn.classList.add('border-emerald-400','bg-emerald-50');
+      else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
+    } else {
+      if (i === idx && correct)  btn.classList.add('border-emerald-400','bg-emerald-50');
+      if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50','opacity-70');
+    }
   });
 
   if (correct) {
     E.gameScore++; document.getElementById('int-score').textContent = E.gameScore;
   }
 
-  if (q.expl) {
+  if (showCorr && q.expl) {
     document.getElementById('int-explanation').textContent = q.expl;
     document.getElementById('int-explanation').classList.remove('hidden');
   }
@@ -1613,6 +1769,16 @@ function saveScore(activity, score, max) {
 }
 
 async function autoSaveProgress() {
+  const syncEl = document.getElementById('sync-indicator');
+  const syncIcon = document.getElementById('sync-icon');
+  const syncText = document.getElementById('sync-text');
+
+  // Afficher "en cours"
+  syncEl.classList.remove('hidden'); syncEl.classList.add('flex');
+  syncIcon.innerHTML = '<div class="w-3 h-3 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin"></div>';
+  syncText.textContent = 'Sauvegarde...';
+  syncText.className = 'text-slate-400';
+
   try {
     const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
     const done = Object.keys(E.scores).length;
@@ -1631,46 +1797,146 @@ async function autoSaveProgress() {
     const listRes = await storage({ action: 'list' });
     const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
     const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-    await storage({ action: 'write', filename, content: result, manifest });
-  } catch(e) { /* sauvegarde silencieuse */ }
+    const writeRes = await storage({ action: 'write', filename, content: result, manifest });
+
+    if (writeRes && writeRes.success) {
+      // Succès
+      syncIcon.innerHTML = '<svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>';
+      syncText.textContent = 'Sauvegardé';
+      syncText.className = 'text-emerald-500';
+    } else {
+      throw new Error(writeRes?.error || 'Réponse inattendue du serveur');
+    }
+    setTimeout(() => { syncEl.classList.add('hidden'); syncEl.classList.remove('flex'); }, 3000);
+  } catch(e) {
+    // Erreur visible
+    syncIcon.innerHTML = '<svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    syncText.textContent = 'Erreur sync Nuage';
+    syncText.className = 'text-red-500';
+    // Laisser l'erreur visible
+  }
 }
 
 // ─── RÉSUMÉ FINAL ─────────────────────────────────────────────────────────────
 function showFinalSummary() {
   document.getElementById('final-student-name').textContent = E.studentId;
 
-  const available = ACTIVITIES.filter(a => E.scores[a.id]);
-  let totalScore = 0, totalMax = 0;
-  available.forEach(a => {
-    const sc = E.scores[a.id];
-    totalScore += (sc.score / sc.max) * 100;
-    totalMax++;
-  });
-  const globalPct = Math.round(totalScore / (totalMax || 1));
-  document.getElementById('final-global').textContent = globalPct + '%';
+  // Toutes les activités de la session
+  const allSessionActivities = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+  const completed = ACTIVITIES.filter(a => E.scores[a.id]);
 
-  document.getElementById('final-details').innerHTML = available.map(a => {
-    const sc = E.scores[a.id];
-    const pct = Math.round((sc.score / sc.max) * 100);
-    return `<div class="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm border border-slate-100">
-      <div class="w-8 h-8 ${COLORS[a.color].bg} rounded-lg flex items-center justify-center flex-none">
-        <i data-lucide="${a.icon}" class="w-4 h-4 ${COLORS[a.color].text}"></i>
-      </div>
-      <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
-      <span class="font-black text-slate-800">${sc.score}/${sc.max}</span>
-      <span class="text-sm font-bold text-slate-400 w-10 text-right">${pct}%</span>
-    </div>`;
-  }).join('');
+  // Score obtenu = somme des pts par activité terminée
+  let totalPts = 0;
+  completed.forEach(a => { totalPts += E.scores[a.id].score; });
+  totalPts = Math.round(totalPts * 10) / 10;
+
+  // Score max = somme du barème de TOUTES les activités de la session
+  const maxPts = allSessionActivities.reduce((sum, a) => sum + (E.session.scoring?.[a.id] || 0), 0);
+
+  // Garder globalPct pour la sauvegarde
+  let pctSum = 0;
+  completed.forEach(a => { pctSum += (E.scores[a.id].score / E.scores[a.id].max) * 100; });
+  E._globalPct = Math.round(pctSum / (completed.length || 1));
+
+  // Afficher "X / Y pts"
+  document.getElementById('final-global').textContent = `${totalPts} / ${maxPts}`;
+  document.getElementById('final-global-sub').textContent =
+    completed.length < allSessionActivities.length
+      ? `points · ${allSessionActivities.length - completed.length} activité(s) non faite(s) = 0 pt`
+      : `points sur ${maxPts} au barème`;
+
+  // Détail : activités faites + activités non faites en grisé
+  document.getElementById('final-details').innerHTML = [
+    ...completed.map(a => {
+      const sc = E.scores[a.id];
+      const pct = Math.round((sc.score / sc.max) * 100);
+      return `<div class="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm border border-slate-100">
+        <div class="w-8 h-8 ${COLORS[a.color].bg} rounded-lg flex items-center justify-center flex-none">
+          <i data-lucide="${a.icon}" class="w-4 h-4 ${COLORS[a.color].text}"></i>
+        </div>
+        <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
+        <span class="font-black text-slate-800">${sc.score} / ${sc.max} pts</span>
+        <span class="text-xs font-bold text-slate-400 w-12 text-right">${pct}%</span>
+      </div>`;
+    }),
+    // Activités non faites = 0 pts, grisées
+    ...allSessionActivities.filter(a => !E.scores[a.id]).map(a => {
+      const maxA = E.session.scoring?.[a.id] || 0;
+      return `<div class="bg-slate-50 rounded-xl p-3 flex items-center gap-3 border border-dashed border-slate-200 opacity-60">
+        <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-none">
+          <i data-lucide="${a.icon}" class="w-4 h-4 text-slate-400"></i>
+        </div>
+        <span class="flex-1 font-bold text-slate-400 text-sm">${a.label}</span>
+        <span class="font-black text-slate-400">0 / ${maxA} pts</span>
+        <span class="text-xs font-bold text-slate-300 w-12 text-right">non fait</span>
+      </div>`;
+    })
+  ].join('');
 
   lucide.createIcons();
   showScreen('final');
   document.getElementById('final-status').textContent = '';
 }
 
-// ─── SOUMETTRE RÉSULTATS ──────────────────────────────────────────────────────
+// ─── CONTINUER PLUS TARD ──────────────────────────────────────────────────────
+function saveLater() {
+  const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+  const done   = available.filter(a => E.scores[a.id]);
+  const notDone = available.filter(a => !E.scores[a.id]);
+
+  // Construire le message d'information
+  const doneList  = done.map(a  => `✅ ${a.label}`).join('\n');
+  const todoList  = notDone.map(a => `⚠️ ${a.label} (non terminée, à recommencer)`).join('\n');
+
+  const msg = [
+    '💾 Ce qui sera sauvegardé :',
+    doneList || '  (aucune activité complètement terminée)',
+    '',
+    notDone.length > 0 ? 'Les activités non terminées devront \u00eatre recommencées depuis le début :' : '',
+    todoList,
+    '',
+    'Tu peux fermer cet onglet et revenir plus tard avec le même lien.'
+  ].filter(l => l !== undefined && !(l === '' && !notDone.length)).join('\n');
+
+  alert(msg);
+
+  // Afficher le message de confirmation dans l'interface
+  const msgEl = document.getElementById('save-later-msg');
+  const hasDone = done.length > 0;
+  msgEl.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 flex-none"></i>
+    <span>
+      <strong>${done.length} activité${done.length > 1 ? 's' : ''} sauvegardée${done.length > 1 ? 's' : ''}</strong>
+      ${notDone.length > 0 ? `&nbsp;—&nbsp;<span class="text-amber-600">${notDone.length} à recommencer</span>` : ''}<br>
+      <span class="font-medium text-emerald-600 text-xs">Reviens avec le même lien pour continuer.</span>
+    </span>`;
+  document.getElementById('btn-save-later').classList.add('hidden');
+  document.getElementById('btn-submit').classList.add('hidden');
+  msgEl.classList.remove('hidden');
+  msgEl.classList.add('flex');
+  msgEl.classList.remove('text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
+  msgEl.classList.add(hasDone ? 'text-emerald-700' : 'text-amber-700',
+                      hasDone ? 'bg-emerald-50'   : 'bg-amber-50',
+                      hasDone ? 'border-emerald-200' : 'border-amber-200');
+  lucide.createIcons();
+}
+
+// ─── CONFIRMER LE RENDU DÉFINITIF ────────────────────────────────────────────
+function confirmSubmit() {
+  const total = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0).length;
+  const done = Object.keys(E.scores).length;
+  let msg = 'Rendre définitivement ton travail au professeur ?\n\nTu ne pourras plus y accéder ensuite.';
+  if (done < total) {
+    msg = `Attention : tu n'as terminé que ${done} activité sur ${total}.\n\nRendre quand même ? Tu ne pourras plus y accéder ensuite.`;
+  }
+  if (confirm(msg)) {
+    submitResults();
+  }
+}
+
+// ─── SOUMETTRE RÉSULTATS (RENDU DÉFINITIF) ──────────────────────────────────
 async function submitResults() {
   const btn = document.getElementById('btn-final-send');
-  btn.disabled = true; btn.textContent = 'Envoi en cours...';
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours...'; }
 
   const available = ACTIVITIES.filter(a => E.scores[a.id]);
   let totalScore = 0, totalMax = 0;
@@ -1680,23 +1946,42 @@ async function submitResults() {
   const result = {
     sessionId: E.session.id, sessionTitle: E.session.title,
     studentId: E.studentId, completedAt: new Date().toISOString(),
-    scores: E.scores, globalPct
+    scores: E.scores, globalPct,
+    submitted: true,  // verrou définitif
+    activitiesDone: available.length,
+    activitiesTotal: ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0).length
   };
 
   try {
-    // Lire le manifest actuel
     const listRes = await storage({ action: 'list' });
     const manifest = listRes.files ? listRes.files.map(f => f.name) : [];
     const filename = `result_${E.session.id}_${E.studentId.replace(/[^a-zA-Z0-9]/g,'-')}.json`;
-    await storage({ action: 'write', filename, content: result, manifest });
-    document.getElementById('final-status').textContent = 'Résultats envoyés au professeur !';
-    document.getElementById('final-status').className = 'text-center text-sm font-bold text-emerald-600 mb-4';
-    btn.textContent = 'Envoyé !';
-    btn.classList.replace('bg-emerald-500','bg-emerald-300');
+    const writeRes = await storage({ action: 'write', filename, content: result, manifest });
+    if (!writeRes?.success) throw new Error(writeRes?.error || 'Erreur serveur');
+
+    // Calcul pts pour l'écran de rendu
+    const allActs = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
+    let totalPtsR = 0;
+    available.forEach(a => { totalPtsR += E.scores[a.id].score; });
+    totalPtsR = Math.round(totalPtsR * 10) / 10;
+    const maxPtsR = allActs.reduce((sum, a) => sum + (E.session.scoring?.[a.id] || 0), 0);
+
+    // Rediriger vers l'écran de confirmation de rendu
+    document.getElementById('submitted-student').textContent = E.studentId + ' — ' + E.session.title;
+    document.getElementById('submitted-score').textContent = `${totalPtsR} / ${maxPtsR} pts`;
+    document.getElementById('submitted-score-sub').textContent =
+      available.length < allActs.length
+        ? `(${available.length}/${allActs.length} activités faites)`
+        : 'session complète';
+    lucide.createIcons();
+    showScreen('submitted');
   } catch(e) {
-    document.getElementById('final-status').textContent = 'Erreur d\'envoi: ' + e.message;
-    document.getElementById('final-status').className = 'text-center text-sm font-medium text-red-500 mb-4';
-    btn.disabled = false; btn.textContent = 'Réessayer';
+    if (btn) { btn.disabled = false; btn.textContent = 'Réessayer'; }
+    const statusEl = document.getElementById('final-status');
+    if (statusEl) {
+      statusEl.textContent = 'Erreur d\'envoi: ' + e.message;
+      statusEl.className = 'text-center text-sm font-medium text-red-500 mb-4';
+    }
   }
 }
 
