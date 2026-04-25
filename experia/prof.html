@@ -141,9 +141,48 @@
         <h2 class="text-2xl font-black text-slate-900">Mes sessions</h2>
         <p id="dash-user" class="text-sm text-slate-500 font-medium"></p>
       </div>
-      <button onclick="showScreen('create')" class="bg-indigo-600 text-white font-bold px-5 py-3 rounded-2xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-200">
-        <i data-lucide="plus" class="w-4 h-4"></i> Nouvelle session
+      <button onclick="showScreen('create')" class="bg-indigo-600 text-white font-black px-6 py-4 rounded-2xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-200">
+        <i data-lucide="plus" class="w-5 h-5"></i> Nouvelle session
       </button>
+    </div>
+
+    <!-- PANNEAU DE DESIGN GLOBAL -->
+    <div class="bg-white/50 backdrop-blur-sm rounded-3xl p-6 border border-white shadow-sm mb-8 fade-up">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
+          <i data-lucide="palette" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-slate-800 text-sm uppercase tracking-wider">Design & Ambiance</h3>
+          <p class="text-xs text-slate-500 font-medium">Personnalise ton espace de travail</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button onclick="applyGlobalTheme('classique')" class="group flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-2 border-slate-100 hover:border-indigo-400 transition-all shadow-sm">
+          <div class="w-4 h-4 rounded-full bg-indigo-400"></div>
+          <span class="text-xs font-bold text-slate-600">Classique</span>
+        </button>
+        <button onclick="applyGlobalTheme('nature')" class="group flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-2 border-slate-100 hover:border-emerald-400 transition-all shadow-sm">
+          <div class="w-4 h-4 rounded-full bg-emerald-400"></div>
+          <span class="text-xs font-bold text-slate-600">Nature</span>
+        </button>
+        <button onclick="applyGlobalTheme('ocean')" class="group flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-2 border-slate-100 hover:border-cyan-400 transition-all shadow-sm">
+          <div class="w-4 h-4 rounded-full bg-cyan-400"></div>
+          <span class="text-xs font-bold text-slate-600">Océan</span>
+        </button>
+        <button onclick="applyGlobalTheme('soleil')" class="group flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-2 border-slate-100 hover:border-orange-400 transition-all shadow-sm">
+          <div class="w-4 h-4 rounded-full bg-orange-400"></div>
+          <span class="text-xs font-bold text-slate-600">Soleil</span>
+        </button>
+        <button onclick="applyGlobalTheme('crepuscule')" class="group flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-2 border-slate-100 hover:border-purple-400 transition-all shadow-sm">
+          <div class="w-4 h-4 rounded-full bg-purple-400"></div>
+          <span class="text-xs font-bold text-slate-600">Crépuscule</span>
+        </button>
+        <button onclick="applyGlobalTheme('rose')" class="group flex items-center gap-2 bg-white px-3 py-2 rounded-xl border-2 border-slate-100 hover:border-pink-400 transition-all shadow-sm">
+          <div class="w-4 h-4 rounded-full bg-pink-400"></div>
+          <span class="text-xs font-bold text-slate-600">Bonbon</span>
+        </button>
+      </div>
     </div>
 
     <div id="sessions-list" class="space-y-3 fade-up">
@@ -560,12 +599,14 @@ const ACTIVITIES = [
   { id: 'questions_ia', label: 'Questions ouvertes IA',   icon: 'message-square',  color: 'indigo', default: 3,  defaultPts: 20 }
 ];
 
-const COLOR_MAP = {
-  blue: 'text-blue-600 bg-blue-50', purple: 'text-purple-600 bg-purple-50',
-  rose: 'text-rose-600 bg-rose-50', orange: 'text-orange-600 bg-orange-50',
-  green: 'text-green-600 bg-green-50', amber: 'text-amber-600 bg-amber-50',
   indigo: 'text-indigo-600 bg-indigo-50', cyan: 'text-cyan-600 bg-cyan-50'
 };
+
+function applyGlobalTheme(theme) {
+  document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+  document.body.classList.add('theme-' + theme);
+  saveConfig();
+}
 
 // ─── NAVIGATION ─────────────────────────────────────────────────────────────
 function showScreen(id) {
@@ -696,6 +737,7 @@ function loadSavedConfig() {
   if (cfg.pass)   document.getElementById('login-pass').value   = cfg.pass;
   if (cfg.server) document.getElementById('login-server').value = cfg.server;
   if (cfg.apiKey) document.getElementById('create-apikey').value = cfg.apiKey;
+  if (cfg.theme)  applyGlobalTheme(cfg.theme);
 }
 
 function toggleAdvanced() {
@@ -711,7 +753,8 @@ function saveConfig() {
     user:   document.getElementById('login-user').value.trim(),
     pass:   document.getElementById('login-pass').value.trim(),
     server: document.getElementById('login-server').value.trim(),
-    apiKey: document.getElementById('create-apikey').value.trim()
+    apiKey: document.getElementById('create-apikey').value.trim(),
+    theme:  document.body.className.match(/theme-(\w+)/)?.[1] || 'classique'
   };
   localStorage.setItem('experia_config', JSON.stringify(cfg));
 }
@@ -887,25 +930,33 @@ async function loadSessions() {
     state.sessions = sessions;
 
     container.innerHTML = sessions.map(s => {
-      const date = new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
-      const nbActivities = Object.keys(s.questions || {}).length;
-      return `<div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all flex items-center gap-4 group">
-        <div onclick="openSession('${s.id}')" class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
-          <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center flex-none">
-            <i data-lucide="folder-open" class="w-5 h-5 text-indigo-600"></i>
+      const themeColor = s.theme ? THEME_COLORS[s.theme]?.bg || 'bg-indigo-50' : 'bg-indigo-50';
+      const iconColor = s.theme ? THEME_COLORS[s.theme]?.border.replace('border-', 'text-') || 'text-indigo-600' : 'text-indigo-600';
+      return `
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all flex items-center gap-4 group">
+          <div onclick="openSession('${s.id}')" class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
+            <div class="w-12 h-12 ${themeColor} rounded-2xl flex items-center justify-center flex-none group-hover:scale-110 transition-transform">
+              <i data-lucide="folder-open" class="w-6 h-6 ${iconColor}"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-black text-slate-800 text-lg truncate group-hover:text-indigo-600 transition-colors">${s.title}</h3>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                ${new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} · 
+                ${Object.keys(s.questions || {}).length} activités · 
+                Code: <span class="text-slate-600">${s.code}</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="font-black text-slate-800 truncate">${s.title}</h3>
-            <p class="text-xs text-slate-400 font-medium">${date} · ${nbActivities} activités · Code: <strong class="text-slate-600">${s.code}</strong></p>
-          </div>
-          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 flex-none"></i>
+          <button onclick="event.stopPropagation(); deleteSession('${s.id}')"
+            class="p-2 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all flex-none"
+            title="Supprimer cette session">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
         </div>
-        <button onclick="event.stopPropagation(); deleteSession('${s.id}')"
-          class="p-2 rounded-xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100 flex-none"
-          title="Supprimer cette session">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-        </button>
-      </div>`;
+      `;
     }).join('');
     lucide.createIcons();
 
