@@ -93,7 +93,7 @@
       <pre><code>experia/
 ├── index.html                      ← Page d'accueil
 ├── prof.html                       ← Interface professeur (SPA multi-écrans)
-├── eleve.html                      ← Interface élève (6 activités + synthèse)
+├── eleve.html                      ← Interface élève (8 activités + synthèse)
 ├── NOTICE-EXPERIA-PROF.html        ← Guide d'utilisation professeur
 ├── NOTICE-EXPERIA-TECHNIQUE.html   ← Ce document
 ├── ROADMAP-EXPERIA.html            ← État d'avancement
@@ -114,14 +114,17 @@
   "title": "Les énergies renouvelables",
   "corpus": "Le soleil est...",
   "createdAt": "2025-09-01T10:00:00Z",
-  "config": { "qcm": 10, "paires": 8, "rapidite": 8, "completer": 5, "intrus": 5, "questions_ia": 3 },
-  "scoring": { "qcm": 10, "paires": 8, "rapidite": 8, "completer": 5, "intrus": 5, "questions_ia": 20 },
+  "config": { "qcm": 10, "paires": 8, "motsmeles": 8, "motscroises": 8, "rapidite": 8, "completer": 5, "intrus": 5, "questions_ia": 3 },
+  "scoring": { "qcm": 10, "paires": 8, "motsmeles": 8, "motscroises": 8, "rapidite": 8, "completer": 5, "intrus": 5, "questions_ia": 20 },
   "retryable": false,
+  "theme": "nature",
   "model": "openai/gpt-oss-120b",
   "apiKey": "sk-...",
   "questions": {
     "qcm":       [{ "q": "...", "choices": ["...", "...", "...", "..."], "correct": 0, "expl": "..." }],
     "paires":    [{ "term": "...", "def": "..." }],
+    "motsmeles": [{ "word": "..." }],
+    "motscroises": [{ "word": "...", "def": "..." }],
     "rapidite":  [{ "q": "...", "choices": ["...", "...", "...", "..."], "correct": 0 }],
     "completer": [{ "phrase": "... _____ ...", "answer": "..." }],
     "intrus":    [{ "statements": ["...", "...", "...", "..."], "intrus": 2, "expl": "..." }],
@@ -136,8 +139,8 @@
   "studentId": "marie.dupont",
   "completedAt": "2025-09-01T10:35:00Z",
   "partial": false,           // true si l'élève n'a pas tout terminé
-  "activitiesDone": 6,
-  "activitiesTotal": 6,
+  "activitiesDone": 8,
+  "activitiesTotal": 8,
   "globalPct": 78,
   "scores": {
     "qcm": { "score": 7.5, "max": 10, "rawScore": 8, "rawMax": 10 }
@@ -225,7 +228,7 @@
   "max_tokens": 3000
 }</code></pre>
 
-      <h3>Les 6 types d'activités générées</h3>
+      <h3>Les 8 types d'activités générées</h3>
       <div class="overflow-x-auto mt-3">
         <table class="w-full text-sm border-collapse">
           <thead>
@@ -238,6 +241,8 @@
           <tbody class="divide-y divide-slate-100">
             <tr><td class="p-2 font-medium">qcm</td><td class="p-2 text-slate-500"><code>[{q, choices:[4], correct:index, expl}]</code></td><td class="p-2">Automatique (index)</td></tr>
             <tr><td class="p-2 font-medium">paires</td><td class="p-2 text-slate-500"><code>[{term, def}]</code></td><td class="p-2">Automatique + pénalité erreurs (−0,5/erreur)</td></tr>
+            <tr><td class="p-2 font-medium">motsmeles</td><td class="p-2 text-slate-500"><code>[{word}]</code></td><td class="p-2">Automatique (tracé grille)</td></tr>
+            <tr><td class="p-2 font-medium">motscroises</td><td class="p-2 text-slate-500"><code>[{word, def}]</code></td><td class="p-2">Automatique (complétion valide)</td></tr>
             <tr><td class="p-2 font-medium">rapidite</td><td class="p-2 text-slate-500"><code>[{q, choices:[4], correct:index}]</code></td><td class="p-2">Automatique + bonus temps restant</td></tr>
             <tr><td class="p-2 font-medium">completer</td><td class="p-2 text-slate-500"><code>[{phrase:"… _____ …", answer}]</code></td><td class="p-2">Levenshtein ≤ 20% de tolérance</td></tr>
             <tr><td class="p-2 font-medium">intrus</td><td class="p-2 text-slate-500"><code>[{statements:[4], intrus:index, expl}]</code></td><td class="p-2">Automatique (index)</td></tr>
@@ -298,8 +303,8 @@ const text = Array.from(tmp.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, td,
     <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100">
       <h2><i data-lucide="database" class="w-5 h-5 text-slate-500"></i> Persistance locale (localStorage)</h2>
       <p class="text-sm">Seuls trois champs sont mémorisés dans <code>localStorage</code> sous la clé <code>experia_config</code> :</p>
-      <pre><code>{ "user": "gcormi", "pass": "mot-de-passe-app", "apiKey": "sk-..." }</code></pre>
-      <p class="text-sm mt-2">Les URLs n8n et le serveur Nuage ne sont <strong>jamais</strong> sauvegardés — ils conservent leurs valeurs par défaut à chaque chargement. Cela évite que d'anciennes URLs incorrectes soient restaurées.</p>
+      <pre><code>{ "user": "gcormi", "pass": "mot-de-passe-app", "apiKey": "sk-...", "server": "nuage03..." }</code></pre>
+      <p class="text-sm mt-2">La déconnexion depuis l'interface vide explicitement ces champs (sécurité pour ordinateurs partagés).</p>
     </div>
 
     <!-- ═══ DÉPLOIEMENT ═══ -->

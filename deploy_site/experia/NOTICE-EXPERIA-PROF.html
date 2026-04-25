@@ -46,7 +46,7 @@
       <li><a href="#c4" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 4. Partager avec les élèves</a></li>
       <li><a href="#c5" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 5. Consulter les résultats</a></li>
       <li><a href="#c6" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 6. Gérer ses sessions (dupliquer, supprimer)</a></li>
-      <li><a href="#c7" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 7. Les 6 activités auto-corrigées</a></li>
+      <li><a href="#c7" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 7. Les 8 activités auto-corrigées</a></li>
       <li><a href="#c8" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 8. Partager l'appli avec un collègue</a></li>
       <li><a href="#c9" class="text-indigo-600 hover:underline flex items-center gap-2"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> 9. Confidentialité &amp; RGPD</a></li>
     </ol>
@@ -134,6 +134,10 @@
           <i data-lucide="info" class="w-3.5 h-3.5 inline mr-1"></i>
           <strong>Mémorisation automatique :</strong> après la première connexion, votre identifiant, mot de passe et clé Albert sont mémorisés dans le navigateur. Vous n'aurez pas à les ressaisir lors des prochaines connexions.
         </div>
+        <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mt-3 text-xs text-emerald-700 font-medium">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 inline mr-1"></i>
+          <strong>Ordinateurs partagés :</strong> Si vous utilisez l'ordinateur de la salle des profs, cliquez bien sur <strong>"Déconnexion"</strong> à la fin. Cela effacera instantanément vos identifiants sauvegardés en mémoire !
+        </div>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
@@ -209,8 +213,9 @@
       </div>
 
       <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
-        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-indigo-400"></i> Activités rejouables</h4>
-        <p class="text-sm text-slate-600 font-medium">Si coché, les élèves peuvent recommencer une activité autant de fois qu'ils le souhaitent. Décochez pour une évaluation en une seule tentative.</p>
+        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-indigo-400"></i> Activités rejouables & Thèmes</h4>
+        <p class="text-sm text-slate-600 font-medium mb-3">Si coché, les élèves peuvent recommencer une activité autant de fois qu'ils le souhaitent. Décochez pour une évaluation en une seule tentative.</p>
+        <p class="text-sm text-slate-600 font-medium"><strong>Thème visuel :</strong> Vous pouvez choisir l'ambiance colorée (Nature, Océan, Soleil, etc.) qui habillera l'interface de l'élève pour le plonger dans le sujet !</p>
       </div>
 
       <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-800 font-medium flex items-start gap-2">
@@ -241,6 +246,14 @@
     </div>
     <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-sm text-slate-600 font-medium">
       <strong>Côté élève :</strong> l'élève saisit son <strong>identifiant ENT</strong> et le code de session. Il peut reprendre là où il s'était arrêté s'il n'a pas eu le temps de tout terminer — ses scores partiels sont sauvegardés automatiquement après chaque activité.
+    </div>
+    
+    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mt-4 text-sm text-indigo-800 font-medium flex items-start gap-2 shadow-sm">
+      <i data-lucide="download" class="w-5 h-5 mt-0.5 flex-none"></i>
+      <div>
+        <strong class="text-slate-800">Télécharger la correction</strong>
+        <p class="text-xs text-slate-600 mt-0.5">Sur cet écran de partage, vous avez accès à un bouton "Télécharger la correction". Il vous permet d'enregistrer instantanément un document HTML (imprimable en PDF) contenant toutes les réponses et grilles de votre session pour la préparation de votre cours !</p>
+      </div>
     </div>
   </section>
 
@@ -320,7 +333,7 @@
   <section id="c7" class="mb-12">
     <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-3">
       <span class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-sm font-black flex-none">7</span>
-      Les 6 activités auto-corrigées
+      Les 8 activités auto-corrigées
     </h2>
     <div class="space-y-3">
       <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
@@ -335,6 +348,20 @@
         <div>
           <strong class="text-slate-800">Paires à relier</strong> — Associer termes et définitions en cliquant. Toute mauvaise association est flashée en rouge et réinitialisée — l'élève peut réessayer mais perd des points (−0,5 pt par erreur).
           <p class="text-xs text-slate-400 mt-0.5">Correction : vérification des paires + pénalité pour les erreurs.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="grid-3x3" class="w-4 h-4"></i></span>
+        <div>
+          <strong class="text-slate-800">Mots mêlés</strong> — Grille générée dynamiquement où l'élève doit retrouver les mots cachés (à la verticale, à l'horizontale, etc.). Sélection par glissement.
+          <p class="text-xs text-slate-400 mt-0.5">Correction : vérification automatique du tracé.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">
+        <span class="w-8 h-8 bg-cyan-50 text-cyan-600 rounded-lg flex items-center justify-center flex-none"><i data-lucide="layout-grid" class="w-4 h-4"></i></span>
+        <div>
+          <strong class="text-slate-800">Mots croisés</strong> — Grille interactive croisée calculée automatiquement à partir des mots et définitions. Frappe fluide au clavier.
+          <p class="text-xs text-slate-400 mt-0.5">Correction : dès qu'un mot est complet et correct, il se valide en vert.</p>
         </div>
       </div>
       <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-start gap-3">

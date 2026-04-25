@@ -807,7 +807,8 @@ function escHtml(s) { return String(s).replace(/'/g, '\\\'').replace(/"/g, '&quo
 
 function selectPairItem(type, idx, value) {
   const el = document.getElementById(`${type}-${idx}`);
-  if (el.classList.contains('matched')) return;
+  // Bloquer les cartes déjà appariées (bonnes ou mauvaises)
+  if (el.classList.contains('matched') || el.classList.contains('wrong')) return;
 
   if (type === 'term') {
     // Désélectionner ancien
@@ -864,20 +865,35 @@ function checkPair() {
     }
   } else {
     pairesState.wrongAttempts++;
+    pairesState.wrongPairs = (pairesState.wrongPairs || 0) + 1;
     pairesState.selectedTerm = null;
     pairesState.selectedDef  = null;
 
-    termEl.classList.add('wrong'); defEl.classList.add('wrong');
-    setTimeout(() => {
-      termEl.classList.remove('wrong', 'selected');
-      defEl.classList.remove('wrong', 'selected');
-    }, 800);
+    // Les cartes restent bloquées en rouge — impossible de les remodifier
+    termEl.classList.remove('selected'); termEl.classList.add('wrong');
+    defEl.classList.remove('selected');  defEl.classList.add('wrong');
+    termEl.style.cursor = 'not-allowed';
+    defEl.style.cursor  = 'not-allowed';
 
     const fb = document.getElementById('paires-feedback');
     fb.className = 'mt-4 text-center text-sm font-bold rounded-xl px-4 py-3 bg-red-50 text-red-500';
-    fb.textContent = '✗ Mauvaise association — réessaie !';
+    fb.textContent = '✗ Mauvaise association — cette paire est bloquée !';
     fb.classList.remove('hidden');
-    setTimeout(() => fb.classList.add('hidden'), 1200);
+    setTimeout(() => fb.classList.add('hidden'), 1800);
+
+    // Si toutes les cartes restantes sont bloquées → fin forcée
+    const remainingTerms = document.querySelectorAll('#paires-terms .pair-card:not(.matched):not(.wrong)').length;
+    const remainingDefs  = document.querySelectorAll('#paires-defs  .pair-card:not(.matched):not(.wrong)').length;
+    if (remainingTerms === 0 || remainingDefs === 0) {
+      setTimeout(() => {
+        const raw = pairesState.total;
+        const penalty = Math.floor(pairesState.wrongAttempts * 0.5);
+        const finalScore = Math.max(0, raw - penalty);
+        document.getElementById('paires-final-score').textContent = `${finalScore}/${raw}`;
+        document.getElementById('paires-end').classList.remove('hidden');
+        saveScore('paires', finalScore, raw);
+      }, 1200);
+    }
   }
 
   pairesState.selectedTerm = null;
