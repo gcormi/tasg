@@ -8,7 +8,13 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Outfit', sans-serif; background: #f0f4ff; }
+    body { font-family: 'Outfit', sans-serif; background: #f0f4ff; transition: background-color 0.5s ease; }
+    body.theme-classique { background: #f0f4ff; }
+    body.theme-nature { background: #f0fdf4; }
+    body.theme-ocean { background: #ecfeff; }
+    body.theme-soleil { background: #fff7ed; }
+    body.theme-crepuscule { background: #faf5ff; }
+    body.theme-rose { background: #fdf2f8; }
     .screen { display: none; }
     .screen.active { display: flex; flex-direction: column; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
@@ -636,6 +642,9 @@ async function doConnect() {
 
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function setupDashboard() {
+  const theme = E.session.theme || 'classique';
+  document.body.className = `min-h-screen theme-${theme}`;
+  
   document.getElementById('dash-student').textContent = E.studentId;
   document.getElementById('dash-session-title').textContent = E.session.title;
 

@@ -224,6 +224,17 @@
             <option value="Adulte / Professionnel">Adulte / Professionnel</option>
           </select>
         </div>
+        <div class="mb-5">
+          <label class="block text-xs font-bold text-slate-400 mb-1.5">Thème d'interface (couleur de fond pour l'élève)</label>
+          <select id="create-theme" class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
+            <option value="classique">Classique (Bleu clair)</option>
+            <option value="nature">Nature (Vert doux)</option>
+            <option value="ocean">Océan (Cyan apaisant)</option>
+            <option value="soleil">Soleil (Orange chaleureux)</option>
+            <option value="crepuscule">Crépuscule (Violet mystique)</option>
+            <option value="rose">Bonbon (Rose pastel)</option>
+          </select>
+        </div>
         <label class="flex items-center gap-3 cursor-pointer">
           <input type="checkbox" id="create-retryable" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
           <div>
@@ -967,6 +978,7 @@ async function startGeneration() {
     scoring[a.id] = parseInt(document.getElementById('pts-' + a.id).value)  || a.defaultPts;
   });
   const retryable = document.getElementById('create-retryable').checked;
+  const theme = document.getElementById('create-theme') ? document.getElementById('create-theme').value : 'classique';
   const level = document.getElementById('create-level') ? document.getElementById('create-level').value : "Non spécifié";
   const model = document.getElementById('create-model').value;
   saveConfig();
@@ -1022,7 +1034,7 @@ async function startGeneration() {
   const code = customCode;
   const session = {
     id: sessionId, code, title, corpus, createdAt: new Date().toISOString(),
-    config, scoring, retryable, questions, model, apiKey
+    config, scoring, retryable, theme, questions, model, apiKey
   };
 
   document.getElementById('gen-subtitle').textContent = 'Sauvegarde sur Nuage...';
