@@ -1,0 +1,255 @@
+CORPUS TECHBOT — TECHNOLOGIE CYCLE 4 (5e, 4e, 3e)
+Référentiel consolidé — connaissances et compétences essentielles
+
+════════════════════════════════════════════════════════
+THÈME 1 — DESIGN, INNOVATION, CRÉATIVITÉ
+════════════════════════════════════════════════════════
+
+[5e] Analyse du besoin et fonctions
+- Besoin utilisateur : ce que l'objet doit satisfaire pour son utilisateur.
+- Fonction d'usage : à quoi sert l'objet (ex : couper, transporter, éclairer).
+- Fonction d'estime : l'image, le style, l'apparence que renvoie l'objet.
+- Contraintes : limites à respecter — fonctionnement, sécurité, esthétique, économique, environnementale.
+- Outils de créativité : remue-méninges (brainstorming), carte mentale (mind map).
+- Croquis à main levée : dessin rapide d'une idée, légendé.
+- Schéma de principe : représentation simplifiée du fonctionnement d'une solution.
+- Principe technique : la solution retenue pour réaliser une fonction.
+
+[4e] Cahier des Charges Fonctionnel (CdCF)
+- Fonctions de service : ce que l'objet doit faire pour l'utilisateur (principale) ou pour l'environnement (complémentaire).
+- Fonctions contraintes : ce que l'objet NE doit PAS faire (limites à respecter).
+- Critère d'appréciation : comment on mesure si la fonction est bien remplie (ex : masse < 500 g).
+- Niveau de performance : valeur cible + flexibilité (tolérance acceptable).
+
+[4e] Ergonomie et UX
+- Ergonomie physique : adaptation de l'objet au corps humain (taille, prise en main).
+- Ergonomie cognitive : facilité de compréhension et d'utilisation.
+- Interface Homme-Machine (IHM) : ce qui permet à l'humain d'interagir avec le système (boutons, écrans, voix).
+- UX Design (User eXperience) : conception centrée sur le ressenti et le confort de l'utilisateur.
+
+[4e] Tendances et design
+- Courant stylistique : tendance esthétique d'une époque (minimaliste, vintage, industriel...).
+- Identité visuelle : ensemble cohérent logo + couleurs + typographie d'une marque.
+- La forme d'un objet est souvent dictée par sa contrainte technique (ex : aérodynamisme → carrosserie arrondie).
+
+[3e] Gestion de projet
+- Démarche de projet : Analyser → Concevoir → Réaliser → Valider.
+- Diagramme de Gantt : tableau de planification des tâches dans le temps.
+- Jalons : étapes clés de validation du projet.
+- Revue de projet : réunion pour vérifier l'avancement et ajuster.
+- Outils collaboratifs : outils numériques de travail en équipe (cloud, partage de fichiers).
+
+[3e] Propriété intellectuelle et veille
+- Veille technologique : surveillance des innovations pour ne pas réinventer ce qui existe.
+- Brevet d'invention : protection d'une innovation technique (20 ans).
+- Marque : protection d'un nom commercial.
+- Droit d'auteur : protection automatique d'une œuvre créative.
+- Licence Creative Commons / Open Source : autorisation partagée d'utilisation.
+
+════════════════════════════════════════════════════════
+THÈME 2 — LES OBJETS TECHNIQUES ET LA SOCIÉTÉ
+════════════════════════════════════════════════════════
+
+[5e] Analyse d'un objet
+- Composant / Pièce : élément qui assure une fonction dans l'objet.
+- Système : ensemble d'éléments en interaction pour remplir une fonction globale.
+- Représentation par schéma légendé ou croquis : moyen de communiquer la structure d'un objet.
+
+[5e] Évolution des objets
+- Frise chronologique : représentation des évolutions d'un objet dans le temps.
+- Lignée d'objets : succession d'objets répondant au même besoin, de + en + perfectionnés.
+- Invention : création d'une solution totalement nouvelle.
+- Innovation : amélioration d'une solution existante qui trouve un marché.
+- Impact sociétal : comment une évolution technique change les habitudes de vie.
+
+════════════════════════════════════════════════════════
+THÈME 3 — INGÉNIERIE : MATÉRIAUX, MÉCANISMES, ÉNERGIE
+════════════════════════════════════════════════════════
+
+[5e] Matériaux
+- Familles de matériaux : métaux (acier, aluminium), matières plastiques (PLA, ABS), matériaux organiques (bois, coton), céramiques (verre, porcelaine), composites (fibre de carbone).
+- Propriétés mécaniques : solidité, rigidité, souplesse, dureté.
+- Propriétés physiques : légèreté, conductivité électrique, isolation thermique, transparence.
+
+[5e] Mécanismes et liaisons
+- Liaison fixe : deux pièces solidaires, sans mouvement relatif (ex : collage, soudage).
+- Liaison pivot : rotation possible autour d'un axe (ex : charnière, roue sur axe).
+- Liaison glissière : translation possible le long d'un axe (ex : tiroir).
+- Mécanismes de transmission : transmettent un mouvement sans le transformer (ex : poulie-courroie, engrenage → vitesse change mais type de mouvement identique).
+- Mécanismes de transformation : changent le type de mouvement (ex : rotation → translation par crémaillère ou bielle-manivelle).
+- Guidage en rotation : maintien d'un axe de rotation précis (roulements).
+- Guidage en translation : maintien d'un mouvement rectiligne.
+
+[4e] Systèmes automatisés
+- Chaîne d'information : Acquérir (capteur) → Traiter (processeur/programme) → Communiquer (afficheur, signal).
+- Chaîne d'énergie : Alimenter (source) → Distribuer (câbles, interrupteurs) → Convertir (moteur, résistance) → Transmettre (mécanisme).
+- Capteur TOR (Tout Ou Rien) : donne un signal 0 ou 1 (ex : bouton poussoir, capteur de fin de course).
+- Capteur analogique : donne une valeur continue (ex : capteur de température, photorésistance).
+- Actionneur : composant qui agit sur le monde physique (moteur, vérin, DEL, résistance chauffante).
+- Microcontrôleur : mini-ordinateur programmable qui traite les infos et pilote les actionneurs (ex : Arduino, BBC Micro:bit).
+
+[4e] Énergie
+- Sources d'énergie : électrique (pile, batterie, secteur), solaire (photovoltaïque), mécanique (éolienne), thermique.
+- Stockage : pile (non rechargeable), accumulateur/batterie (rechargeable).
+- Puissance (en Watts, W) : quantité d'énergie consommée ou produite par unité de temps.
+- Capacité d'une batterie (en mAh ou Wh) : durée d'autonomie possible.
+- Énergies renouvelables : inépuisables à l'échelle humaine (soleil, vent, eau).
+
+[4e] Éco-conception et ACV
+- Analyse du Cycle de Vie (ACV) : évaluation des impacts environnementaux de la fabrication à la fin de vie.
+  Étapes : extraction des matières premières → fabrication → transport → utilisation → fin de vie (recyclage, décharge).
+- Éco-conception : intégrer les contraintes environnementales dès la conception.
+- Économie circulaire : Réduire, Réutiliser, Recycler (3R).
+- Obsolescence technique : l'objet ne fonctionne plus (panne, incompatibilité).
+- Obsolescence programmée : l'objet est conçu pour tomber en panne rapidement.
+- Indice de réparabilité : note sur 10 indiquant la facilité à réparer un produit.
+
+[3e] Systèmes complexes et mécatronique
+- Mécatronique : synergie entre mécanique, électronique et informatique dans un même système.
+- Système embarqué : système informatique intégré dans un objet (ex : calculateur d'une voiture).
+- Fiabilité : probabilité qu'un système fonctionne sans panne sur une durée donnée.
+- Redondance : doublement de composants critiques pour éviter la panne totale.
+- Flux dans un système : flux de matière, flux d'énergie, flux d'information.
+
+[3e] Procédés de fabrication
+- Prototypage rapide : fabrication d'un exemplaire unique pour tester (dont impression 3D).
+- Fabrication en série : production d'un grand nombre d'exemplaires identiques.
+- Procédés par ajout de matière : impression 3D (FDM, SLA...).
+- Procédés par enlèvement de matière : usinage, découpe laser, CNC.
+- Procédés par formage : moulage par injection (plastique), emboutissage (métal).
+- Commande Numérique (CNC) : machine pilotée par programme informatique.
+
+════════════════════════════════════════════════════════
+THÈME 4 — MODÉLISATION ET SIMULATION
+════════════════════════════════════════════════════════
+
+[5e] Représentation technique
+- Vues normalisées (projection orthogonale) : face, dessus, gauche — représentation sans perspective.
+- Perspective cavalière : vue 3D simplifiée avec les arêtes fuyantes à 45°.
+- Échelle : rapport entre la dimension du dessin et la dimension réelle (ex : 1:2 = deux fois plus petit).
+
+[5e-4e] CAO — Modélisation 3D
+- CAO (Conception Assistée par Ordinateur) : logiciel de modélisation 3D (ex : Onshape, FreeCAD, SolidWorks).
+- Esquisse (2D) : tracé de la forme de base dans un plan, avec des contraintes géométriques.
+- Extrusion : génération d'un volume 3D en "étirant" une esquisse 2D.
+- Enlèvement de matière : création d'un trou ou d'une cavité dans un volume.
+- Perçage, congé, chanfrein : opérations courantes sur un volume 3D.
+- Assemblage sous contraintes : positionnement de plusieurs pièces avec des relations géométriques (coaxialité, coïncidence, tangence).
+- Vue éclatée : représentation des pièces d'un assemblage séparées mais dans leur position relative.
+- Nomenclature : liste des pièces d'un assemblage avec leurs références et quantités.
+- Degré de liberté : nombre de mouvements possibles d'une pièce par rapport à une autre.
+
+[4e-3e] Simulation numérique
+- Simulation numérique : test virtuel du comportement d'un objet dans un logiciel.
+- Jumeau numérique (Digital Twin) : modèle numérique fidèle à un objet réel, mis à jour en temps réel.
+- Scénario de test : conditions définies pour tester le modèle (efforts, température, vitesse...).
+- Optimisation : modification du modèle pour améliorer ses performances (allègement, résistance).
+- Types de simulation : mécanique (résistance), thermique (chaleur), aérodynamique (flux d'air).
+
+[3e] Impression 3D (FDM)
+- FDM (Fused Deposition Modeling) : dépôt de filament fondu couche par couche.
+- Slicer : logiciel qui "tranche" le modèle 3D en couches et génère le fichier machine (ex : Cura, PrusaSlicer).
+- Paramètres d'impression : épaisseur de couche (qualité), taux de remplissage (solidité), vitesse, température.
+- Supports : structures temporaires pour imprimer des parties en surplomb.
+- Matériaux FDM courants : PLA (biodégradable, facile), PETG (résistant), ABS (robuste, difficile).
+
+════════════════════════════════════════════════════════
+THÈME 5 — INFORMATIQUE ET PROGRAMMATION
+════════════════════════════════════════════════════════
+
+[5e] Environnement numérique
+- Système d'exploitation : logiciel de base gérant le matériel et les applications (Windows, Linux, macOS).
+- Fichier : données numériques avec un nom et une extension (.jpg, .docx, .pdf).
+- Dossier : conteneur de fichiers et de sous-dossiers.
+- Arborescence : organisation hiérarchique des dossiers (arbre de fichiers).
+- Chemin d'accès : adresse complète d'un fichier (ex : C:/Documents/Technologie/cours.pdf).
+- Stockage local : sur le disque dur de l'appareil.
+- Stockage en réseau (Cloud/ENT) : sur des serveurs distants accessibles via internet.
+
+[5e] Citoyenneté numérique
+- Identité numérique : ensemble des informations qui nous représentent en ligne (pseudo, avatar, historique).
+- Donnée personnelle : information permettant d'identifier une personne (nom, photo, adresse...).
+- Mot de passe robuste : long (12+ caractères), mélange de lettres/chiffres/symboles, unique par service.
+- Nétiquette : règles de politesse et de respect sur internet.
+- Droit à l'image : interdiction de publier la photo de quelqu'un sans son accord.
+- Cyberharcèlement : harcèlement répété via les outils numériques.
+
+[5e-4e] Algorithmique — du bloc au code
+- Algorithme : suite d'instructions précises et ordonnées pour résoudre un problème.
+- Programme / Script : traduction d'un algorithme dans un langage compréhensible par la machine.
+- Instruction : ordre élémentaire donné à la machine.
+- Séquence : instructions exécutées l'une après l'autre dans l'ordre.
+- Événement déclencheur : ce qui lance l'exécution d'un bloc d'instructions (clic, timer, capteur...).
+- Boucle "répéter N fois" (itérative) : répète un bloc un nombre fixe de fois.
+- Boucle "tant que" (conditionnelle) : répète un bloc aussi longtemps qu'une condition est vraie.
+- Variable : espace mémoire avec un nom, qui stocke une valeur modifiable.
+- Types de données : entier (nombre entier), flottant (nombre décimal), chaîne (texte), booléen (vrai/faux).
+- Opérateurs de comparaison : = , ≠ , < , > , ≤ , ≥
+- Opérateurs logiques : ET (and), OU (or), NON (not).
+- Structure conditionnelle : SI [condition] ALORS [instructions] SINON [autres instructions].
+- Langage par blocs : programmation visuelle (Scratch, Blockly) — idéal pour débuter.
+
+[4e] Données et tableur
+- Tableur : logiciel de traitement de données en tableau (Excel, Calc, Google Sheets).
+- Fichier CSV (Comma-Separated Values) : format texte simple pour stocker des données tabulaires.
+- Tri : classer des données par ordre croissant/décroissant.
+- Filtre : afficher uniquement les lignes qui correspondent à un critère.
+- Graphique : représentation visuelle de données (histogramme, camembert, courbe).
+- Métadonnées : données qui décrivent d'autres données (ex : date de prise de vue d'une photo, auteur d'un fichier).
+
+[4e] Réseaux informatiques
+- Réseau local (LAN) : réseau interne à un bâtiment (collège, maison).
+- Réseau étendu (WAN) : réseau reliant des sites distants (internet).
+- Architecture client/serveur : le client demande, le serveur répond et stocke.
+- Adresse IP : identifiant numérique unique d'un appareil sur un réseau (ex : 192.168.1.1).
+- Protocole TCP/IP : règles communes permettant à tous les appareils de communiquer.
+- Routeur : appareil qui dirige les données entre plusieurs réseaux.
+- DNS : annuaire qui traduit un nom de domaine (www.google.fr) en adresse IP.
+- Wi-Fi : réseau local sans fil.
+
+[3e] Programmation Python
+- Python : langage de programmation textuel, très utilisé en science et IA.
+- Syntaxe Python : indentation obligatoire pour les blocs (pas d'accolades).
+- print() : afficher un résultat.
+- input() : saisie de l'utilisateur.
+- def nom_fonction(): : définir une fonction réutilisable.
+- Bibliothèque (librairie) : ensemble de fonctions prêtes à l'emploi (ex : random, math, time).
+- Commentaire : ligne commençant par # ignorée par Python, pour expliquer le code.
+
+[3e] Architecture des services en ligne
+- Front-end : partie visible d'une application (ce que l'utilisateur voit et touche).
+- Back-end : partie invisible (serveur, base de données, calculs).
+- Requête HTTP : message envoyé par le client au serveur pour demander une ressource.
+- Réponse HTTP : message renvoyé par le serveur au client.
+- API (Application Programming Interface) : point de communication standardisé entre deux logiciels.
+- Base de données : système organisé pour stocker et retrouver des informations.
+- Cloud Computing : utilisation de serveurs distants via internet (IaaS, PaaS, SaaS).
+
+[3e] Cybersécurité
+- Hameçonnage (phishing) : fausse page ou faux mail pour voler des identifiants.
+- Rançongiciel (ransomware) : logiciel malveillant qui chiffre les données et demande une rançon.
+- Malware / Virus : programme malveillant qui endommage ou espionne un système.
+- Ingénierie sociale : manipulation psychologique pour obtenir des informations confidentielles.
+- Authentification forte (2FA) : double vérification de l'identité (mot de passe + code SMS).
+- Chiffrement (cryptage) : transformation des données pour les rendre illisibles sans clé.
+- RGPD : règlement européen sur la protection des données personnelles.
+- Empreinte numérique : traces laissées en ligne par nos activités.
+
+[3e] Intelligence Artificielle
+- IA (Intelligence Artificielle) : système capable de réaliser des tâches nécessitant normalement l'intelligence humaine.
+- Machine Learning (apprentissage automatique) : l'IA apprend à partir d'exemples (données).
+- Apprentissage supervisé : entraînement avec des données étiquetées (ex : photos de chats labellisées "chat").
+- Jeu de données d'entraînement : ensemble d'exemples utilisés pour apprendre.
+- Jeu de données de validation/test : exemples non vus pendant l'entraînement, pour mesurer les performances.
+- Biais dans les données : déséquilibre qui fausse les prédictions de l'IA (ex : sous-représentation d'un groupe).
+- Applications : reconnaissance d'image, de voix, traduction automatique, recommandation.
+
+════════════════════════════════════════════════════════
+REPÈRES PAR NIVEAU
+════════════════════════════════════════════════════════
+
+5e — Notions clés : besoin/fonction, matériaux, mécanismes, représentation technique, CAO initiation, algorithme par blocs, citoyenneté numérique.
+
+4e — Notions clés : CdCF, ergonomie, chaîne d'info/énergie, capteurs/actionneurs, ACV, CAO assemblage, simulation, variables/conditions/boucles, tableur, réseaux, microcontrôleur.
+
+3e — Notions clés : gestion de projet, brevet/veille, mécatronique, procédés de fabrication, impression 3D avancée, simulation comportementale, Python, cybersécurité, IA, architecture web, préparation DNB.
