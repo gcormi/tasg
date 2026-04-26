@@ -195,6 +195,9 @@
   <a href="#eleves" onclick="setActive(this)">5. Inviter les élèves</a>
   <a href="#resultats" onclick="setActive(this)">6. Résultats & présence</a>
 
+  <div class="nav-section">Évolutions futures</div>
+  <a href="#roadmap" onclick="setActive(this)">Roadmap</a>
+
   <div class="nav-section">Notice Technique</div>
   <a href="#deploiement" onclick="setActive(this)">Déploiement Cloudflare</a>
   <a href="#firebase" onclick="setActive(this)">Déploiement Firebase</a>
@@ -598,6 +601,65 @@
 
     <div class="alert alert-success">
       <strong>Présence vs résultats :</strong> un élève "connecté" (section du haut) est en train de travailler. Un élève "résultat" (section du bas) a terminé et soumis au moins une activité. Un élève peut passer de connecté à résultat en cours de session.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ROADMAP                                                -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <section id="roadmap">
+    <div class="section-label">Évolutions futures</div>
+    <h2>Roadmap</h2>
+    <p>Cette section recense les évolutions envisagées pour Experia, issues des premiers retours terrain. Elles ne sont pas encore développées — l'objectif est d'abord de tester avec de vraies classes avant d'arbitrer les priorités.</p>
+
+    <div class="alert alert-info">
+      <strong>Priorité actuelle :</strong> tests grandeur réelle avec des élèves. Les idées ci-dessous seront affinées en fonction des retours observés en classe.
+    </div>
+
+    <h3>Questions générées par l'IA, validées par le prof</h3>
+    <p>Aujourd'hui, le prof remplit manuellement chaque activité de la session. L'évolution prévue : un bouton <strong>"Générer des questions"</strong> dans l'éditeur de session. Le prof donne un titre de séquence ou colle un extrait de cours — Albert propose un lot de questions (QCM + questions ouvertes). Le prof sélectionne, modifie, supprime, réordonne, puis sauvegarde. Aucune question ne part aux élèves sans validation.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">✍️</div>
+        <h4>Ce qui change pour le prof</h4>
+        <p>Un bouton supplémentaire dans l'éditeur de session. Le reste du flux (lien élève, résultats) reste identique.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🔧</div>
+        <h4>Ce qui change côté technique</h4>
+        <p>Un appel Albert au moment de la création de session, avec un prompt de génération. Les questions générées pré-remplissent l'éditeur existant.</p>
+      </div>
+    </div>
+
+    <h3>Trois niveaux de difficulté</h3>
+    <p>Pour permettre au prof de différencier selon les groupes ou les élèves, deux approches complémentaires sont envisagées :</p>
+
+    <table>
+      <thead>
+        <tr><th>Option</th><th>Fonctionnement</th><th>Avantage</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A — Niveau sur la session entière</strong></td>
+          <td>Un menu "Niveau" (Simple / Moyen / Avancé) sur chaque session. Ce niveau est transmis à Albert comme consigne de correction — le barème et le feedback s'adaptent. Un seul lien élève.</td>
+          <td>Simple à implémenter. Le prof crée une session, choisit un niveau, tout le reste est automatique.</td>
+        </tr>
+        <tr>
+          <td><strong>B — Trois sessions distinctes via "+ Classe"</strong></td>
+          <td>Le prof crée une session "modèle", puis utilise le bouton <strong>+ Classe</strong> pour créer une copie par niveau (ex : <code>3eA-simple</code>, <code>3eA-moyen</code>, <code>3eA-avancé</code>). Chaque copie a son propre lien élève.</td>
+          <td>Déjà faisable aujourd'hui avec les outils existants. Donne un contrôle total sur les questions de chaque niveau.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-success">
+      <strong>Option B utilisable dès maintenant :</strong> si vous souhaitez tester la différenciation avant que l'Option A soit développée, créez votre session principale puis cliquez "+ Classe" autant de fois que nécessaire — une copie par groupe de niveau.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Option à ne pas retenir (pour l'instant) :</strong> l'adaptation automatique de la difficulté en cours de session (questions qui s'ajustent selon les réponses de l'élève) est techniquement possible mais représente un chantier important. À envisager dans une version ultérieure.
     </div>
   </section>
 
