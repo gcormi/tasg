@@ -973,35 +973,59 @@ async function loadSessions() {
       return;
     }
 
-    container.innerHTML = sessions.map(s => {
+    // Grouper : parents (sans templateId) + leurs copies
+    const parents = sessions.filter(s => !s.templateId);
+    const copies = sessions.filter(s => s.templateId);
+
+    const sessionCard = (s, isChild = false) => {
       const themeColor = s.theme ? THEME_COLORS[s.theme]?.bg || 'bg-indigo-50' : 'bg-indigo-50';
       const iconColor = s.theme ? THEME_COLORS[s.theme]?.border.replace('border-', 'text-') || 'text-indigo-600' : 'text-indigo-600';
+      const classBadge = s.classe ? `<span class="text-xs font-bold text-violet-600 bg-violet-50 border border-violet-200 px-2 py-0.5 rounded-full">${s.classe}</span>` : '';
+      const indent = isChild ? 'ml-6 border-l-2 border-indigo-100 pl-4' : '';
       return `
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all flex items-center gap-4 group">
-          <div onclick="openSession('${s.id}')" class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
-            <div class="w-12 h-12 ${themeColor} rounded-2xl flex items-center justify-center flex-none group-hover:scale-110 transition-transform">
-              <i data-lucide="folder-open" class="w-6 h-6 ${iconColor}"></i>
+        <div class="${indent}">
+          <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all flex items-center gap-4 group">
+            <div onclick="openSession('${s.id}')" class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
+              <div class="w-12 h-12 ${themeColor} rounded-2xl flex items-center justify-center flex-none group-hover:scale-110 transition-transform">
+                <i data-lucide="${isChild ? 'users' : 'folder-open'}" class="w-6 h-6 ${iconColor}"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-black text-slate-800 text-lg truncate group-hover:text-indigo-600 transition-colors">${s.title}</h3>
+                  ${classBadge}
+                </div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                  ${new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} ·
+                  ${s.activitiesCount || 0} activités ·
+                  Code: <span class="text-slate-600">${s.code}</span>
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-black text-slate-800 text-lg truncate group-hover:text-indigo-600 transition-colors">${s.title}</h3>
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                ${new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} · 
-                ${s.activitiesCount || 0} activités ·
-                Code: <span class="text-slate-600">${s.code}</span>
-              </p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
-              <i data-lucide="chevron-right" class="w-5 h-5"></i>
-            </div>
+            ${!isChild ? `<button onclick="event.stopPropagation(); duplicateForClass('${s.id}')"
+              class="p-2 rounded-xl text-slate-300 hover:text-violet-500 hover:bg-violet-50 transition-all flex-none"
+              title="Utiliser avec une autre classe">
+              <i data-lucide="copy-plus" class="w-4 h-4"></i>
+            </button>` : ''}
+            <button onclick="event.stopPropagation(); deleteSession('${s.id}')"
+              class="p-2 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all flex-none"
+              title="Supprimer cette session">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
           </div>
-          <button onclick="event.stopPropagation(); deleteSession('${s.id}')"
-            class="p-2 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all flex-none"
-            title="Supprimer cette session">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
         </div>
       `;
-    }).join('');
+    };
+
+    const groups = parents.map(p => {
+      const children = copies.filter(c => c.templateId === p.id);
+      return sessionCard(p, false) + children.map(c => sessionCard(c, true)).join('');
+    });
+    // Sessions copies orphelines (si parent supprimé)
+    const orphans = copies.filter(c => !parents.find(p => p.id === c.templateId));
+    container.innerHTML = [...groups, ...orphans.map(c => sessionCard(c, false))].join('');
     lucide.createIcons();
 
   } catch (e) {
@@ -1190,37 +1214,41 @@ async function saveTeacherNote() {
 }
 
 // ─── DUPLIQUER SESSION ────────────────────────────────────────────────────────
-async function duplicateCurrentSession() {
-  if (!state.currentSession) return;
-  const newTitle = prompt('Titre pour la nouvelle session :', state.currentSession.title + ' — Copie');
-  if (!newTitle || !newTitle.trim()) return;
-  const codeInput = prompt('Code d\'accès pour cette session :', state.currentSession.code);
-  if (!codeInput || !codeInput.trim()) return;
-  const code = codeInput.trim().replace(/\s+/g, '-').toUpperCase();
+async function duplicateForClass(templateId) {
+  const template = state.sessions.find(s => s.id === templateId);
+  if (!template) return;
 
+  const classe = prompt('Nom de la classe (ex: 6ème A, Terminale B…) :');
+  if (!classe || !classe.trim()) return;
+
+  // Charger la session complète pour avoir les questions
+  const res = await storage({ action: 'readSession', sessionId: templateId });
+  if (!res.success) { alert('Impossible de lire la session source.'); return; }
+  const source = res.session;
+
+  const code = classe.trim().replace(/\s+/g, '-').toUpperCase() + '-' + Date.now().toString(36).slice(-4).toUpperCase();
   const sessionId = 'session_' + Date.now();
   const duplicate = {
-    ...state.currentSession,
-    id: sessionId, code,
-    title: newTitle.trim(),
-    createdAt: new Date().toISOString()
+    ...source,
+    id: sessionId,
+    code,
+    title: source.title,
+    classe: classe.trim(),
+    templateId,
+    createdAt: Date.now()
   };
 
   const saveRes = await storage({ action: 'writeSession', session: duplicate });
   if (!saveRes.success) { alert('Erreur sauvegarde : ' + (saveRes.error || 'inconnue')); return; }
 
-  state.sessions.unshift(duplicate);
-  state.currentSession = duplicate;
+  // Retourner au dashboard et recharger
+  showScreen('dashboard');
+  await loadSessions();
+}
 
-  document.getElementById('sess-title').textContent = duplicate.title;
-  document.getElementById('sess-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('sess-code').textContent = code;
-
-  const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId, model: duplicate.model}))))}`;
-  document.getElementById('sess-link').value = link;
-  document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
-  renderBareme(duplicate);
-  lucide.createIcons();
+async function duplicateCurrentSession() {
+  if (!state.currentSession) return;
+  await duplicateForClass(state.currentSession.id);
 }
 
 // ─── SUPPRIMER SESSION ────────────────────────────────────────────────────────

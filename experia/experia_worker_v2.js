@@ -146,7 +146,9 @@ async function handleListSessions(body, env) {
       scoring: s.scoring,
       createdAt: s.createdAt,
       updatedAt: s.updatedAt,
-      activitiesCount: Object.keys(s.questions || {}).length
+      activitiesCount: Object.keys(s.questions || {}).length,
+      templateId: s.templateId || null,
+      classe: s.classe || null
     });
   }
   return json({ success: true, sessions });
