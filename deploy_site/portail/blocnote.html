@@ -140,7 +140,7 @@
             font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
             background: transparent;
             white-space: nowrap;
-            max-width: 180px;
+            max-width: 200px;
             transition: all 0.2s;
             position: relative;
             bottom: -1px;
@@ -149,10 +149,13 @@
         }
         .tab:hover { background: white; color: var(--text); border-color: var(--border); }
         .tab.active {
-            background: white; color: var(--accent);
+            background: white; color: var(--text);
             border-color: var(--border);
             border-bottom-color: white;
-            box-shadow: 0 -2px 0 var(--accent) inset;
+        }
+        .tab-color-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.1);
         }
 
         .tab-title {
@@ -366,6 +369,9 @@
         </div>
 
         <div class="header-right">
+            <button class="btn-icon" id="color-btn" title="Couleur de la note">
+                <i class="fas fa-palette"></i>
+            </button>
             <button class="btn-icon" id="rename-btn" title="Renommer l'onglet actif">
                 <i class="fas fa-pen"></i>
             </button>
@@ -405,7 +411,33 @@
         </div>
     </div>
 
+    <!-- COLOR PICKER MODAL -->
+    <div class="modal-overlay" id="color-modal">
+        <div class="modal-box">
+            <h3><i class="fas fa-palette" style="color:#6366f1;margin-right:8px"></i>Couleur de la note</h3>
+            <div id="color-swatches" style="display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;justify-content:center;"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel-sm" onclick="closeColorModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+    // ====== VARIABLES GLOBALES ======
+    let notes = [];
+    let activeId = null;
+    let quill = null;
+    let isLoading = false;
+    let saveTimer = null;
+
+    // ====== SYNC STATUS ======
+    function setSyncStatus(status, label) {
+        const dot = document.getElementById('sync-dot');
+        const lbl = document.getElementById('sync-label');
+        if(dot) dot.className = 'sync-dot ' + status;
+        if(lbl) lbl.textContent = label;
+    }
+
     // ====== FIREBASE ======
     const firebaseConfig = {
         apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
@@ -523,10 +555,12 @@
         const bar = document.getElementById('tabs-bar');
         bar.innerHTML = '';
         notes.forEach(note => {
+            const colorEntry = NOTE_COLORS.find(c => c.value === (note.color || null)) || NOTE_COLORS[0];
             const tab = document.createElement('div');
             tab.className = 'tab' + (note.id === activeId ? ' active' : '');
             tab.dataset.id = note.id;
             tab.innerHTML = `
+                <span class="tab-color-dot" style="background:${colorEntry.dot};"></span>
                 <span class="tab-title" title="${escHtml(note.title)}">${escHtml(note.title || 'Sans titre')}</span>
                 <button class="tab-close" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="Fermer"><i class="fas fa-times"></i></button>
             `;
@@ -567,19 +601,25 @@
 
         area.innerHTML = '<div id="quill-editor"></div>';
 
+        // Appliquer couleur de fond de l'éditeur
+        const note2 = notes.find(n => n.id === activeId);
+        applyNoteColor(note2?.color || null);
+
         isLoading = true;
         quill = new Quill('#quill-editor', {
             theme: 'snow',
-            placeholder: 'Commencez à écrire... (Ctrl+V pour coller une capture d\'écran)',
+            placeholder: 'Commencez à écrire… (Ctrl+V pour coller une image)',
             modules: {
                 toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
+                    [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [1, 2, 3, 4, false] }],
                     ['bold', 'italic', 'underline', 'strike'],
                     [{ 'color': [] }, { 'background': [] }],
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
                     [{ 'indent': '-1' }, { 'indent': '+1' }],
                     ['blockquote', 'code-block'],
-                    ['link'],
+                    ['link', 'image'],
                     ['clean']
                 ]
             }
@@ -627,10 +667,11 @@
 
     // ====== NEW NOTE ======
     async function createNote() {
+        if(!notesRef) { alert('Connexion en cours, réessayez dans un instant.'); return; }
         const title = 'Note ' + (notes.length + 1);
         const order = notes.length > 0 ? Math.max(...notes.map(n => n.order || 0)) + 1 : 0;
-        setSyncStatus('saving', 'Création...');
         try {
+            setSyncStatus('saving', 'Création...');
             const doc = await notesRef.add({
                 title,
                 content: '',
@@ -638,10 +679,10 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            // Select the new note immediately
             selectNote(doc.id);
         } catch(e) {
-            setSyncStatus('error', 'Erreur');
+            setSyncStatus('error', 'Erreur création');
+            console.error('createNote error:', e);
         }
     }
 
@@ -726,13 +767,80 @@
         return data.secure_url;
     }
 
+    // ====== COULEURS DE NOTES ======
+    const NOTE_COLORS = [
+        { name: 'Défaut',    value: null,      bg: '#ffffff', dot: '#cbd5e1' },
+        { name: 'Jaune',     value: '#fefce8', bg: '#fefce8', dot: '#facc15' },
+        { name: 'Rose',      value: '#fdf2f8', bg: '#fdf2f8', dot: '#ec4899' },
+        { name: 'Bleu',      value: '#eff6ff', bg: '#eff6ff', dot: '#3b82f6' },
+        { name: 'Vert',      value: '#f0fdf4', bg: '#f0fdf4', dot: '#22c55e' },
+        { name: 'Orange',    value: '#fff7ed', bg: '#fff7ed', dot: '#f97316' },
+        { name: 'Violet',    value: '#faf5ff', bg: '#faf5ff', dot: '#a855f7' },
+        { name: 'Cyan',      value: '#ecfeff', bg: '#ecfeff', dot: '#06b6d4' },
+        { name: 'Gris',      value: '#f8fafc', bg: '#f8fafc', dot: '#94a3b8' },
+        { name: 'Rouge',     value: '#fff1f2', bg: '#fff1f2', dot: '#f43f5e' },
+        { name: 'Indigo',    value: '#eef2ff', bg: '#eef2ff', dot: '#6366f1' },
+        { name: 'Lime',      value: '#f7fee7', bg: '#f7fee7', dot: '#84cc16' },
+    ];
+
+    function applyNoteColor(colorValue) {
+        const editorEl = document.querySelector('.ql-editor');
+        const containerEl = document.querySelector('.ql-container');
+        const bg = colorValue || '#ffffff';
+        if(editorEl) editorEl.style.background = bg;
+        if(containerEl) containerEl.style.background = bg;
+    }
+
+    function openColorModal() {
+        if(!activeId) return;
+        const note = notes.find(n => n.id === activeId);
+        const swatches = document.getElementById('color-swatches');
+        swatches.innerHTML = '';
+        NOTE_COLORS.forEach(c => {
+            const btn = document.createElement('button');
+            const isSelected = (note?.color || null) === c.value;
+            btn.title = c.name;
+            btn.style.cssText = `
+                width:40px;height:40px;border-radius:50%;
+                background:${c.bg};
+                border:${isSelected ? '3px solid #6366f1' : '2px solid #e2e8f0'};
+                cursor:pointer;position:relative;
+                box-shadow:${isSelected ? '0 0 0 3px rgba(99,102,241,0.2)' : 'none'};
+                transition:all 0.15s;
+            `;
+            if(c.value === null) {
+                btn.innerHTML = '<span style="font-size:1rem;line-height:40px;">✕</span>';
+            } else {
+                btn.innerHTML = `<span style="display:block;width:20px;height:20px;border-radius:50%;background:${c.dot};margin:auto;margin-top:8px;"></span>`;
+            }
+            btn.addEventListener('click', () => pickColor(c.value));
+            swatches.appendChild(btn);
+        });
+        document.getElementById('color-modal').classList.add('active');
+    }
+
+    function closeColorModal() {
+        document.getElementById('color-modal').classList.remove('active');
+    }
+
+    async function pickColor(colorValue) {
+        closeColorModal();
+        if(!activeId) return;
+        await notesRef.doc(activeId).update({ color: colorValue || null }).catch(console.error);
+        applyNoteColor(colorValue);
+    }
+
     // ====== EVENTS ======
     document.getElementById('new-note-btn').addEventListener('click', createNote);
     document.getElementById('rename-btn').addEventListener('click', openRenameModal);
+    document.getElementById('color-btn').addEventListener('click', openColorModal);
     document.getElementById('delete-btn').addEventListener('click', () => { if(activeId) deleteNote(activeId); });
 
     document.getElementById('rename-modal').addEventListener('click', e => {
         if(e.target === document.getElementById('rename-modal')) closeRenameModal();
+    });
+    document.getElementById('color-modal').addEventListener('click', e => {
+        if(e.target === document.getElementById('color-modal')) closeColorModal();
     });
     document.getElementById('rename-input').addEventListener('keydown', e => {
         if(e.key === 'Enter') confirmRename();
