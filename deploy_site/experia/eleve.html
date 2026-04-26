@@ -732,6 +732,9 @@ async function doConnect() {
     E.session = session;
     E.scores = {};
 
+    // Signal de présence (visible par le prof même sans activité)
+    storage({ action: 'writePresence', sessionId: session.id, studentId }).catch(() => {});
+
     // Reprendre la progression existante si disponible
     try {
       const prev = await storage({ action: 'readResult', sessionId: session.id, studentId });

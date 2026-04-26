@@ -31,6 +31,8 @@ export default {
     if (action === 'studentReadSession') return handleStudentReadSession(body, env);
     if (action === 'writeResult')        return handleWriteResult(body, env);
     if (action === 'readResult')         return handleStudentReadResult(body, env);
+    if (action === 'writePresence')      return handleWritePresence(body, env);
+    if (action === 'readPresences')      return handleReadPresences(body, env);
     if (action === 'albert')             return handleAlbert(body, env);
 
     // ── Inscription prof ──────────────────────────────────────────────────────
@@ -240,6 +242,30 @@ async function handleWriteResult(body, env) {
   await env.EXPERIA_KV.put(listKey, JSON.stringify(list));
 
   return json({ success: true });
+}
+
+async function handleWritePresence(body, env) {
+  const { sessionId, studentId } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+  const safeStudent = safeId(studentId);
+  await env.EXPERIA_KV.put('presence:' + sessionId + ':' + safeStudent, JSON.stringify({ studentId, connectedAt: Date.now() }));
+  const listKey = 'presencelist:' + sessionId;
+  let list = await env.EXPERIA_KV.get(listKey, 'json') || [];
+  if (!list.includes(safeStudent)) list.push(safeStudent);
+  await env.EXPERIA_KV.put(listKey, JSON.stringify(list));
+  return json({ success: true });
+}
+
+async function handleReadPresences(body, env) {
+  const { sessionId } = body;
+  if (!sessionId) return json({ success: false, error: 'sessionId requis' });
+  const list = await env.EXPERIA_KV.get('presencelist:' + sessionId, 'json') || [];
+  const presences = [];
+  for (const sid of list) {
+    const p = await env.EXPERIA_KV.get('presence:' + sessionId + ':' + sid, 'json');
+    if (p) presences.push(p);
+  }
+  return json({ success: true, presences });
 }
 
 async function handleStudentReadResult(body, env) {

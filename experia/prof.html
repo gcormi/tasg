@@ -1099,10 +1099,18 @@ async function loadSessionResults() {
   lucide.createIcons();
 
   try {
-    const res = await storage({ action: 'readResults', sessionId: state.currentSession.id });
-    const results = res.results || [];
+    const [resResults, resPresences] = await Promise.all([
+      storage({ action: 'readResults', sessionId: state.currentSession.id }),
+      storage({ action: 'readPresences', sessionId: state.currentSession.id })
+    ]);
+    const results = resResults.results || [];
+    const presences = resPresences.presences || [];
 
-    if (results.length === 0) {
+    // Élèves connectés mais sans résultat encore
+    const resultIds = new Set(results.map(r => r.studentId));
+    const connected = presences.filter(p => !resultIds.has(p.studentId));
+
+    if (results.length === 0 && connected.length === 0) {
       container.innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100">
         <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
         <p class="font-medium text-sm">En attente des premiers élèves...</p>
@@ -1110,7 +1118,18 @@ async function loadSessionResults() {
       lucide.createIcons(); return;
     }
 
-    container.innerHTML = results.map(r => {
+    const connectedCards = connected.map(p => `
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 opacity-70">
+        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-none">
+          <i data-lucide="wifi" class="w-5 h-5 text-blue-400"></i>
+        </div>
+        <div class="flex-1">
+          <div class="font-black text-slate-700">${p.studentId}</div>
+          <div class="text-xs text-blue-500 font-bold">Connecté — pas encore commencé</div>
+        </div>
+      </div>`).join('');
+
+    container.innerHTML = connectedCards + results.map(r => {
       const pct = Math.round(r.globalPct || 0);
       const color = pct >= 70 ? 'emerald' : pct >= 50 ? 'amber' : 'red';
       const date = new Date(r.completedAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
