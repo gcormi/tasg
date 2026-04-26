@@ -191,11 +191,13 @@
   <a href="#compte" onclick="setActive(this)">1. Créer son compte</a>
   <a href="#connexion" onclick="setActive(this)">2. Se connecter</a>
   <a href="#session" onclick="setActive(this)">3. Créer une session</a>
-  <a href="#eleves" onclick="setActive(this)">4. Inviter les élèves</a>
-  <a href="#resultats" onclick="setActive(this)">5. Consulter les résultats</a>
+  <a href="#classes" onclick="setActive(this)">4. Sessions par classe</a>
+  <a href="#eleves" onclick="setActive(this)">5. Inviter les élèves</a>
+  <a href="#resultats" onclick="setActive(this)">6. Résultats & présence</a>
 
   <div class="nav-section">Notice Technique</div>
   <a href="#deploiement" onclick="setActive(this)">Déploiement Cloudflare</a>
+  <a href="#firebase" onclick="setActive(this)">Déploiement Firebase</a>
   <a href="#secrets" onclick="setActive(this)">Secrets & Variables</a>
   <a href="#donnees" onclick="setActive(this)">Structure des données</a>
   <a href="#maintenance" onclick="setActive(this)">Maintenance</a>
@@ -222,8 +224,9 @@
         <a href="#presentation"><span class="toc-num">01</span> Qu'est-ce qu'Experia ?</a>
         <a href="#architecture"><span class="toc-num">02</span> Comment ça fonctionne</a>
         <a href="#compte"><span class="toc-num">03</span> Guide professeur pas à pas</a>
-        <a href="#deploiement"><span class="toc-num">04</span> Notice technique — Déploiement</a>
-        <a href="#rgpd"><span class="toc-num">05</span> Conformité RGPD</a>
+        <a href="#classes"><span class="toc-num">04</span> Sessions par classe & présence</a>
+        <a href="#deploiement"><span class="toc-num">05</span> Notice technique — Déploiement</a>
+        <a href="#rgpd"><span class="toc-num">06</span> Conformité RGPD</a>
       </div>
     </div>
   </div>
@@ -459,8 +462,54 @@
     </div>
   </section>
 
-  <section id="eleves">
+  <!-- ── SESSIONS PAR CLASSE ── -->
+  <section id="classes">
     <div class="section-label">Guide Professeur — Étape 4</div>
+    <h2>Sessions par classe</h2>
+    <p>Une session créée peut être <strong>réutilisée pour plusieurs classes</strong> — sans refaire toutes les activités. Chaque classe garde ses propres résultats, bien séparés.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Repérez le bouton "+ Classe" sur la session</h4>
+          <p>Dans le tableau de bord, chaque session affiche un bouton <strong style="color:#7c3aed">+ Classe</strong> en violet. Ce bouton n'apparaît que sur les sessions "originales" (pas sur les copies).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Cliquez "+ Classe" et entrez le nom de la classe</h4>
+          <p>Exemple : <code>3ème A</code>, <code>Terminale 1</code>, <code>6ème C</code>. Cette information apparaîtra comme badge sur la copie de session.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Une nouvelle session est créée, indentée sous l'originale</h4>
+          <p>Elle contient les mêmes activités que l'originale, mais un lien élève différent. Les résultats des deux classes sont totalement séparés.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Partagez le lien de la bonne classe</h4>
+          <p>Chaque classe reçoit son propre lien. Ouvrez la session de la classe concernée pour copier son lien élève.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Organisation visuelle :</strong> dans le tableau de bord, les copies sont affichées en retrait sous la session originale, avec le badge de classe en violet (ex : <strong style="color:#7c3aed">3ème A</strong>). Un seul coup d'œil suffit pour savoir quels élèves ont rendu quoi, par classe.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Supprimer une session :</strong> supprimer la session originale ne supprime pas automatiquement ses copies. Supprimez chaque session de classe séparément si nécessaire.
+    </div>
+  </section>
+
+  <section id="eleves">
+    <div class="section-label">Guide Professeur — Étape 5</div>
     <h2>Inviter les élèves</h2>
     <p>Une fois la session créée, un <strong>lien élève unique</strong> est généré. Ce lien contient tout ce dont l'élève a besoin — aucune inscription, aucun compte.</p>
 
@@ -494,42 +543,61 @@
 
     <h3>Ce que voit l'élève</h3>
     <p>L'élève accède à une interface claire adaptée au mobile et à l'ordinateur. Il répond aux activités, reçoit un feedback immédiat de l'IA, et peut voir son score global à la fin.</p>
+
+    <div class="alert alert-info">
+      <strong>Ordre des réponses QCM mélangé :</strong> pour les activités de type QCM, les choix de réponses sont mélangés de façon aléatoire à chaque ouverture. Deux élèves côte à côte voient les mêmes options dans un ordre différent — pas de copie possible.
+    </div>
   </section>
 
   <section id="resultats">
-    <div class="section-label">Guide Professeur — Étape 5</div>
-    <h2>Consulter les résultats</h2>
-    <p>Les résultats des élèves sont visibles en temps réel dans prof.html, dans la vue de la session concernée.</p>
+    <div class="section-label">Guide Professeur — Étape 6</div>
+    <h2>Résultats & présence</h2>
+    <p>Les résultats et la présence des élèves sont visibles <strong>en temps réel</strong> dans prof.html, dès l'ouverture d'une session. La page se rafraîchit automatiquement toutes les 30 secondes.</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
           <h4>Ouvrez la session dans le tableau de bord</h4>
-          <p>Cliquez sur la session dans la liste. Les résultats se chargent automatiquement.</p>
+          <p>Cliquez sur la session dans la liste. Les résultats et la liste de présence se chargent immédiatement.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h4>Consultez les résultats par élève</h4>
-          <p>Chaque élève apparaît avec son score global et le détail de ses réponses. Cliquez sur un élève pour voir le détail.</p>
+          <h4>Voyez les élèves connectés (même sans activité terminée)</h4>
+          <p>Dès qu'un élève ouvre le lien et entre son prénom, il apparaît dans une section <strong>"Connectés"</strong> — avant même qu'il ait terminé une activité. Pratique pour savoir qui est en ligne et attendre les retardataires.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Consultez les résultats par élève</h4>
+          <p>Les élèves qui ont terminé apparaissent avec leur score global. Cliquez sur un élève pour voir le détail de chaque réponse et le feedback IA.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
         <div class="step-body">
           <h4>Ajoutez une note manuelle (optionnel)</h4>
           <p>Sur la fiche d'un élève, vous pouvez ajouter votre propre note /20 et un commentaire, en complément de la correction IA.</p>
         </div>
       </div>
       <div class="step">
-        <div class="step-num">4</div>
+        <div class="step-num">5</div>
         <div class="step-body">
           <h4>Téléchargez la correction (optionnel)</h4>
           <p>Utilisez le bouton "Télécharger la correction" pour exporter un récapitulatif au format HTML.</p>
         </div>
       </div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Rafraîchissement automatique :</strong> la vue résultats se met à jour toutes les 30 secondes sans manipulation. Vous pouvez aussi cliquer sur le bouton de rafraîchissement manuel pour obtenir les données immédiatement.
+    </div>
+
+    <div class="alert alert-success">
+      <strong>Présence vs résultats :</strong> un élève "connecté" (section du haut) est en train de travailler. Un élève "résultat" (section du bas) a terminé et soumis au moins une activité. Un élève peut passer de connecté à résultat en cours de session.
     </div>
   </section>
 
@@ -606,6 +674,88 @@
       </tbody>
     </table>
     <p>Cliquez "Deploy" après chaque ajout.</p>
+  </section>
+
+  <!-- ── DÉPLOIEMENT FIREBASE ── -->
+  <section id="firebase">
+    <div class="section-label">Notice Technique</div>
+    <h2>Déploiement des pages Firebase</h2>
+    <p>Les pages <code>prof.html</code> et <code>eleve.html</code> sont hébergées sur <strong>Firebase Hosting</strong> (projet <code>portail-postits</code>). Elles sont indépendantes du Worker Cloudflare. Tout changement dans ces fichiers nécessite deux étapes : copier vers le dossier de déploiement, puis lancer Firebase.</p>
+
+    <div class="alert alert-warning">
+      <strong>Important :</strong> modifier un fichier dans <code>experia/</code> ne suffit pas — il faut aussi copier dans <code>deploy_site/experia/</code> et relancer <code>firebase deploy</code>. Sinon le site en ligne reste sur l'ancienne version.
+    </div>
+
+    <h3>Flux de déploiement</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Modifier le fichier dans <code>experia/</code></h4>
+          <p>Toutes les modifications se font dans le dossier de travail : <code>experia/prof.html</code>, <code>experia/eleve.html</code>, ou <code>experia/experia_worker_v2.js</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Copier vers <code>deploy_site/experia/</code></h4>
+          <p>Dans le terminal (depuis le dossier <code>frojet/</code>) :</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+<span class="comment"># Copier prof.html</span>
+cp experia/prof.html deploy_site/experia/prof.html
+
+<span class="comment"># Copier eleve.html</span>
+cp experia/eleve.html deploy_site/experia/eleve.html
+
+<span class="comment"># Copier le guide</span>
+cp experia/guide_experia.html deploy_site/experia/guide_experia.html
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Déployer sur Firebase</h4>
+          <p>Depuis le dossier <code>frojet/</code> (pas <code>experia/</code>) :</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+<span class="comment"># Depuis C:\Users\gille\Documents\Downloads\Dossier-projet\frojet</span>
+firebase deploy
+    </div>
+
+    <div class="alert alert-success">
+      <strong>Résultat :</strong> Firebase publie les fichiers sur <code>portail-postits.web.app</code>. Le déploiement prend environ 30 secondes.
+    </div>
+
+    <h3>Mettre à jour le Worker Cloudflare</h3>
+    <p>Le Worker est indépendant de Firebase. Pour le mettre à jour :</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Aller sur dash.cloudflare.com → Workers & Pages → experia-proxy → Edit code</h4>
+          <p>Sélectionner tout (Ctrl+A), coller le contenu de <code>experia_worker_v2.js</code>, cliquer "Deploy".</p>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Composant</th><th>Emplacement source</th><th>Déploiement</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>prof.html</code></td><td><code>experia/prof.html</code></td><td>Copie → <code>deploy_site/</code> → <code>firebase deploy</code></td></tr>
+        <tr><td><code>eleve.html</code></td><td><code>experia/eleve.html</code></td><td>Copie → <code>deploy_site/</code> → <code>firebase deploy</code></td></tr>
+        <tr><td><code>experia_worker_v2.js</code></td><td><code>experia/experia_worker_v2.js</code></td><td>Coller dans l'éditeur Cloudflare → Deploy</td></tr>
+      </tbody>
+    </table>
   </section>
 
   <section id="secrets">
