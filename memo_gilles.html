@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memo Gilles — Experia & Mentoria</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; padding: 2rem; }
+  h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: .25rem; }
+  .subtitle { color: #64748b; font-size: .9rem; margin-bottom: 2rem; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #fff; border-radius: 1rem; padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+  }
+  .card-header {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #f1f5f9;
+  }
+  .card-icon {
+    width: 2.5rem; height: 2.5rem; border-radius: .6rem;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+  }
+  .icon-experia { background: #ede9fe; }
+  .icon-mentoria { background: #ccfbf1; }
+  .icon-deploy { background: #fef3c7; }
+  .card-title { font-weight: 800; font-size: 1.05rem; }
+  .card-tag { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; }
+
+  .url-block { margin-bottom: 1rem; }
+  .url-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: .35rem; }
+  .url-row {
+    display: flex; align-items: center; gap: .5rem;
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: .6rem;
+    padding: .5rem .75rem; font-size: .82rem;
+  }
+  .url-row a { color: #4f46e5; text-decoration: none; flex: 1; word-break: break-all; font-family: monospace; }
+  .url-row a:hover { text-decoration: underline; }
+  .url-row.teal a { color: #0d9488; }
+  .copy-btn {
+    flex-shrink: 0; background: none; border: 1px solid #e2e8f0; border-radius: .4rem;
+    padding: .25rem .5rem; font-size: .7rem; cursor: pointer; color: #64748b;
+    transition: all .15s;
+  }
+  .copy-btn:hover { background: #f1f5f9; color: #1e293b; }
+  .copy-btn.copied { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+
+  .code-pill {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: #1e293b; color: #e2e8f0; border-radius: .5rem;
+    padding: .4rem .85rem; font-family: monospace; font-size: .9rem; font-weight: 700;
+    margin: .25rem 0;
+  }
+
+  .alert { border-radius: .6rem; padding: .75rem 1rem; font-size: .85rem; line-height: 1.6; margin-bottom: 1rem; }
+  .alert-indigo { background: #ede9fe; border: 1px solid #c4b5fd; color: #4338ca; }
+  .alert-teal { background: #ccfbf1; border: 1px solid #99f6e4; color: #0f766e; }
+  .alert-yellow { background: #fefce8; border: 1px solid #fde68a; color: #92400e; }
+  .alert strong { font-weight: 700; }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: .6rem;
+    padding: .45rem 0; border-bottom: 1px solid #f1f5f9; font-size: .875rem; color: #334155;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .num {
+    flex-shrink: 0; width: 1.4rem; height: 1.4rem; background: #f1f5f9; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800; color: #64748b;
+  }
+
+  .section-full { background: #fff; border-radius: 1rem; padding: 1.5rem; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+  .section-full .card-header { margin-bottom: 1.25rem; }
+
+  .deploy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .deploy-grid { grid-template-columns: 1fr; } }
+
+  .deploy-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: .75rem; padding: 1rem; }
+  .deploy-block h4 { font-size: .85rem; font-weight: 700; margin-bottom: .6rem; color: #334155; }
+  .deploy-block code {
+    display: block; background: #1e293b; color: #86efac; border-radius: .4rem;
+    padding: .5rem .75rem; font-size: .78rem; font-family: monospace; margin-bottom: .4rem; line-height: 1.6;
+    white-space: pre;
+  }
+
+  .tag-who {
+    display: inline-block; font-size: .65rem; font-weight: 700; text-transform: uppercase;
+    padding: .15rem .5rem; border-radius: 2rem; margin-left: .4rem; vertical-align: middle;
+  }
+  .tag-prof { background: #ede9fe; color: #6d28d9; }
+  .tag-eleve { background: #dcfce7; color: #15803d; }
+  .tag-toi { background: #fef3c7; color: #92400e; }
+</style>
+</head>
+<body>
+
+<h1>🗂️ Memo Gilles — Experia & Mentoria</h1>
+<p class="subtitle">Référence personnelle — URLs, codes d'accès, procédures de déploiement</p>
+
+<!-- ── GRILLE PRINCIPALE ── -->
+<div class="grid">
+
+  <!-- EXPERIA -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-experia">⚡</div>
+      <div>
+        <div class="card-title">Experia</div>
+        <div class="card-tag">Évaluations IA structurées</div>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Inscription prof <span class="tag-who tag-toi">tu envoies</span></div>
+      <div class="url-row">
+        <a href="https://portail-postits.web.app/experia/setup_experia.html" target="_blank">portail-postits.web.app/experia/setup_experia.html</a>
+        <button class="copy-btn" onclick="copyUrl(this, 'https://portail-postits.web.app/experia/setup_experia.html')">Copier</button>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Code d'inscription <span class="tag-who tag-toi">tu donnes oralement</span></div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <div class="code-pill">experia2026</div>
+        <button class="copy-btn" onclick="copyUrl(this, 'experia2026')">Copier</button>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Studio prof <span class="tag-who tag-prof">prof</span></div>
+      <div class="url-row">
+        <a href="https://portail-postits.web.app/experia/prof.html" target="_blank">portail-postits.web.app/experia/prof.html</a>
+        <button class="copy-btn" onclick="copyUrl(this, 'https://portail-postits.web.app/experia/prof.html')">Copier</button>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Lien élève <span class="tag-who tag-eleve">généré par le prof</span></div>
+      <div class="url-row" style="color:#94a3b8;font-size:.82rem;font-style:italic;">
+        <span style="flex:1;">Généré automatiquement dans prof.html après création de session</span>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Guide prof <span class="tag-who tag-toi">tu envoies</span></div>
+      <div class="url-row">
+        <a href="https://portail-postits.web.app/experia/guide_experia.html" target="_blank">portail-postits.web.app/experia/guide_experia.html</a>
+        <button class="copy-btn" onclick="copyUrl(this, 'https://portail-postits.web.app/experia/guide_experia.html')">Copier</button>
+      </div>
+    </div>
+
+    <div class="alert alert-indigo" style="margin-top:1rem;">
+      <strong>Onboarder un nouveau prof Experia :</strong><br>
+      1. Envoie le lien "Inscription prof" + le code <code>experia2026</code><br>
+      2. Envoie le lien "Studio prof" (à mettre en favori)<br>
+      3. Envoie le lien "Guide prof"
+    </div>
+  </div>
+
+  <!-- MENTORIA -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-mentoria">🧑‍🏫</div>
+      <div>
+        <div class="card-title">Mentoria</div>
+        <div class="card-tag">Assistants IA conversationnels</div>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Studio prof <span class="tag-who tag-toi">tu envoies</span></div>
+      <div class="url-row teal">
+        <a href="https://portail-postits.web.app/mentoria/index.html" target="_blank">portail-postits.web.app/mentoria/index.html</a>
+        <button class="copy-btn" onclick="copyUrl(this, 'https://portail-postits.web.app/mentoria/index.html')">Copier</button>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Lien Compagnon élève <span class="tag-who tag-toi">tu envoies au prof</span></div>
+      <div class="url-row teal">
+        <a href="https://portail-postits.web.app/mentoria/compagnion.html" target="_blank">portail-postits.web.app/mentoria/compagnion.html</a>
+        <button class="copy-btn" onclick="copyUrl(this, 'https://portail-postits.web.app/mentoria/compagnion.html')">Copier</button>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Guide prof <span class="tag-who tag-toi">tu envoies</span></div>
+      <div class="url-row teal">
+        <a href="https://portail-postits.web.app/mentoria/guide_mentoria.html" target="_blank">portail-postits.web.app/mentoria/guide_mentoria.html</a>
+        <button class="copy-btn" onclick="copyUrl(this, 'https://portail-postits.web.app/mentoria/guide_mentoria.html')">Copier</button>
+      </div>
+    </div>
+
+    <div class="url-block">
+      <div class="url-label">Clé Albert <span class="tag-who tag-prof">le prof crée la sienne</span></div>
+      <div class="url-row teal">
+        <a href="https://albert.api.etalab.gouv.fr" target="_blank">albert.api.etalab.gouv.fr</a>
+      </div>
+    </div>
+
+    <div class="alert alert-teal" style="margin-top:1rem;">
+      <strong>Onboarder un nouveau prof Mentoria :</strong><br>
+      1. Envoie le lien "Studio prof" et le lien "Compagnon élève"<br>
+      2. Envoie le lien "Guide prof" — il contient tout le reste :<br>
+      &nbsp;&nbsp;• Créer le dossier Nuage<br>
+      &nbsp;&nbsp;• Créer le mot de passe d'application Nuage<br>
+      &nbsp;&nbsp;• Obtenir la clé Albert API
+    </div>
+  </div>
+
+</div>
+
+<!-- ── DÉPLOIEMENT ── -->
+<div class="section-full">
+  <div class="card-header">
+    <div class="card-icon icon-deploy">🚀</div>
+    <div>
+      <div class="card-title">Déploiement — que faire quand tu modifies un fichier</div>
+    </div>
+  </div>
+
+  <div class="deploy-grid">
+
+    <div class="deploy-block">
+      <h4>⚡ Mettre à jour une page Experia (prof.html, eleve.html, guide…)</h4>
+      <code>cp experia/prof.html deploy_site/experia/prof.html
+cp experia/eleve.html deploy_site/experia/eleve.html
+firebase deploy</code>
+      <div style="font-size:.78rem;color:#64748b;">Depuis le dossier <code>frojet/</code></div>
+    </div>
+
+    <div class="deploy-block">
+      <h4>🧑‍🏫 Mettre à jour une page Mentoria (index.html, compagnion.html, guide…)</h4>
+      <code>cp mentoria/index.html deploy_site/mentoria/index.html
+cp mentoria/compagnion.html deploy_site/mentoria/compagnion.html
+firebase deploy</code>
+      <div style="font-size:.78rem;color:#64748b;">Depuis le dossier <code>frojet/</code></div>
+    </div>
+
+    <div class="deploy-block">
+      <h4>⚡ Mettre à jour le Worker Experia</h4>
+      <code>dash.cloudflare.com
+→ Workers & Pages
+→ experia-proxy → Edit code
+→ Ctrl+A → Coller → Deploy</code>
+      <div style="font-size:.78rem;color:#64748b;">Fichier source : <code>experia/experia_worker_v2.js</code></div>
+    </div>
+
+    <div class="deploy-block">
+      <h4>🧑‍🏫 Mettre à jour le Worker Mentoria</h4>
+      <code>dash.cloudflare.com
+→ Workers & Pages
+→ mentoria-proxy → Edit code
+→ Ctrl+A → Coller → Deploy</code>
+      <div style="font-size:.78rem;color:#64748b;">Fichier source : <code>mentoria/worker.js</code></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── LIENS ADMIN ── -->
+<div class="section-full">
+  <div class="card-header">
+    <div class="card-icon icon-deploy">🔧</div>
+    <div>
+      <div class="card-title">Liens d'administration</div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-bottom:0;">
+    <div>
+      <div class="url-block">
+        <div class="url-label">Cloudflare — Workers & KV</div>
+        <div class="url-row">
+          <a href="https://dash.cloudflare.com" target="_blank">dash.cloudflare.com</a>
+        </div>
+      </div>
+      <div class="url-block">
+        <div class="url-label">Firebase — Hébergement</div>
+        <div class="url-row">
+          <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="url-block">
+        <div class="url-label">Albert API — Gestion clés</div>
+        <div class="url-row">
+          <a href="https://albert.api.etalab.gouv.fr" target="_blank">albert.api.etalab.gouv.fr</a>
+        </div>
+      </div>
+      <div class="url-block">
+        <div class="url-label">Nuage — Espace personnel</div>
+        <div class="url-row">
+          <a href="https://nuage.apps.education.fr" target="_blank">nuage.apps.education.fr</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyUrl(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copier';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>

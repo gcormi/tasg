@@ -213,6 +213,9 @@
   <a href="#suivi" onclick="setActive(this)">5. Suivre les élèves</a>
   <a href="#gerer" onclick="setActive(this)">6. Gérer les assistants</a>
 
+  <div class="nav-section">Évolutions futures</div>
+  <a href="#roadmap" onclick="setActive(this)">Roadmap</a>
+
   <div class="nav-section">Notice Technique</div>
   <a href="#worker" onclick="setActive(this)">Déploiement Worker</a>
   <a href="#n8n" onclick="setActive(this)">Workflows n8n</a>
@@ -764,6 +767,56 @@
 
     <div class="alert alert-teal">
       <strong>Partage entre collègues :</strong> exportez un assistant en JSON et envoyez le fichier à un collègue. Il l'importe dans son propre Studio. Chacun peut ensuite le personnaliser indépendamment — aucune dépendance entre les comptes.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ROADMAP                                                -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <section id="roadmap">
+    <div class="section-label">Évolutions futures</div>
+    <h2>Roadmap</h2>
+    <p>Cette section recense les évolutions envisagées pour Mentoria, issues des réflexions pédagogiques en amont des premiers tests terrain. Elles seront affinées en fonction des retours des classes.</p>
+
+    <div class="alert alert-info">
+      <strong>Priorité actuelle :</strong> tests grandeur réelle avec des élèves. Les idées ci-dessous seront arbitrées en fonction de ce qui est observé en classe.
+    </div>
+
+    <h3>Évaluation automatique de la qualité de la discussion</h3>
+    <p>Aujourd'hui, le panneau Suivi montre les échanges élèves mais ne les évalue pas. L'évolution prévue : Albert analyse l'historique complet de la conversation et produit une <strong>grille d'évaluation sur 10</strong>, visible dans le Suivi pédagogique.</p>
+
+    <p>L'intérêt pédagogique est distinct d'Experia — ce n'est pas une évaluation des réponses correctes, mais de la <strong>démarche intellectuelle</strong> : un élève curieux qui pose beaucoup de questions et approfondit ses échanges est valorisé, même s'il ne maîtrise pas encore tout le contenu.</p>
+
+    <table>
+      <thead>
+        <tr><th>Critère</th><th>Ce qu'Albert évalue</th><th>Note</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Richesse du vocabulaire</strong></td><td>L'élève utilise-t-il des termes précis, disciplinaires ?</td><td>/2</td></tr>
+        <tr><td><strong>Qualité des questions posées</strong></td><td>Les questions sont-elles pertinentes, ouvertes, approfondies ?</td><td>/2</td></tr>
+        <tr><td><strong>Compréhension du sujet</strong></td><td>L'élève montre-t-il qu'il comprend les réponses reçues ?</td><td>/2</td></tr>
+        <tr><td><strong>Profondeur des échanges</strong></td><td>L'élève relance-t-il, reformule-t-il, va-t-il plus loin ?</td><td>/2</td></tr>
+        <tr><td><strong>Progression dans la session</strong></td><td>Y a-t-il une évolution visible entre le début et la fin ?</td><td>/2</td></tr>
+        <tr><td colspan="2"><strong>Total</strong></td><td><strong>/10</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">⚙️</div>
+        <h4>Comment ça fonctionnerait</h4>
+        <p>L'historique de la conversation est envoyé à Albert avec une consigne d'évaluation structurée. Albert renvoie une note et une justification par critère, affichées dans le panneau Suivi.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🎯</div>
+        <h4>Déclenchement</h4>
+        <p>Deux options envisagées : automatique à la fermeture de la session par l'élève, ou bouton manuel "Évaluer" dans le panneau Suivi du prof.</p>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Point à trancher avant développement :</strong> les 5 critères ci-dessus sont une proposition — ils doivent être validés et ajustés par les profs utilisateurs après les premiers tests terrain. Les critères peuvent aussi varier selon la matière ou le niveau.
     </div>
   </section>
 
