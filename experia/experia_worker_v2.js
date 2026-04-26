@@ -30,6 +30,7 @@ export default {
     // ── Actions élève (aucune authentification) ───────────────────────────────
     if (action === 'studentReadSession') return handleStudentReadSession(body, env);
     if (action === 'writeResult')        return handleWriteResult(body, env);
+    if (action === 'readResult')         return handleStudentReadResult(body, env);
     if (action === 'albert')             return handleAlbert(body, env);
 
     // ── Inscription prof ──────────────────────────────────────────────────────
@@ -237,6 +238,15 @@ async function handleWriteResult(body, env) {
   await env.EXPERIA_KV.put(listKey, JSON.stringify(list));
 
   return json({ success: true });
+}
+
+async function handleStudentReadResult(body, env) {
+  const { sessionId, studentId } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+  const safeStudent = safeId(studentId);
+  const content = await env.EXPERIA_KV.get('result:' + sessionId + ':' + safeStudent, 'json');
+  if (!content) return json({ success: false });
+  return json({ success: true, content });
 }
 
 // ── Albert ────────────────────────────────────────────────────────────────────
