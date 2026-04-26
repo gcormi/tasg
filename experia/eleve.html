@@ -718,7 +718,7 @@ async function doConnect() {
   showScreen('loading');
 
   try {
-    const res = await storage({ action: 'readSession', sessionId: E.config.sessionId });
+    const res = await storage({ action: 'studentReadSession', sessionId: E.config.sessionId });
     if (!res.success || !res.content) throw new Error('Session introuvable.');
 
     const session = res.content;

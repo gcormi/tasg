@@ -61,6 +61,11 @@
 
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
       <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Identifiant professeur</label>
+        <input id="login-profid" type="text" placeholder="Votre identifiant (ex : dupont.marie)"
+          class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
+      </div>
+      <div>
         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Secret professeur</label>
         <input id="login-secret" type="password" placeholder="Votre mot de passe Experia"
           class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
@@ -606,10 +611,9 @@ async function updateSessionTheme(theme) {
   document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
   document.body.classList.add('theme-' + theme);
 
-  // Sauvegarder sur le Nuage
+  // Sauvegarder sur le Worker KV
   try {
-    const filename = state.currentSession.id.startsWith('session_') ? state.currentSession.id + '.json' : `session_${state.currentSession.id}.json`;
-    await storage({ action: 'write', filename, content: state.currentSession, manifest: state.manifest });
+    await storage({ action: 'writeSession', session: state.currentSession });
     
     // Mettre à jour le lien de partage
     const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId: state.currentSession.id, model: state.currentSession.model}))))}`;
@@ -623,9 +627,10 @@ async function updateSessionTheme(theme) {
 
 // ─── ÉTAT ───────────────────────────────────────────────────────────────────
 const state = {
-  proxyUrl: '',    // URL du Worker Experia
-  profSecret: '',  // Secret professeur
-  manifest: [], sessions: [],
+  proxyUrl: '',    // URL du Worker Experia central
+  profId: '',      // Identifiant professeur (choisi à l'inscription)
+  profSecret: '',  // Secret professeur (choisi à l'inscription)
+  sessions: [],
   currentSession: null, currentResult: null
 };
 
@@ -674,7 +679,7 @@ async function storage(params) {
   const res = await fetch(state.proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...params, profSecret: state.profSecret })
+    body: JSON.stringify({ ...params, profId: state.profId, profSecret: state.profSecret })
   });
   if (!res.ok) throw new Error('Erreur réseau Worker : ' + res.status);
   return await res.json();
@@ -786,6 +791,7 @@ function loadSavedConfig() {
     document.getElementById('login-proxy').value = cfg.proxy;
     if (document.getElementById('config-proxy')) document.getElementById('config-proxy').value = cfg.proxy;
   }
+  if (cfg.profId) document.getElementById('login-profid').value = cfg.profId;
   if (cfg.theme) applyGlobalTheme(cfg.theme);
   // Note: le secret n'est PAS sauvegardé en localStorage (sécurité)
 }
@@ -801,6 +807,7 @@ function toggleAdvanced() {
 function saveConfig() {
   const cfg = {
     proxy: document.getElementById('login-proxy').value.trim(),
+    profId: document.getElementById('login-profid').value.trim(),
     theme: document.body.className.match(/theme-(\w+)/)?.[1] || 'classique'
   };
   localStorage.setItem('experia_config', JSON.stringify(cfg));
@@ -825,6 +832,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(7)))));
       if (decoded.proxy)  document.getElementById('login-proxy').value  = decoded.proxy;
+      if (decoded.profId) document.getElementById('login-profid').value = decoded.profId;
       if (decoded.secret) document.getElementById('login-secret').value = decoded.secret;
       setTimeout(() => doLogin(), 300);
     } catch(e) { /* lien invalide */ }
@@ -835,9 +843,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 async function doLogin() {
+  const profId = document.getElementById('login-profid').value.trim();
   const secret = document.getElementById('login-secret').value.trim();
   const proxy  = document.getElementById('login-proxy').value.trim();
 
+  if (!profId) { showLoginError('L\'identifiant professeur est requis.'); return; }
   if (!secret) { showLoginError('Le secret professeur est requis.'); return; }
   if (!proxy)  { showLoginError('L\'URL du Worker est requise.'); return; }
 
@@ -845,17 +855,18 @@ async function doLogin() {
   btn.textContent = 'Connexion en cours...';
 
   state.proxyUrl   = proxy;
+  state.profId     = profId;
   state.profSecret = secret;
 
   try {
     const res = await fetch(state.proxyUrl, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'test', profSecret: secret })
+      body: JSON.stringify({ action: 'test', profId, profSecret: secret })
     });
     const data = await res.json();
-    if (!data.success) { showLoginError(data.error || 'Secret invalide ou Worker inaccessible.'); btn.textContent = 'Se connecter'; return; }
+    if (!data.success) { showLoginError(data.error || 'Identifiant ou secret invalide.'); btn.textContent = 'Se connecter'; return; }
 
-    document.getElementById('dash-user').textContent = data.user || 'Professeur';
+    document.getElementById('dash-user').textContent = data.profId || profId;
     saveConfig();
     showScreen('dashboard');
     loadSessions();
@@ -880,15 +891,16 @@ function logout() {
 
 // ─── LIEN DE CONNEXION RAPIDE ────────────────────────────────────────────────
 function generateQuickLink() {
+  const profId = document.getElementById('login-profid').value.trim();
   const secret = document.getElementById('login-secret').value.trim();
   const proxy  = document.getElementById('login-proxy').value.trim();
 
-  if (!secret) {
-    alert('Entre d\'abord ton secret professeur avant de générer le lien.');
+  if (!profId || !secret) {
+    alert('Entre d\'abord ton identifiant et ton secret avant de générer le lien.');
     return;
   }
 
-  const config = { proxy, secret };
+  const config = { proxy, profId, secret };
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
   const url = `${location.origin}${location.pathname}#login=${encoded}`;
 
@@ -947,11 +959,11 @@ async function loadSessions() {
   lucide.createIcons();
 
   try {
-    const res = await storage({ action: 'list' });
-    state.manifest = res.files ? res.files.map(f => f.name) : [];
-    const sessionFiles = state.manifest.filter(n => n.startsWith('session_'));
+    const res = await storage({ action: 'listSessions' });
+    const sessions = (res.sessions || []).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    state.sessions = sessions;
 
-    if (sessionFiles.length === 0) {
+    if (sessions.length === 0) {
       container.innerHTML = `<div class="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-100">
         <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-50"></i>
         <p class="font-medium">Aucune session pour le moment</p>
@@ -960,14 +972,6 @@ async function loadSessions() {
       lucide.createIcons();
       return;
     }
-
-    const sessions = [];
-    for (const fn of sessionFiles) {
-      const r = await storage({ action: 'read', filename: fn });
-      if (r.success && r.content) sessions.push(r.content);
-    }
-    sessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    state.sessions = sessions;
 
     container.innerHTML = sessions.map(s => {
       const themeColor = s.theme ? THEME_COLORS[s.theme]?.bg || 'bg-indigo-50' : 'bg-indigo-50';
@@ -982,7 +986,7 @@ async function loadSessions() {
               <h3 class="font-black text-slate-800 text-lg truncate group-hover:text-indigo-600 transition-colors">${s.title}</h3>
               <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
                 ${new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} · 
-                ${Object.keys(s.questions || {}).length} activités · 
+                ${s.activitiesCount || 0} activités ·
                 Code: <span class="text-slate-600">${s.code}</span>
               </p>
             </div>
@@ -1007,8 +1011,15 @@ async function loadSessions() {
 
 // ─── OUVRIR SESSION ───────────────────────────────────────────────────────────
 async function openSession(id) {
-  const session = state.sessions.find(s => s.id === id);
-  if (!session) return;
+  // Charger la session complète depuis le Worker (la liste n'a que les métadonnées)
+  let session;
+  try {
+    const r = await storage({ action: 'readSession', sessionId: id });
+    if (!r.success) { alert('Erreur : ' + (r.error || 'Session introuvable')); return; }
+    session = r.session;
+    const idx = state.sessions.findIndex(s => s.id === id);
+    if (idx >= 0) state.sessions[idx] = session;
+  } catch(e) { alert('Erreur réseau : ' + e.message); return; }
   state.currentSession = session;
 
   document.getElementById('sess-title').textContent = session.title;
@@ -1064,22 +1075,15 @@ async function loadSessionResults() {
   lucide.createIcons();
 
   try {
-    const res = await storage({ action: 'list' });
-    const manifest = res.files ? res.files.map(f => f.name) : [];
-    const resultFiles = manifest.filter(n => n.startsWith(`result_${state.currentSession.id}_`));
+    const res = await storage({ action: 'readResults', sessionId: state.currentSession.id });
+    const results = res.results || [];
 
-    if (resultFiles.length === 0) {
+    if (results.length === 0) {
       container.innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100">
         <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
         <p class="font-medium text-sm">En attente des premiers élèves...</p>
       </div>`;
       lucide.createIcons(); return;
-    }
-
-    const results = [];
-    for (const fn of resultFiles) {
-      const r = await storage({ action: 'read', filename: fn });
-      if (r.success && r.content) results.push(r.content);
     }
 
     container.innerHTML = results.map(r => {
@@ -1115,7 +1119,7 @@ async function loadSessionResults() {
     const container = document.getElementById('results-list');
     container.innerHTML = `<div class="text-red-500 bg-red-50 rounded-2xl p-5 text-sm font-medium flex items-center gap-2">
       <i data-lucide="alert-triangle" class="w-4 h-4 flex-none"></i>
-      Erreur de lecture Nuage : ${e.message}
+      Erreur de lecture résultats : ${e.message}
     </div>`;
     lucide.createIcons();
   }
@@ -1178,8 +1182,7 @@ async function saveTeacherNote() {
   state.currentResult.teacherGrade = document.getElementById('teacher-grade').value;
   state.currentResult.teacherComment = document.getElementById('teacher-comment').value;
 
-  const filename = `result_${state.currentSession.id}_${state.currentResult.studentId}.json`;
-  const res = await storage({ action: 'write', filename, content: state.currentResult, manifest: state.manifest });
+  const res = await storage({ action: 'writeResult', sessionId: state.currentSession.id, studentId: state.currentResult.studentId, data: state.currentResult });
   if (res.success) {
     document.getElementById('note-saved').classList.remove('hidden');
     setTimeout(() => document.getElementById('note-saved').classList.add('hidden'), 3000);
@@ -1203,10 +1206,9 @@ async function duplicateCurrentSession() {
     createdAt: new Date().toISOString()
   };
 
-  const saveRes = await storage({ action: 'write', filename: `${sessionId}.json`, content: duplicate, manifest: state.manifest });
+  const saveRes = await storage({ action: 'writeSession', session: duplicate });
   if (!saveRes.success) { alert('Erreur sauvegarde : ' + (saveRes.error || 'inconnue')); return; }
 
-  state.manifest.push(`${sessionId}.json`);
   state.sessions.unshift(duplicate);
   state.currentSession = duplicate;
 
@@ -1226,23 +1228,13 @@ async function deleteSession(id) {
   const sess = state.sessions.find(s => s.id === id);
   if (!sess) return;
 
-  let toDelete = [`session_${sess.id}.json`, `${sess.id}.json`];
-  try {
-    const listRes = await storage({ action: 'list' });
-    const all = listRes.files ? listRes.files.map(f => f.name) : [];
-    toDelete = [...toDelete, ...all.filter(n => n.startsWith(`result_${sess.id}_`))];
-  } catch(e) {}
-
-  const nbResults = toDelete.filter(f => f.startsWith('result_')).length;
-  const msg = nbResults > 0
-    ? `Supprimer "${sess.title}" et ${nbResults} résultat${nbResults > 1 ? 's' : ''} d'élève${nbResults > 1 ? 's' : ''} ?\nIrréversible.`
-    : `Supprimer "${sess.title}" ?\nIrréversible.`;
-
+  const msg = `Supprimer "${sess.title}" et tous les résultats élèves associés ?\nIrréversible.`;
   if (!confirm(msg)) return;
 
-  for (const filename of toDelete) {
-    try { await storage({ action: 'delete', filename }); } catch(e) {}
-  }
+  try {
+    await storage({ action: 'deleteSession', sessionId: id });
+  } catch(e) { alert('Erreur suppression : ' + e.message); return; }
+
   if (state.currentSession?.id === id) state.currentSession = null;
   loadSessions();
 }
@@ -1344,14 +1336,15 @@ async function startGeneration() {
     config, scoring, retryable, showCorrection, theme, questions, model
   };
 
-  document.getElementById('gen-subtitle').textContent = 'Sauvegarde sur Nuage...';
-  const saveRes = await storage({ action: 'write', filename: `${sessionId}.json`, content: session, manifest: state.manifest });
+  document.getElementById('gen-subtitle').textContent = 'Sauvegarde en cours...';
+  const saveRes = await storage({ action: 'writeSession', session });
   if (!saveRes.success) {
     showScreen('create');
-    document.getElementById('create-error').textContent = 'Erreur sauvegarde Nuage : ' + (saveRes.error || 'Vérifiez que le dossier "experia" existe sur votre Nuage.');
+    document.getElementById('create-error').textContent = 'Erreur sauvegarde : ' + (saveRes.error || 'Vérifiez votre connexion au Worker.');
     document.getElementById('create-error').classList.remove('hidden');
     return;
   }
+  if (saveRes.sessionId) session.id = saveRes.sessionId;
 
   state.currentSession = session;
   state.sessions.unshift(session);

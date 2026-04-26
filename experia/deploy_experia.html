@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Déploiement Experia — Installation automatique</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --success: #16a34a;
+    --error: #dc2626;
+    --warn: #d97706;
+    --bg: #f8fafc;
+    --card: #fff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: .25rem; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: .75rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+  .step-num { background: var(--primary); color: #fff; border-radius: 50%; width: 1.5rem; height: 1.5rem; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+  label { display: block; font-size: .875rem; font-weight: 500; margin-bottom: .35rem; }
+  input { width: 100%; padding: .55rem .75rem; border: 1px solid var(--border); border-radius: .5rem; font-size: .95rem; margin-bottom: 1rem; }
+  input:focus { outline: 2px solid var(--primary); border-color: var(--primary); }
+  .hint { font-size: .8rem; color: var(--muted); margin-top: -.75rem; margin-bottom: 1rem; }
+  .btn { background: var(--primary); color: #fff; border: none; border-radius: .5rem; padding: .7rem 1.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; transition: opacity .15s; }
+  .btn:hover { opacity: .9; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  #log { display: none; }
+  #log.visible { display: block; }
+  .log-item { padding: .4rem 0; border-bottom: 1px solid var(--border); font-size: .9rem; display: flex; gap: .5rem; align-items: flex-start; }
+  .log-item:last-child { border-bottom: none; }
+  .log-ok   { color: var(--success); }
+  .log-err  { color: var(--error); }
+  .log-wait { color: var(--warn); }
+  .log-info { color: var(--primary); }
+  .result { background: #f0fdf4; border: 1px solid #86efac; border-radius: .75rem; padding: 1.5rem; margin-top: 1.5rem; display: none; }
+  .result.visible { display: block; }
+  .url-box { background: #fff; border: 1px solid #86efac; border-radius: .5rem; padding: .75rem 1rem; font-family: monospace; font-size: .95rem; margin: .75rem 0; word-break: break-all; }
+  .copy-btn { background: var(--success); color: #fff; border: none; border-radius: .4rem; padding: .4rem .9rem; font-size: .85rem; cursor: pointer; }
+  .tip { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: .5rem; padding: .75rem 1rem; font-size: .875rem; margin-bottom: 1rem; }
+  .tip strong { color: var(--primary); }
+  a { color: var(--primary); }
+  .error-box { background: #fef2f2; border: 1px solid #fca5a5; border-radius: .75rem; padding: 1rem 1.5rem; margin-top: 1rem; display: none; color: var(--error); font-size: .9rem; }
+  .error-box.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Déploiement Experia</h1>
+  <p class="subtitle">Installation automatique du proxy Cloudflare en 3 étapes — aucune connaissance technique requise.</p>
+
+  <!-- Étape 1 : Compte Cloudflare -->
+  <div class="card">
+    <h2><span class="step-num">1</span> Créer un compte Cloudflare gratuit</h2>
+    <div class="tip">
+      <strong>Si vous avez déjà un compte Cloudflare</strong>, passez directement à l'étape 2.
+    </div>
+    <ol style="padding-left:1.2rem; font-size:.9rem; color:var(--muted);">
+      <li>Allez sur <a href="https://dash.cloudflare.com/sign-up" target="_blank">dash.cloudflare.com/sign-up</a></li>
+      <li>Entrez votre adresse e-mail et créez un mot de passe</li>
+      <li>Validez votre e-mail (lien envoyé par Cloudflare)</li>
+      <li>Vous êtes dans le tableau de bord Cloudflare — continuez ci-dessous.</li>
+    </ol>
+  </div>
+
+  <!-- Étape 2 : Token API -->
+  <div class="card">
+    <h2><span class="step-num">2</span> Créer un jeton API Cloudflare</h2>
+    <div class="tip">
+      Ce jeton permet à cette page de déployer le Worker en votre nom. Il ne sera jamais stocké.
+    </div>
+    <ol style="padding-left:1.2rem; font-size:.9rem; color:var(--muted);">
+      <li>Dans le tableau de bord Cloudflare : cliquez sur votre <strong>icône de profil</strong> (en haut à droite) → <strong>Mon profil</strong></li>
+      <li>Menu de gauche : <strong>Jetons API</strong></li>
+      <li>Cliquez <strong>Créer un jeton</strong></li>
+      <li>Choisissez le modèle <strong>« Edit Cloudflare Workers »</strong></li>
+      <li>Cliquez <strong>Continuer vers le récapitulatif</strong> puis <strong>Créer un jeton</strong></li>
+      <li>Copiez le jeton affiché (il ne sera montré qu'une seule fois)</li>
+    </ol>
+    <br>
+    <label>Votre jeton API Cloudflare</label>
+    <input type="password" id="cf-token" placeholder="Collez ici votre jeton API">
+    <div class="hint">Format : une longue chaîne de lettres et chiffres</div>
+
+    <label>Votre identifiant de compte (Account ID)</label>
+    <input type="text" id="cf-account" placeholder="ex : a1b2c3d4e5f6789...">
+    <div class="hint">
+      Visible dans <strong>Aperçu du compte → Identifiant du compte</strong> (colonne droite du tableau de bord).
+    </div>
+  </div>
+
+  <!-- Étape 3 : Vos identifiants -->
+  <div class="card">
+    <h2><span class="step-num">3</span> Vos identifiants pédagogiques</h2>
+
+    <label>Identifiant Nuage (nuage.apps.education.fr)</label>
+    <input type="text" id="nuage-user" placeholder="ex : prenom.nom ou pnom01">
+
+    <label>Mot de passe d'application Nuage</label>
+    <input type="password" id="nuage-pass" placeholder="Mot de passe généré dans Nuage → Sécurité">
+    <div class="hint">
+      Dans Nuage : cliquez sur votre avatar → <strong>Paramètres → Sécurité → Créer un nouveau mot de passe d'application</strong>
+    </div>
+
+    <label>Serveur Nuage (laisser tel quel si vous ne savez pas)</label>
+    <input type="text" id="nuage-server" value="nuage03.apps.education.fr" placeholder="nuage03.apps.education.fr">
+
+    <label>Clé API Albert (albert.api.etalab.gouv.fr)</label>
+    <input type="password" id="albert-key" placeholder="sk-...">
+    <div class="hint">
+      Obtenir une clé : <a href="https://albert.api.etalab.gouv.fr" target="_blank">albert.api.etalab.gouv.fr</a> → se connecter avec ProConnect
+    </div>
+
+    <label>Secret professeur (mot de passe que vous choisissez librement)</label>
+    <input type="text" id="prof-secret" placeholder="ex : MonSecretExperia2025">
+    <div class="hint">Ce mot de passe vous sera demandé à chaque connexion dans prof.html. Retenez-le.</div>
+
+    <label>Nom du Worker (laisser tel quel ou personnaliser)</label>
+    <input type="text" id="worker-name" value="experia-proxy" placeholder="experia-proxy">
+    <div class="hint">Utilisé dans l'URL finale. Ne mettez que des lettres minuscules et des tirets.</div>
+  </div>
+
+  <button class="btn" id="deploy-btn" onclick="deploy()">Déployer mon Experia</button>
+
+  <!-- Journal de déploiement -->
+  <div class="card" id="log" style="margin-top:1.5rem;">
+    <h2>Avancement</h2>
+    <div id="log-items"></div>
+  </div>
+
+  <!-- Résultat final -->
+  <div class="result" id="result">
+    <h2 style="color:var(--success);margin-bottom:.5rem;">✓ Experia déployé avec succès !</h2>
+    <p style="margin-bottom:.75rem;">Votre URL Worker :</p>
+    <div class="url-box" id="result-url"></div>
+    <button class="copy-btn" onclick="copyUrl()">Copier l'URL</button>
+    <hr style="margin:1rem 0;border-color:#86efac;">
+    <p style="font-size:.875rem;color:var(--text);">
+      <strong>Que faire maintenant ?</strong><br>
+      1. Ouvrez <strong>prof.html</strong><br>
+      2. Dans le champ « URL du Worker Experia », collez l'URL ci-dessus<br>
+      3. Dans « Secret professeur », entrez le secret que vous avez choisi<br>
+      4. Cliquez « Se connecter » — c'est prêt !
+    </p>
+  </div>
+
+  <div class="error-box" id="error-box"></div>
+</div>
+
+<script>
+// ── Worker script (identique à experia_worker.js) ────────────────────────────
+const WORKER_SCRIPT = `
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export default {
+  async fetch(request, env) {
+    if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+    if (request.method !== 'POST') return json({ error: 'POST requis' }, 405);
+    let body;
+    try { body = await request.json(); }
+    catch { return json({ error: 'Corps JSON invalide' }, 400); }
+    const { action } = body;
+    if (!action) return json({ error: 'action requise' }, 400);
+    if (action === 'readSession') return handleReadSession(body, env);
+    if (action === 'writeResult') return handleWriteResult(body, env);
+    if (action === 'readResult')  return handleReadResult(body, env);
+    if (action === 'albert')      return handleAlbert(body, env);
+    if (!env.PROF_SECRET || body.profSecret !== env.PROF_SECRET)
+      return json({ success: false, error: 'Secret professeur invalide.' }, 403);
+    if (action === 'test')       return handleTest(env);
+    if (action === 'listModels') return handleListModels(env);
+    if (action === 'list')       return handleList(env);
+    if (action === 'read')       return handleRead(body, env);
+    if (action === 'write')      return handleWrite(body, env);
+    if (action === 'delete')     return handleDelete(body, env);
+    return json({ success: false, error: 'Action inconnue : ' + action }, 400);
+  }
+};
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', ...CORS } });
+}
+function nuageAuth(env) { return 'Basic ' + btoa(env.NUAGE_USER + ':' + env.NUAGE_PASS); }
+function nuageBase(env) {
+  const s = (env.NUAGE_SERVER || 'nuage03.apps.education.fr').replace(/^https?:\\/\\//, '').replace(/\\/$/, '');
+  return 'https://' + s + '/remote.php/dav/files/' + encodeURIComponent(env.NUAGE_USER) + '/experia/';
+}
+async function nuageGet(url, env) { return fetch(url, { headers: { Authorization: nuageAuth(env) } }); }
+async function nuagePut(url, data, env) {
+  return fetch(url, { method: 'PUT', headers: { Authorization: nuageAuth(env), 'Content-Type': 'application/octet-stream' }, body: data });
+}
+async function nuageMkcol(url, env) { return fetch(url, { method: 'MKCOL', headers: { Authorization: nuageAuth(env) } }); }
+async function nuageDelete(url, env) { return fetch(url, { method: 'DELETE', headers: { Authorization: nuageAuth(env) } }); }
+async function readManifest(env) {
+  const res = await nuageGet(nuageBase(env) + 'manifest.json', env);
+  if (res.status !== 200) return [];
+  try { const p = JSON.parse(await res.text()); return Array.isArray(p) ? p : []; } catch { return []; }
+}
+async function writeManifest(manifest, env) { await nuagePut(nuageBase(env) + 'manifest.json', JSON.stringify(manifest), env); }
+
+async function handleTest(env) {
+  const s = (env.NUAGE_SERVER || 'nuage03.apps.education.fr').replace(/^https?:\\/\\//, '').replace(/\\/$/, '');
+  try {
+    const res = await fetch('https://' + s + '/ocs/v1.php/cloud/user?format=json', { headers: { Authorization: nuageAuth(env), 'OCS-APIREQUEST': 'true' } });
+    if (res.status === 401 || res.status === 403) return json({ success: false, error: 'Credentials Nuage invalides.' });
+    if (res.status !== 200) return json({ success: false, error: 'Erreur OCS : ' + res.status });
+    await nuageMkcol(nuageBase(env), env);
+    return json({ success: true, user: env.NUAGE_USER, server: s });
+  } catch(e) { return json({ success: false, error: e.message }); }
+}
+
+async function handleAlbert(body, env) {
+  const { messages, model, temperature = 0.3 } = body;
+  if (!messages) return json({ error: 'messages requis' }, 400);
+  try {
+    const res = await fetch('https://albert.api.etalab.gouv.fr/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + env.ALBERT_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: model || 'openai/gpt-oss-120b', messages, temperature, max_tokens: 3000 })
+    });
+    const data = await res.json();
+    if (res.status >= 400) return json({ error: 'Albert erreur ' + res.status, detail: data });
+    return json(data);
+  } catch(e) { return json({ error: e.message }); }
+}
+
+async function handleListModels(env) {
+  try {
+    const res = await fetch('https://albert.api.etalab.gouv.fr/v1/models', { headers: { Authorization: 'Bearer ' + env.ALBERT_KEY } });
+    const data = await res.json();
+    if (res.status >= 400) return json({ error: 'Albert erreur ' + res.status });
+    return json(data);
+  } catch(e) { return json({ error: e.message }); }
+}
+
+async function handleList(env) {
+  try { return json({ success: true, files: (await readManifest(env)).map(n => ({ name: n })) }); }
+  catch(e) { return json({ success: false, error: e.message }); }
+}
+
+async function handleRead(body, env) {
+  const { filename } = body;
+  if (!filename) return json({ success: false, error: 'filename requis' });
+  const res = await nuageGet(nuageBase(env) + encodeURIComponent(filename), env);
+  if (res.status === 404) return json({ success: false, error: 'Fichier introuvable' });
+  if (res.status >= 400) return json({ success: false, error: 'Erreur lecture ' + res.status });
+  try { return json({ success: true, content: JSON.parse(await res.text()) }); }
+  catch(e) { return json({ success: false, error: e.message }); }
+}
+
+async function handleWrite(body, env) {
+  const { filename, content } = body;
+  if (!filename) return json({ success: false, error: 'filename requis' });
+  const data = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+  let res = await nuagePut(nuageBase(env) + encodeURIComponent(filename), data, env);
+  if ([404,405,409].includes(res.status)) { await nuageMkcol(nuageBase(env), env); res = await nuagePut(nuageBase(env) + encodeURIComponent(filename), data, env); }
+  if (res.status >= 400) return json({ success: false, error: 'Erreur ecriture ' + res.status });
+  const m = await readManifest(env); if (!m.includes(filename)) m.push(filename); await writeManifest(m, env);
+  return json({ success: true, action: 'write' });
+}
+
+async function handleDelete(body, env) {
+  const { filename } = body;
+  if (!filename) return json({ success: false, error: 'filename requis' });
+  await nuageDelete(nuageBase(env) + encodeURIComponent(filename), env);
+  const m = await readManifest(env); await writeManifest(m.filter(n => n !== filename), env);
+  return json({ success: true, action: 'delete' });
+}
+
+async function handleReadSession(body, env) {
+  const { sessionId } = body;
+  if (!sessionId) return json({ success: false, error: 'sessionId requis' });
+  const fn = (sessionId.startsWith('session_') ? sessionId : 'session_' + sessionId) + '.json';
+  const res = await nuageGet(nuageBase(env) + encodeURIComponent(fn), env);
+  if (res.status === 404) return json({ success: false, error: 'Session introuvable' });
+  if (res.status >= 400) return json({ success: false, error: 'Erreur ' + res.status });
+  try {
+    const c = JSON.parse(await res.text());
+    const { apiKey: _k, nuagePass: _p, nuageUser: _u, ...safe } = c;
+    return json({ success: true, content: safe });
+  } catch(e) { return json({ success: false, error: e.message }); }
+}
+
+async function handleWriteResult(body, env) {
+  const { sessionId, studentId, data } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+  const ss = studentId.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 64);
+  const fn = 'result_' + sessionId + '_' + ss + '.json';
+  const content = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  let res = await nuagePut(nuageBase(env) + encodeURIComponent(fn), content, env);
+  if ([404,405,409].includes(res.status)) { await nuageMkcol(nuageBase(env), env); res = await nuagePut(nuageBase(env) + encodeURIComponent(fn), content, env); }
+  if (res.status >= 400) return json({ success: false, error: 'Erreur ecriture ' + res.status });
+  const m = await readManifest(env); if (!m.includes(fn)) m.push(fn); await writeManifest(m, env);
+  return json({ success: true });
+}
+
+async function handleReadResult(body, env) {
+  const { sessionId, studentId } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+  const ss = studentId.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 64);
+  const fn = 'result_' + sessionId + '_' + ss + '.json';
+  const res = await nuageGet(nuageBase(env) + encodeURIComponent(fn), env);
+  if (res.status === 404) return json({ success: false, error: 'Resultat introuvable' });
+  if (res.status >= 400) return json({ success: false, error: 'Erreur ' + res.status });
+  try { return json({ success: true, content: JSON.parse(await res.text()) }); }
+  catch(e) { return json({ success: false, error: e.message }); }
+}
+`.trim();
+
+// ── Helpers UI ───────────────────────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const icons = { ok: '✓', err: '✗', wait: '⟳', info: '→' };
+  const el = document.createElement('div');
+  el.className = `log-item log-${type}`;
+  el.textContent = (icons[type] || '→') + ' ' + msg;
+  document.getElementById('log-items').appendChild(el);
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-box');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function v(id) { return document.getElementById(id).value.trim(); }
+
+// ── Déploiement ──────────────────────────────────────────────────────────────
+async function deploy() {
+  const btn = document.getElementById('deploy-btn');
+  const logEl = document.getElementById('log');
+  const resultEl = document.getElementById('result');
+  const errorEl = document.getElementById('error-box');
+
+  // Lecture des valeurs
+  const token    = v('cf-token');
+  const account  = v('cf-account');
+  const name     = v('worker-name') || 'experia-proxy';
+  const nuageUser   = v('nuage-user');
+  const nuagePass   = v('nuage-pass');
+  const nuageServer = v('nuage-server') || 'nuage03.apps.education.fr';
+  const albertKey   = v('albert-key');
+  const profSecret  = v('prof-secret');
+
+  // Validation
+  const missing = [];
+  if (!token) missing.push('Jeton API Cloudflare');
+  if (!account) missing.push('Identifiant de compte');
+  if (!nuageUser) missing.push('Identifiant Nuage');
+  if (!nuagePass) missing.push('Mot de passe Nuage');
+  if (!albertKey) missing.push('Clé API Albert');
+  if (!profSecret) missing.push('Secret professeur');
+  if (missing.length) { showError('Champs manquants : ' + missing.join(', ')); return; }
+
+  btn.disabled = true;
+  errorEl.classList.remove('visible');
+  resultEl.classList.remove('visible');
+  document.getElementById('log-items').innerHTML = '';
+  logEl.classList.add('visible');
+
+  const base = `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/${name}`;
+  const headers = { Authorization: `Bearer ${token}` };
+
+  try {
+    // 1. Upload du script Worker
+    log('Envoi du script Worker vers Cloudflare…', 'wait');
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify({
+      main_module: 'worker.js',
+      compatibility_date: '2024-09-02'
+    })], { type: 'application/json' }), 'metadata.json');
+    form.append('worker.js', new Blob([WORKER_SCRIPT], { type: 'application/javascript+module' }), 'worker.js');
+
+    const uploadRes = await fetch(base, { method: 'PUT', headers, body: form });
+    const uploadData = await uploadRes.json();
+    if (!uploadRes.ok) throw new Error('Échec upload script : ' + (uploadData.errors?.[0]?.message || uploadRes.status));
+    log('Script Worker déployé.', 'ok');
+
+    // 2. Secrets
+    const secrets = [
+      ['NUAGE_USER', nuageUser],
+      ['NUAGE_PASS', nuagePass],
+      ['NUAGE_SERVER', nuageServer],
+      ['ALBERT_KEY', albertKey],
+      ['PROF_SECRET', profSecret],
+    ];
+    for (const [secretName, secretValue] of secrets) {
+      log(`Secret ${secretName}…`, 'wait');
+      const sr = await fetch(`${base}/secrets`, {
+        method: 'PUT',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: secretName, text: secretValue, type: 'secret_text' })
+      });
+      const sd = await sr.json();
+      if (!sr.ok) throw new Error(`Échec secret ${secretName} : ` + (sd.errors?.[0]?.message || sr.status));
+      log(`Secret ${secretName} enregistré.`, 'ok');
+    }
+
+    // 3. Récupération du sous-domaine Workers
+    log('Récupération de votre URL Worker…', 'wait');
+    const subRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/workers/subdomain`, { headers });
+    const subData = await subRes.json();
+    let workerUrl;
+    if (subRes.ok && subData.result?.subdomain) {
+      workerUrl = `https://${name}.${subData.result.subdomain}.workers.dev`;
+    } else {
+      workerUrl = `https://${name}.YOUR-SUBDOMAIN.workers.dev`;
+      log('Impossible de récupérer le sous-domaine automatiquement — remplacez YOUR-SUBDOMAIN par votre sous-domaine Workers.', 'wait');
+    }
+
+    log('Déploiement terminé !', 'ok');
+
+    // Résultat
+    document.getElementById('result-url').textContent = workerUrl;
+    resultEl.classList.add('visible');
+    window._workerUrl = workerUrl;
+
+  } catch(e) {
+    log('Erreur : ' + e.message, 'err');
+    showError(e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function copyUrl() {
+  if (window._workerUrl) {
+    navigator.clipboard.writeText(window._workerUrl).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'Copié !';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  }
+}
+</script>
+</body>
+</html>

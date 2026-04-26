@@ -1,0 +1,284 @@
+// Experia Worker v2 — Stockage KV, sans credentials profs
+//
+// Secrets Cloudflare requis :
+//   ALBERT_KEY      → clé Albert partagée (Gilles) pour les élèves
+//   MASTER_SECRET   → code d'inscription (Gilles le donne aux profs du test)
+//
+// KV binding requis : EXPERIA_KV
+//
+// Aucun credential Nuage n'est stocké. Les profs s'authentifient
+// avec profId + profSecret (haché SHA-256 en KV).
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export default {
+  async fetch(request, env) {
+    if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+    if (request.method !== 'POST') return json({ error: 'POST requis' }, 405);
+
+    let body;
+    try { body = await request.json(); }
+    catch { return json({ error: 'Corps JSON invalide' }, 400); }
+
+    const { action } = body;
+    if (!action) return json({ error: 'action requise' }, 400);
+
+    // ── Actions élève (aucune authentification) ───────────────────────────────
+    if (action === 'studentReadSession') return handleStudentReadSession(body, env);
+    if (action === 'writeResult')        return handleWriteResult(body, env);
+    if (action === 'albert')             return handleAlbert(body, env);
+
+    // ── Inscription prof ──────────────────────────────────────────────────────
+    if (action === 'register') return handleRegister(body, env);
+
+    // ── Actions prof (profId + profSecret requis) ─────────────────────────────
+    const auth = await verifyProf(body, env);
+    if (!auth.ok) return json({ success: false, error: auth.error }, 403);
+
+    if (action === 'test')          return json({ success: true, profId: body.profId });
+    if (action === 'writeSession')  return handleWriteSession(body, env);
+    if (action === 'listSessions')  return handleListSessions(body, env);
+    if (action === 'readSession')   return handleReadSession(body, env);
+    if (action === 'deleteSession') return handleDeleteSession(body, env);
+    if (action === 'readResults')   return handleReadResults(body, env);
+    if (action === 'listModels')    return handleListModels(body, env);
+
+    return json({ success: false, error: 'Action inconnue : ' + action }, 400);
+  }
+};
+
+// ── Utilitaires ───────────────────────────────────────────────────────────────
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS }
+  });
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function safeId(str) {
+  return str.replace(/[^a-zA-Z0-9_-]/g, '-').substring(0, 64);
+}
+
+// ── Authentification prof ─────────────────────────────────────────────────────
+
+async function verifyProf(body, env) {
+  const { profId, profSecret } = body;
+  if (!profId || !profSecret) return { ok: false, error: 'profId et profSecret requis' };
+  const record = await env.EXPERIA_KV.get('prof:' + safeId(profId), 'json');
+  if (!record) return { ok: false, error: 'Compte introuvable — vérifiez votre identifiant.' };
+  const hash = await sha256(profSecret);
+  if (hash !== record.secretHash) return { ok: false, error: 'Secret incorrect.' };
+  return { ok: true };
+}
+
+// ── Inscription ───────────────────────────────────────────────────────────────
+
+async function handleRegister(body, env) {
+  const { profId, profSecret, masterSecret } = body;
+
+  // Vérification du code d'inscription
+  if (!env.MASTER_SECRET || masterSecret !== env.MASTER_SECRET) {
+    return json({ success: false, error: 'Code d\'inscription invalide. Contactez l\'administrateur.' }, 403);
+  }
+
+  if (!profId || !profSecret) return json({ success: false, error: 'profId et profSecret requis' });
+  if (profSecret.length < 6) return json({ success: false, error: 'Secret trop court (6 caractères minimum).' });
+
+  const key = 'prof:' + safeId(profId);
+  const existing = await env.EXPERIA_KV.get(key);
+  if (existing) return json({ success: false, error: 'Cet identifiant est déjà utilisé. Choisissez-en un autre.' });
+
+  const secretHash = await sha256(profSecret);
+  await env.EXPERIA_KV.put(key, JSON.stringify({ secretHash, createdAt: Date.now() }));
+  return json({ success: true, profId: safeId(profId) });
+}
+
+// ── Sessions (prof) ───────────────────────────────────────────────────────────
+
+async function handleWriteSession(body, env) {
+  const { profId, session } = body;
+  if (!session) return json({ success: false, error: 'session requise' });
+
+  const sessionId = session.id || ('s_' + uid());
+  const safeProfId = safeId(profId);
+  const fullSession = { ...session, id: sessionId, profId: safeProfId, updatedAt: Date.now() };
+
+  await env.EXPERIA_KV.put('session:' + sessionId, JSON.stringify(fullSession));
+
+  // Mise à jour du manifeste prof
+  const manifestKey = 'manifest:' + safeProfId;
+  let manifest = await env.EXPERIA_KV.get(manifestKey, 'json') || [];
+  if (!manifest.includes(sessionId)) manifest.push(sessionId);
+  await env.EXPERIA_KV.put(manifestKey, JSON.stringify(manifest));
+
+  return json({ success: true, sessionId });
+}
+
+async function handleListSessions(body, env) {
+  const safeProfId = safeId(body.profId);
+  const manifest = await env.EXPERIA_KV.get('manifest:' + safeProfId, 'json') || [];
+
+  const sessions = [];
+  for (const sid of manifest) {
+    const s = await env.EXPERIA_KV.get('session:' + sid, 'json');
+    if (s) sessions.push({
+      id: s.id,
+      title: s.title || sid,
+      code: s.code,
+      theme: s.theme,
+      model: s.model,
+      scoring: s.scoring,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+      activitiesCount: Object.keys(s.questions || {}).length
+    });
+  }
+  return json({ success: true, sessions });
+}
+
+async function handleReadSession(body, env) {
+  const { sessionId } = body;
+  if (!sessionId) return json({ success: false, error: 'sessionId requis' });
+
+  const session = await env.EXPERIA_KV.get('session:' + sessionId, 'json');
+  if (!session) return json({ success: false, error: 'Session introuvable' });
+
+  // Vérifier que la session appartient bien à ce prof
+  if (session.profId !== safeId(body.profId)) {
+    return json({ success: false, error: 'Accès non autorisé.' }, 403);
+  }
+  return json({ success: true, session });
+}
+
+async function handleDeleteSession(body, env) {
+  const { sessionId } = body;
+  if (!sessionId) return json({ success: false, error: 'sessionId requis' });
+
+  const session = await env.EXPERIA_KV.get('session:' + sessionId, 'json');
+  if (session && session.profId !== safeId(body.profId)) {
+    return json({ success: false, error: 'Accès non autorisé.' }, 403);
+  }
+
+  await env.EXPERIA_KV.delete('session:' + sessionId);
+
+  const manifestKey = 'manifest:' + safeId(body.profId);
+  let manifest = await env.EXPERIA_KV.get(manifestKey, 'json') || [];
+  await env.EXPERIA_KV.put(manifestKey, JSON.stringify(manifest.filter(id => id !== sessionId)));
+
+  return json({ success: true });
+}
+
+// ── Résultats ─────────────────────────────────────────────────────────────────
+
+async function handleReadResults(body, env) {
+  const { sessionId } = body;
+  if (!sessionId) return json({ success: false, error: 'sessionId requis' });
+
+  // Vérifier ownership
+  const session = await env.EXPERIA_KV.get('session:' + sessionId, 'json');
+  if (!session || session.profId !== safeId(body.profId)) {
+    return json({ success: false, error: 'Accès non autorisé.' }, 403);
+  }
+
+  const listKey = 'resultlist:' + sessionId;
+  const studentIds = await env.EXPERIA_KV.get(listKey, 'json') || [];
+
+  const results = [];
+  for (const sid of studentIds) {
+    const r = await env.EXPERIA_KV.get('result:' + sessionId + ':' + sid, 'json');
+    if (r) results.push(r);
+  }
+  return json({ success: true, results });
+}
+
+// ── Actions élève ─────────────────────────────────────────────────────────────
+
+async function handleStudentReadSession(body, env) {
+  const { sessionId } = body;
+  if (!sessionId) return json({ success: false, error: 'sessionId requis' });
+
+  const session = await env.EXPERIA_KV.get('session:' + sessionId, 'json');
+  if (!session) return json({ success: false, error: 'Session introuvable' });
+
+  // Ne jamais renvoyer profId ni données internes à l'élève
+  const { profId: _p, ...safe } = session;
+  return json({ success: true, content: safe });
+}
+
+async function handleWriteResult(body, env) {
+  const { sessionId, studentId, data } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+
+  const safeStudent = safeId(studentId);
+  const resultKey = 'result:' + sessionId + ':' + safeStudent;
+  const content = typeof data === 'object' ? { ...data, studentId, submittedAt: Date.now() } : { raw: data, studentId, submittedAt: Date.now() };
+
+  await env.EXPERIA_KV.put(resultKey, JSON.stringify(content));
+
+  // Mise à jour de la liste des élèves
+  const listKey = 'resultlist:' + sessionId;
+  let list = await env.EXPERIA_KV.get(listKey, 'json') || [];
+  if (!list.includes(safeStudent)) list.push(safeStudent);
+  await env.EXPERIA_KV.put(listKey, JSON.stringify(list));
+
+  return json({ success: true });
+}
+
+// ── Albert ────────────────────────────────────────────────────────────────────
+
+async function handleAlbert(body, env) {
+  const { messages, model, temperature = 0.3, profAlbertKey } = body;
+  if (!messages) return json({ error: 'messages requis' }, 400);
+
+  // Le prof peut envoyer sa propre clé ; sinon on utilise la clé partagée
+  const key = profAlbertKey || env.ALBERT_KEY;
+  if (!key) return json({ error: 'Clé Albert non configurée.' }, 500);
+
+  try {
+    const res = await fetch('https://albert.api.etalab.gouv.fr/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model || 'openai/gpt-oss-120b',
+        messages,
+        temperature,
+        max_tokens: 3000
+      })
+    });
+    const data = await res.json();
+    if (res.status >= 400) return json({ error: 'Albert erreur ' + res.status, detail: data });
+    return json(data);
+  } catch(e) {
+    return json({ error: e.message });
+  }
+}
+
+async function handleListModels(body, env) {
+  const key = body.profAlbertKey || env.ALBERT_KEY;
+  if (!key) return json({ error: 'Clé Albert non configurée.' }, 500);
+  try {
+    const res = await fetch('https://albert.api.etalab.gouv.fr/v1/models', {
+      headers: { Authorization: 'Bearer ' + key }
+    });
+    const data = await res.json();
+    if (res.status >= 400) return json({ error: 'Albert erreur ' + res.status });
+    return json(data);
+  } catch(e) {
+    return json({ error: e.message });
+  }
+}

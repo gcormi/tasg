@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentoria — Accueil</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Bleu */
+            --secondary: #0d9488; /* Teal */
+            --tertiary: #4f46e5; /* Indigo */
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-page);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* En-tête */
+        header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .logo-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        h1 {
+            color: #111827;
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Grille des cartes */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Style des cartes */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            transition: opacity 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .card-prof::before { background-color: var(--primary); }
+        .card-tech::before { background-color: var(--secondary); }
+        .card-ex::before { background-color: var(--tertiary); }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-color: transparent;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            background: #f1f5f9;
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            border-radius: 12px;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            color: #111827;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            flex-grow: 1;
+        }
+
+        .card-arrow {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-prof .card-arrow { color: var(--primary); }
+        .card-tech .card-arrow { color: var(--secondary); }
+        .card-ex .card-arrow { color: var(--tertiary); }
+
+        /* Pied de page */
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .intro-text { font-size: 1rem; }
+            .card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo-icon">🎓</div>
+            <h1>Bienvenue sur Mentoria</h1>
+            <p class="intro-text">
+                Le studio de création d'assistants pédagogiques IA <span class="highlight">100% souverains</span>. 
+                Propulsé par l'IA de l'État et conçu selon les normes RGPD : aucune base de données tierce, 
+                aucun compte élève requis, pour un apprentissage sécurisé et maîtrisé.
+            </p>
+        </header>
+
+        <div class="cards-grid">
+            <!-- Carte Guide Enseignant -->
+            <a href="NOTICE-MENTORIA-PROF.html" class="card card-prof">
+                <div class="card-icon">📘</div>
+                <h2>Guide de l'Enseignant</h2>
+                <p>Découvrez la philosophie de l'outil, les prérequis, et apprenez pas à pas à créer, publier et suivre les échanges de vos assistants en classe.</p>
+                <div class="card-arrow">Consulter le guide <span>→</span></div>
+            </a>
+
+            <!-- Carte Architecture Technique -->
+            <a href="NOTICE-MENTORIA-TECHNIQUE.html" class="card card-tech">
+                <div class="card-icon">⚙️</div>
+                <h2>Documentation Technique</h2>
+                <p>Plongez dans l'architecture de Mentoria. Comprenez la conformité RGPD "by design", les proxys de l'État, et la technologie des URL auto-portées.</p>
+                <div class="card-arrow">Voir l'architecture <span>→</span></div>
+            </a>
+
+            <!-- Carte Exemples -->
+            <a href="EXEMPLES-BOTS-MENTORIA.html" class="card card-ex">
+                <div class="card-icon">🤖</div>
+                <h2>Exemples de Bots</h2>
+                <p>Inspirez-vous de cas d'usage concrets avec des configurations complètes prêtes à être reproduites dans votre studio pour différents niveaux.</p>
+                <div class="card-arrow">Explorer les exemples <span>→</span></div>
+            </a>
+        </div>
+
+        <footer>
+            <p>Conçu et développé par <strong>Gilles Cormi</strong> &nbsp;·&nbsp; v2.7</p>
+        </footer>
+    </div>
+
+</body>
+</html>

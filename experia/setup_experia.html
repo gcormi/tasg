@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experia — Créer mon compte professeur</title>
+<style>
+  :root { --primary:#4f46e5; --success:#16a34a; --error:#dc2626; --bg:#f0f4ff; --card:#fff; --border:#e2e8f0; --text:#1e293b; --muted:#64748b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:1rem; padding:2rem; width:100%; max-width:480px; box-shadow:0 4px 24px rgba(79,70,229,.08); }
+  .logo { display:flex; align-items:center; gap:.6rem; margin-bottom:1.5rem; }
+  .logo-icon { width:2.5rem; height:2.5rem; background:var(--primary); border-radius:.6rem; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.1rem; }
+  h1 { font-size:1.3rem; font-weight:800; margin-bottom:.25rem; }
+  .subtitle { color:var(--muted); font-size:.875rem; margin-bottom:1.5rem; }
+  label { display:block; font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:.35rem; }
+  input { width:100%; padding:.65rem .85rem; border:2px solid var(--border); border-radius:.6rem; font-size:.95rem; margin-bottom:1rem; outline:none; transition:border-color .15s; font-family:inherit; }
+  input:focus { border-color:var(--primary); }
+  .hint { font-size:.78rem; color:var(--muted); margin-top:-.75rem; margin-bottom:1rem; }
+  .btn { width:100%; background:var(--primary); color:#fff; border:none; border-radius:.6rem; padding:.8rem; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity .15s; font-family:inherit; }
+  .btn:hover { opacity:.9; }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .success { background:#f0fdf4; border:1px solid #86efac; border-radius:.75rem; padding:1.25rem; margin-top:1rem; display:none; }
+  .success.visible { display:block; }
+  .success h2 { color:var(--success); font-size:1rem; margin-bottom:.5rem; }
+  .url-row { display:flex; gap:.5rem; margin:.5rem 0; }
+  .url-box { flex:1; background:#fff; border:1px solid #86efac; border-radius:.5rem; padding:.5rem .75rem; font-family:monospace; font-size:.85rem; word-break:break-all; }
+  .copy-btn { background:var(--success); color:#fff; border:none; border-radius:.45rem; padding:.5rem .9rem; font-size:.8rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .error { background:#fef2f2; border:1px solid #fca5a5; border-radius:.6rem; padding:.75rem 1rem; color:var(--error); font-size:.875rem; margin-top:.75rem; display:none; }
+  .error.visible { display:block; }
+  .divider { border:none; border-top:1px solid var(--border); margin:1.25rem 0; }
+  .tip { background:#eff6ff; border:1px solid #bfdbfe; border-radius:.5rem; padding:.75rem 1rem; font-size:.8rem; color:#1e40af; margin-bottom:1rem; }
+  .tip strong { font-weight:700; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div style="font-weight:800;font-size:1.1rem;">Experia</div>
+      <div style="font-size:.75rem;color:var(--muted);font-weight:600;">Création de compte professeur</div>
+    </div>
+  </div>
+
+  <h1>Créer mon espace Experia</h1>
+  <p class="subtitle">Deux minutes suffisent. Vous aurez besoin du code d'inscription fourni par l'administrateur.</p>
+
+  <div class="tip">
+    <strong>Ce que vous aurez besoin de retenir :</strong><br>
+    votre identifiant + votre secret. C'est tout.
+    Aucun mot de passe Nuage, aucune clé API à gérer.
+  </div>
+
+  <label>Code d'inscription</label>
+  <input type="text" id="master-secret" placeholder="Code fourni par l'administrateur Experia">
+  <div class="hint">L'administrateur (votre référent Experia) vous communique ce code.</div>
+
+  <hr class="divider">
+
+  <label>Votre identifiant Experia</label>
+  <input type="text" id="prof-id" placeholder="ex : dupont.marie ou mmartinez">
+  <div class="hint">Lettres, chiffres, tirets et points autorisés. Pas d'espaces.</div>
+
+  <label>Votre secret professeur</label>
+  <input type="password" id="prof-secret" placeholder="Minimum 6 caractères">
+
+  <label>Confirmer le secret</label>
+  <input type="password" id="prof-secret2" placeholder="Répétez votre secret">
+  <div class="hint">Ce secret vous sera demandé à chaque connexion. Notez-le.</div>
+
+  <div class="error" id="err-box"></div>
+
+  <button class="btn" id="register-btn" onclick="register()">Créer mon compte</button>
+
+  <div class="success" id="success-box">
+    <h2>✓ Compte créé avec succès !</h2>
+    <p style="font-size:.875rem;margin-bottom:.75rem;">Gardez ces informations précieusement :</p>
+
+    <div style="margin-bottom:.5rem;">
+      <label style="margin-bottom:.25rem;">Votre identifiant</label>
+      <div class="url-box" id="result-profid" style="font-family:inherit;font-size:.9rem;"></div>
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <label style="margin-bottom:.25rem;">URL du Worker Experia (à coller dans prof.html)</label>
+      <div class="url-row">
+        <div class="url-box" id="result-url"></div>
+        <button class="copy-btn" onclick="copyUrl()">Copier</button>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin:.75rem 0;">
+    <p style="font-size:.8rem;color:var(--muted);line-height:1.6;">
+      <strong style="color:var(--text);">Que faire maintenant ?</strong><br>
+      1. Ouvrez <strong>prof.html</strong><br>
+      2. Entrez votre identifiant + votre secret<br>
+      3. L'URL du Worker est pré-remplie — cliquez « Se connecter »
+    </p>
+  </div>
+</div>
+
+<script>
+const WORKER_URL = 'https://experia-proxy.gilles-cormi.workers.dev'; // URL du Worker central
+
+function showError(msg) {
+  const el = document.getElementById('err-box');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('err-box').classList.remove('visible');
+}
+
+async function register() {
+  hideError();
+  const masterSecret = document.getElementById('master-secret').value.trim();
+  const profId       = document.getElementById('prof-id').value.trim();
+  const profSecret   = document.getElementById('prof-secret').value;
+  const profSecret2  = document.getElementById('prof-secret2').value;
+
+  if (!masterSecret) { showError('Le code d\'inscription est requis.'); return; }
+  if (!profId)        { showError('L\'identifiant est requis.'); return; }
+  if (!/^[a-zA-Z0-9._-]+$/.test(profId)) { showError('Identifiant invalide : lettres, chiffres, tirets et points uniquement.'); return; }
+  if (profSecret.length < 6) { showError('Le secret doit faire au moins 6 caractères.'); return; }
+  if (profSecret !== profSecret2) { showError('Les deux secrets ne correspondent pas.'); return; }
+
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true;
+  btn.textContent = 'Création en cours...';
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'register', profId, profSecret, masterSecret })
+    });
+    const data = await res.json();
+    if (!data.success) { showError(data.error || 'Erreur lors de la création du compte.'); return; }
+
+    document.getElementById('result-profid').textContent = data.profId || profId;
+    document.getElementById('result-url').textContent = WORKER_URL;
+    document.getElementById('success-box').classList.add('visible');
+    btn.textContent = 'Compte créé ✓';
+
+    // Pré-remplir le login profid dans prof.html via localStorage
+    try {
+      const cfg = JSON.parse(localStorage.getItem('experia_config') || '{}');
+      cfg.proxy  = WORKER_URL;
+      cfg.profId = data.profId || profId;
+      localStorage.setItem('experia_config', JSON.stringify(cfg));
+    } catch(e) {}
+
+  } catch(e) {
+    showError('Erreur réseau : ' + e.message);
+  } finally {
+    if (btn.textContent !== 'Compte créé ✓') { btn.disabled = false; btn.textContent = 'Créer mon compte'; }
+  }
+}
+
+function copyUrl() {
+  navigator.clipboard.writeText(WORKER_URL).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copié !';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+</script>
+</body>
+</html>
