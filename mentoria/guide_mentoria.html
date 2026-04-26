@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mentoria — Guide complet</title>
+<style>
+  :root {
+    --primary: #0d9488;
+    --primary-light: #ccfbf1;
+    --primary-dark: #0f766e;
+    --success: #16a34a;
+    --warning: #d97706;
+    --bg: #f0faf8;
+    --card: #fff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* ── Navigation ── */
+  .nav {
+    position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
+    background: var(--card); border-right: 1px solid var(--border);
+    overflow-y: auto; z-index: 100; padding: 1.5rem 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: .6rem;
+    padding: 0 1.25rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem;
+  }
+  .nav-logo-icon {
+    width: 2rem; height: 2rem; background: var(--primary); border-radius: .5rem;
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: .9rem;
+  }
+  .nav-section { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: .75rem 1.25rem .25rem; }
+  .nav a {
+    display: block; padding: .45rem 1.25rem; font-size: .875rem; color: var(--text);
+    text-decoration: none; border-left: 3px solid transparent; transition: all .15s;
+  }
+  .nav a:hover { background: var(--bg); color: var(--primary); }
+  .nav a.active { background: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+
+  /* ── Contenu ── */
+  .main { margin-left: 260px; padding: 2rem 3rem; max-width: 960px; }
+
+  /* ── Page de garde ── */
+  .cover {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0d9488 0%, #0891b2 50%, #1d4ed8 100%);
+    margin-left: -3rem; margin-right: -3rem; margin-top: -2rem; padding: 4rem 3rem;
+    color: #fff; text-align: center;
+  }
+  .cover-inner { max-width: 640px; }
+  .cover-icon {
+    width: 5rem; height: 5rem; background: rgba(255,255,255,.2); border-radius: 1.25rem;
+    display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
+    margin: 0 auto 2rem; backdrop-filter: blur(10px);
+  }
+  .cover h1 { font-size: 3rem; font-weight: 900; margin-bottom: .5rem; }
+  .cover .tagline { font-size: 1.25rem; opacity: .85; margin-bottom: 2.5rem; }
+  .cover-badges { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+  .badge {
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 2rem; padding: .35rem .9rem; font-size: .8rem; font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+  .cover-toc {
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 1rem; padding: 1.5rem 2rem; text-align: left; backdrop-filter: blur(10px);
+  }
+  .cover-toc h3 { font-size: .875rem; text-transform: uppercase; letter-spacing: .08em; opacity: .7; margin-bottom: 1rem; }
+  .cover-toc a { display: block; color: #fff; text-decoration: none; padding: .3rem 0; font-size: .95rem; opacity: .9; }
+  .cover-toc a:hover { opacity: 1; }
+  .cover-toc .toc-num { display: inline-block; width: 1.5rem; opacity: .6; }
+
+  /* ── Sections ── */
+  section { padding: 3rem 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: var(--primary-light); color: var(--primary);
+    font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    padding: .25rem .75rem; border-radius: 2rem; margin-bottom: 1rem;
+  }
+  h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: .5rem; }
+  h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .75rem; margin-top: 1.75rem; }
+  h4 { font-size: .9rem; font-weight: 700; margin-bottom: .5rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  p { line-height: 1.7; color: var(--muted); margin-bottom: 1rem; }
+  p strong { color: var(--text); }
+
+  /* ── Étapes ── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 1.25rem; margin-bottom: 1.75rem;
+    background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem;
+  }
+  .step-num {
+    flex-shrink: 0; width: 2rem; height: 2rem; background: var(--primary); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: .875rem; counter-increment: step;
+  }
+  .step-body { flex: 1; }
+  .step-body h4 { color: var(--text); margin-bottom: .4rem; font-size: .95rem; text-transform: none; letter-spacing: 0; }
+  .step-body p { margin-bottom: 0; font-size: .9rem; }
+
+  /* ── Cartes info ── */
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+  .info-card { background: var(--card); border: 1px solid var(--border); border-radius: .75rem; padding: 1.25rem; }
+  .info-card .icon { font-size: 1.5rem; margin-bottom: .5rem; }
+  .info-card h4 { color: var(--text); text-transform: none; letter-spacing: 0; font-size: .95rem; margin-bottom: .25rem; }
+  .info-card p { font-size: .85rem; margin-bottom: 0; }
+
+  /* ── Stockage modes ── */
+  .storage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+  .storage-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: 1rem; padding: 1.25rem;
+    text-align: center; transition: border-color .2s;
+  }
+  .storage-card.recommended { border-color: var(--primary); }
+  .storage-card .storage-icon { font-size: 2rem; margin-bottom: .5rem; }
+  .storage-card h4 { color: var(--text); text-transform: none; letter-spacing: 0; font-size: 1rem; margin-bottom: .25rem; }
+  .storage-card p { font-size: .82rem; margin-bottom: .5rem; }
+  .storage-badge { font-size: .7rem; font-weight: 700; text-transform: uppercase; padding: .2rem .6rem; border-radius: 2rem; }
+  .badge-recommended { background: var(--primary-light); color: var(--primary); }
+  .badge-advanced { background: #fef3c7; color: #92400e; }
+  .badge-local { background: #f3f4f6; color: var(--muted); }
+
+  /* ── Alertes ── */
+  .alert { border-radius: .75rem; padding: 1rem 1.25rem; margin: 1rem 0; font-size: .9rem; line-height: 1.6; }
+  .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+  .alert-success { background: #f0fdf4; border: 1px solid #86efac; color: #15803d; }
+  .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+  .alert-teal { background: var(--primary-light); border: 1px solid #99f6e4; color: #0f766e; }
+  .alert strong { font-weight: 700; }
+
+  /* ── Code ── */
+  .code-block {
+    background: var(--code-bg); color: var(--code-text); border-radius: .75rem;
+    padding: 1.25rem; font-family: 'Courier New', monospace; font-size: .85rem;
+    line-height: 1.6; overflow-x: auto; margin: 1rem 0;
+  }
+  .code-block .comment { color: #94a3b8; }
+  .code-block .key { color: #7dd3fc; }
+  .code-block .value { color: #86efac; }
+  .code-block .string { color: #fda4af; }
+
+  /* ── Tableau ── */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .875rem; }
+  th { background: var(--bg); text-align: left; padding: .6rem 1rem; font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border: 1px solid var(--border); }
+  td { padding: .6rem 1rem; border: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  td code { background: var(--bg); padding: .15rem .4rem; border-radius: .3rem; font-family: monospace; font-size: .85rem; }
+  tr:hover td { background: var(--bg); }
+
+  /* ── Architecture ── */
+  .arch-diagram {
+    background: var(--card); border: 1px solid var(--border); border-radius: 1rem;
+    padding: 2rem; margin: 1.25rem 0; text-align: center;
+  }
+  .arch-row { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: .5rem 0; flex-wrap: wrap; }
+  .arch-box {
+    background: var(--primary-light); border: 2px solid var(--primary); color: var(--primary);
+    border-radius: .6rem; padding: .5rem 1.25rem; font-size: .85rem; font-weight: 700;
+  }
+  .arch-box.green { background: #f0fdf4; border-color: #16a34a; color: #15803d; }
+  .arch-box.orange { background: #fffbeb; border-color: #d97706; color: #92400e; }
+  .arch-box.blue { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+  .arch-arrow { color: var(--muted); font-size: 1.2rem; }
+  .arch-label { font-size: .75rem; color: var(--muted); margin-top: .25rem; }
+
+  /* ── Print ── */
+  @media print {
+    .nav { display: none; }
+    .main { margin-left: 0; padding: 1rem 2rem; }
+    .cover { min-height: auto; padding: 3rem; }
+    section { page-break-inside: avoid; }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .nav { display: none; }
+    .main { margin-left: 0; padding: 1.5rem; }
+    .cover { margin: -1.5rem -1.5rem 0; }
+    h2 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation latérale -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🧑‍🏫</div>
+    <div>
+      <div style="font-weight:800;font-size:.95rem;">Mentoria</div>
+      <div style="font-size:.7rem;color:var(--muted);">Guide complet</div>
+    </div>
+  </div>
+
+  <div class="nav-section">Présentation</div>
+  <a href="#presentation" onclick="setActive(this)">Qu'est-ce que Mentoria ?</a>
+  <a href="#architecture" onclick="setActive(this)">Comment ça fonctionne</a>
+
+  <div class="nav-section">Guide Professeur</div>
+  <a href="#studio" onclick="setActive(this)">1. Accéder au Studio</a>
+  <a href="#stockage" onclick="setActive(this)">2. Choisir le stockage</a>
+  <a href="#creer" onclick="setActive(this)">3. Créer un assistant</a>
+  <a href="#publier" onclick="setActive(this)">4. Publier le lien élève</a>
+  <a href="#suivi" onclick="setActive(this)">5. Suivre les élèves</a>
+  <a href="#gerer" onclick="setActive(this)">6. Gérer les assistants</a>
+
+  <div class="nav-section">Notice Technique</div>
+  <a href="#worker" onclick="setActive(this)">Déploiement Worker</a>
+  <a href="#n8n" onclick="setActive(this)">Workflows n8n</a>
+  <a href="#nuage-tech" onclick="setActive(this)">Stockage Nuage</a>
+  <a href="#donnees" onclick="setActive(this)">Structure des données</a>
+  <a href="#maintenance" onclick="setActive(this)">Maintenance</a>
+  <a href="#rgpd" onclick="setActive(this)">Conformité RGPD</a>
+</nav>
+
+<!-- Contenu principal -->
+<main class="main">
+
+  <!-- ── PAGE DE GARDE ── -->
+  <div class="cover" id="cover">
+    <div class="cover-inner">
+      <div class="cover-icon">🧑‍🏫</div>
+      <h1>Mentoria</h1>
+      <p class="tagline">Créez des assistants IA pédagogiques souverains pour vos élèves — simple, éthique, 100 % français</p>
+      <div class="cover-badges">
+        <span class="badge">Souverain RGPD</span>
+        <span class="badge">Nuage apps.education.fr</span>
+        <span class="badge">Albert IA française</span>
+        <span class="badge">Zéro installation élève</span>
+        <span class="badge">Suivi pédagogique</span>
+      </div>
+      <div class="cover-toc">
+        <h3>Sommaire</h3>
+        <a href="#presentation"><span class="toc-num">01</span> Qu'est-ce que Mentoria ?</a>
+        <a href="#architecture"><span class="toc-num">02</span> Comment ça fonctionne</a>
+        <a href="#studio"><span class="toc-num">03</span> Guide professeur pas à pas</a>
+        <a href="#worker"><span class="toc-num">04</span> Notice technique</a>
+        <a href="#rgpd"><span class="toc-num">05</span> Conformité RGPD</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRÉSENTATION ── -->
+  <section id="presentation">
+    <div class="section-label">Présentation</div>
+    <h2>Qu'est-ce que Mentoria ?</h2>
+    <p>Mentoria est un studio de création d'<strong>assistants IA pédagogiques personnalisés</strong>. En quelques minutes, un professeur configure un assistant sur mesure pour sa classe — avec ses propres instructions, son corpus documentaire et ses règles pédagogiques. L'élève y accède via un simple lien, sans compte, sans application.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">🛠️</div>
+        <h4>Le Studio (prof)</h4>
+        <p>Interface de création : titre, personnalité, corpus, règles, avatar. Sauvegarde dans votre espace Nuage personnel.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">💬</div>
+        <h4>Le Compagnon (élève)</h4>
+        <p>Interface de chat fluide — accès via un lien ou QR Code. Aucun compte, aucune installation. Fonctionne sur mobile.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🤖</div>
+        <h4>L'IA Albert</h4>
+        <p>Chaque échange passe par Albert, l'IA souveraine française hébergée par l'État (Etalab / DINUM). Aucune donnée envoyée hors UE.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">📊</div>
+        <h4>Suivi pédagogique</h4>
+        <p>Le prof voit les échanges de ses élèves, peut exclure un élève, et supprime les logs à tout moment. Rétention 7 jours.</p>
+      </div>
+    </div>
+
+    <div class="alert alert-teal">
+      <strong>Pour commencer, vous avez besoin de :</strong><br>
+      • Un compte <strong>Nuage apps.education.fr</strong> (fourni avec votre ENT académique)<br>
+      • Un <strong>mot de passe d'application</strong> créé dans Nuage (différent de votre mot de passe habituel)<br>
+      • Une <strong>clé Albert API</strong> (créée sur <a href="https://albert.api.etalab.gouv.fr" style="color:var(--primary);">albert.api.etalab.gouv.fr</a>)<br>
+      • Le <strong>lien vers le Studio</strong> fourni par votre référent numérique
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Différence avec Experia :</strong> dans Experia, le prof crée des évaluations avec des activités structurées (QCM, questions ouvertes…). Dans Mentoria, le prof crée un <em>assistant conversationnel</em> — l'élève dialogue librement avec l'IA autour d'un sujet ou d'un corpus de documents.
+    </div>
+  </section>
+
+  <!-- ── ARCHITECTURE ── -->
+  <section id="architecture">
+    <div class="section-label">Fonctionnement</div>
+    <h2>Comment ça fonctionne</h2>
+    <p>Mentoria repose sur trois briques souveraines : le stockage dans <strong>Nuage apps.education.fr</strong> (WebDAV), l'IA <strong>Albert</strong> (DINUM), et un proxy léger (<strong>Cloudflare Worker</strong>) pour les appels IA. Aucune donnée ne passe par des services commerciaux.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-row">
+        <div>
+          <div class="arch-box">Studio (index.html)</div>
+          <div class="arch-label">Navigateur prof</div>
+        </div>
+        <div class="arch-arrow">⟷</div>
+        <div>
+          <div class="arch-box orange">n8n proxy (stockage)</div>
+          <div class="arch-label">Relay WebDAV</div>
+        </div>
+        <div class="arch-arrow">⟷</div>
+        <div>
+          <div class="arch-box green">Nuage WebDAV</div>
+          <div class="arch-label">Stockage des bots & logs</div>
+        </div>
+      </div>
+      <div style="margin:1.25rem 0;color:var(--muted);font-size:.85rem;">↕ lien publié (config encodée dans l'URL)</div>
+      <div class="arch-row">
+        <div>
+          <div class="arch-box blue">Compagnon (compagnion.html)</div>
+          <div class="arch-label">Navigateur élève</div>
+        </div>
+        <div class="arch-arrow">⟷</div>
+        <div>
+          <div class="arch-box orange">Worker Cloudflare</div>
+          <div class="arch-label">Proxy CORS</div>
+        </div>
+        <div class="arch-arrow">⟷</div>
+        <div>
+          <div class="arch-box green">Albert API</div>
+          <div class="arch-label">IA souveraine française</div>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Composant</th><th>Rôle</th><th>Hébergement</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>index.html</code></td><td>Studio de création des assistants (prof)</td><td>Firebase / Forge GitLab</td></tr>
+        <tr><td><code>compagnion.html</code></td><td>Interface de chat pour les élèves</td><td>Firebase / Forge GitLab</td></tr>
+        <tr><td>n8n (mentoria_storage)</td><td>Proxy WebDAV pour lecture/écriture dans Nuage</td><td>n8n.incubateur.education.gouv.fr</td></tr>
+        <tr><td>Worker Cloudflare</td><td>Proxy CORS pour les appels IA Albert</td><td>mentoria-proxy.gilles-cormi.workers.dev</td></tr>
+        <tr><td>Nuage apps.education.fr</td><td>Stockage des bots, logs élèves, liste de bannissement</td><td>Compte personnel du prof</td></tr>
+        <tr><td>Albert API</td><td>IA conversationnelle souveraine</td><td>albert.api.etalab.gouv.fr (DINUM)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <strong>Particularité clé :</strong> chaque prof stocke ses données dans <em>son propre</em> espace Nuage. Il n'y a pas de base de données centrale — le référent Mentoria n'a accès à rien. Chaque enseignant est autonome et propriétaire de ses données.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- GUIDE PROFESSEUR                                       -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <section id="studio">
+    <div class="section-label">Guide Professeur — Étape 1</div>
+    <h2>Accéder au Studio</h2>
+    <p>Le Studio Mentoria est une page web — <strong>aucune installation</strong>. Votre référent numérique vous communique le lien. Mettez-le en favori pour y revenir facilement.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Ouvrez le lien Studio transmis par votre référent</h4>
+          <p>Le Studio s'ouvre dans votre navigateur habituel. Chrome ou Edge sont recommandés pour bénéficier de toutes les fonctionnalités (notamment le mode USB).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Choisissez votre mode de stockage</h4>
+          <p>Un écran de démarrage vous propose trois modes. Le mode <strong>Nuage</strong> est recommandé pour une utilisation en classe (voir étape suivante).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Entrez vos identifiants et cliquez "Connexion"</h4>
+          <p>Après connexion, votre bibliothèque d'assistants s'affiche dans la barre de gauche. Si c'est votre première connexion, elle est vide — normal.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Vos identifiants ne sont jamais envoyés à un serveur central.</strong> Ils restent dans votre navigateur et servent uniquement à accéder à votre propre espace Nuage. À chaque session, vous devrez les re-saisir (mesure de sécurité intentionnelle).
+    </div>
+  </section>
+
+  <section id="stockage">
+    <div class="section-label">Guide Professeur — Étape 2</div>
+    <h2>Choisir le mode de stockage</h2>
+    <p>Mentoria propose trois façons de stocker vos assistants. Le choix se fait à la connexion et peut être changé en relançant le Studio.</p>
+
+    <div class="storage-grid">
+      <div class="storage-card recommended">
+        <div class="storage-icon">☁️</div>
+        <h4>Nuage apps.education.fr</h4>
+        <p>Stockage dans votre espace académique. Accès depuis n'importe quel appareil. Logs élèves inclus.</p>
+        <span class="storage-badge badge-recommended">Recommandé</span>
+      </div>
+      <div class="storage-card">
+        <div class="storage-icon">💾</div>
+        <h4>USB / Dossier local</h4>
+        <p>Stockage sur votre poste ou clé USB. Fonctionne sans réseau. Chrome et Edge uniquement.</p>
+        <span class="storage-badge badge-local">Hors ligne</span>
+      </div>
+      <div class="storage-card">
+        <div class="storage-icon">🦊</div>
+        <h4>La Forge (GitLab EN)</h4>
+        <p>Stockage dans un dépôt GitLab académique. Mode avancé — nécessite un token d'accès.</p>
+        <span class="storage-badge badge-advanced">Avancé</span>
+      </div>
+    </div>
+
+    <h3>Mode Nuage — prérequis</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Créer un mot de passe d'application dans Nuage</h4>
+          <p>Connectez-vous sur <strong>nuage.apps.education.fr</strong> → cliquez sur votre avatar (en haut à droite) → Paramètres → Sécurité → Créer un nouveau mot de passe d'application. Donnez-lui le nom "Mentoria" et notez le mot de passe généré.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Créer un dossier "mentoria" dans Nuage</h4>
+          <p>Dans l'interface Nuage, créez un dossier nommé exactement <code>mentoria</code> à la racine de votre espace. Mentoria y stockera tous vos assistants et logs automatiquement.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Dans le Studio : entrez votre identifiant ENT et le mot de passe d'application</h4>
+          <p>Utilisez votre identifiant ENT habituel (ex : <code>p.dupont</code>), mais le mot de passe est celui créé à l'étape 1 — pas votre mot de passe ENT habituel.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Mode USB :</strong> sélectionnez un dossier sur votre poste ou clé USB. Mentoria y crée les fichiers bots directement. Attention — ce dossier doit être re-sélectionné à chaque session (contrainte de sécurité du navigateur). Ne fonctionne pas avec Firefox ou Safari.
+    </div>
+  </section>
+
+  <section id="creer">
+    <div class="section-label">Guide Professeur — Étape 3</div>
+    <h2>Créer un assistant</h2>
+    <p>Un assistant Mentoria, c'est une personnalité IA construite autour de vos besoins pédagogiques. Il peut avoir un nom, un avatar, un domaine d'expertise, des règles de comportement et un corpus de documents.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Cliquez "+ Nouvel assistant" dans la barre de gauche</h4>
+          <p>Un panneau de configuration s'ouvre au centre. Il est divisé en trois sections dépliables.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Section 1 — Identité & Présentation</h4>
+          <p>Renseignez : le <strong>titre</strong> (visible dans la liste), le <strong>nom</strong> de l'assistant (celui que l'élève voit), le <strong>message d'accueil</strong>, l'<strong>âge cible</strong> (ex : "12-14 ans"), le <strong>thème ou matière</strong>, et optionnellement un <strong>avatar</strong> (image importée, max 128×128 px).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Section 2 — Pédagogie & Corpus</h4>
+          <p>C'est le cœur de l'assistant. Rédigez les <strong>instructions IA</strong> (ex : "Tu es un professeur de mathématiques bienveillant…"). Cochez les <strong>règles pédagogiques</strong> prédéfinies (réponses concises, guidage socratique…). Collez votre <strong>corpus documentaire</strong> (textes de cours, extraits, fiches…). L'IA s'appuiera dessus pour répondre.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Configurer les boutons de réponse rapide (optionnel)</h4>
+          <p>Ces boutons apparaissent sous la zone de chat de l'élève. Chaque bouton déclenche une demande ponctuelle prédéfinie (ex : "Expliquer ce concept autrement", "Donner un exemple"). Très utile pour guider les élèves moins à l'aise.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Section 3 — Sécurité & API</h4>
+          <p>Entrez votre <strong>clé Albert API</strong> (commence par <code>eyJ…</code>). Si vous activez le <strong>suivi pédagogique</strong>, renseignez également votre identifiant Nuage, le mot de passe d'application et un identifiant de classe (ex : <code>3eA</code>).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-teal">
+      <strong>Poids de l'assistant :</strong> un indicateur en temps réel affiche le poids total du bot (corpus + avatar). Restez en dessous de 300 Ko pour que le lien élève reste confortable. Un corpus trop long allonge aussi le temps de réponse de l'IA.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Thème strict :</strong> si vous activez l'option "Thème strict", l'assistant refusera de répondre à toute question hors du sujet défini. Pratique pour les évaluations — moins adapté à un usage d'accompagnement ouvert.
+    </div>
+  </section>
+
+  <section id="publier">
+    <div class="section-label">Guide Professeur — Étape 4</div>
+    <h2>Publier le lien élève</h2>
+    <p>Une fois votre assistant configuré et sauvegardé, vous pouvez générer un <strong>lien élève</strong>. Ce lien contient toute la configuration de l'assistant encodée — l'élève n'a besoin de rien d'autre.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Sauvegardez d'abord l'assistant</h4>
+          <p>Cliquez le bouton <strong>"Sauvegarder"</strong>. L'assistant est écrit dans votre espace Nuage (ou USB). Un indicateur de synchronisation confirme la sauvegarde.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Cliquez "Publier"</h4>
+          <p>Un lien est généré — c'est l'URL de la page <code>compagnion.html</code> avec la configuration de votre assistant encodée dans l'adresse.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Copiez et partagez le lien</h4>
+          <p>Envoyez-le par ENT, Pronote, e-mail ou affichez le QR Code généré en classe. L'élève clique — aucun compte à créer, aucune installation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>L'élève entre son identifiant ENT</h4>
+          <p>À l'ouverture du Compagnon, l'élève saisit son identifiant ENT (ou pseudonyme selon votre consigne). Cet identifiant sert à retrouver son historique de conversation et pour le suivi pédagogique.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Le lien est auto-suffisant :</strong> toute la configuration de l'assistant (instructions, corpus, règles…) est encodée dans l'URL elle-même. Si votre Nuage est indisponible, le lien fonctionne quand même pour les élèves (mais le suivi pédagogique est désactivé).
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Lien long :</strong> si votre corpus est très volumineux ou si votre avatar est en haute résolution, l'URL peut devenir très longue. Mentoria compresse automatiquement la configuration, mais restez raisonnable. En cas d'URL trop longue, réduisez le corpus ou utilisez un avatar plus petit.
+    </div>
+
+    <h3>Ce que voit l'élève</h3>
+    <p>L'élève arrive sur une page claire avec le nom et l'avatar de l'assistant, un message d'accueil, et un champ pour entrer son identifiant. Ensuite, il accède à une interface de chat fluide — il peut poser des questions, utiliser les boutons de réponse rapide, et récupérer l'historique de sa session précédente.</p>
+
+    <div class="alert alert-teal">
+      <strong>Reprise de session :</strong> si un élève revient sur le même lien avec le même identifiant, ses 40 derniers échanges sont rechargés automatiquement. Il reprend là où il s'était arrêté.
+    </div>
+  </section>
+
+  <section id="suivi">
+    <div class="section-label">Guide Professeur — Étape 5</div>
+    <h2>Suivre les élèves</h2>
+    <p>Le panneau de <strong>Suivi pédagogique</strong> vous permet de consulter les échanges de vos élèves avec l'assistant, de modérer, et de purger les données.</p>
+
+    <div class="alert alert-warning">
+      <strong>Prérequis :</strong> le suivi n'est disponible que si vous avez activé la <strong>configuration de suivi</strong> dans la section "Sécurité & API" de l'assistant (identifiant Nuage + mot de passe app + identifiant de classe).
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Cliquez "Suivi" dans le Studio</h4>
+          <p>Un panneau s'ouvre (déplaçable et redimensionnable). Il liste tous les élèves qui ont interagi avec cet assistant pour la classe configurée.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Consultez les échanges par élève</h4>
+          <p>Cliquez sur un identifiant élève pour voir l'historique complet de sa conversation — questions posées, réponses de l'IA, durée, nombre de messages.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Exclure un élève (bannissement)</h4>
+          <p>Si un élève détourne l'assistant, cliquez "Bannir". La prochaine fois qu'il tentera de se connecter avec son identifiant, l'accès sera refusé. Le bannissement est réversible.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Supprimer les logs d'une classe</h4>
+          <p>En bas du panneau, un bouton permet de supprimer tous les logs de la classe pour cet assistant. Utile entre deux groupes ou en fin d'année.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>Rétention automatique :</strong> les logs sont automatiquement supprimés après 7 jours. Cette règle s'applique message par message — un échange de 6 jours reste visible, un échange de 8 jours disparaît. Aucune action manuelle requise.
+    </div>
+
+    <div class="alert alert-info">
+      <strong>RGPD :</strong> informez vos élèves que leurs échanges sont visibles par leur professeur pendant 7 jours. Ce message est affiché automatiquement sur la page d'accueil du Compagnon.
+    </div>
+  </section>
+
+  <section id="gerer">
+    <div class="section-label">Guide Professeur — Étape 6</div>
+    <h2>Gérer les assistants</h2>
+    <p>Tous vos assistants sont listés dans la barre de gauche du Studio. Vous pouvez en créer autant que nécessaire — un par matière, par niveau, par séquence pédagogique.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Cliquer sur un assistant pour le modifier</h4>
+          <p>La configuration se recharge dans le panneau central. Modifiez ce que vous souhaitez et sauvegardez.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Exporter un assistant (JSON)</h4>
+          <p>Le bouton "Exporter JSON" télécharge la configuration complète de l'assistant sélectionné. Utile pour sauvegarder, partager avec un collègue, ou réimporter plus tard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Importer un assistant (JSON)</h4>
+          <p>Le bouton "Importer JSON" charge un assistant depuis un fichier exporté (le vôtre ou celui d'un collègue). Il apparaît dans votre bibliothèque avec un nouvel identifiant.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Supprimer un assistant</h4>
+          <p>Une icône de suppression est disponible sur chaque assistant dans la liste. La suppression retire le fichier de votre Nuage (ou USB) et met à jour le manifeste.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-teal">
+      <strong>Partage entre collègues :</strong> exportez un assistant en JSON et envoyez le fichier à un collègue. Il l'importe dans son propre Studio. Chacun peut ensuite le personnaliser indépendamment — aucune dépendance entre les comptes.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- NOTICE TECHNIQUE                                       -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <section id="worker">
+    <div class="section-label">Notice Technique</div>
+    <h2>Déploiement du Worker Cloudflare</h2>
+    <p>Le Worker Cloudflare est un <strong>proxy CORS léger</strong> — il ne stocke rien, ne logge rien. Son unique rôle est de permettre aux navigateurs des élèves d'appeler l'API Albert sans blocage CORS.</p>
+
+    <h3>Créer le Worker</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>dash.cloudflare.com → Compute → Workers & Pages → Create</h4>
+          <p>Choisissez "Create Worker", nommez-le <code>mentoria-proxy</code>, cliquez "Deploy".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Coller le code de worker.js</h4>
+          <p>Cliquez "Edit code", sélectionnez tout (Ctrl+A), collez le contenu du fichier <code>worker.js</code>, puis cliquez "Deploy".</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+<span class="comment">// URL du Worker après déploiement</span>
+<span class="key">https://</span><span class="string">mentoria-proxy.gilles-cormi.workers.dev</span>
+
+<span class="comment">// Cette URL est codée en dur dans compagnion.html</span>
+<span class="comment">// Si vous créez votre propre Worker, mettez à jour cette valeur</span>
+    </div>
+
+    <h3>Ce que fait le Worker</h3>
+    <p>Le Worker reçoit les requêtes de <code>compagnion.html</code> avec la clé Albert du prof encodée, puis les transmet à <code>albert.api.etalab.gouv.fr</code>. Il ajoute les en-têtes CORS nécessaires pour que les navigateurs acceptent la réponse.</p>
+
+    <div class="alert alert-success">
+      <strong>Plan gratuit Cloudflare :</strong> 100 000 requêtes/jour. Chaque échange élève = 1 requête. Largement suffisant pour une phase test avec 20-30 profs et des classes de 30 élèves.
+    </div>
+
+    <h3>Mettre à jour le Worker</h3>
+    <p>Workers & Pages → mentoria-proxy → Edit code → Ctrl+A → Coller le nouveau <code>worker.js</code> → Deploy. Les sessions en cours ne sont pas interrompues.</p>
+  </section>
+
+  <section id="n8n">
+    <div class="section-label">Notice Technique</div>
+    <h2>Workflows n8n</h2>
+    <p>Le workflow <code>mentoria_storage</code> est le proxy entre le Studio et le stockage WebDAV de Nuage. Il gère toutes les opérations : lire, écrire, supprimer des fichiers bots, et gérer les logs élèves.</p>
+
+    <h3>Importer le workflow dans n8n</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Connexion à n8n.incubateur.education.gouv.fr</h4>
+          <p>Demandez un accès à l'équipe n8n de l'incubateur, ou déployez votre propre instance n8n.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Importer mentoria_storage.json</h4>
+          <p>Dans n8n : menu hamburger → Import workflow → sélectionner le fichier <code>mentoria_storage.json</code>. Le workflow apparaît dans votre espace.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Activer le webhook</h4>
+          <p>Cliquez sur le nœud "Webhook" dans le workflow → copiez l'URL de production. C'est cette URL qui doit être renseignée dans <code>index.html</code> comme <code>STORAGE_PROXY_URL</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Actions gérées par le workflow</h3>
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Description</th><th>Fichier touché dans Nuage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>test</code></td><td>Vérifie les identifiants Nuage</td><td>—</td></tr>
+        <tr><td><code>list</code></td><td>Liste tous les bots du prof</td><td><code>manifest.json</code></td></tr>
+        <tr><td><code>read</code></td><td>Lit un bot complet</td><td><code>bot_TIMESTAMP.json</code></td></tr>
+        <tr><td><code>write</code></td><td>Crée ou met à jour un bot + manifeste</td><td><code>bot_TIMESTAMP.json</code> + <code>manifest.json</code></td></tr>
+        <tr><td><code>delete</code></td><td>Supprime un bot + met à jour le manifeste</td><td><code>bot_TIMESTAMP.json</code> + <code>manifest.json</code></td></tr>
+        <tr><td><code>log_message</code></td><td>Enregistre un échange élève</td><td><code>log_BOTID_CLASSE_ELEVE.json</code></td></tr>
+        <tr><td><code>get_logs</code></td><td>Liste les élèves d'une classe pour un bot</td><td><code>sessions_BOTID_CLASSE.json</code></td></tr>
+        <tr><td><code>get_student_log</code></td><td>Récupère l'historique d'un élève</td><td><code>log_BOTID_CLASSE_ELEVE.json</code></td></tr>
+        <tr><td><code>delete_logs</code></td><td>Supprime les logs (sélectif ou en masse)</td><td><code>log_*.json</code> + <code>sessions_*.json</code></td></tr>
+        <tr><td><code>check_banned</code></td><td>Vérifie si un élève est banni</td><td><code>banned.json</code></td></tr>
+        <tr><td><code>ban_student</code></td><td>Ajoute un élève à la liste de bannissement</td><td><code>banned.json</code></td></tr>
+        <tr><td><code>unban_student</code></td><td>Retire un élève de la liste de bannissement</td><td><code>banned.json</code></td></tr>
+        <tr><td><code>fetch_url</code></td><td>Télécharge et extrait le texte d'une URL</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <strong>Authentification WebDAV :</strong> chaque requête vers n8n inclut l'identifiant et le mot de passe d'application Nuage du prof. n8n les utilise pour faire les opérations WebDAV sur le compte du prof. n8n ne stocke pas ces identifiants — ils sont envoyés à chaque requête depuis le navigateur.
+    </div>
+  </section>
+
+  <section id="nuage-tech">
+    <div class="section-label">Notice Technique</div>
+    <h2>Stockage Nuage (WebDAV)</h2>
+    <p>Tous les fichiers d'un prof sont stockés dans son espace Nuage sous <code>/mentoria/</code>. Le référent Mentoria n'a aucun accès à ces fichiers — chaque prof est propriétaire de ses données.</p>
+
+    <h3>Structure du dossier Nuage</h3>
+    <div class="code-block">
+<span class="comment"># Espace Nuage du prof p.dupont</span>
+<span class="key">nuage.apps.education.fr/files/p.dupont/mentoria/</span>
+├── <span class="string">manifest.json</span>              <span class="comment">← liste de tous les bots</span>
+├── <span class="string">bot_1713281234567.json</span>     <span class="comment">← un assistant complet</span>
+├── <span class="string">bot_1713295810234.json</span>     <span class="comment">← un autre assistant</span>
+├── <span class="string">banned.json</span>                <span class="comment">← liste élèves bannis (tous bots)</span>
+├── <span class="string">sessions_BOTID_3eA.json</span>    <span class="comment">← index des élèves de la classe 3eA</span>
+└── <span class="string">log_BOTID_3eA_p.martin.json</span> <span class="comment">← historique d'un élève</span>
+    </div>
+
+    <h3>Mot de passe d'application Nuage</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Nuage → Avatar → Paramètres → Sécurité</h4>
+          <p>Section "Mots de passe d'application" → cliquez "Créer un nouveau mot de passe d'application".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Donnez-lui un nom (ex : "Mentoria") et validez</h4>
+          <p>Un mot de passe de 20 caractères est généré. <strong>Copiez-le immédiatement</strong> — il n'est affiché qu'une fois. C'est ce mot de passe qui est utilisé dans le Studio (pas votre mot de passe ENT habituel).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>En cas de perte du mot de passe d'application :</strong> supprimez-le dans Nuage et créez-en un nouveau. Les fichiers bots existants ne sont pas affectés. Mettez à jour le mot de passe dans le Studio Mentoria.
+    </div>
+  </section>
+
+  <section id="donnees">
+    <div class="section-label">Notice Technique</div>
+    <h2>Structure des données</h2>
+
+    <h3>Structure d'un fichier bot (bot_TIMESTAMP.json)</h3>
+    <div class="code-block">
+{
+  <span class="key">"id"</span>: <span class="string">"bot_1713281234567"</span>,
+  <span class="key">"updatedAt"</span>: <span class="string">"2026-04-16T15:00:00.000Z"</span>,
+  <span class="key">"config"</span>: {
+    <span class="key">"title"</span>: <span class="string">"Assistant Mathématiques 3e"</span>,
+    <span class="key">"name"</span>: <span class="string">"MathBot"</span>,
+    <span class="key">"welcomeMessage"</span>: <span class="string">"Bonjour ! Je suis là pour vous aider."</span>,
+    <span class="key">"targetAge"</span>: <span class="string">"12-14 ans"</span>,
+    <span class="key">"theme"</span>: <span class="string">"Mathématiques"</span>,
+    <span class="key">"instructions"</span>: <span class="string">"Tu es un professeur de mathématiques bienveillant..."</span>,
+    <span class="key">"pedagogicRules"</span>: [<span class="string">"Fournis des réponses concises"</span>, <span class="string">"..."</span>],
+    <span class="key">"quickReplies"</span>: [{ <span class="key">"label"</span>: <span class="string">"Expliquer autrement"</span>, <span class="key">"prompt"</span>: <span class="string">"..."</span> }],
+    <span class="key">"strictTheme"</span>: <span class="string">"Mathématiques uniquement"</span>
+  },
+  <span class="key">"corpus"</span>: <span class="string">"--- SOURCE: cours.pdf ---\n..."</span>,
+  <span class="key">"apiKey"</span>: <span class="string">"eyJ..."</span>,
+  <span class="key">"vignette"</span>: <span class="string">"data:image/png;base64,..."</span>,
+  <span class="key">"loggingConfig"</span>: {
+    <span class="key">"username"</span>: <span class="string">"p.dupont"</span>,
+    <span class="key">"password"</span>: <span class="string">"app_password_nuage"</span>,
+    <span class="key">"server"</span>: <span class="string">"nuage.apps.education.fr"</span>,
+    <span class="key">"classKey"</span>: <span class="string">"3eA"</span>
+  }
+}
+    </div>
+
+    <h3>Fichiers de logs et sessions</h3>
+    <table>
+      <thead>
+        <tr><th>Fichier</th><th>Contenu</th><th>Écrit par</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>manifest.json</code></td><td>Liste des IDs de bots du prof</td><td>Action <code>write</code> / <code>delete</code></td></tr>
+        <tr><td><code>bot_{timestamp}.json</code></td><td>Configuration complète d'un assistant</td><td>Action <code>write</code></td></tr>
+        <tr><td><code>sessions_{botId}_{classe}.json</code></td><td>Index des élèves ayant interagi (par bot et classe)</td><td>Action <code>log_message</code></td></tr>
+        <tr><td><code>log_{botId}_{classe}_{studentId}.json</code></td><td>Historique complet des échanges d'un élève</td><td>Action <code>log_message</code></td></tr>
+        <tr><td><code>banned.json</code></td><td>Liste des identifiants élèves bannis</td><td>Action <code>ban_student</code> / <code>unban_student</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Format des logs</h3>
+    <div class="code-block">
+<span class="comment">// log_bot_1713281234567_3eA_p.martin.json</span>
+[
+  {
+    <span class="key">"role"</span>: <span class="string">"user"</span>,
+    <span class="key">"content"</span>: <span class="string">"Pouvez-vous m'expliquer le théorème de Pythagore ?"</span>,
+    <span class="key">"timestamp"</span>: <span class="value">1714123456789</span>
+  },
+  {
+    <span class="key">"role"</span>: <span class="string">"assistant"</span>,
+    <span class="key">"content"</span>: <span class="string">"Bien sûr ! Le théorème de Pythagore..."</span>,
+    <span class="key">"timestamp"</span>: <span class="value">1714123460123</span>
+  }
+]
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Purge automatique :</strong> à chaque opération de lecture ou d'écriture de log, les messages de plus de 7 jours sont filtrés et ne sont pas renvoyés. La purge physique des fichiers se fait via l'action <code>delete_logs</code> ou manuellement dans Nuage.
+    </div>
+  </section>
+
+  <section id="maintenance">
+    <div class="section-label">Notice Technique</div>
+    <h2>Maintenance</h2>
+
+    <h3>Mettre à jour les pages HTML (Studio et Compagnon)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Modifier index.html ou compagnion.html dans le dossier de travail</h4>
+          <p>Les fichiers sources sont dans <code>mentoria/</code> (dossier de développement).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Copier vers deploy_site/mentoria/ et lancer firebase deploy</h4>
+          <p>Les commandes à exécuter depuis le dossier <code>frojet/</code> :</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+<span class="comment"># Copier les fichiers mis à jour</span>
+cp mentoria/index.html deploy_site/mentoria/index.html
+cp mentoria/compagnion.html deploy_site/mentoria/compagnion.html
+
+<span class="comment"># Déployer sur Firebase (depuis frojet/)</span>
+firebase deploy
+    </div>
+
+    <h3>Mettre à jour le Worker Cloudflare</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>dash.cloudflare.com → Workers & Pages → mentoria-proxy → Edit code</h4>
+          <p>Ctrl+A → Coller le nouveau <code>worker.js</code> → Deploy. Aucune session en cours n'est interrompue.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Supprimer les données d'un prof (droit à l'effacement)</h3>
+    <p>Demandez au prof de supprimer lui-même le dossier <code>mentoria/</code> dans son espace Nuage, ou d'en supprimer les fichiers individuellement. Vous n'avez pas accès à cet espace en tant que référent.</p>
+
+    <h3>Réinitialiser le mot de passe d'application Nuage d'un prof</h3>
+    <p>Le prof va dans Nuage → Paramètres → Sécurité → Supprime l'ancien mot de passe "Mentoria" → Crée un nouveau → Renseigne le nouveau dans le Studio. Ses fichiers bots ne sont pas affectés.</p>
+
+    <h3>Limites du plan gratuit Cloudflare</h3>
+    <table>
+      <thead>
+        <tr><th>Ressource</th><th>Limite gratuite</th><th>Estimation Mentoria</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Requêtes Worker / jour</td><td>100 000</td><td>1 req/message élève → suffisant pour 3 000 messages/jour</td></tr>
+        <tr><td>CPU par requête</td><td>10 ms</td><td>Proxy simple — largement en dessous</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="rgpd">
+    <div class="section-label">Notice Technique</div>
+    <h2>Conformité RGPD</h2>
+    <p>Mentoria a été conçu avec la souveraineté des données comme contrainte principale. L'architecture "stockage chez le prof" élimine toute base de données centrale.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="icon">🏠</div>
+        <h4>Données chez le prof</h4>
+        <p>Chaque prof stocke ses bots et les logs de ses élèves dans <em>son propre</em> espace Nuage. Le référent Mentoria n'a aucun accès à ces données.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">👤</div>
+        <h4>Élèves pseudonymes</h4>
+        <p>L'élève entre son identifiant ENT ou un pseudonyme — aucun e-mail, aucune donnée biographique. Le prof voit cet identifiant, pas une identité complète.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🕐</div>
+        <h4>Logs limités à 7 jours</h4>
+        <p>Les échanges élèves sont automatiquement filtrés après 7 jours. Le prof peut aussi supprimer manuellement à tout moment.</p>
+      </div>
+      <div class="info-card">
+        <div class="icon">🇫🇷</div>
+        <h4>IA souveraine</h4>
+        <p>Albert API est hébergée par le DINUM (État français). Les réponses des élèves n'alimentent pas des modèles commerciaux étrangers.</p>
+      </div>
+    </div>
+
+    <h3>Ce qui est stocké et où</h3>
+    <table>
+      <thead>
+        <tr><th>Donnée</th><th>Stockée ?</th><th>Où</th><th>Qui peut y accéder</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mot de passe ENT du prof</td><td>❌ Non</td><td>—</td><td>—</td></tr>
+        <tr><td>Clé Albert du prof</td><td>✅ Dans le bot JSON</td><td>Nuage du prof</td><td>Le prof uniquement</td></tr>
+        <tr><td>Mot de passe app Nuage</td><td>✅ Dans le bot JSON (loggingConfig)</td><td>Nuage du prof</td><td>Le prof uniquement</td></tr>
+        <tr><td>Configuration des bots</td><td>✅ Oui</td><td>Nuage du prof</td><td>Le prof uniquement</td></tr>
+        <tr><td>Échanges élèves (logs)</td><td>✅ Oui, 7 jours</td><td>Nuage du prof</td><td>Le prof (pour suivi pédagogique)</td></tr>
+        <tr><td>Identité réelle des élèves</td><td>❌ Non</td><td>—</td><td>—</td></tr>
+        <tr><td>Données dans un serveur central</td><td>❌ Non</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Transparence vis-à-vis des élèves</h3>
+    <p>La page d'accueil du Compagnon affiche automatiquement ce message aux élèves : <em>"Vos échanges sont visibles par votre enseignant pendant 7 jours à des fins pédagogiques."</em> Aucune action supplémentaire requise du prof.</p>
+
+    <div class="alert alert-success">
+      <strong>Conclusion :</strong> Mentoria est conforme aux principes RGPD de minimisation des données, de pseudonymisation, de limitation de la durée de conservation et de souveraineté des traitements IA. Les données des élèves restent dans l'espace académique du professeur — jamais dans un cloud commercial.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Point d'attention :</strong> la clé Albert et le mot de passe d'application Nuage sont encodés dans le fichier JSON du bot, qui lui-même est encodé dans l'URL publiée. Recommandez aux profs de ne pas partager ce lien sur des plateformes publiques indexées.
+    </div>
+  </section>
+
+</main>
+
+<script>
+function setActive(el) {
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav a[href^="#"]');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+</body>
+</html>
