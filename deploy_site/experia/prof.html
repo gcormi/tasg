@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -55,28 +55,23 @@
       <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
         <i data-lucide="cloud" class="w-7 h-7 text-white"></i>
       </div>
-      <h2 class="text-2xl font-black text-slate-900">Connexion Nuage</h2>
-      <p class="text-sm text-slate-500 mt-1">Connectez votre espace apps.education.fr</p>
+      <h2 class="text-2xl font-black text-slate-900">Connexion Experia</h2>
+      <p class="text-sm text-slate-500 mt-1">Entrez votre secret professeur pour accéder au studio</p>
     </div>
 
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
       <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Identifiant Nuage</label>
-        <input id="login-user" type="text" placeholder="prenom.nom"
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Identifiant professeur</label>
+        <input id="login-profid" type="text" placeholder="Votre identifiant (ex : dupont.marie)"
           class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
       </div>
       <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-          Mot de passe d'application
-          <a href="https://nuage03.apps.education.fr/settings/user/security" target="_blank" class="lowercase ml-2 text-indigo-500 hover:text-indigo-700">
-            <i data-lucide="external-link" class="w-3 h-3 inline"></i> générer
-          </a>
-        </label>
-        <input id="login-pass" type="password" placeholder="Mot de passe d'application Nextcloud"
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Secret professeur</label>
+        <input id="login-secret" type="password" placeholder="Votre mot de passe Experia"
           class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-3 outline-none text-sm transition-all">
       </div>
 
-      <!-- Paramètres avancés -->
+      <!-- Paramètre avancé : URL du Worker -->
       <div>
         <button type="button" onclick="toggleAdvanced()" class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors font-bold">
           <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
@@ -84,19 +79,10 @@
         </button>
         <div id="advanced-settings" class="hidden mt-3 space-y-3 border-t border-slate-100 pt-3">
           <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Serveur Nuage</label>
-            <input id="login-server" type="text" value="nuage03.apps.education.fr"
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL du Worker Experia</label>
+            <input id="login-proxy" type="text" value="https://experia-proxy.gilles-cormi.workers.dev"
               class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL Proxy Albert (n8n)</label>
-            <input id="login-proxy" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/experia_albert"
-              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">URL Stockage Experia (n8n)</label>
-            <input id="login-storage" type="text" value="https://n8n.incubateur.education.gouv.fr/webhook/experia_storage"
-              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+            <p class="text-xs text-slate-400 font-medium mt-1">Cloudflare Worker — contient vos credentials de façon sécurisée.</p>
           </div>
         </div>
       </div>
@@ -122,7 +108,7 @@
               Copier
             </button>
           </div>
-          <p class="text-xs text-slate-400 font-medium mt-1.5">⚠️ Ce lien contient ton mot de passe. Ne le partage pas.</p>
+          <p class="text-xs text-slate-400 font-medium mt-1.5">⚠️ Ce lien contient ton secret Experia. Ne le partage pas.</p>
           <div id="quicklink-copied" class="hidden mt-1.5 text-xs font-bold text-emerald-600">✅ Lien copié dans le presse-papier !</div>
         </div>
       </div>
@@ -229,54 +215,29 @@
     </div>
 
     <div class="space-y-6">
-      <!-- Section IA -->
+      <!-- Section Worker -->
       <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
         <div class="flex items-center gap-2 mb-4 text-indigo-600">
-          <i data-lucide="sparkles" class="w-5 h-5"></i>
-          <h3 class="font-black uppercase tracking-wider text-xs">Intelligence Artificielle Albert</h3>
+          <i data-lucide="server" class="w-5 h-5"></i>
+          <h3 class="font-black uppercase tracking-wider text-xs">Worker Experia (Albert + Nuage)</h3>
         </div>
         <div class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Clé API Albert</label>
-            <div class="flex gap-2">
-              <input id="config-apikey" type="password" placeholder="sk-..."
-                class="flex-1 bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
-              <button onclick="syncConfigFrom('config-apikey', 'create-apikey')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-indigo-700 transition-all">
-                OK
-              </button>
-            </div>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">URL du Worker</label>
+            <input id="config-proxy" type="text"
+              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Modèle par défaut</label>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Modèle Albert par défaut</label>
             <select id="config-model" class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
               <option value="openai/gpt-oss-120b">Albert Grand (gpt-oss-120b)</option>
               <option value="openai/gpt-oss-20b">Albert Moyen (gpt-oss-20b)</option>
               <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
             </select>
           </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">URL Proxy Albert (n8n)</label>
-            <input id="config-proxy" type="text"
-              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
-          </div>
-        </div>
-      </div>
-
-      <!-- Section Stockage -->
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-        <div class="flex items-center gap-2 mb-4 text-emerald-600">
-          <i data-lucide="cloud" class="w-5 h-5"></i>
-          <h3 class="font-black uppercase tracking-wider text-xs">Stockage Nuage (apps.education.fr)</h3>
-        </div>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">URL Stockage Experia (n8n)</label>
-            <input id="config-storage" type="text"
-              class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
-          </div>
-          <div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-            <p class="text-[11px] text-amber-700 font-medium leading-relaxed">
-              <strong>Note :</strong> Ces réglages sont sauvegardés localement dans votre navigateur. Pour les modifier définitivement, mettez à jour votre lien de connexion rapide.
+          <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
+            <p class="text-[11px] text-emerald-700 font-medium leading-relaxed">
+              <strong>Sécurisé :</strong> Les identifiants Nuage et la clé Albert sont stockés dans les secrets Cloudflare du Worker — jamais dans le navigateur ni dans les liens élèves.
             </p>
           </div>
         </div>
@@ -353,22 +314,17 @@
         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Configuration IA</h3>
         <div class="space-y-3">
           <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5">Clé API Albert</label>
+            <label class="block text-xs font-bold text-slate-400 mb-1.5">Modèle</label>
             <div class="flex gap-2">
-              <input id="create-apikey" type="password" placeholder="sk-..."
-                class="flex-1 bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 outline-none font-mono text-xs transition-all">
+              <select id="create-model" class="flex-1 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
+                <option value="openai/gpt-oss-120b">Albert Grand — gpt-oss-120b (recommandé)</option>
+                <option value="openai/gpt-oss-20b">Albert Moyen — gpt-oss-20b</option>
+                <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
+              </select>
               <button type="button" onclick="loadModels()" class="bg-indigo-100 text-indigo-700 font-bold px-3 py-2 rounded-xl hover:bg-indigo-200 transition-all text-xs whitespace-nowrap">
-                Charger modèles
+                Charger
               </button>
             </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5">Modèle</label>
-            <select id="create-model" class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-xl px-4 py-2.5 outline-none text-sm font-bold">
-              <option value="openai/gpt-oss-120b">Albert Grand — gpt-oss-120b (recommandé)</option>
-              <option value="openai/gpt-oss-20b">Albert Moyen — gpt-oss-20b</option>
-              <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
-            </select>
           </div>
         </div>
       </div>
@@ -655,17 +611,12 @@ async function updateSessionTheme(theme) {
   document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
   document.body.classList.add('theme-' + theme);
 
-  // Sauvegarder sur le Nuage
+  // Sauvegarder sur le Worker KV
   try {
-    const filename = state.currentSession.id.startsWith('session_') ? state.currentSession.id + '.json' : `session_${state.currentSession.id}.json`;
-    await storage({ action: 'write', filename, content: state.currentSession, manifest: state.manifest });
+    await storage({ action: 'writeSession', session: state.currentSession });
     
     // Mettre à jour le lien de partage
-    const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
-      storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
-      nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
-      sessionId: state.currentSession.id, apiKey: state.currentSession.apiKey, model: state.currentSession.model
-    }))))}`;
+    const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId: state.currentSession.id, model: state.currentSession.model}))))}`;
     document.getElementById('sess-link').value = link;
     
     document.getElementById('quick-theme-selector').classList.add('hidden');
@@ -676,9 +627,10 @@ async function updateSessionTheme(theme) {
 
 // ─── ÉTAT ───────────────────────────────────────────────────────────────────
 const state = {
-  nuageUser: '', nuagePass: '', nuageServer: 'nuage03.apps.education.fr',
-  storageUrl: '', proxyUrl: '',
-  manifest: [], sessions: [],
+  proxyUrl: '',    // URL du Worker Experia central
+  profId: '',      // Identifiant professeur (choisi à l'inscription)
+  profSecret: '',  // Secret professeur (choisi à l'inscription)
+  sessions: [],
   currentSession: null, currentResult: null
 };
 
@@ -714,10 +666,8 @@ function showScreen(id) {
   
   // Remplir l'écran config si besoin
   if (id === 'config') {
-    document.getElementById('config-apikey').value = document.getElementById('create-apikey').value;
     document.getElementById('config-model').value = document.getElementById('create-model').value;
     document.getElementById('config-proxy').value = state.proxyUrl || document.getElementById('login-proxy').value;
-    document.getElementById('config-storage').value = state.storageUrl || document.getElementById('login-storage').value;
   }
 
   // Stopper l'auto-refresh si on quitte l'écran session
@@ -726,26 +676,24 @@ function showScreen(id) {
 
 // ─── STORAGE ─────────────────────────────────────────────────────────────────
 async function storage(params) {
-  const res = await fetch(state.storageUrl, {
+  const res = await fetch(state.proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...params, username: state.nuageUser, password: state.nuagePass, server: state.nuageServer })
+    body: JSON.stringify({ ...params, profId: state.profId, profSecret: state.profSecret })
   });
-  if (!res.ok) throw new Error('Erreur réseau: ' + res.status);
+  if (!res.ok) throw new Error('Erreur réseau Worker : ' + res.status);
   return await res.json();
 }
 
 // ─── ALBERT ──────────────────────────────────────────────────────────────────
 async function loadModels() {
-  const apiKey = document.getElementById('create-apikey').value.trim();
-  if (!apiKey) { alert('Entrez d\'abord votre clé API Albert.'); return; }
   const sel = document.getElementById('create-model');
   sel.innerHTML = '<option>Chargement...</option>';
   try {
     const res = await fetch(state.proxyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'listModels', apiKey })
+      body: JSON.stringify({ action: 'listModels', profSecret: state.profSecret })
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -759,14 +707,13 @@ async function loadModels() {
 }
 
 async function callAlbert(messages) {
-  const apiKey = document.getElementById('create-apikey').value.trim();
-  const model  = document.getElementById('create-model').value;
+  const model = document.getElementById('create-model').value;
   const res = await fetch(state.proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages, temperature: 0.3, apiKey })
+    body: JSON.stringify({ action: 'albert', model, messages, temperature: 0.3 })
   });
-  if (!res.ok) throw new Error('Proxy Albert erreur HTTP ' + res.status);
+  if (!res.ok) throw new Error('Worker Experia erreur HTTP ' + res.status);
   const data = await res.json();
   if (data.error) throw new Error('Albert : ' + data.error);
   return data.choices?.[0]?.message?.content || '';
@@ -840,22 +787,13 @@ async function importFile(input) {
 // ─── CONFIG PERSISTANTE ───────────────────────────────────────────────────────
 function loadSavedConfig() {
   const cfg = JSON.parse(localStorage.getItem('experia_config') || '{}');
-  if (cfg.user)   document.getElementById('login-user').value   = cfg.user;
-  if (cfg.pass)   document.getElementById('login-pass').value   = cfg.pass;
-  if (cfg.server) document.getElementById('login-server').value = cfg.server;
-  if (cfg.apiKey) {
-    document.getElementById('create-apikey').value = cfg.apiKey;
-    if (document.getElementById('config-apikey')) document.getElementById('config-apikey').value = cfg.apiKey;
-  }
   if (cfg.proxy) {
-    if (document.getElementById('login-proxy')) document.getElementById('login-proxy').value = cfg.proxy;
+    document.getElementById('login-proxy').value = cfg.proxy;
     if (document.getElementById('config-proxy')) document.getElementById('config-proxy').value = cfg.proxy;
   }
-  if (cfg.storage) {
-    if (document.getElementById('login-storage')) document.getElementById('login-storage').value = cfg.storage;
-    if (document.getElementById('config-storage')) document.getElementById('config-storage').value = cfg.storage;
-  }
-  if (cfg.theme)  applyGlobalTheme(cfg.theme);
+  if (cfg.profId) document.getElementById('login-profid').value = cfg.profId;
+  if (cfg.theme) applyGlobalTheme(cfg.theme);
+  // Note: le secret n'est PAS sauvegardé en localStorage (sécurité)
 }
 
 function toggleAdvanced() {
@@ -868,38 +806,19 @@ function toggleAdvanced() {
 
 function saveConfig() {
   const cfg = {
-    user:   document.getElementById('login-user').value.trim(),
-    pass:   document.getElementById('login-pass').value.trim(),
-    server: document.getElementById('login-server').value.trim(),
-    apiKey: document.getElementById('create-apikey').value.trim(),
-    proxy:  document.getElementById('login-proxy').value.trim(),
-    storage: document.getElementById('login-storage').value.trim(),
-    theme:  document.body.className.match(/theme-(\w+)/)?.[1] || 'classique'
+    proxy: document.getElementById('login-proxy').value.trim(),
+    profId: document.getElementById('login-profid').value.trim(),
+    theme: document.body.className.match(/theme-(\w+)/)?.[1] || 'classique'
   };
   localStorage.setItem('experia_config', JSON.stringify(cfg));
 }
 
-function syncConfigFrom(fromId, toId) {
-  const val = document.getElementById(fromId).value.trim();
-  document.getElementById(toId).value = val;
-  saveConfig();
-  alert('Paramètre synchronisé !');
-}
-
 function applyAndSaveConfig() {
-  const apiKey = document.getElementById('config-apikey').value.trim();
-  const model  = document.getElementById('config-model').value;
-  const proxy  = document.getElementById('config-proxy').value.trim();
-  const storageUrl = document.getElementById('config-storage').value.trim();
-
+  const model = document.getElementById('config-model').value;
+  const proxy = document.getElementById('config-proxy').value.trim();
   state.proxyUrl = proxy;
-  state.storageUrl = storageUrl;
-  
-  document.getElementById('create-apikey').value = apiKey;
   document.getElementById('create-model').value = model;
   document.getElementById('login-proxy').value = proxy;
-  document.getElementById('login-storage').value = storageUrl;
-
   saveConfig();
   showScreen('dashboard');
   lucide.createIcons();
@@ -907,23 +826,14 @@ function applyAndSaveConfig() {
 
 // Ajouter des écouteurs pour sauvegarder automatiquement dès qu'un champ change
 document.addEventListener('DOMContentLoaded', () => {
-  ['login-user', 'login-pass', 'login-server', 'create-apikey'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', saveConfig);
-  });
-
   // Lire le hash #login=BASE64 pour connexion automatique
   const hash = location.hash;
   if (hash.startsWith('#login=')) {
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(7)))));
-      if (decoded.user)    document.getElementById('login-user').value    = decoded.user;
-      if (decoded.pass)    document.getElementById('login-pass').value    = decoded.pass;
-      if (decoded.server)  document.getElementById('login-server').value  = decoded.server;
-      if (decoded.proxy)   document.getElementById('login-proxy').value   = decoded.proxy;
-      if (decoded.storage) document.getElementById('login-storage').value = decoded.storage;
-      if (decoded.apiKey)  document.getElementById('create-apikey').value = decoded.apiKey;
-      // Connexion automatique
+      if (decoded.proxy)  document.getElementById('login-proxy').value  = decoded.proxy;
+      if (decoded.profId) document.getElementById('login-profid').value = decoded.profId;
+      if (decoded.secret) document.getElementById('login-secret').value = decoded.secret;
       setTimeout(() => doLogin(), 300);
     } catch(e) { /* lien invalide */ }
   } else {
@@ -933,35 +843,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 async function doLogin() {
-  const user    = document.getElementById('login-user').value.trim();
-  const pass    = document.getElementById('login-pass').value.trim();
-  const server  = document.getElementById('login-server').value.trim();
-  const proxy   = document.getElementById('login-proxy').value.trim();
-  const storage = document.getElementById('login-storage').value.trim();
+  const profId = document.getElementById('login-profid').value.trim();
+  const secret = document.getElementById('login-secret').value.trim();
+  const proxy  = document.getElementById('login-proxy').value.trim();
 
-  if (!user || !pass) { showLoginError('Identifiant et mot de passe requis.'); return; }
-  if (!proxy || !storage) { showLoginError('Les URLs n8n sont requises.'); return; }
+  if (!profId) { showLoginError('L\'identifiant professeur est requis.'); return; }
+  if (!secret) { showLoginError('Le secret professeur est requis.'); return; }
+  if (!proxy)  { showLoginError('L\'URL du Worker est requise.'); return; }
 
   const btn = document.getElementById('login-btn-text');
   btn.textContent = 'Connexion en cours...';
 
-  state.nuageUser = user; state.nuagePass = pass; state.nuageServer = server;
-  state.proxyUrl = proxy; state.storageUrl = storage;
+  state.proxyUrl   = proxy;
+  state.profId     = profId;
+  state.profSecret = secret;
 
   try {
-    const res = await fetch(state.storageUrl, {
+    const res = await fetch(state.proxyUrl, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'test', username: user, password: pass, server })
+      body: JSON.stringify({ action: 'test', profId, profSecret: secret })
     });
     const data = await res.json();
-    if (!data.success) { showLoginError(data.error || 'Erreur de connexion.'); btn.textContent = 'Se connecter'; return; }
+    if (!data.success) { showLoginError(data.error || 'Identifiant ou secret invalide.'); btn.textContent = 'Se connecter'; return; }
 
-    document.getElementById('dash-user').textContent = user;
+    document.getElementById('dash-user').textContent = data.profId || profId;
     saveConfig();
     showScreen('dashboard');
     loadSessions();
   } catch (e) {
-    showLoginError('Impossible de joindre le serveur n8n: ' + e.message);
+    showLoginError('Impossible de joindre le Worker : ' + e.message);
   }
   btn.textContent = 'Se connecter';
 }
@@ -973,28 +883,24 @@ function showLoginError(msg) {
 }
 
 function logout() {
-  state.nuageUser = ''; state.nuagePass = '';
-  document.getElementById('login-user').value = '';
-  document.getElementById('login-pass').value = '';
+  state.profSecret = '';
+  document.getElementById('login-secret').value = '';
   saveConfig();
   showScreen('login');
 }
 
 // ─── LIEN DE CONNEXION RAPIDE ────────────────────────────────────────────────
 function generateQuickLink() {
-  const user    = document.getElementById('login-user').value.trim();
-  const pass    = document.getElementById('login-pass').value.trim();
-  const server  = document.getElementById('login-server').value.trim();
-  const proxy   = document.getElementById('login-proxy').value.trim();
-  const storage = document.getElementById('login-storage').value.trim();
-  const apiKey  = document.getElementById('create-apikey').value.trim();
+  const profId = document.getElementById('login-profid').value.trim();
+  const secret = document.getElementById('login-secret').value.trim();
+  const proxy  = document.getElementById('login-proxy').value.trim();
 
-  if (!user || !pass) {
-    alert('Remplis d\'abord ton identifiant et ton mot de passe avant de générer le lien.');
+  if (!profId || !secret) {
+    alert('Entre d\'abord ton identifiant et ton secret avant de générer le lien.');
     return;
   }
 
-  const config = { user, pass, server, proxy, storage, apiKey };
+  const config = { proxy, profId, secret };
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
   const url = `${location.origin}${location.pathname}#login=${encoded}`;
 
@@ -1053,11 +959,11 @@ async function loadSessions() {
   lucide.createIcons();
 
   try {
-    const res = await storage({ action: 'list' });
-    state.manifest = res.files ? res.files.map(f => f.name) : [];
-    const sessionFiles = state.manifest.filter(n => n.startsWith('session_'));
+    const res = await storage({ action: 'listSessions' });
+    const sessions = (res.sessions || []).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    state.sessions = sessions;
 
-    if (sessionFiles.length === 0) {
+    if (sessions.length === 0) {
       container.innerHTML = `<div class="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-100">
         <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-50"></i>
         <p class="font-medium">Aucune session pour le moment</p>
@@ -1067,43 +973,59 @@ async function loadSessions() {
       return;
     }
 
-    const sessions = [];
-    for (const fn of sessionFiles) {
-      const r = await storage({ action: 'read', filename: fn });
-      if (r.success && r.content) sessions.push(r.content);
-    }
-    sessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    state.sessions = sessions;
+    // Grouper : parents (sans templateId) + leurs copies
+    const parents = sessions.filter(s => !s.templateId);
+    const copies = sessions.filter(s => s.templateId);
 
-    container.innerHTML = sessions.map(s => {
+    const sessionCard = (s, isChild = false) => {
       const themeColor = s.theme ? THEME_COLORS[s.theme]?.bg || 'bg-indigo-50' : 'bg-indigo-50';
       const iconColor = s.theme ? THEME_COLORS[s.theme]?.border.replace('border-', 'text-') || 'text-indigo-600' : 'text-indigo-600';
+      const classBadge = s.classe ? `<span class="text-xs font-bold text-violet-600 bg-violet-50 border border-violet-200 px-2 py-0.5 rounded-full">${s.classe}</span>` : '';
+      const indent = isChild ? 'ml-6 border-l-2 border-indigo-100 pl-4' : '';
       return `
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all flex items-center gap-4 group">
-          <div onclick="openSession('${s.id}')" class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
-            <div class="w-12 h-12 ${themeColor} rounded-2xl flex items-center justify-center flex-none group-hover:scale-110 transition-transform">
-              <i data-lucide="folder-open" class="w-6 h-6 ${iconColor}"></i>
+        <div class="${indent}">
+          <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all flex items-center gap-4 group">
+            <div onclick="openSession('${s.id}')" class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
+              <div class="w-12 h-12 ${themeColor} rounded-2xl flex items-center justify-center flex-none group-hover:scale-110 transition-transform">
+                <i data-lucide="${isChild ? 'users' : 'folder-open'}" class="w-6 h-6 ${iconColor}"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-black text-slate-800 text-lg truncate group-hover:text-indigo-600 transition-colors">${s.title}</h3>
+                  ${classBadge}
+                </div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                  ${new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} ·
+                  ${s.activitiesCount || 0} activités ·
+                  Code: <span class="text-slate-600">${s.code}</span>
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-black text-slate-800 text-lg truncate group-hover:text-indigo-600 transition-colors">${s.title}</h3>
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                ${new Date(s.createdAt).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} · 
-                ${Object.keys(s.questions || {}).length} activités · 
-                Code: <span class="text-slate-600">${s.code}</span>
-              </p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
-              <i data-lucide="chevron-right" class="w-5 h-5"></i>
-            </div>
+            ${!isChild ? `<button onclick="event.stopPropagation(); duplicateForClass('${s.id}')"
+              class="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-all flex-none whitespace-nowrap"
+              title="Utiliser avec une autre classe">
+              + Classe
+            </button>` : ''}
+            <button onclick="event.stopPropagation(); deleteSession('${s.id}')"
+              class="p-2 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all flex-none"
+              title="Supprimer cette session">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
           </div>
-          <button onclick="event.stopPropagation(); deleteSession('${s.id}')"
-            class="p-2 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all flex-none"
-            title="Supprimer cette session">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
         </div>
       `;
-    }).join('');
+    };
+
+    const groups = parents.map(p => {
+      const children = copies.filter(c => c.templateId === p.id);
+      return sessionCard(p, false) + children.map(c => sessionCard(c, true)).join('');
+    });
+    // Sessions copies orphelines (si parent supprimé)
+    const orphans = copies.filter(c => !parents.find(p => p.id === c.templateId));
+    container.innerHTML = [...groups, ...orphans.map(c => sessionCard(c, false))].join('');
     lucide.createIcons();
 
   } catch (e) {
@@ -1113,19 +1035,22 @@ async function loadSessions() {
 
 // ─── OUVRIR SESSION ───────────────────────────────────────────────────────────
 async function openSession(id) {
-  const session = state.sessions.find(s => s.id === id);
-  if (!session) return;
+  // Charger la session complète depuis le Worker (la liste n'a que les métadonnées)
+  let session;
+  try {
+    const r = await storage({ action: 'readSession', sessionId: id });
+    if (!r.success) { alert('Erreur : ' + (r.error || 'Session introuvable')); return; }
+    session = r.session;
+    const idx = state.sessions.findIndex(s => s.id === id);
+    if (idx >= 0) state.sessions[idx] = session;
+  } catch(e) { alert('Erreur réseau : ' + e.message); return; }
   state.currentSession = session;
 
   document.getElementById('sess-title').textContent = session.title;
   document.getElementById('sess-date').textContent = new Date(session.createdAt).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   document.getElementById('sess-code').textContent = session.code;
 
-  const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
-    storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
-    nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
-    sessionId: session.id, apiKey: session.apiKey, model: session.model
-  }))))}`;
+  const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId: session.id, model: session.model}))))}`;
   document.getElementById('sess-link').value = link;
 
   renderBareme(session);
@@ -1174,22 +1099,15 @@ async function loadSessionResults() {
   lucide.createIcons();
 
   try {
-    const res = await storage({ action: 'list' });
-    const manifest = res.files ? res.files.map(f => f.name) : [];
-    const resultFiles = manifest.filter(n => n.startsWith(`result_${state.currentSession.id}_`));
+    const res = await storage({ action: 'readResults', sessionId: state.currentSession.id });
+    const results = res.results || [];
 
-    if (resultFiles.length === 0) {
+    if (results.length === 0) {
       container.innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100">
         <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
         <p class="font-medium text-sm">En attente des premiers élèves...</p>
       </div>`;
       lucide.createIcons(); return;
-    }
-
-    const results = [];
-    for (const fn of resultFiles) {
-      const r = await storage({ action: 'read', filename: fn });
-      if (r.success && r.content) results.push(r.content);
     }
 
     container.innerHTML = results.map(r => {
@@ -1225,7 +1143,7 @@ async function loadSessionResults() {
     const container = document.getElementById('results-list');
     container.innerHTML = `<div class="text-red-500 bg-red-50 rounded-2xl p-5 text-sm font-medium flex items-center gap-2">
       <i data-lucide="alert-triangle" class="w-4 h-4 flex-none"></i>
-      Erreur de lecture Nuage : ${e.message}
+      Erreur de lecture résultats : ${e.message}
     </div>`;
     lucide.createIcons();
   }
@@ -1288,8 +1206,7 @@ async function saveTeacherNote() {
   state.currentResult.teacherGrade = document.getElementById('teacher-grade').value;
   state.currentResult.teacherComment = document.getElementById('teacher-comment').value;
 
-  const filename = `result_${state.currentSession.id}_${state.currentResult.studentId}.json`;
-  const res = await storage({ action: 'write', filename, content: state.currentResult, manifest: state.manifest });
+  const res = await storage({ action: 'writeResult', sessionId: state.currentSession.id, studentId: state.currentResult.studentId, data: state.currentResult });
   if (res.success) {
     document.getElementById('note-saved').classList.remove('hidden');
     setTimeout(() => document.getElementById('note-saved').classList.add('hidden'), 3000);
@@ -1297,42 +1214,41 @@ async function saveTeacherNote() {
 }
 
 // ─── DUPLIQUER SESSION ────────────────────────────────────────────────────────
-async function duplicateCurrentSession() {
-  if (!state.currentSession) return;
-  const newTitle = prompt('Titre pour la nouvelle session :', state.currentSession.title + ' — Copie');
-  if (!newTitle || !newTitle.trim()) return;
-  const codeInput = prompt('Code d\'accès pour cette session :', state.currentSession.code);
-  if (!codeInput || !codeInput.trim()) return;
-  const code = codeInput.trim().replace(/\s+/g, '-').toUpperCase();
+async function duplicateForClass(templateId) {
+  const template = state.sessions.find(s => s.id === templateId);
+  if (!template) return;
 
+  const classe = prompt('Nom de la classe (ex: 6ème A, Terminale B…) :');
+  if (!classe || !classe.trim()) return;
+
+  // Charger la session complète pour avoir les questions
+  const res = await storage({ action: 'readSession', sessionId: templateId });
+  if (!res.success) { alert('Impossible de lire la session source.'); return; }
+  const source = res.session;
+
+  const code = classe.trim().replace(/\s+/g, '-').toUpperCase() + '-' + Date.now().toString(36).slice(-4).toUpperCase();
   const sessionId = 'session_' + Date.now();
   const duplicate = {
-    ...state.currentSession,
-    id: sessionId, code,
-    title: newTitle.trim(),
-    createdAt: new Date().toISOString()
+    ...source,
+    id: sessionId,
+    code,
+    title: source.title,
+    classe: classe.trim(),
+    templateId,
+    createdAt: Date.now()
   };
 
-  const saveRes = await storage({ action: 'write', filename: `${sessionId}.json`, content: duplicate, manifest: state.manifest });
+  const saveRes = await storage({ action: 'writeSession', session: duplicate });
   if (!saveRes.success) { alert('Erreur sauvegarde : ' + (saveRes.error || 'inconnue')); return; }
 
-  state.manifest.push(`${sessionId}.json`);
-  state.sessions.unshift(duplicate);
-  state.currentSession = duplicate;
+  // Retourner au dashboard et recharger
+  showScreen('dashboard');
+  await loadSessions();
+}
 
-  document.getElementById('sess-title').textContent = duplicate.title;
-  document.getElementById('sess-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('sess-code').textContent = code;
-
-  const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
-    storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
-    nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
-    sessionId, apiKey: duplicate.apiKey, model: duplicate.model
-  }))))}`;
-  document.getElementById('sess-link').value = link;
-  document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
-  renderBareme(duplicate);
-  lucide.createIcons();
+async function duplicateCurrentSession() {
+  if (!state.currentSession) return;
+  await duplicateForClass(state.currentSession.id);
 }
 
 // ─── SUPPRIMER SESSION ────────────────────────────────────────────────────────
@@ -1340,23 +1256,13 @@ async function deleteSession(id) {
   const sess = state.sessions.find(s => s.id === id);
   if (!sess) return;
 
-  let toDelete = [`session_${sess.id}.json`, `${sess.id}.json`];
-  try {
-    const listRes = await storage({ action: 'list' });
-    const all = listRes.files ? listRes.files.map(f => f.name) : [];
-    toDelete = [...toDelete, ...all.filter(n => n.startsWith(`result_${sess.id}_`))];
-  } catch(e) {}
-
-  const nbResults = toDelete.filter(f => f.startsWith('result_')).length;
-  const msg = nbResults > 0
-    ? `Supprimer "${sess.title}" et ${nbResults} résultat${nbResults > 1 ? 's' : ''} d'élève${nbResults > 1 ? 's' : ''} ?\nIrréversible.`
-    : `Supprimer "${sess.title}" ?\nIrréversible.`;
-
+  const msg = `Supprimer "${sess.title}" et tous les résultats élèves associés ?\nIrréversible.`;
   if (!confirm(msg)) return;
 
-  for (const filename of toDelete) {
-    try { await storage({ action: 'delete', filename }); } catch(e) {}
-  }
+  try {
+    await storage({ action: 'deleteSession', sessionId: id });
+  } catch(e) { alert('Erreur suppression : ' + e.message); return; }
+
   if (state.currentSession?.id === id) state.currentSession = null;
   loadSessions();
 }
@@ -1371,7 +1277,6 @@ async function deleteCurrentSession() {
 async function startGeneration() {
   const title  = document.getElementById('create-title').value.trim();
   const corpus = document.getElementById('create-corpus').value.trim();
-  const apiKey = document.getElementById('create-apikey').value.trim();
   const codeRaw = document.getElementById('create-code').value.trim();
 
   const errEl = document.getElementById('create-error');
@@ -1380,7 +1285,6 @@ async function startGeneration() {
   if (!title)  { errEl.textContent = 'Le titre est requis.'; errEl.classList.remove('hidden'); return; }
   if (!codeRaw){ errEl.textContent = 'Le code d\'accès est requis.'; errEl.classList.remove('hidden'); return; }
   if (!corpus) { errEl.textContent = 'Le corpus est requis.'; errEl.classList.remove('hidden'); return; }
-  if (!apiKey) { errEl.textContent = 'La clé API Albert est requise.'; errEl.classList.remove('hidden'); return; }
 
   // Normaliser le code : trim, espaces → tirets, majuscules
   const customCode = codeRaw.trim().replace(/\s+/g, '-').toUpperCase();
@@ -1457,17 +1361,18 @@ async function startGeneration() {
   const code = customCode;
   const session = {
     id: sessionId, code, title, corpus, createdAt: new Date().toISOString(),
-    config, scoring, retryable, showCorrection, theme, questions, model, apiKey
+    config, scoring, retryable, showCorrection, theme, questions, model
   };
 
-  document.getElementById('gen-subtitle').textContent = 'Sauvegarde sur Nuage...';
-  const saveRes = await storage({ action: 'write', filename: `${sessionId}.json`, content: session, manifest: state.manifest });
+  document.getElementById('gen-subtitle').textContent = 'Sauvegarde en cours...';
+  const saveRes = await storage({ action: 'writeSession', session });
   if (!saveRes.success) {
     showScreen('create');
-    document.getElementById('create-error').textContent = 'Erreur sauvegarde Nuage : ' + (saveRes.error || 'Vérifiez que le dossier "experia" existe sur votre Nuage.');
+    document.getElementById('create-error').textContent = 'Erreur sauvegarde : ' + (saveRes.error || 'Vérifiez votre connexion au Worker.');
     document.getElementById('create-error').classList.remove('hidden');
     return;
   }
+  if (saveRes.sessionId) session.id = saveRes.sessionId;
 
   state.currentSession = session;
   state.sessions.unshift(session);
@@ -1476,12 +1381,7 @@ async function startGeneration() {
   document.getElementById('sess-title').textContent = title;
   document.getElementById('sess-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   document.getElementById('sess-code').textContent = code;
-
-  const link = `${location.origin}${location.pathname.replace('prof.html','eleve.html')}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({
-    storageUrl: state.storageUrl, proxyUrl: state.proxyUrl,
-    nuageUser: state.nuageUser, nuagePass: state.nuagePass, nuageServer: state.nuageServer,
-    sessionId, apiKey, model
-  }))))}`;
+  const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId, model}))))}`;
   document.getElementById('sess-link').value = link;
   document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
   renderBareme(session);
