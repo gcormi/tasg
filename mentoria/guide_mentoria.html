@@ -205,6 +205,7 @@
   <a href="#architecture" onclick="setActive(this)">Comment ça fonctionne</a>
 
   <div class="nav-section">Guide Professeur</div>
+  <a href="#avant" onclick="setActive(this)">0. Avant de commencer</a>
   <a href="#studio" onclick="setActive(this)">1. Accéder au Studio</a>
   <a href="#stockage" onclick="setActive(this)">2. Choisir le stockage</a>
   <a href="#creer" onclick="setActive(this)">3. Créer un assistant</a>
@@ -278,11 +279,14 @@
     </div>
 
     <div class="alert alert-teal">
-      <strong>Pour commencer, vous avez besoin de :</strong><br>
-      • Un compte <strong>Nuage apps.education.fr</strong> (fourni avec votre ENT académique)<br>
-      • Un <strong>mot de passe d'application</strong> créé dans Nuage (différent de votre mot de passe habituel)<br>
-      • Une <strong>clé Albert API</strong> (créée sur <a href="https://albert.api.etalab.gouv.fr" style="color:var(--primary);">albert.api.etalab.gouv.fr</a>)<br>
-      • Le <strong>lien vers le Studio</strong> fourni par votre référent numérique
+      <strong>Ce que vous fournit votre référent numérique (Gilles Cormi) :</strong><br>
+      • Le <strong>lien vers le Studio</strong> Mentoria (à mettre en favori)<br>
+      • Le <strong>lien vers le Compagnon</strong> (à partager aux élèves une fois votre assistant publié)<br><br>
+      <strong>Ce que vous devez préparer vous-même (une seule fois) :</strong><br>
+      • Un <strong>dossier "mentoria"</strong> dans votre espace Nuage apps.education.fr<br>
+      • Un <strong>mot de passe d'application</strong> Nuage (différent de votre mot de passe habituel)<br>
+      • Une <strong>clé Albert API</strong> personnelle<br><br>
+      La section <a href="#avant" style="color:var(--primary);font-weight:700;">Avant de commencer</a> vous guide pas à pas pour tout préparer.
     </div>
 
     <div class="alert alert-info">
@@ -355,6 +359,127 @@
   <!-- GUIDE PROFESSEUR                                       -->
   <!-- ══════════════════════════════════════════════════════ -->
 
+  <!-- ── AVANT DE COMMENCER ── -->
+  <section id="avant">
+    <div class="section-label">Guide Professeur — Préparation</div>
+    <h2>Avant de commencer</h2>
+    <p>Avant d'ouvrir le Studio pour la première fois, trois éléments doivent être préparés. Chacun ne se fait <strong>qu'une seule fois</strong>. Suivez les étapes dans l'ordre.</p>
+
+    <div class="alert alert-teal">
+      <strong>Les liens d'accès (Studio et Compagnon) sont fournis par Gilles Cormi, votre référent numérique.</strong> Contactez-le pour les obtenir si vous ne les avez pas encore.
+    </div>
+
+    <h3>Étape A — Créer un dossier "mentoria" dans Nuage</h3>
+    <p>Mentoria stocke tous vos assistants et les échanges de vos élèves dans un dossier de votre espace Nuage. Il faut le créer manuellement une fois.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Connectez-vous sur nuage.apps.education.fr</h4>
+          <p>Utilisez votre identifiant et mot de passe académique habituels (les mêmes que votre ENT).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Créez un nouveau dossier à la racine</h4>
+          <p>Cliquez sur le bouton <strong>"+"</strong> ou <strong>"Nouveau"</strong> en haut de l'interface → "Nouveau dossier". Nommez-le exactement <code>mentoria</code> (tout en minuscules, sans espace, sans accent).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Vérifiez que le dossier est bien créé à la racine</h4>
+          <p>Il doit apparaître directement dans votre espace, pas dans un sous-dossier. Mentoria cherchera précisément à cet emplacement.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Étape B — Créer un mot de passe d'application Nuage</h3>
+    <p>Mentoria ne peut pas utiliser votre mot de passe ENT habituel pour accéder à Nuage — c'est une mesure de sécurité. Il faut créer un <strong>mot de passe d'application</strong> dédié, que vous utiliserez uniquement dans le Studio Mentoria.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Dans Nuage, cliquez sur votre avatar (en haut à droite)</h4>
+          <p>Un menu apparaît. Cliquez sur <strong>"Paramètres"</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Allez dans l'onglet "Sécurité"</h4>
+          <p>Dans la page Paramètres, cliquez sur <strong>"Sécurité"</strong> dans le menu de gauche.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Créez un nouveau mot de passe d'application</h4>
+          <p>Faites défiler jusqu'à la section <strong>"Mots de passe d'application"</strong>. Dans le champ "Nom de l'application", tapez <code>Mentoria</code>. Cliquez <strong>"Créer un nouveau mot de passe d'application"</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Copiez et conservez le mot de passe généré</h4>
+          <p>Un mot de passe de 20 caractères s'affiche (ex : <code>AbCdE-FgHiJ-KlMnO-PqRsT</code>). <strong>Copiez-le immédiatement</strong> dans un endroit sûr (mémo, gestionnaire de mots de passe). Il n'est affiché qu'une seule fois.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Important :</strong> ce mot de passe d'application est différent de votre mot de passe ENT. Si vous le perdez, il suffit d'en créer un nouveau dans Nuage — vos fichiers ne sont pas affectés. Mettez simplement à jour le Studio Mentoria avec le nouveau mot de passe.
+    </div>
+
+    <h3>Étape C — Obtenir une clé Albert API</h3>
+    <p>Albert est l'IA française qui alimente les assistants Mentoria. Pour l'utiliser, chaque professeur doit obtenir sa propre clé API — c'est gratuit pour les agents de l'Éducation nationale.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Ouvrez albert.api.etalab.gouv.fr</h4>
+          <p>Ce site est géré par l'État français (DINUM / Etalab). Pas de compte commercial requis.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Cliquez "S'inscrire" ou "Créer un compte"</h4>
+          <p>Utilisez votre adresse e-mail académique (ex : <code>p.dupont@ac-corse.fr</code>). Remplissez le formulaire d'inscription en indiquant votre établissement et votre rôle d'enseignant.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Validez votre compte par e-mail</h4>
+          <p>Un lien de confirmation est envoyé à votre adresse académique. Cliquez dessus pour activer votre compte.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Générez une clé API</h4>
+          <p>Une fois connecté, allez dans votre profil ou tableau de bord → section <strong>"Clés API"</strong> → cliquez <strong>"Créer une clé"</strong>. Donnez-lui un nom (ex : <code>Mentoria</code>).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Copiez la clé et conservez-la</h4>
+          <p>La clé commence par <code>eyJ…</code>. Copiez-la dans un endroit sûr. Vous la renseignerez dans la section "Sécurité & API" de chaque assistant que vous créez dans Mentoria.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>Une fois ces trois étapes faites</strong>, vous avez tout ce qu'il faut pour utiliser Mentoria. Ces préparatifs ne sont à faire qu'une seule fois — ensuite, la création d'assistants et le partage aux élèves se font en quelques minutes.
+    </div>
+  </section>
+
   <section id="studio">
     <div class="section-label">Guide Professeur — Étape 1</div>
     <h2>Accéder au Studio</h2>
@@ -415,27 +540,30 @@
       </div>
     </div>
 
-    <h3>Mode Nuage — prérequis</h3>
+    <h3>Mode Nuage — connexion au Studio</h3>
+    <div class="alert alert-info">
+      <strong>Prérequis :</strong> le dossier <code>mentoria</code> et le mot de passe d'application doivent déjà être créés. Si ce n'est pas encore fait, suivez d'abord la section <a href="#avant" style="color:var(--primary);font-weight:700;">Avant de commencer</a>.
+    </div>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
-          <h4>Créer un mot de passe d'application dans Nuage</h4>
-          <p>Connectez-vous sur <strong>nuage.apps.education.fr</strong> → cliquez sur votre avatar (en haut à droite) → Paramètres → Sécurité → Créer un nouveau mot de passe d'application. Donnez-lui le nom "Mentoria" et notez le mot de passe généré.</p>
+          <h4>Dans le Studio, choisissez "Nuage apps.education.fr"</h4>
+          <p>L'écran de connexion Nuage s'affiche.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h4>Créer un dossier "mentoria" dans Nuage</h4>
-          <p>Dans l'interface Nuage, créez un dossier nommé exactement <code>mentoria</code> à la racine de votre espace. Mentoria y stockera tous vos assistants et logs automatiquement.</p>
+          <h4>Entrez votre identifiant ENT et votre mot de passe d'application</h4>
+          <p>Identifiant : votre identifiant ENT habituel (ex : <code>p.dupont</code>). Mot de passe : le <strong>mot de passe d'application</strong> créé pour Mentoria dans Nuage — pas votre mot de passe ENT habituel.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <h4>Dans le Studio : entrez votre identifiant ENT et le mot de passe d'application</h4>
-          <p>Utilisez votre identifiant ENT habituel (ex : <code>p.dupont</code>), mais le mot de passe est celui créé à l'étape 1 — pas votre mot de passe ENT habituel.</p>
+          <h4>Cliquez "Connexion"</h4>
+          <p>Votre bibliothèque d'assistants se charge. Si c'est votre première connexion, elle est vide — c'est normal.</p>
         </div>
       </div>
     </div>
