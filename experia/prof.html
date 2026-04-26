@@ -1354,7 +1354,6 @@ async function startGeneration() {
   document.getElementById('sess-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   document.getElementById('sess-code').textContent = code;
   const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId, model}))))}`;
-  }))))}`;
   document.getElementById('sess-link').value = link;
   document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
   renderBareme(session);
