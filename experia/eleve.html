@@ -850,8 +850,18 @@ function initQCM() {
   renderQCM();
 }
 
+function shuffleChoices(choices, correctIdx) {
+  const items = choices.map((text, i) => ({ text, isCorrect: i === correctIdx }));
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return { choices: items.map(x => x.text), correct: items.findIndex(x => x.isCorrect) };
+}
+
 function renderQCM() {
   const q = E.gameData[E.gameIdx];
+  E.shuffled = shuffleChoices(q.choices, q.correct);
   const total = E.gameData.length;
   document.getElementById('qcm-bar').style.width = `${(E.gameIdx/total)*100}%`;
   document.getElementById('qcm-progress').textContent = `${E.gameIdx+1}/${total}`;
@@ -860,7 +870,7 @@ function renderQCM() {
   document.getElementById('qcm-next').classList.add('hidden');
 
   const letters = ['A', 'B', 'C', 'D'];
-  document.getElementById('qcm-choices').innerHTML = q.choices.map((c, i) => `
+  document.getElementById('qcm-choices').innerHTML = E.shuffled.choices.map((c, i) => `
     <button onclick="answerQCM(${i})" class="choice-btn w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-left font-bold text-slate-700 hover:border-blue-300 hover:bg-blue-50 flex items-center gap-3">
       <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 font-black text-sm flex items-center justify-center flex-none">${letters[i]}</span>
       ${c}
@@ -871,15 +881,14 @@ function renderQCM() {
 function answerQCM(idx) {
   const q = E.gameData[E.gameIdx];
   const btns = document.querySelectorAll('#qcm-choices button');
-  const correct = idx === q.correct;
+  const correct = idx === E.shuffled.correct;
   const showCorr = E.session.showCorrection;
   if (correct) { E.gameScore++; document.getElementById('qcm-score').textContent = E.gameScore; }
 
   btns.forEach((btn, i) => {
     btn.disabled = true;
     if (showCorr) {
-      // Mode correction : surligner la bonne réponse
-      if (i === q.correct) btn.className = btn.className.replace('border-slate-100','border-emerald-400').replace('text-slate-700','text-emerald-700') + ' bg-emerald-50';
+      if (i === E.shuffled.correct) btn.className = btn.className.replace('border-slate-100','border-emerald-400').replace('text-slate-700','text-emerald-700') + ' bg-emerald-50';
       else if (i === idx && !correct) btn.className = btn.className.replace('border-slate-100','border-red-300') + ' bg-red-50';
     } else {
       // Mode sans correction : juste barrer la mauvaise, rien surligner
@@ -1471,6 +1480,7 @@ function initRapidite() {
 function renderRapidite() {
   clearInterval(rapTimer);
   const q = E.gameData[E.gameIdx];
+  E.shuffled = shuffleChoices(q.choices, q.correct);
   const total = E.gameData.length;
   document.getElementById('rap-bar').style.width = `${(E.gameIdx/total)*100}%`;
   document.getElementById('rap-progress').textContent = `${E.gameIdx+1}/${total}`;
@@ -1479,7 +1489,7 @@ function renderRapidite() {
   document.getElementById('rap-next').classList.add('hidden');
 
   const letters = ['A','B','C','D'];
-  document.getElementById('rap-choices').innerHTML = q.choices.map((c, i) => `
+  document.getElementById('rap-choices').innerHTML = E.shuffled.choices.map((c, i) => `
     <button onclick="answerRap(${i})" class="choice-btn w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-left font-bold text-slate-700 hover:border-orange-300 hover:bg-orange-50 flex items-center gap-3">
       <span class="w-6 h-6 rounded-lg bg-orange-50 text-orange-600 font-black text-xs flex items-center justify-center flex-none">${letters[i]}</span>${c}
     </button>`).join('');
@@ -1500,13 +1510,13 @@ function renderRapidite() {
 function answerRap(idx) {
   clearInterval(rapTimer);
   const q = E.gameData[E.gameIdx];
-  const correct = idx === q.correct;
+  const correct = idx === E.shuffled.correct;
   const showCorr = E.session.showCorrection;
   const btns = document.querySelectorAll('#rap-choices button');
   btns.forEach((btn, i) => {
     btn.disabled = true;
     if (showCorr) {
-      if (i === q.correct) btn.classList.add('border-emerald-400','bg-emerald-50');
+      if (i === E.shuffled.correct) btn.classList.add('border-emerald-400','bg-emerald-50');
       else if (i === idx && !correct) btn.classList.add('border-red-300','bg-red-50');
     } else {
       if (i === idx && correct)  btn.classList.add('border-emerald-400','bg-emerald-50');
