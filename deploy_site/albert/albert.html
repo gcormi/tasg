@@ -1,351 +1,186 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Assistant IA - Albert & Gemini</title>
+    <title>Albert - Assistant IA Souverain</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .slide-in { animation: slideIn 0.3s ease-out forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+            background-size: 24px 24px;
+        }
 
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .bubble-bot {
+            border-radius: 1.5rem 1.5rem 1.5rem 0.4rem;
+        }
+
+        .bubble-user {
+            border-radius: 1.5rem 1.5rem 0.4rem 1.5rem;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
-<body class="flex flex-col h-screen bg-slate-50 font-sans text-slate-800 transition-all">
+
+<body class="h-screen flex flex-col overflow-hidden text-slate-900">
 
     <!-- HEADER -->
-    <header class="flex-none flex justify-between items-center bg-white shadow-sm px-6 py-4 border-b border-slate-200">
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 flex items-center justify-between z-10">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
                 <i data-lucide="bot" class="w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900 leading-none">Mon Assistant IA</h1>
-                <div class="flex items-center gap-2 mt-1">
-                    <div id="sovereignty-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-all">
-                        <!-- Rempli par JS -->
-                    </div>
-                    <span id="sync-status" class="hidden text-[10px] font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1">
-                        <i data-lucide="cloud-off" class="w-3 h-3"></i> Hors ligne
-                    </span>
+                <h1 class="font-black text-lg leading-tight tracking-tight">Albert</h1>
+                <div id="sovereignty-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 flex items-center gap-1">
+                    <i data-lucide="shield-check" class="w-3 h-3"></i> Souveraineté d'État (FR)
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="resetChat()" title="Réinitialiser la conversation" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+            <button onclick="clearChat()" class="p-3 hover:bg-red-50 rounded-xl text-slate-400 hover:text-red-500 transition-all" title="Effacer la discussion">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </button>
-            <button onclick="toggleSettings(true)" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all">
+            <button onclick="toggleSettings(true)" class="p-3 hover:bg-slate-50 rounded-xl text-slate-400 transition-all" title="Réglages">
                 <i data-lucide="settings" class="w-6 h-6"></i>
             </button>
         </div>
     </header>
 
-    <!-- ZONE DE MESSAGES -->
-    <main id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar bg-[#fcfdfe]">
-        <!-- Messages injectés en JS -->
+    <!-- ZONE DE CHAT -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-6 chat-container">
+        <!-- Messages ici -->
     </main>
 
-    <!-- INDICATEUR DE CHARGEMENT -->
-    <div id="loading-indicator" class="hidden px-8 pb-8">
-        <div class="flex justify-start animate-pulse">
-            <div class="flex gap-4">
-                <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm">
-                    <i data-lucide="bot" class="w-5 h-5"></i>
-                </div>
-                <div class="px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-400 italic text-sm">
-                    Albert réfléchit...
-                </div>
+    <!-- LOADING INDICATOR -->
+    <div id="loading-indicator" class="hidden px-6 pb-4">
+        <div class="flex gap-4">
+            <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white flex-none">
+                <i data-lucide="bot" class="w-5 h-5"></i>
+            </div>
+            <div class="px-5 py-3 bubble-bot bg-white border border-slate-100 shadow-sm text-slate-400 font-bold text-xs">
+                Albert réfléchit...
             </div>
         </div>
     </div>
 
     <!-- ZONE DE SAISIE -->
-    <footer class="bg-white border-t p-4 pb-6">
-        <form id="chat-form" class="max-w-4xl mx-auto flex gap-3 p-2 bg-slate-50/50 rounded-2xl border-2 border-slate-100 focus-within:border-indigo-300 transition-all">
-            <textarea 
-                id="message-input"
-                class="flex-1 bg-transparent border-none focus:ring-0 p-3 min-h-[44px] max-h-32 resize-none text-slate-700 outline-none"
-                placeholder="Message Albert..."
-                rows="1"
-            ></textarea>
-            <button type="submit" id="send-btn" class="px-6 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100 disabled:bg-slate-300 transition-all hover:bg-indigo-700 flex items-center justify-center">
-                <i data-lucide="send" class="w-5 h-5"></i>
+    <footer class="p-4 bg-white border-t border-slate-100">
+        <form id="chat-form" class="max-w-4xl mx-auto flex gap-3">
+            <input type="text" id="message-input" placeholder="Message Albert..."
+                class="flex-1 bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl px-6 py-4 outline-none transition-all font-medium">
+            <button type="submit"
+                class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all">
+                <i data-lucide="send" class="w-6 h-6"></i>
             </button>
         </form>
     </footer>
 
-    <!-- MODAL PARAMÈTRES -->
+    <!-- MODAL RÉGLAGES -->
     <div id="settings-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl slide-in">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-2xl font-black text-slate-900">Albert Setup</h2>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">Configuration API Locale</p>
+                    <h2 class="text-xl font-black text-slate-900 leading-tight">Configuration Albert</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Souveraineté & Sécurité</p>
                 </div>
-                <button onclick="toggleSettings(false)" class="p-3 hover:bg-slate-100 rounded-full text-slate-400">
-                    <i data-lucide="x" class="w-6 h-6"></i>
+                <button onclick="toggleSettings(false)" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <div class="space-y-4 text-sm max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
-                <!-- SELECTEUR DE PROVIDER -->
-                <div class="p-1 bg-slate-100 rounded-2xl flex gap-1">
-                    <button onclick="switchProvider('albert')" id="btn-prov-albert" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all">Albert (Etalab)</button>
-                    <button onclick="switchProvider('gemini')" id="btn-prov-gemini" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all">Gemini (Google)</button>
-                </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 text-emerald-700 text-xs font-bold">
+                La clé Albert est gérée automatiquement via le Worker Experia. Aucune configuration requise.
+            </div>
 
-                <!-- CONFIG ALBERT -->
-                <div id="config-albert" class="space-y-4">
-                    <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">URL API Albert</label>
-                        <input type="text" id="set-url" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé d'API Albert (Bearer)</label>
-                        <input type="password" id="set-key" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs" placeholder="sk-...">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
-                            Modèle Albert
-                            <button onclick="fetchModels()" class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
-                                <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> Actualiser
-                            </button>
-                        </label>
-                        <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white" onchange="toggleCustomModel()">
-                            <option value="openweight-medium">Albert Moyen (Mistral 24B)</option>
-                            <option value="openweight-large">Albert Grand (GPT-120B)</option>
-                            <option value="openweight-small">Albert Rapide (8B)</option>
-                            <option value="openweight-code">Albert Code (Qwen 30B)</option>
-                            <option value="custom">Autre...</option>
-                        </select>
-                        <input type="text" id="set-model-custom" class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2" placeholder="ID exact">
-                    </div>
-                </div>
-
-                <!-- CONFIG GEMINI -->
-                <div id="config-gemini" class="hidden space-y-4">
-                    <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
-                        <p class="text-[10px] text-orange-700 leading-tight">
-                            <i data-lucide="alert-triangle" class="w-3 h-3 inline"></i> <strong>Note :</strong> Gemini n'est pas une IA souveraine. Ne l'utilisez pas pour des données administratives sensibles.
-                        </p>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé API Google AI Studio</label>
-                        <input type="password" id="set-gemini-key" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs" placeholder="AIza...">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Modèle Gemini</label>
-                        <select id="set-gemini-model" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
-                            <option value="gemini-3-flash-preview">Gemini 3 Flash (Preview)</option>
-                            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Standard)</option>
-                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" id="set-proxy" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
-                        <span class="font-bold text-slate-700 text-[12px] group-hover:text-indigo-600 transition-colors">Proxy CORS (Recommandé pour Albert)</span>
-                    </label>
-                </div>
-
-                <div class="pt-4 border-t border-slate-100">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider block mb-3">Synchronisation Cloud</label>
-                    <div id="auth-section" class="bg-slate-50 rounded-2xl p-4 border-2 border-slate-100">
-                        <!-- Rempli par JS -->
-                    </div>
-                </div>
+            <div class="space-y-1">
+                <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Modèle Albert</label>
+                <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white">
+                    <option value="openai/gpt-oss-120b">Albert Grand — GPT-120B (recommandé)</option>
+                    <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Albert Moyen — Mistral 24B</option>
+                </select>
             </div>
 
             <div class="mt-8">
-                <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-indigo-100 transition-all hover:bg-indigo-700 flex items-center justify-center gap-2">
+                <button onclick="saveSettings()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 mt-4 flex items-center justify-center gap-2">
                     <i data-lucide="save" class="w-5 h-5"></i> SAUVEGARDER
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT LOGIQUE -->
     <script>
-        // Initialisation Lucide
         lucide.createIcons();
 
-        // 1. Firebase Initialisation
-        const firebaseConfig = {
-            apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
-            authDomain: "portail-postits.firebaseapp.com",
-            projectId: "portail-postits",
-            storageBucket: "portail-postits.firebasestorage.app",
-            messagingSenderId: "494625342197",
-            appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
-        };
-        
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        let currentUser = null;
+        // ÉTAT
+        const WORKER_URL = 'https://experia-proxy.gilles-cormi.workers.dev';
+        let modelName = localStorage.getItem('albert_model') || 'openai/gpt-oss-120b';
 
-        // 2. État IA
-        let provider = localStorage.getItem('ai_provider') || 'albert';
-        
-        // Settings Albert
-        let apiUrl = localStorage.getItem('albert_api_url') || 'https://albert.api.etalab.gouv.fr/v1/chat/completions';
-        let apiKey = localStorage.getItem('albert_api_key') || '';
-        let modelName = localStorage.getItem('albert_model') || 'openweight-medium';
-        let useProxy = localStorage.getItem('albert_use_proxy') === 'true';
+        // Nettoyage de l'historique des messages parasites
+        let rawHistory = JSON.parse(localStorage.getItem('albert_history')) || [];
+        let messages = rawHistory.filter(m => !m.text.includes('Configuration mise à jour'));
+        if (messages.length === 0) {
+            messages = [{ role: 'bot', text: 'Bonjour ! Je suis Albert, l\'IA souveraine d\'Etalab. Comment puis-je vous aider ?' }];
+        }
 
-        // Settings Gemini
-        let geminiKey = localStorage.getItem('gemini_api_key') || '';
-        let geminiModel = localStorage.getItem('gemini_model') || 'gemini-1.5-flash';
-
-        let messages = JSON.parse(localStorage.getItem('albert_history')) || [
-            { role: 'bot', text: 'Bonjour ! Je suis votre Assistant IA. Accès direct à Albert ou Gemini (voir réglages ⚙️).' }
-        ];
-
-        // 2. DOM
         const chatContainer = document.getElementById('chat-container');
-        const messageInput = document.getElementById('message-input');
         const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
         const loading = document.getElementById('loading-indicator');
-        const syncStatus = document.getElementById('sync-status');
-        const authSection = document.getElementById('auth-section');
         const sovereigntyBadge = document.getElementById('sovereignty-badge');
-        const loadingText = loading.querySelector('div.px-5');
 
-        // 4. Firebase Sync Logic
-        auth.onAuthStateChanged(async (user) => {
-            currentUser = user;
-            updateAuthUI();
-            if (user) {
-                syncStatus.classList.remove('hidden');
-                syncStatus.innerHTML = '<i data-lucide="cloud" class="w-3 h-3 text-indigo-500"></i> Sync Cloud Active';
-                syncStatus.classList.remove('text-rose-500');
-                syncStatus.classList.add('text-indigo-500');
-                
-                // Charger les paramètres depuis Firestore
-                try {
-                    const doc = await db.collection('users').doc(user.uid).collection('config').doc('albert').get();
-                    if (doc.exists) {
-                        const cloudData = doc.data();
-                        
-                        // Sync Albert
-                        if (!apiKey && cloudData.apiKey) {
-                            apiKey = cloudData.apiKey;
-                            apiUrl = cloudData.apiUrl || apiUrl;
-                            modelName = cloudData.modelName || modelName;
-                            useProxy = cloudData.useProxy !== undefined ? cloudData.useProxy : useProxy;
-                            localStorage.setItem('albert_api_key', apiKey);
-                            localStorage.setItem('albert_api_url', apiUrl);
-                            localStorage.setItem('albert_model', modelName);
-                            localStorage.setItem('albert_use_proxy', useProxy);
-                        }
-
-                        // Sync Gemini
-                        if (!geminiKey && cloudData.geminiKey) {
-                            geminiKey = cloudData.geminiKey;
-                            geminiModel = cloudData.geminiModel || geminiModel;
-                            localStorage.setItem('gemini_api_key', geminiKey);
-                            localStorage.setItem('gemini_model', geminiModel);
-                        }
-
-                        if (cloudData.provider) {
-                            provider = cloudData.provider;
-                            localStorage.setItem('ai_provider', provider);
-                        }
-                        
-                        updateStatus();
-                    }
-                } catch (e) {
-                    console.error("Erreur sync:", e);
-                }
-            } else {
-                syncStatus.classList.add('hidden');
-            }
-            lucide.createIcons();
-        });
-
-        function updateAuthUI() {
-            if (currentUser) {
-                authSection.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img src="${currentUser.photoURL || 'https://www.gravatar.com/avatar?d=mp'}" class="w-8 h-8 rounded-full border border-slate-200">
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-700 leading-none">${currentUser.displayName}</p>
-                                <p class="text-[9px] text-slate-400 truncate w-32">${currentUser.email}</p>
-                            </div>
-                        </div>
-                        <button onclick="logout()" class="text-[10px] font-bold text-rose-500 hover:text-rose-700 uppercase tracking-wider">Déconnexion</button>
-                    </div>
-                `;
-            } else {
-                authSection.innerHTML = `
-                    <div class="flex flex-col items-center gap-3">
-                        <p class="text-xs text-slate-500 text-center">Connectez-vous pour sauvegarder votre clé API Albert et la retrouver sur tous vos écrans.</p>
-                        <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-3 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            <span class="font-bold text-slate-700 text-sm">Se connecter avec Google</span>
-                        </button>
-                    </div>
-                `;
-            }
+        function formatText(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/^\s*-\s+(.*)$/gm, '• $1')
+                .replace(/\n/g, '<br>');
         }
 
-        async function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.signInWithPopup(provider);
-            } catch (e) {
-                console.error(e);
-                alert("Erreur de connexion : " + e.message);
-            }
-        }
-
-        function logout() {
-            auth.signOut();
-        }
-
-        function updateStatus() {
-            if (provider === 'albert') {
-                sovereigntyBadge.innerHTML = '<i data-lucide="shield-check" class="w-3 h-3"></i> Souveraineté d\'État (FR)';
-                sovereigntyBadge.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 flex items-center gap-1";
-                messageInput.placeholder = "Message Albert...";
-                loadingText.textContent = "Albert réfléchit...";
-            } else {
-                sovereigntyBadge.innerHTML = '<i data-lucide="globe" class="w-3 h-3"></i> IA Externe (Google)';
-                sovereigntyBadge.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700 flex items-center gap-1";
-                messageInput.placeholder = "Message Gemini...";
-                loadingText.textContent = "Gemini réfléchit...";
-            }
-            lucide.createIcons();
-        }
-
-        function switchProvider(p) {
-            provider = p;
-            
-            // Mise à jour de l'UI du modal
-            document.getElementById('btn-prov-albert').className = p === 'albert' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-indigo-600" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-700";
-            document.getElementById('btn-prov-gemini').className = p === 'gemini' ? "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white shadow-sm text-indigo-600" : "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-700";
-            
-            document.getElementById('config-albert').classList.toggle('hidden', p !== 'albert');
-            document.getElementById('config-gemini').classList.toggle('hidden', p !== 'gemini');
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>';
+                lucide.createIcons();
+                setTimeout(() => { btn.innerHTML = originalHTML; lucide.createIcons(); }, 2000);
+            });
         }
 
         function renderMessages() {
@@ -353,112 +188,46 @@
             messages.forEach(msg => {
                 const isUser = msg.role === 'user';
                 const isError = msg.role === 'error';
-                
-                const bubbleClass = isUser ? 'bg-indigo-600 text-white shadow-indigo-50' : (isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-white border border-slate-200 shadow-sm');
-                const avatarClass = isUser ? 'bg-slate-200 text-slate-600' : (isError ? 'bg-red-100 text-red-600' : 'bg-indigo-600 text-white shadow-md');
+                const avatarClass = isUser ? 'bg-slate-100 text-slate-400' : (isError ? 'bg-red-100 text-red-500' : 'bg-indigo-600 text-white');
+                const bubbleClass = isUser ? 'bg-indigo-600 text-white bubble-user' : (isError ? 'bg-red-50 text-red-700 border border-red-100 bubble-bot' : 'bg-white border border-slate-100 text-slate-700 bubble-bot');
                 const icon = isUser ? 'user' : (isError ? 'alert-circle' : 'bot');
 
                 const html = `
-                    <div class="flex ${isUser ? 'justify-end' : 'justify-start'} slide-in">
+                    <div class="flex ${isUser ? 'justify-end' : 'justify-start'} slide-in group">
                         <div class="flex max-w-[85%] gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}">
                             <div class="mt-1 flex-none">
                                 <div class="w-9 h-9 rounded-xl flex items-center justify-center ${avatarClass}">
                                     <i data-lucide="${icon}" class="w-5 h-5"></i>
                                 </div>
                             </div>
-                            <div class="px-5 py-3 rounded-2xl ${bubbleClass} whitespace-pre-wrap">${msg.text}</div>
+                            <div class="relative">
+                                <div class="px-5 py-3 rounded-2xl ${bubbleClass}">${isUser ? msg.text : formatText(msg.text)}</div>
+                                ${!isUser && !isError ? `
+                                <button onclick="copyToClipboard(\`${msg.text.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, this)" 
+                                    class="absolute -right-10 top-2 p-2 text-slate-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-all" title="Copier le texte">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
                 chatContainer.insertAdjacentHTML('beforeend', html);
             });
             lucide.createIcons();
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
         }
 
-        function toggleCustomModel() {
-            const select = document.getElementById('set-model');
-            const customInput = document.getElementById('set-model-custom');
-            if (select.value === 'custom') {
-                customInput.classList.remove('hidden');
-            } else {
-                customInput.classList.add('hidden');
-            }
-        }
-
-        async function fetchModels() {
-            if (!apiKey) {
-                alert("Veuillez d'abord saisir votre clé API.");
-                return;
-            }
-            
-            const btn = event.currentTarget;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-2.5 h-2.5 animate-spin"></i> Chargement...';
-            lucide.createIcons();
-            
-            try {
-                // Utilisation du même tunnel Proxy que pour le Chat
-                const baseModelsUrl = apiUrl.replace('/chat/completions', '/models');
-                const finalUrl = useProxy ? `https://cors-anywhere.herokuapp.com/${baseModelsUrl}` : baseModelsUrl;
-                
-                const response = await fetch(finalUrl, {
-                    headers: { 
-                        'Authorization': `Bearer ${apiKey}`,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                
-                if (!response.ok) throw new Error("Erreur lors de la récupération");
-                
-                const data = await response.json();
-                const select = document.getElementById('set-model');
-                
-                // On garde les options par défaut et on ajoute les nouvelles
-                const defaults = ['openweight-medium', 'openweight-large', 'openweight-small', 'openweight-code', 'custom'];
-                
-                data.data.forEach(m => {
-                    if (!defaults.includes(m.id)) {
-                        const opt = document.createElement('option');
-                        opt.value = m.id;
-                        opt.textContent = m.id;
-                        select.insertBefore(opt, select.lastElementChild);
-                    }
-                });
-                
-                alert(`${data.data.length} modèles trouvés sur Albert ! La liste a été mise à jour.`);
-            } catch (err) {
-                console.error(err);
-                alert("Impossible de lister les modèles. Vérifiez votre clé et l'activation du proxy.");
-            } finally {
-                btn.innerHTML = originalHTML;
-                lucide.createIcons();
+        function clearChat() {
+            if (confirm("Effacer toute la discussion ?")) {
+                messages = [{ role: 'bot', text: 'Bonjour ! Je suis Albert, l\'IA souveraine d\'Etalab. Comment puis-je vous aider ?' }];
+                localStorage.setItem('albert_history', JSON.stringify(messages));
+                renderMessages();
             }
         }
 
         function toggleSettings(show) {
-            if(show) {
-                switchProvider(provider);
-                
-                // Albert Settings
-                document.getElementById('set-url').value = apiUrl;
-                document.getElementById('set-key').value = apiKey;
-                const select = document.getElementById('set-model');
-                let found = false;
-                for (let opt of select.options) {
-                    if (opt.value === modelName) { select.value = modelName; found = true; break; }
-                }
-                if (!found && modelName) {
-                    select.value = 'custom';
-                    document.getElementById('set-model-custom').value = modelName;
-                }
-                toggleCustomModel();
-                document.getElementById('set-proxy').checked = useProxy;
-
-                // Gemini Settings
-                document.getElementById('set-gemini-key').value = geminiKey;
-                document.getElementById('set-gemini-model').value = geminiModel;
-
+            if (show) {
+                document.getElementById('set-model').value = modelName;
                 document.getElementById('settings-modal').classList.remove('hidden');
             } else {
                 document.getElementById('settings-modal').classList.add('hidden');
@@ -466,152 +235,49 @@
         }
 
         function saveSettings() {
-            apiUrl = document.getElementById('set-url').value;
-            apiKey = document.getElementById('set-key').value;
-            const select = document.getElementById('set-model');
-            modelName = (select.value === 'custom') ? document.getElementById('set-model-custom').value : select.value;
-            useProxy = document.getElementById('set-proxy').checked;
-
-            geminiKey = document.getElementById('set-gemini-key').value;
-            geminiModel = document.getElementById('set-gemini-model').value;
-
-            localStorage.setItem('ai_provider', provider);
-            localStorage.setItem('albert_api_url', apiUrl);
-            localStorage.setItem('albert_api_key', apiKey);
+            modelName = document.getElementById('set-model').value;
             localStorage.setItem('albert_model', modelName);
-            localStorage.setItem('albert_use_proxy', useProxy);
-            localStorage.setItem('gemini_api_key', geminiKey);
-            localStorage.setItem('gemini_model', geminiModel);
-
-            // Synchroniser avec Firestore si connecté
-            if (currentUser) {
-                db.collection('users').doc(currentUser.uid).collection('config').doc('albert').set({
-                    provider,
-                    apiUrl, apiKey, modelName, useProxy,
-                    geminiKey, geminiModel,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }).catch(e => console.error("Erreur sauvegarde cloud:", e));
-            }
-            
             toggleSettings(false);
-            updateStatus();
-            messages.push({ role: 'bot', text: `✅ Configuration mise à jour. Source active : ${provider === 'albert' ? 'Albert' : 'Gemini'}` });
             renderMessages();
-        }
-
-        function resetChat() {
-            if (confirm("Voulez-vous vraiment effacer l'historique et recommencer une nouvelle conversation ?")) {
-                messages = [
-                    { role: 'bot', text: 'Bonjour ! Je suis Albert. Nouvelle conversation démarrée. Comment puis-je vous aider ?' }
-                ];
-                localStorage.removeItem('albert_history');
-                renderMessages();
-            }
         }
 
         chatForm.onsubmit = async (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
-            if(!text || loading.classList.contains('hidden') === false) return;
-
+            if (!text) return;
             messages.push({ role: 'user', text });
             messageInput.value = '';
             renderMessages();
+            loading.classList.remove('hidden');
 
-            if (provider === 'albert') {
-                await callAlbert(text);
-            } else {
-                await callGemini(text);
+            try {
+                const apiMessages = [
+                    { role: "system", content: "Tu es Albert, l'intelligence artificielle souveraine de l'État Français (Etalab). Réponds de manière claire, concise et professionnelle. Utilise le gras pour l'essentiel." },
+                    ...messages.filter(m => m.role !== 'error').map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }))
+                ];
+
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'albert', model: modelName, messages: apiMessages, temperature: 0.7 })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                messages.push({ role: 'bot', text: data.choices?.[0]?.message?.content || "Pas de réponse." });
+                localStorage.setItem('albert_history', JSON.stringify(messages.slice(-10)));
+            } catch (error) {
+                let msg = error.message;
+                if (msg === 'Failed to fetch') msg = "Échec de connexion au Worker.";
+                messages.push({ role: 'error', text: msg });
+            } finally {
+                loading.classList.add('hidden');
+                renderMessages();
             }
         };
 
-        async function callAlbert(text) {
-            if(!apiKey) {
-                messages.push({ role: 'error', text: '⚠️ Clé API Albert manquante.' });
-                renderMessages();
-                loading.classList.add('hidden');
-                return;
-            }
-
-            try {
-                const apiMessages = [{ role: "system", content: "Tu es Albert, un assistant IA intelligent d'Etalab." }];
-                messages.filter(m => m.role !== 'error').forEach(m => {
-                    apiMessages.push({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text });
-                });
-
-                const finalUrl = useProxy ? `https://cors-anywhere.herokuapp.com/${apiUrl}` : apiUrl;
-                const response = await fetch(finalUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({ model: modelName, messages: apiMessages, temperature: 0.7 })
-                });
-
-                if (!response.ok) throw new Error(`Erreur API Albert: ${response.status}`);
-
-                const data = await response.json();
-                messages.push({ role: 'bot', text: data.choices?.[0]?.message?.content || "Pas de réponse." });
-                localStorage.setItem('albert_history', JSON.stringify(messages.slice(-10)));
-
-            } catch (error) {
-                messages.push({ role: 'error', text: error.message });
-            } finally {
-                loading.classList.add('hidden');
-                renderMessages();
-            }
-        }
-
-        async function callGemini(text) {
-            if(!geminiKey) {
-                messages.push({ role: 'error', text: '⚠️ Clé API Gemini manquante. Configurez-la dans les paramètres.' });
-                renderMessages();
-                loading.classList.add('hidden');
-                return;
-            }
-
-            try {
-                const contents = [];
-                messages.filter(m => m.role !== 'error').forEach(m => {
-                    contents.push({
-                        role: m.role === 'bot' ? 'model' : 'user',
-                        parts: [{ text: m.text }]
-                    });
-                });
-
-                // Nettoyage du nom du modèle au cas où
-                const cleanModel = geminiModel.replace('models/', '');
-                const url = `https://generativelanguage.googleapis.com/v1/models/${cleanModel}:generateContent?key=${geminiKey}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: contents })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Erreur Gemini: ${errorData.error?.message || response.status}`);
-                }
-
-                const data = await response.json();
-                const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Aucune réponse de Gemini.";
-                messages.push({ role: 'bot', text: botReply });
-                localStorage.setItem('albert_history', JSON.stringify(messages.slice(-10)));
-
-            } catch (error) {
-                messages.push({ role: 'error', text: error.message });
-            } finally {
-                loading.classList.add('hidden');
-                renderMessages();
-            }
-        }
-
-        // Init
-        updateStatus();
         renderMessages();
-
     </script>
 </body>
+
 </html>

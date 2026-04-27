@@ -49,6 +49,10 @@ export default {
     if (action === 'deleteSession') return handleDeleteSession(body, env);
     if (action === 'readResults')   return handleReadResults(body, env);
     if (action === 'listModels')    return handleListModels(body, env);
+    if (action === 'listNotes')     return handleListNotes(body, env);
+    if (action === 'readNote')      return handleReadNote(body, env);
+    if (action === 'writeNote')     return handleWriteNote(body, env);
+    if (action === 'deleteNote')    return handleDeleteNote(body, env);
 
     return json({ success: false, error: 'Action inconnue : ' + action }, 400);
   }
@@ -304,6 +308,55 @@ async function handleAlbert(body, env) {
   } catch(e) {
     return json({ error: e.message });
   }
+}
+
+// ── Notes (prof) ─────────────────────────────────────────────────────────────
+
+async function handleListNotes(body, env) {
+  const safeProfId = safeId(body.profId);
+  const list = await env.EXPERIA_KV.get('notelist:' + safeProfId, 'json') || [];
+  const notes = [];
+  for (const nid of list) {
+    const n = await env.EXPERIA_KV.get('note:' + safeProfId + ':' + nid, 'json');
+    if (n) notes.push({ id: n.id, title: n.title, color: n.color || null, order: n.order || 0, updatedAt: n.updatedAt });
+  }
+  notes.sort((a, b) => (a.order || 0) - (b.order || 0));
+  return json({ success: true, notes });
+}
+
+async function handleReadNote(body, env) {
+  const { noteId } = body;
+  if (!noteId) return json({ success: false, error: 'noteId requis' });
+  const safeProfId = safeId(body.profId);
+  const note = await env.EXPERIA_KV.get('note:' + safeProfId + ':' + noteId, 'json');
+  if (!note) return json({ success: false, error: 'Note introuvable' });
+  return json({ success: true, note });
+}
+
+async function handleWriteNote(body, env) {
+  const { note } = body;
+  if (!note) return json({ success: false, error: 'note requise' });
+  const safeProfId = safeId(body.profId);
+  const noteId = note.id || ('n_' + uid());
+  const fullNote = { ...note, id: noteId, updatedAt: Date.now() };
+  if (!fullNote.createdAt) fullNote.createdAt = Date.now();
+  await env.EXPERIA_KV.put('note:' + safeProfId + ':' + noteId, JSON.stringify(fullNote));
+  const listKey = 'notelist:' + safeProfId;
+  let list = await env.EXPERIA_KV.get(listKey, 'json') || [];
+  if (!list.includes(noteId)) list.push(noteId);
+  await env.EXPERIA_KV.put(listKey, JSON.stringify(list));
+  return json({ success: true, noteId });
+}
+
+async function handleDeleteNote(body, env) {
+  const { noteId } = body;
+  if (!noteId) return json({ success: false, error: 'noteId requis' });
+  const safeProfId = safeId(body.profId);
+  await env.EXPERIA_KV.delete('note:' + safeProfId + ':' + noteId);
+  const listKey = 'notelist:' + safeProfId;
+  let list = await env.EXPERIA_KV.get(listKey, 'json') || [];
+  await env.EXPERIA_KV.put(listKey, JSON.stringify(list.filter(id => id !== noteId)));
+  return json({ success: true });
 }
 
 async function handleListModels(body, env) {

@@ -5,18 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bloc-note | Portail Éducatif</title>
 
-    <!-- Quill.js rich text editor -->
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-
-    <!-- Icons & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,6 +30,78 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+        }
+
+        /* ====== AUTH OVERLAY ====== */
+        .auth-overlay {
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .auth-overlay.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transform: scale(1.05);
+        }
+        .auth-card {
+            background: white;
+            padding: 2.5rem; border-radius: 1.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            width: 90%; max-width: 380px;
+        }
+        .auth-logo {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem;
+            margin: 0 auto 1.25rem;
+            box-shadow: 0 8px 20px rgba(99,102,241,0.35);
+        }
+        .auth-card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800; font-size: 1.4rem;
+            text-align: center; color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+        .auth-card p {
+            text-align: center; color: var(--text-muted);
+            font-size: 0.85rem; margin-bottom: 1.5rem;
+        }
+        .auth-label {
+            display: block; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted); margin-bottom: 0.35rem;
+        }
+        .auth-input {
+            width: 100%; padding: 0.7rem 0.9rem;
+            border: 2px solid var(--border); border-radius: 0.6rem;
+            font-size: 0.95rem; margin-bottom: 1rem; outline: none;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.15s;
+        }
+        .auth-input:focus { border-color: var(--accent); }
+        .auth-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white; border: none; border-radius: 0.75rem;
+            padding: 0.85rem; font-size: 1rem; font-weight: 700;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: opacity 0.15s; box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+        }
+        .auth-btn:hover { opacity: 0.9; }
+        .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .auth-error {
+            background: #fef2f2; border: 1px solid #fca5a5;
+            border-radius: 0.5rem; padding: 0.6rem 0.85rem;
+            color: #dc2626; font-size: 0.82rem;
+            margin-bottom: 1rem; display: none;
+        }
+        .auth-error.visible { display: block; }
+        .auth-hint {
+            text-align: center; margin-top: 1rem;
+            font-size: 0.78rem; color: var(--text-muted);
         }
 
         /* ====== HEADER ====== */
@@ -104,6 +168,14 @@
         }
         .btn-icon:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
 
+        .btn-logout {
+            font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+            background: none; border: 1.5px solid var(--border); border-radius: 9px;
+            padding: 0 10px; height: 34px; cursor: pointer; white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+
         .btn-new-note {
             display: flex; align-items: center; gap: 7px;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -157,18 +229,9 @@
             width: 10px; height: 10px; border-radius: 50%;
             flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.1);
         }
-
         .tab-title {
             overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0;
         }
-
-        .tab-title-edit {
-            border: none; outline: none;
-            background: transparent; font: inherit;
-            color: var(--accent); width: 120px;
-            padding: 0;
-        }
-
         .tab-close {
             width: 18px; height: 18px; border-radius: 50%;
             border: none; background: none;
@@ -179,7 +242,7 @@
         }
         .tab-close:hover { background: #fee2e2; color: #dc2626; }
 
-        /* ====== TOOLBAR (Quill override) ====== */
+        /* ====== EDITOR ====== */
         .quill-wrapper {
             flex: 1;
             display: flex;
@@ -216,7 +279,6 @@
 
         .ql-editor:focus { outline: none; }
 
-        /* Image in editor */
         .ql-editor img {
             max-width: 100%;
             border-radius: 8px;
@@ -225,7 +287,6 @@
             display: block;
         }
 
-        /* Placeholder note when no tabs */
         .no-notes {
             flex: 1;
             display: flex; flex-direction: column;
@@ -240,7 +301,7 @@
         }
         .no-notes p { font-size: 0.875rem; }
 
-        /* ====== IMAGE PASTE INDICATOR ====== */
+        /* ====== TOAST ====== */
         .paste-toast {
             position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(60px);
             background: rgba(15,23,42,0.82); color: white;
@@ -251,7 +312,7 @@
         }
         .paste-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* ====== MODAL RENAME ====== */
+        /* ====== MODALS ====== */
         .modal-overlay {
             position: fixed; inset: 0;
             background: rgba(15,23,42,0.5);
@@ -292,63 +353,30 @@
             font-size: 0.82rem; cursor: pointer;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        /* ===== AUTH OVERLAY (Glassmorphism) ===== */
-        .auth-overlay {
-            position: fixed; inset: 0;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 1; visibility: visible;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .auth-overlay.hidden {
-            opacity: 0; visibility: hidden; pointer-events: none;
-            transform: scale(1.1);
-        }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.85);
-            padding: 2.5rem; border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            text-align: center; max-width: 400px; width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        .login-btn {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            color: white; padding: 1rem 2rem; border-radius: 1rem;
-            font-weight: 700; display: flex; align-items: center; gap: 0.75rem;
-            margin: 1.5rem auto 0; transition: all 0.3s; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-        }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4); }
     </style>
 </head>
 <body>
-    <!-- Overlay de connexion -->
+
+    <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="auth-overlay">
-        <div class="auth-card" id="auth-card">
-            <div id="auth-loading" class="mb-6">
-                <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
-                <p class="text-slate-500 mt-4 font-bold text-sm" id="auth-loading-msg">Vérification de session...</p>
-            </div>
-            <div id="auth-content" class="hidden">
-                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h2 class="text-2xl font-black text-slate-900 mb-2">Accès Sécurisé</h2>
-                <p class="text-slate-500 mb-4 font-medium">Connectez-vous pour retrouver votre bloc-notes personnel.</p>
-                <button onclick="window.login()" class="login-btn">
-                    <i class="fab fa-google"></i> Se connecter avec Google
-                </button>
-                <div style="margin-top:1rem; border-top:1px solid #e2e8f0; padding-top:1rem;">
-                    <button onclick="window.loginAnonymous()" style="background:none;border:none;color:#6366f1;font-weight:700;cursor:pointer;font-size:0.85rem;">
-                        <i class="fas fa-user-secret" style="margin-right:5px;"></i> Continuer en mode invité
-                    </button>
-                </div>
-            </div>
+        <div class="auth-card">
+            <div class="auth-logo"><i class="fas fa-book-open"></i></div>
+            <h2>Bloc-note</h2>
+            <p>Connectez-vous avec votre identifiant Experia pour retrouver vos notes sur n'importe quel ordinateur.</p>
+
+            <div class="auth-error" id="auth-error"></div>
+
+            <label class="auth-label">Identifiant</label>
+            <input type="text" id="login-id" class="auth-input" placeholder="ex : gcormi" autocomplete="username">
+
+            <label class="auth-label">Secret</label>
+            <input type="password" id="login-secret" class="auth-input" placeholder="Votre secret Experia" autocomplete="current-password">
+
+            <button class="auth-btn" id="login-btn" onclick="doLogin()">Se connecter</button>
+
+            <p class="auth-hint">Même identifiant et secret que pour Experia.</p>
         </div>
     </div>
 
@@ -372,31 +400,28 @@
             <button class="btn-icon" id="color-btn" title="Couleur de la note">
                 <i class="fas fa-palette"></i>
             </button>
-            <button class="btn-icon" id="rename-btn" title="Renommer l'onglet actif">
+            <button class="btn-icon" id="rename-btn" title="Renommer la note">
                 <i class="fas fa-pen"></i>
             </button>
-            <button class="btn-icon" id="delete-btn" title="Supprimer l'onglet actif">
+            <button class="btn-icon" id="delete-btn" title="Supprimer la note">
                 <i class="fas fa-trash"></i>
             </button>
             <button class="btn-new-note" id="new-note-btn">
                 <i class="fas fa-plus"></i> Nouvelle note
             </button>
+            <button class="btn-logout" id="logout-btn" onclick="logout()">Déconnexion</button>
         </div>
     </header>
 
     <!-- TABS -->
-    <div class="tabs-bar" id="tabs-bar">
-        <!-- Tabs injected by JS -->
-    </div>
+    <div class="tabs-bar" id="tabs-bar"></div>
 
     <!-- EDITOR AREA -->
-    <div id="editor-area" class="quill-wrapper">
-        <!-- Quill or empty state injected by JS -->
-    </div>
+    <div id="editor-area" class="quill-wrapper"></div>
 
-    <!-- PASTE TOAST -->
+    <!-- TOAST -->
     <div class="paste-toast" id="paste-toast">
-        <i class="fas fa-image" style="margin-right:7px"></i><span id="paste-toast-msg">Image collée et uploadée !</span>
+        <i class="fas fa-image" style="margin-right:7px"></i><span id="paste-toast-msg">Image insérée !</span>
     </div>
 
     <!-- RENAME MODAL -->
@@ -411,7 +436,7 @@
         </div>
     </div>
 
-    <!-- COLOR PICKER MODAL -->
+    <!-- COLOR MODAL -->
     <div class="modal-overlay" id="color-modal">
         <div class="modal-box">
             <h3><i class="fas fa-palette" style="color:#6366f1;margin-right:8px"></i>Couleur de la note</h3>
@@ -422,439 +447,449 @@
         </div>
     </div>
 
-    <script>
-    // ====== VARIABLES GLOBALES ======
-    let notes = [];
-    let activeId = null;
-    let quill = null;
-    let isLoading = false;
-    let saveTimer = null;
+<script>
+const WORKER_URL = 'https://experia-proxy.gilles-cormi.workers.dev';
 
-    // ====== SYNC STATUS ======
-    function setSyncStatus(status, label) {
-        const dot = document.getElementById('sync-dot');
-        const lbl = document.getElementById('sync-label');
-        if(dot) dot.className = 'sync-dot ' + status;
-        if(lbl) lbl.textContent = label;
-    }
+// ── État global ───────────────────────────────────────────────────────────────
+let notes = [];
+let activeId = null;
+let quill = null;
+let isLoading = false;
+let saveTimer = null;
+let profId = null;
+let profSecret = null;
 
-    // ====== FIREBASE ======
-    const firebaseConfig = {
-        apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
-        authDomain: "portail-postits.firebaseapp.com",
-        projectId: "portail-postits",
-        storageBucket: "portail-postits.firebasestorage.app",
-        messagingSenderId: "494625342197",
-        appId: "1:494625342197:web:9cc573fda25019e57ebbbc"
-    };
+// ── Sync status ───────────────────────────────────────────────────────────────
+function setSyncStatus(status, label) {
+    const dot = document.getElementById('sync-dot');
+    const lbl = document.getElementById('sync-label');
+    if (dot) dot.className = 'sync-dot ' + status;
+    if (lbl) lbl.textContent = label;
+}
 
-    let fbApp;
-    try { fbApp = firebase.app(); } catch(e) { fbApp = firebase.initializeApp(firebaseConfig); }
-    const db = firebase.firestore();
-    
-    // Initialisation scopée
-    let notesRef = null;
-    let unsubscribeNotes = null;
+// ── Worker call ───────────────────────────────────────────────────────────────
+async function workerCall(data) {
+    const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, profId, profSecret })
+    });
+    return res.json();
+}
 
-    window.login = function() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).catch(err => {
-            if(err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
-               firebase.auth().signInWithRedirect(provider);
-            } else {
-               alert("Erreur d'authentification : " + err.message);
-            }
-        });
-    };
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function showAuthError(msg) {
+    const el = document.getElementById('auth-error');
+    el.textContent = msg;
+    el.classList.add('visible');
+}
 
-    window.loginAnonymous = function() {
-        document.getElementById('auth-content').classList.add('hidden');
-        document.getElementById('auth-loading').classList.remove('hidden');
-        document.getElementById('auth-loading-msg').textContent = 'Connexion en mode invité...';
-        firebase.auth().signInAnonymously().catch(err => alert(err.message));
-    };
+async function doLogin() {
+    const id = document.getElementById('login-id').value.trim();
+    const secret = document.getElementById('login-secret').value;
+    document.getElementById('auth-error').classList.remove('visible');
 
-    async function startApp(user) {
-        const overlay = document.getElementById('auth-overlay');
+    if (!id || !secret) { showAuthError('Identifiant et secret requis.'); return; }
 
-        // --- VERIFICATION TOKEN INVITE ---
-        if (user.isAnonymous) {
-            const token = sessionStorage.getItem('guest_token');
-            if (!token) {
-                alert("Accès refusé : Aucun jeton d'invitation trouvé.");
-                window.location.href = "index.html";
-                return;
-            }
-            const snap = await db.collection('invitations').where('token', '==', token).get();
-            if (snap.empty || snap.docs[0].data().expiresAt.toDate() < new Date()) {
-                alert("Votre accès invité a été révoqué ou a expiré.");
-                window.location.href = "index.html";
-                return;
-            }
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Connexion...';
+
+    try {
+        profId = id;
+        profSecret = secret;
+        const data = await workerCall({ action: 'test' });
+        if (!data.success) {
+            showAuthError(data.error || 'Identifiant ou secret incorrect.');
+            profId = null; profSecret = null;
+            return;
         }
-
-        overlay.classList.add('hidden');
-
-        // Isolation des données
-        notesRef = db.collection('users').doc(user.uid).collection('blocnotes');
-
-        // --- MIGRATION AUTOMATIQUE ---
-        if (!user.isAnonymous) {
-            db.collection('blocnotes').get().then(snap => {
-                if (!snap.empty) {
-                    snap.forEach(oldDoc => notesRef.doc(oldDoc.id).set(oldDoc.data(), {merge: true}));
-                }
-            });
-        }
-
-        // Écoute temps réel
-        if (unsubscribeNotes) unsubscribeNotes();
-        unsubscribeNotes = notesRef.orderBy('order', 'asc').onSnapshot(snapshot => {
-            notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            renderTabs();
-            
-            if (!activeId && notes.length > 0) {
-                selectNote(notes[0].id);
-            } else if (activeId && !notes.find(n => n.id === activeId)) {
-                selectNote(notes[0]?.id || null);
-            }
-        }, err => {
-            setSyncStatus('error', 'Erreur: ' + err.code);
-        });
+        localStorage.setItem('blocnote_auth', JSON.stringify({ profId: id, profSecret: secret }));
+        startApp();
+    } catch(e) {
+        showAuthError('Erreur réseau : ' + e.message);
+        profId = null; profSecret = null;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Se connecter';
     }
+}
 
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            startApp(user);
+function logout() {
+    if (!confirm('Se déconnecter du bloc-note ?')) return;
+    localStorage.removeItem('blocnote_auth');
+    profId = null; profSecret = null;
+    notes = []; activeId = null; quill = null;
+    document.getElementById('tabs-bar').innerHTML = '';
+    document.getElementById('editor-area').innerHTML = '';
+    document.getElementById('auth-overlay').classList.remove('hidden');
+    document.getElementById('login-id').value = '';
+    document.getElementById('login-secret').value = '';
+}
+
+// ── Démarrage ─────────────────────────────────────────────────────────────────
+async function startApp() {
+    document.getElementById('auth-overlay').classList.add('hidden');
+    await loadNotes();
+}
+
+async function loadNotes() {
+    setSyncStatus('saving', 'Chargement...');
+    try {
+        const data = await workerCall({ action: 'listNotes' });
+        if (!data.success) { setSyncStatus('error', 'Erreur chargement'); return; }
+        notes = data.notes || [];
+        renderTabs();
+        if (notes.length > 0) {
+            await selectNote(notes[0].id);
         } else {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('invit')) {
-                sessionStorage.setItem('guest_token', urlParams.get('invit'));
-            }
+            renderEditor();
+            setSyncStatus('saved', 'Prêt');
+        }
+    } catch(e) {
+        setSyncStatus('error', 'Erreur réseau');
+    }
+}
 
-            if (sessionStorage.getItem('guest_token')) {
-                firebase.auth().signInAnonymously().catch(() => {
-                    document.getElementById('auth-loading').classList.add('hidden');
-                    document.getElementById('auth-content').classList.remove('hidden');
-                });
-            } else {
-                setTimeout(() => {
-                    if (!firebase.auth().currentUser) {
-                        firebase.auth().signInAnonymously().catch(() => {
-                            document.getElementById('auth-loading').classList.add('hidden');
-                            document.getElementById('auth-content').classList.remove('hidden');
-                        });
-                    }
-                }, 1500);
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function renderTabs() {
+    const bar = document.getElementById('tabs-bar');
+    bar.innerHTML = '';
+    notes.forEach(note => {
+        const colorEntry = NOTE_COLORS.find(c => c.value === (note.color || null)) || NOTE_COLORS[0];
+        const tab = document.createElement('div');
+        tab.className = 'tab' + (note.id === activeId ? ' active' : '');
+        tab.dataset.id = note.id;
+        tab.innerHTML = `
+            <span class="tab-color-dot" style="background:${colorEntry.dot};"></span>
+            <span class="tab-title" title="${escHtml(note.title)}">${escHtml(note.title || 'Sans titre')}</span>
+            <button class="tab-close" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="Fermer"><i class="fas fa-times"></i></button>
+        `;
+        tab.addEventListener('click', () => selectNote(note.id));
+        bar.appendChild(tab);
+    });
+}
+
+// ── Select note ───────────────────────────────────────────────────────────────
+async function selectNote(id) {
+    if (id === activeId && quill) return;
+
+    if (quill && activeId) {
+        clearTimeout(saveTimer);
+        await saveCurrentNote();
+    }
+
+    activeId = id;
+    renderTabs();
+
+    const note = notes.find(n => n.id === id);
+    if (note && note.content === undefined) {
+        setSyncStatus('saving', 'Chargement...');
+        try {
+            const data = await workerCall({ action: 'readNote', noteId: id });
+            if (data.success) {
+                note.content = data.note.content || '';
             }
+        } catch(e) {}
+    }
+
+    renderEditor();
+    setSyncStatus('saved', 'Synchronisé');
+}
+
+// ── Editor ────────────────────────────────────────────────────────────────────
+function renderEditor() {
+    const area = document.getElementById('editor-area');
+    const note = notes.find(n => n.id === activeId);
+
+    if (!note) {
+        area.innerHTML = `
+            <div class="no-notes">
+                <div class="icon"><i class="fas fa-book-open"></i></div>
+                <h2>Aucune note</h2>
+                <p>Cliquez sur <strong>"Nouvelle note"</strong> pour commencer.</p>
+            </div>`;
+        quill = null;
+        return;
+    }
+
+    area.innerHTML = '<div id="quill-editor"></div>';
+    applyNoteColor(note.color || null);
+
+    isLoading = true;
+    quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Commencez à écrire…',
+        modules: {
+            toolbar: [
+                [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                ['clean']
+            ]
         }
     });
 
-    // ====== RENDER TABS ======
-    function renderTabs() {
-        const bar = document.getElementById('tabs-bar');
-        bar.innerHTML = '';
-        notes.forEach(note => {
-            const colorEntry = NOTE_COLORS.find(c => c.value === (note.color || null)) || NOTE_COLORS[0];
-            const tab = document.createElement('div');
-            tab.className = 'tab' + (note.id === activeId ? ' active' : '');
-            tab.dataset.id = note.id;
-            tab.innerHTML = `
-                <span class="tab-color-dot" style="background:${colorEntry.dot};"></span>
-                <span class="tab-title" title="${escHtml(note.title)}">${escHtml(note.title || 'Sans titre')}</span>
-                <button class="tab-close" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="Fermer"><i class="fas fa-times"></i></button>
-            `;
-            tab.addEventListener('click', () => selectNote(note.id));
-            bar.appendChild(tab);
-        });
+    if (note.content) {
+        try {
+            quill.setContents(JSON.parse(note.content), 'silent');
+        } catch(e) {
+            quill.setText(note.content);
+        }
+    }
+    isLoading = false;
+
+    quill.on('text-change', () => {
+        if (isLoading) return;
+        setSyncStatus('saving', 'Sauvegarde...');
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => saveCurrentNote(), 1200);
+    });
+
+    quill.root.addEventListener('paste', handlePaste);
+    quill.focus();
+    quill.setSelection(quill.getLength(), 0);
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────────
+async function saveCurrentNote() {
+    if (!quill || !activeId) return;
+    const note = notes.find(n => n.id === activeId);
+    if (!note) return;
+    const content = JSON.stringify(quill.getContents());
+    note.content = content;
+    try {
+        await workerCall({ action: 'writeNote', note: { ...note, content } });
+        setSyncStatus('saved', 'Synchronisé');
+    } catch(e) {
+        setSyncStatus('error', 'Erreur sauvegarde');
+    }
+}
+
+// ── Nouvelle note ─────────────────────────────────────────────────────────────
+async function createNote() {
+    const title = 'Note ' + (notes.length + 1);
+    const order = notes.length > 0 ? Math.max(...notes.map(n => n.order || 0)) + 1 : 0;
+    const newNote = { title, content: '', color: null, order, createdAt: Date.now() };
+    setSyncStatus('saving', 'Création...');
+    try {
+        const data = await workerCall({ action: 'writeNote', note: newNote });
+        if (!data.success) { setSyncStatus('error', 'Erreur création'); return; }
+        newNote.id = data.noteId;
+        notes.push(newNote);
+        renderTabs();
+        await selectNote(newNote.id);
+    } catch(e) {
+        setSyncStatus('error', 'Erreur réseau');
+    }
+}
+
+// ── Supprimer note ────────────────────────────────────────────────────────────
+async function deleteNote(id) {
+    if (notes.length <= 1) {
+        if (!confirm('Supprimer cette dernière note ?')) return;
+    } else {
+        if (!confirm('Supprimer cette note définitivement ?')) return;
     }
 
-    // ====== SELECT NOTE ======
-    function selectNote(id) {
-        if(id === activeId && quill) return;
-        
-        // Save current before switching
-        if(quill && activeId) {
-            saveCurrentNote(true);
-        }
-        
-        activeId = id;
-        renderTabs();
+    if (id === activeId) {
+        const others = notes.filter(n => n.id !== id);
+        activeId = others[0]?.id || null;
+    }
+
+    notes = notes.filter(n => n.id !== id);
+    renderTabs();
+
+    if (activeId) {
+        await selectNote(activeId);
+    } else {
         renderEditor();
     }
 
-    // ====== RENDER EDITOR ======
-    function renderEditor() {
-        const area = document.getElementById('editor-area');
-        const note = notes.find(n => n.id === activeId);
+    await workerCall({ action: 'deleteNote', noteId: id }).catch(() => {});
+}
 
-        if(!note) {
-            area.innerHTML = `
-                <div class="no-notes">
-                    <div class="icon"><i class="fas fa-book-open"></i></div>
-                    <h2>Aucune note</h2>
-                    <p>Cliquez sur <strong>"Nouvelle note"</strong> pour commencer.</p>
-                </div>`;
-            quill = null;
+// ── Renommer ──────────────────────────────────────────────────────────────────
+function openRenameModal() {
+    if (!activeId) return;
+    const note = notes.find(n => n.id === activeId);
+    const input = document.getElementById('rename-input');
+    input.value = note?.title || '';
+    document.getElementById('rename-modal').classList.add('active');
+    setTimeout(() => { input.focus(); input.select(); }, 80);
+}
+function closeRenameModal() {
+    document.getElementById('rename-modal').classList.remove('active');
+}
+async function confirmRename() {
+    const title = document.getElementById('rename-input').value.trim() || 'Sans titre';
+    closeRenameModal();
+    if (!activeId) return;
+    const note = notes.find(n => n.id === activeId);
+    if (!note) return;
+    note.title = title;
+    renderTabs();
+    await workerCall({ action: 'writeNote', note }).catch(() => {});
+}
+
+// ── Couleurs ──────────────────────────────────────────────────────────────────
+const NOTE_COLORS = [
+    { name: 'Défaut',  value: null,      bg: '#ffffff', dot: '#cbd5e1' },
+    { name: 'Jaune',   value: '#fefce8', bg: '#fefce8', dot: '#facc15' },
+    { name: 'Rose',    value: '#fdf2f8', bg: '#fdf2f8', dot: '#ec4899' },
+    { name: 'Bleu',    value: '#eff6ff', bg: '#eff6ff', dot: '#3b82f6' },
+    { name: 'Vert',    value: '#f0fdf4', bg: '#f0fdf4', dot: '#22c55e' },
+    { name: 'Orange',  value: '#fff7ed', bg: '#fff7ed', dot: '#f97316' },
+    { name: 'Violet',  value: '#faf5ff', bg: '#faf5ff', dot: '#a855f7' },
+    { name: 'Cyan',    value: '#ecfeff', bg: '#ecfeff', dot: '#06b6d4' },
+    { name: 'Gris',    value: '#f8fafc', bg: '#f8fafc', dot: '#94a3b8' },
+    { name: 'Rouge',   value: '#fff1f2', bg: '#fff1f2', dot: '#f43f5e' },
+    { name: 'Indigo',  value: '#eef2ff', bg: '#eef2ff', dot: '#6366f1' },
+    { name: 'Lime',    value: '#f7fee7', bg: '#f7fee7', dot: '#84cc16' },
+];
+
+function applyNoteColor(colorValue) {
+    const editorEl = document.querySelector('.ql-editor');
+    const containerEl = document.querySelector('.ql-container');
+    const bg = colorValue || '#ffffff';
+    if (editorEl) editorEl.style.background = bg;
+    if (containerEl) containerEl.style.background = bg;
+}
+
+function openColorModal() {
+    if (!activeId) return;
+    const note = notes.find(n => n.id === activeId);
+    const swatches = document.getElementById('color-swatches');
+    swatches.innerHTML = '';
+    NOTE_COLORS.forEach(c => {
+        const btn = document.createElement('button');
+        const isSelected = (note?.color || null) === c.value;
+        btn.title = c.name;
+        btn.style.cssText = `
+            width:40px;height:40px;border-radius:50%;
+            background:${c.bg};
+            border:${isSelected ? '3px solid #6366f1' : '2px solid #e2e8f0'};
+            cursor:pointer;
+            box-shadow:${isSelected ? '0 0 0 3px rgba(99,102,241,0.2)' : 'none'};
+            transition:all 0.15s;
+        `;
+        if (c.value === null) {
+            btn.innerHTML = '<span style="font-size:1rem;line-height:40px;">✕</span>';
+        } else {
+            btn.innerHTML = `<span style="display:block;width:20px;height:20px;border-radius:50%;background:${c.dot};margin:auto;margin-top:8px;"></span>`;
+        }
+        btn.addEventListener('click', () => pickColor(c.value));
+        swatches.appendChild(btn);
+    });
+    document.getElementById('color-modal').classList.add('active');
+}
+function closeColorModal() {
+    document.getElementById('color-modal').classList.remove('active');
+}
+async function pickColor(colorValue) {
+    closeColorModal();
+    if (!activeId) return;
+    const note = notes.find(n => n.id === activeId);
+    if (!note) return;
+    note.color = colorValue || null;
+    renderTabs();
+    applyNoteColor(colorValue);
+    await workerCall({ action: 'writeNote', note }).catch(() => {});
+}
+
+// ── Image paste (base64) ──────────────────────────────────────────────────────
+async function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) {
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (!file) continue;
+            showPasteToast('⏳ Insertion de l\'image...');
+            try {
+                const dataUrl = await fileToBase64(file);
+                const range = quill.getSelection(true);
+                quill.insertEmbed(range.index, 'image', dataUrl);
+                quill.setSelection(range.index + 1);
+                showPasteToast('✅ Image insérée !');
+                clearTimeout(saveTimer);
+                saveTimer = setTimeout(() => saveCurrentNote(), 800);
+            } catch(err) {
+                showPasteToast('❌ Erreur image');
+            }
             return;
         }
-
-        area.innerHTML = '<div id="quill-editor"></div>';
-
-        // Appliquer couleur de fond de l'éditeur
-        const note2 = notes.find(n => n.id === activeId);
-        applyNoteColor(note2?.color || null);
-
-        isLoading = true;
-        quill = new Quill('#quill-editor', {
-            theme: 'snow',
-            placeholder: 'Commencez à écrire… (Ctrl+V pour coller une image)',
-            modules: {
-                toolbar: [
-                    [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
-                    [{ 'header': [1, 2, 3, 4, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'align': [] }],
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
-                    [{ 'indent': '-1' }, { 'indent': '+1' }],
-                    ['blockquote', 'code-block'],
-                    ['link', 'image'],
-                    ['clean']
-                ]
-            }
-        });
-
-        // Load content
-        if(note.content) {
-            try {
-                const delta = JSON.parse(note.content);
-                quill.setContents(delta, 'silent');
-            } catch(e) {
-                quill.setText(note.content);
-            }
-        }
-        isLoading = false;
-
-        // Autosave on change
-        quill.on('text-change', () => {
-            if(isLoading) return;
-            setSyncStatus('saving', 'Sauvegarde...');
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => saveCurrentNote(false), 1200);
-        });
-
-        // Paste image handler
-        quill.root.addEventListener('paste', handlePaste);
-
-        // Focus
-        quill.focus();
-        // Move cursor to end
-        quill.setSelection(quill.getLength(), 0);
     }
+}
 
-    // ====== SAVE NOTE ======
-    async function saveCurrentNote(immediate = false) {
-        if(!quill || !activeId) return;
-        const content = JSON.stringify(quill.getContents());
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function showPasteToast(msg) {
+    const toast = document.getElementById('paste-toast');
+    document.getElementById('paste-toast-msg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function escHtml(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+document.getElementById('new-note-btn').addEventListener('click', createNote);
+document.getElementById('rename-btn').addEventListener('click', openRenameModal);
+document.getElementById('color-btn').addEventListener('click', openColorModal);
+document.getElementById('delete-btn').addEventListener('click', () => { if (activeId) deleteNote(activeId); });
+
+document.getElementById('rename-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('rename-modal')) closeRenameModal();
+});
+document.getElementById('color-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('color-modal')) closeColorModal();
+});
+document.getElementById('rename-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmRename();
+    if (e.key === 'Escape') closeRenameModal();
+});
+document.getElementById('login-secret').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeRenameModal(); closeColorModal(); }
+});
+
+// ── Auto-login depuis localStorage ────────────────────────────────────────────
+(async function init() {
+    const saved = JSON.parse(localStorage.getItem('blocnote_auth') || '{}');
+    if (saved.profId && saved.profSecret) {
+        document.getElementById('login-id').value = saved.profId;
+        document.getElementById('login-secret').value = saved.profSecret;
+        profId = saved.profId;
+        profSecret = saved.profSecret;
         try {
-            await notesRef.doc(activeId).update({ content, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            setSyncStatus('saved', 'Synchronisé');
-        } catch(e) {
-            setSyncStatus('error', 'Erreur sauvegarde');
-        }
+            const data = await workerCall({ action: 'test' });
+            if (data.success) { startApp(); return; }
+        } catch(e) {}
+        profId = null; profSecret = null;
     }
-
-    // ====== NEW NOTE ======
-    async function createNote() {
-        if(!notesRef) { alert('Connexion en cours, réessayez dans un instant.'); return; }
-        const title = 'Note ' + (notes.length + 1);
-        const order = notes.length > 0 ? Math.max(...notes.map(n => n.order || 0)) + 1 : 0;
-        try {
-            setSyncStatus('saving', 'Création...');
-            const doc = await notesRef.add({
-                title,
-                content: '',
-                order,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            selectNote(doc.id);
-        } catch(e) {
-            setSyncStatus('error', 'Erreur création');
-            console.error('createNote error:', e);
-        }
-    }
-
-    // ====== DELETE NOTE ======
-    async function deleteNote(id) {
-        if(notes.length <= 1) {
-            if(!confirm('Supprimer cette dernière note ? Le bloc-note sera vide.')) return;
-        } else {
-            if(!confirm('Supprimer cette note définitivement ?')) return;
-        }
-        if(id === activeId) {
-            const others = notes.filter(n => n.id !== id);
-            activeId = others[0]?.id || null;
-        }
-        await notesRef.doc(id).delete().catch(console.error);
-    }
-
-    // ====== RENAME ======
-    function openRenameModal() {
-        if(!activeId) return;
-        const note = notes.find(n => n.id === activeId);
-        const input = document.getElementById('rename-input');
-        input.value = note?.title || '';
-        document.getElementById('rename-modal').classList.add('active');
-        setTimeout(() => { input.focus(); input.select(); }, 80);
-    }
-    function closeRenameModal() {
-        document.getElementById('rename-modal').classList.remove('active');
-    }
-    async function confirmRename() {
-        const title = document.getElementById('rename-input').value.trim() || 'Sans titre';
-        closeRenameModal();
-        if(!activeId) return;
-        await notesRef.doc(activeId).update({ title }).catch(console.error);
-    }
-
-    // ====== IMAGE PASTE (Cloudinary) ======
-    async function handlePaste(e) {
-        const items = e.clipboardData?.items;
-        if(!items) return;
-
-        for(const item of items) {
-            if(item.type.startsWith('image/')) {
-                e.preventDefault();
-                const file = item.getAsFile();
-                if(!file) continue;
-
-                showPasteToast('⏳ Envoi de l\'image...');
-                setSyncStatus('saving', 'Upload image...');
-
-                try {
-                    const url = await uploadToCloudinary(file);
-                    const range = quill.getSelection(true);
-                    quill.insertEmbed(range.index, 'image', url);
-                    quill.setSelection(range.index + 1);
-                    showPasteToast('✅ Image insérée et sauvegardée !');
-                    // Trigger save
-                    clearTimeout(saveTimer);
-                    saveTimer = setTimeout(() => saveCurrentNote(false), 800);
-                } catch(err) {
-                    showPasteToast('❌ Erreur upload image');
-                    setSyncStatus('error', 'Erreur image');
-                    console.error(err);
-                }
-                return;
-            }
-        }
-    }
-
-    async function uploadToCloudinary(file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', UPLOAD_PRESET);
-        formData.append('folder', 'blocnote-images');
-
-        const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-            method: 'POST',
-            body: formData
-        });
-        if(!resp.ok) throw new Error('Cloudinary upload failed: ' + resp.status);
-        const data = await resp.json();
-        return data.secure_url;
-    }
-
-    // ====== COULEURS DE NOTES ======
-    const NOTE_COLORS = [
-        { name: 'Défaut',    value: null,      bg: '#ffffff', dot: '#cbd5e1' },
-        { name: 'Jaune',     value: '#fefce8', bg: '#fefce8', dot: '#facc15' },
-        { name: 'Rose',      value: '#fdf2f8', bg: '#fdf2f8', dot: '#ec4899' },
-        { name: 'Bleu',      value: '#eff6ff', bg: '#eff6ff', dot: '#3b82f6' },
-        { name: 'Vert',      value: '#f0fdf4', bg: '#f0fdf4', dot: '#22c55e' },
-        { name: 'Orange',    value: '#fff7ed', bg: '#fff7ed', dot: '#f97316' },
-        { name: 'Violet',    value: '#faf5ff', bg: '#faf5ff', dot: '#a855f7' },
-        { name: 'Cyan',      value: '#ecfeff', bg: '#ecfeff', dot: '#06b6d4' },
-        { name: 'Gris',      value: '#f8fafc', bg: '#f8fafc', dot: '#94a3b8' },
-        { name: 'Rouge',     value: '#fff1f2', bg: '#fff1f2', dot: '#f43f5e' },
-        { name: 'Indigo',    value: '#eef2ff', bg: '#eef2ff', dot: '#6366f1' },
-        { name: 'Lime',      value: '#f7fee7', bg: '#f7fee7', dot: '#84cc16' },
-    ];
-
-    function applyNoteColor(colorValue) {
-        const editorEl = document.querySelector('.ql-editor');
-        const containerEl = document.querySelector('.ql-container');
-        const bg = colorValue || '#ffffff';
-        if(editorEl) editorEl.style.background = bg;
-        if(containerEl) containerEl.style.background = bg;
-    }
-
-    function openColorModal() {
-        if(!activeId) return;
-        const note = notes.find(n => n.id === activeId);
-        const swatches = document.getElementById('color-swatches');
-        swatches.innerHTML = '';
-        NOTE_COLORS.forEach(c => {
-            const btn = document.createElement('button');
-            const isSelected = (note?.color || null) === c.value;
-            btn.title = c.name;
-            btn.style.cssText = `
-                width:40px;height:40px;border-radius:50%;
-                background:${c.bg};
-                border:${isSelected ? '3px solid #6366f1' : '2px solid #e2e8f0'};
-                cursor:pointer;position:relative;
-                box-shadow:${isSelected ? '0 0 0 3px rgba(99,102,241,0.2)' : 'none'};
-                transition:all 0.15s;
-            `;
-            if(c.value === null) {
-                btn.innerHTML = '<span style="font-size:1rem;line-height:40px;">✕</span>';
-            } else {
-                btn.innerHTML = `<span style="display:block;width:20px;height:20px;border-radius:50%;background:${c.dot};margin:auto;margin-top:8px;"></span>`;
-            }
-            btn.addEventListener('click', () => pickColor(c.value));
-            swatches.appendChild(btn);
-        });
-        document.getElementById('color-modal').classList.add('active');
-    }
-
-    function closeColorModal() {
-        document.getElementById('color-modal').classList.remove('active');
-    }
-
-    async function pickColor(colorValue) {
-        closeColorModal();
-        if(!activeId) return;
-        await notesRef.doc(activeId).update({ color: colorValue || null }).catch(console.error);
-        applyNoteColor(colorValue);
-    }
-
-    // ====== EVENTS ======
-    document.getElementById('new-note-btn').addEventListener('click', createNote);
-    document.getElementById('rename-btn').addEventListener('click', openRenameModal);
-    document.getElementById('color-btn').addEventListener('click', openColorModal);
-    document.getElementById('delete-btn').addEventListener('click', () => { if(activeId) deleteNote(activeId); });
-
-    document.getElementById('rename-modal').addEventListener('click', e => {
-        if(e.target === document.getElementById('rename-modal')) closeRenameModal();
-    });
-    document.getElementById('color-modal').addEventListener('click', e => {
-        if(e.target === document.getElementById('color-modal')) closeColorModal();
-    });
-    document.getElementById('rename-input').addEventListener('keydown', e => {
-        if(e.key === 'Enter') confirmRename();
-        if(e.key === 'Escape') closeRenameModal();
-    });
-    document.addEventListener('keydown', e => {
-        if(e.key === 'Escape') closeRenameModal();
-    });
-
-    // ====== UTILS ======
-    function escHtml(s) {
-        return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    </script>
+    document.getElementById('auth-overlay').classList.remove('hidden');
+})();
+</script>
 
 </body>
 </html>

@@ -124,45 +124,16 @@
                 </button>
             </div>
 
-            <div id="config-albert" class="space-y-4">
-                <div class="space-y-1">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
-                        URL API / RELAIS
-                        <button onclick="setMentoriaPreset()" class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
-                            <i data-lucide="zap" class="w-2.5 h-2.5"></i> Utiliser Relais Mentoria (n8n)
-                        </button>
-                    </label>
-                    <input type="text" id="set-url" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs">
-                </div>
-                <div class="space-y-1">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Clé D'API ALBERT (BEARER)</label>
-                    <input type="password" id="set-key" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs" placeholder="sk-...">
-                </div>
-                <div class="space-y-1">
-                    <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider flex justify-between">
-                        Modèle Albert
-                        <button onclick="fetchModels()" class="text-indigo-600 hover:text-indigo-800 lowercase text-[10px] flex items-center gap-1">
-                            <i data-lucide="refresh-cw" class="w-2.5 h-2.5"></i> actualiser
-                        </button>
-                    </label>
-                    <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white" onchange="toggleCustomModel()">
-                        <option value="albert-medium">Albert Moyen (Mistral 24B)</option>
-                        <option value="albert-large">Albert Grand (GPT-120B)</option>
-                        <option value="albert-small">Albert Rapide (8B)</option>
-                        <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Mistral Small (Etalab)</option>
-                        <option value="openai/gpt-oss-120b">Albert 120B (Souverain)</option>
-                        <option value="custom">Autre...</option>
-                    </select>
-                    <input type="text" id="set-model-custom" class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2" placeholder="ID exact (ex: albert-medium)">
-                </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 text-emerald-700 text-xs font-bold">
+                La clé Albert est gérée automatiquement via le Worker Experia. Aucune configuration requise.
             </div>
 
-            <div class="pt-2 mt-4">
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" id="set-proxy" onchange="document.getElementById('set-proxy-url').classList.toggle('hidden', !this.checked)" class="w-5 h-5 rounded border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500">
-                    <span class="font-bold text-slate-700 text-[12px] group-hover:text-indigo-600 transition-colors">Utiliser un relais Proxy / Webhook</span>
-                </label>
-                <input type="text" id="set-proxy-url" class="hidden w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-mono text-xs mt-2" placeholder="URL proxy (ex: https://corsproxy.io/?)">
+            <div class="space-y-1">
+                <label class="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Modèle Albert</label>
+                <select id="set-model" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none font-bold text-xs bg-white">
+                    <option value="openai/gpt-oss-120b">Albert Grand — GPT-120B (recommandé)</option>
+                    <option value="mistralai/Mistral-Small-3.2-24B-Instruct-2506">Albert Moyen — Mistral 24B</option>
+                </select>
             </div>
 
             <div class="mt-8">
@@ -177,11 +148,8 @@
         lucide.createIcons();
 
         // ÉTAT
-        let apiUrl = localStorage.getItem('albert_api_url') || 'https://albert.api.etalab.gouv.fr/v1/chat/completions';
-        let apiKey = localStorage.getItem('albert_api_key') || '';
-        let modelName = localStorage.getItem('albert_model') || 'albert-medium';
-        let useProxy = localStorage.getItem('albert_use_proxy') === 'true';
-        let proxyUrl = localStorage.getItem('albert_proxy_url') || 'https://corsproxy.io/?';
+        const WORKER_URL = 'https://experia-proxy.gilles-cormi.workers.dev';
+        let modelName = localStorage.getItem('albert_model') || 'openai/gpt-oss-120b';
 
         // Nettoyage de l'historique des messages parasites
         let rawHistory = JSON.parse(localStorage.getItem('albert_history')) || [];
@@ -259,60 +227,16 @@
 
         function toggleSettings(show) {
             if (show) {
-                document.getElementById('set-url').value = apiUrl;
-                document.getElementById('set-key').value = apiKey;
-                document.getElementById('set-model').value = ['albert-medium','albert-large','albert-small','mistralai/Mistral-Small-3.2-24B-Instruct-2506','openai/gpt-oss-120b'].includes(modelName) ? modelName : 'custom';
-                if (document.getElementById('set-model').value === 'custom') {
-                    document.getElementById('set-model-custom').classList.remove('hidden');
-                    document.getElementById('set-model-custom').value = modelName;
-                }
-                document.getElementById('set-proxy').checked = useProxy;
-                document.getElementById('set-proxy-url').value = proxyUrl;
-                document.getElementById('set-proxy-url').classList.toggle('hidden', !useProxy);
+                document.getElementById('set-model').value = modelName;
                 document.getElementById('settings-modal').classList.remove('hidden');
             } else {
                 document.getElementById('settings-modal').classList.add('hidden');
             }
         }
 
-        function toggleCustomModel() {
-            const isCustom = document.getElementById('set-model').value === 'custom';
-            document.getElementById('set-model-custom').classList.toggle('hidden', !isCustom);
-        }
-
-        function setMentoriaPreset() {
-            document.getElementById('set-url').value = 'https://n8n.incubateur.education.gouv.fr/webhook/mentoria_chat';
-            document.getElementById('set-proxy').checked = false;
-            document.getElementById('set-proxy-url').classList.add('hidden');
-            alert("Mode Mentoria configuré !");
-        }
-
-        async function fetchModels() {
-            if (!apiKey) return alert("Clé API requise.");
-            try {
-                const target = apiUrl.includes('n8n.incubateur') ? apiUrl : apiUrl.replace('/chat/completions', '/models');
-                const finalUrl = (useProxy && !apiUrl.includes('n8n')) ? `${proxyUrl}${encodeURIComponent(target)}` : target;
-                const res = await fetch(finalUrl, { headers: { 'Authorization': `Bearer ${apiKey}` } });
-                const data = await res.json();
-                alert("Modèles disponibles récupérés (voir console).");
-                console.log("Modèles:", data);
-            } catch (e) { alert("Erreur: " + e.message); }
-        }
-
         function saveSettings() {
-            apiUrl = document.getElementById('set-url').value;
-            apiKey = document.getElementById('set-key').value;
             modelName = document.getElementById('set-model').value;
-            if (modelName === 'custom') modelName = document.getElementById('set-model-custom').value;
-            useProxy = document.getElementById('set-proxy').checked;
-            proxyUrl = document.getElementById('set-proxy-url').value;
-
-            localStorage.setItem('albert_api_url', apiUrl);
-            localStorage.setItem('albert_api_key', apiKey);
             localStorage.setItem('albert_model', modelName);
-            localStorage.setItem('albert_use_proxy', useProxy ? 'true' : 'false');
-            localStorage.setItem('albert_proxy_url', proxyUrl);
-
             toggleSettings(false);
             renderMessages();
         }
@@ -326,39 +250,25 @@
             renderMessages();
             loading.classList.remove('hidden');
 
-            if (!apiKey) {
-                messages.push({ role: 'error', text: '⚠️ Clé API Albert manquante.' });
-                loading.classList.add('hidden');
-                renderMessages();
-                return;
-            }
-
             try {
                 const apiMessages = [
                     { role: "system", content: "Tu es Albert, l'intelligence artificielle souveraine de l'État Français (Etalab). Réponds de manière claire, concise et professionnelle. Utilise le gras pour l'essentiel." },
                     ...messages.filter(m => m.role !== 'error').map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }))
                 ];
 
-                const isN8n = apiUrl.includes('n8n.incubateur.education.gouv.fr');
-                const finalUrl = (useProxy && !isN8n) ? `${proxyUrl || 'https://corsproxy.io/?'}${encodeURIComponent(apiUrl)}` : apiUrl;
-
-                const response = await fetch(finalUrl, {
+                const response = await fetch(WORKER_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                    body: JSON.stringify({ model: modelName, messages: apiMessages, temperature: 0.7 })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'albert', model: modelName, messages: apiMessages, temperature: 0.7 })
                 });
 
-                if (!response.ok) {
-                    const err = await response.text();
-                    throw new Error(`Erreur API (${response.status}): ${err.substring(0, 100)}`);
-                }
-
                 const data = await response.json();
+                if (data.error) throw new Error(data.error);
                 messages.push({ role: 'bot', text: data.choices?.[0]?.message?.content || "Pas de réponse." });
                 localStorage.setItem('albert_history', JSON.stringify(messages.slice(-10)));
             } catch (error) {
                 let msg = error.message;
-                if (msg === 'Failed to fetch') msg = "Échec de connexion. Vérifiez votre URL et le Proxy.";
+                if (msg === 'Failed to fetch') msg = "Échec de connexion au Worker.";
                 messages.push({ role: 'error', text: msg });
             } finally {
                 loading.classList.add('hidden');
