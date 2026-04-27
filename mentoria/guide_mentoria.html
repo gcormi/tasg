@@ -647,7 +647,17 @@
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h4>Cliquez "Publier"</h4>
+          <h4>Entrez le code de classe avant de générer le lien</h4>
+          <p>Dans la fenêtre de publication, renseignez votre <strong>code de classe</strong> (ex : <code>gc42</code>) avant de cliquer "Générer le lien". Ce champ est obligatoire — sans code, le lien ne peut pas être généré.</p>
+          <div class="alert alert-warning" style="margin-top:.75rem;">
+            <strong>Important :</strong> notez ce code de classe. Si vous le perdez, vous ne pourrez plus accéder aux sessions élèves depuis le Suivi. En cas de doute, retrouvez-le dans votre dossier <code>mentoria/</code> sur le Nuage.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Cliquez "Générer le lien"</h4>
           <p>Un lien est généré — c'est l'URL de la page <code>compagnion.html</code> avec la configuration de votre assistant encodée dans l'adresse.</p>
         </div>
       </div>
@@ -710,17 +720,25 @@
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <h4>Exclure un élève (bannissement)</h4>
-          <p>Si un élève détourne l'assistant, cliquez "Bannir". La prochaine fois qu'il tentera de se connecter avec son identifiant, l'accès sera refusé. Le bannissement est réversible.</p>
+          <h4>Bannir un élève</h4>
+          <p>Chaque carte élève dispose d'un bouton <strong>✕ ban</strong>. Cliquez dessus pour exclure immédiatement cet élève — il ne pourra plus accéder à l'assistant. Le bannissement est réversible depuis le Nuage (<code>banned.json</code>).</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <h4>Supprimer les logs d'une classe</h4>
-          <p>En bas du panneau, un bouton permet de supprimer tous les logs de la classe pour cet assistant. Utile entre deux groupes ou en fin d'année.</p>
+          <p>L'icône <strong>poubelle</strong> en haut à droite supprime tous les logs du code de classe actuellement sélectionné. Utile entre deux groupes ou en fin d'année.</p>
         </div>
       </div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Rafraîchissement automatique :</strong> le Suivi se met à jour toutes les <strong>5 minutes</strong>. Un bouton de rafraîchissement manuel est disponible en haut à droite pour forcer la mise à jour immédiatement.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Code de classe perdu ?</strong> Si vous avez utilisé un code généré automatiquement (navigation privée, autre PC), vous pouvez le retrouver dans votre Nuage (<code>mentoria/sessions/</code>) et l'entrer manuellement dans le champ prévu à cet effet dans le Suivi, à côté du sélecteur de groupe.
     </div>
 
     <div class="alert alert-success">
