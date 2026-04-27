@@ -910,6 +910,10 @@
                                 Clé précédente réutilisée — <button onclick="clearApiKey()" class="underline ml-0.5" style="color:#64748b">Changer</button>
                             </div>
                         </div>
+                        <div>
+                            <label class="label"><i data-lucide="link" class="w-3 h-3 inline mr-1"></i>URL du proxy Albert <span class="tip" data-tip="Laissez vide pour utiliser le proxy par défaut (n8n).&#10;&#10;Pour une classe entière, collez l'URL de votre Cloudflare Worker ici.&#10;&#10;Ex: https://mentoria-proxy.votre-compte.workers.dev">?</span></label>
+                            <input type="text" id="bot-proxy-url" class="input-field font-mono" placeholder="https://mentoria-proxy.votre-compte.workers.dev">
+                        </div>
                         <button onclick="saveCurrentBot()" class="btn btn-teal w-full text-xs py-2 justify-center">
                             <i data-lucide="save" class="w-3.5 h-3.5"></i> Valider et Enregistrer
                         </button>
@@ -1022,28 +1026,36 @@
             <button onclick="closeModal()" class="text-gray-300 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         <div class="p-5 space-y-4">
-            <div>
-                <label class="label">Lien élève</label>
-                <div class="flex gap-2">
-                    <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="Cliquez sur Publier…">
-                    <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+            <!-- Code de classe personnalisé -->
+            <div class="p-3 rounded-lg" style="background:#eef2ff;border:1px solid #c7d2fe">
+                <label class="label" style="color:#4338ca">👥 Code de classe <span class="normal-case font-normal text-indigo-400">— obligatoire avant de générer le lien</span></label>
+                <div class="flex gap-2 mt-1">
+                    <input id="class-key-input" type="text" maxlength="10" class="input-field flex-1 font-mono font-black text-base tracking-widest uppercase" placeholder="ex : GC42" style="color:#4338ca;letter-spacing:0.15em" oninput="this.value=this.value.toUpperCase(); document.getElementById('class-key-error').classList.add('hidden'); this.style.borderColor='';">
+                    <button onclick="generateShareLink()" class="btn btn-teal whitespace-nowrap"><i data-lucide="link" class="w-3.5 h-3.5"></i> Générer le lien</button>
                 </div>
+                <p class="text-[10px] text-indigo-400 mt-1.5">Initiales + numéro de classe : <strong>GC42</strong> pour la 4e2 de Gilles Cormi. Ce code identifie la classe dans le suivi élèves.</p>
+                <p id="class-key-error" class="hidden mt-1.5 text-[11px] font-bold text-red-600">⚠️ Entrez votre code de classe avant de générer le lien.</p>
             </div>
-            <!-- Jauge de poids du lien -->
-            <div class="p-3 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-[10px] font-semibold text-gray-600">Poids du lien élève (encodé)</span>
-                    <span id="publish-weight-label" class="text-[10px] font-bold text-gray-700">—</span>
+            <div id="share-link-section" class="hidden space-y-3">
+                <div>
+                    <label class="label">Lien élève</label>
+                    <div class="flex gap-2">
+                        <input id="share-link" readonly type="text" class="input-field flex-1 font-mono text-xs" style="color:var(--teal)" value="">
+                        <button onclick="copyToClipboard('share-link')" class="btn btn-teal"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copier</button>
+                    </div>
                 </div>
-                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div id="publish-weight-bar" class="h-full rounded-full transition-all" style="width:0%;background:#22c55e"></div>
+                <!-- Jauge de poids du lien -->
+                <div class="p-3 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-semibold text-gray-600">Poids du lien élève (encodé)</span>
+                        <span id="publish-weight-label" class="text-[10px] font-bold text-gray-700">—</span>
+                    </div>
+                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="publish-weight-bar" class="h-full rounded-full transition-all" style="width:0%;background:#22c55e"></div>
+                    </div>
+                    <p id="publish-weight-warn" class="hidden mt-1.5 text-[10px] text-amber-600">⚠️ Lien lourd — certains ENT ou emails peuvent tronquer les URLs longues. Réduisez le corpus ou retirez l'avatar.</p>
+                    <p id="publish-weight-alert" class="hidden mt-1.5 text-[10px] font-semibold text-red-600">🚨 Lien trop lourd (&gt; 200 Ko) — risque de rejet par certaines plateformes. Réduisez impérativement le corpus et/ou l'avatar.</p>
                 </div>
-                <p id="publish-weight-warn" class="hidden mt-1.5 text-[10px] text-amber-600">⚠️ Lien lourd — certains ENT ou emails peuvent tronquer les URLs longues. Réduisez le corpus ou retirez l'avatar.</p>
-                <p id="publish-weight-alert" class="hidden mt-1.5 text-[10px] font-semibold text-red-600">🚨 Lien trop lourd (&gt; 200 Ko) — risque de rejet par certaines plateformes. Réduisez impérativement le corpus et/ou l'avatar.</p>
-            </div>
-            <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca">
-                👥 <strong>Code de groupe :</strong> <span id="share-class-key" class="font-mono font-black text-lg tracking-widest">—</span>
-                <span class="block mt-1 text-[10px] text-indigo-400">Notez ce code — il vous permettra de retrouver cette classe dans le suivi. Chaque publication génère un code différent.</span>
             </div>
             <div class="p-3 rounded-lg text-xs leading-relaxed" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d">
                 🔒 <strong>Souverain :</strong> Lien auto-contenu. Aucun compte élève. Aucune donnée transmise à un tiers.
@@ -1326,7 +1338,7 @@
         }
         bots.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
         list.innerHTML = bots.map(bot => `
-            <div class="bot-item flex items-center justify-between mb-1 ${bot.id === currentBotId ? 'active' : ''}" onclick="loadBot('${bot.id}')">
+            <div class="bot-item group flex items-center justify-between mb-1 ${bot.id === currentBotId ? 'active' : ''}" onclick="loadBot('${bot.id}')">
                 <div class="flex items-center gap-2 overflow-hidden">
                     <div class="w-6 h-6 rounded flex items-center justify-center flex-none" style="background:#1e293b">
                         <i data-lucide="graduation-cap" class="w-3 h-3" style="color:var(--teal)"></i>
@@ -1336,7 +1348,7 @@
                         <p class="text-[9px] truncate" style="color:#64748b">${bot.config.theme || 'Thème libre'}</p>
                     </div>
                 </div>
-                <button onclick="event.stopPropagation(); deleteBot('${bot.id}')" class="p-1 flex-none opacity-30 hover:opacity-100 transition-opacity" style="color:#475569" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#475569'">
+                <button onclick="event.stopPropagation(); deleteBot('${bot.id}')" title="Supprimer cet assistant" class="p-1 flex-none opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-all duration-300" style="color:#94a3b8" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">
                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                 </button>
             </div>
@@ -1386,7 +1398,7 @@
             corpus: document.getElementById('bot-corpus-text')?.value || '',
             corpusUrls,
             apiKey: (() => { const k = document.getElementById('api-key')?.value || ''; if (k) localStorage.setItem('mentoria_api_key', k); return k; })(),
-            proxyUrl: '',
+            proxyUrl: document.getElementById('bot-proxy-url')?.value.trim() || '',
             vignette: hasVig ? vigImg.src : null,
             loggingConfig: (storageMode === 'nuage' && nuageUsername) ? {
                 username: nuageUsername,
@@ -1419,6 +1431,7 @@
         set('bot-strict-theme', bot.config.strictTheme); set('bot-custom-rules', bot.config.customRules);
         set('bot-corpus-text', bot.corpus);
         set('api-key', bot.apiKey || localStorage.getItem('mentoria_api_key') || '');
+        set('bot-proxy-url', bot.proxyUrl || '');
         document.getElementById('api-key-reused')?.classList.add('hidden');
         document.querySelectorAll('.rule-toggle').forEach(cb => { cb.checked = (bot.config.pedagogicRules || []).includes(rulesMap[cb.value]); });
         setAnswerSource(bot.config.answerSource || 'both');
@@ -1438,13 +1451,14 @@
 
     // ── SUPPRESSION ──
     window.deleteBot = async (id) => {
-        if (!confirm('Supprimer cet assistant ?')) return;
+        const botName = library[id]?.config?.title || 'cet assistant';
+        if (!confirm(`⚠️ Supprimer définitivement "${botName}" ?\n\nCette action est irréversible. Le bot sera effacé de votre stockage.`)) return;
         try {
             await deleteBotFile(id + '.json');
             delete library[id];
             if (currentBotId === id) resetForm();
             updateLibraryUI();
-            showToast('Supprimé', 'Assistant retiré.');
+            showToast('🗑️ Supprimé', `"${botName}" a été supprimé.`);
         } catch(e) { showToast('❌ Erreur', e.message); }
     };
 
@@ -1499,8 +1513,25 @@
     window.publishBot = async () => {
         await saveCurrentBot();
         const bot = library[currentBotId]; if (!bot) return;
-        // Générer un code de groupe unique à chaque publication
-        const classKey = Math.random().toString(36).slice(2, 6).toUpperCase();
+        // Ouvrir le modal et laisser le prof saisir son code de classe
+        document.getElementById('share-link-section').classList.add('hidden');
+        document.getElementById('class-key-input').value = '';
+        document.getElementById('publish-modal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => document.getElementById('class-key-input').focus(), 100);
+    };
+
+    window.generateShareLink = () => {
+        const bot = library[currentBotId]; if (!bot) return;
+        const classKey = document.getElementById('class-key-input').value.trim().toUpperCase();
+        if (!classKey) {
+            document.getElementById('class-key-input').focus();
+            document.getElementById('class-key-input').style.borderColor='#ef4444';
+            document.getElementById('class-key-error').classList.remove('hidden');
+            return;
+        }
+        document.getElementById('class-key-input').style.borderColor='';
+        document.getElementById('class-key-error').classList.add('hidden');
         const botForShare = JSON.parse(JSON.stringify(bot));
         if (botForShare.loggingConfig) botForShare.loggingConfig.classKey = classKey;
         const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(botForShare));
@@ -1513,8 +1544,7 @@
         if (groups.length > 20) groups.pop();
         localStorage.setItem(groupsKey, JSON.stringify(groups));
         document.getElementById('share-link').value = link;
-        const keyEl = document.getElementById('share-class-key');
-        if (keyEl) keyEl.textContent = classKey;
+        document.getElementById('share-link-section').classList.remove('hidden');
         // Jauge de poids du lien
         const urlKo = Math.round(encoded.length / 1024);
         const wBar = document.getElementById('publish-weight-bar');
@@ -1535,7 +1565,6 @@
                 wWarn?.classList.add('hidden'); wAlert?.classList.remove('hidden');
             }
         }
-        document.getElementById('publish-modal').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
     };
 

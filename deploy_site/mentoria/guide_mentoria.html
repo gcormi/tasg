@@ -614,7 +614,10 @@
         <div class="step-num">5</div>
         <div class="step-body">
           <h4>Section 3 — Sécurité & API</h4>
-          <p>Entrez votre <strong>clé Albert API</strong> (commence par <code>eyJ…</code>). Si vous activez le <strong>suivi pédagogique</strong>, renseignez également votre identifiant Nuage, le mot de passe d'application et un identifiant de classe (ex : <code>3eA</code>).</p>
+          <p>Entrez votre <strong>clé Albert API</strong> (commence par <code>eyJ…</code>). Si vous activez le <strong>suivi pédagogique</strong>, renseignez également votre identifiant Nuage, le mot de passe d'application et un <strong>code de classe</strong>.</p>
+          <div class="alert alert-warning" style="margin-top:.75rem;">
+            <strong>Convention de nommage obligatoire :</strong> le code de classe doit être unique sur tout le système. Utilisez vos <strong>initiales + numéro de classe</strong> : <code>gc42</code> pour la 4e2 de Gilles Cormi, <code>dm51</code> pour la 5e1 de Dupont Marie, etc. Ce code est celui que vous donnerez à vos élèves avec le lien du compagnon.
+          </div>
         </div>
       </div>
     </div>
@@ -686,7 +689,7 @@
     <p>Le panneau de <strong>Suivi pédagogique</strong> vous permet de consulter les échanges de vos élèves avec l'assistant, de modérer, et de purger les données.</p>
 
     <div class="alert alert-warning">
-      <strong>Prérequis :</strong> le suivi n'est disponible que si vous avez activé la <strong>configuration de suivi</strong> dans la section "Sécurité & API" de l'assistant (identifiant Nuage + mot de passe app + identifiant de classe).
+      <strong>Prérequis :</strong> le suivi n'est disponible que si vous avez activé la <strong>configuration de suivi</strong> dans la section "Sécurité & API" de l'assistant (identifiant Nuage + mot de passe app + code de classe au format <code>initiales+numéro</code>, ex : <code>gc42</code>).
     </div>
 
     <div class="steps">
@@ -936,8 +939,8 @@
 ├── <span class="string">bot_1713281234567.json</span>     <span class="comment">← un assistant complet</span>
 ├── <span class="string">bot_1713295810234.json</span>     <span class="comment">← un autre assistant</span>
 ├── <span class="string">banned.json</span>                <span class="comment">← liste élèves bannis (tous bots)</span>
-├── <span class="string">sessions_BOTID_3eA.json</span>    <span class="comment">← index des élèves de la classe 3eA</span>
-└── <span class="string">log_BOTID_3eA_p.martin.json</span> <span class="comment">← historique d'un élève</span>
+├── <span class="string">sessions_BOTID_gc42.json</span>    <span class="comment">← index des élèves de la classe 3eA</span>
+└── <span class="string">log_BOTID_gc42_p.martin.json</span> <span class="comment">← historique d'un élève</span>
     </div>
 
     <h3>Mot de passe d'application Nuage</h3>
@@ -990,7 +993,7 @@
     <span class="key">"username"</span>: <span class="string">"p.dupont"</span>,
     <span class="key">"password"</span>: <span class="string">"app_password_nuage"</span>,
     <span class="key">"server"</span>: <span class="string">"nuage.apps.education.fr"</span>,
-    <span class="key">"classKey"</span>: <span class="string">"3eA"</span>
+    <span class="key">"classKey"</span>: <span class="string">"gc42"</span>
   }
 }
     </div>
@@ -1011,7 +1014,7 @@
 
     <h3>Format des logs</h3>
     <div class="code-block">
-<span class="comment">// log_bot_1713281234567_3eA_p.martin.json</span>
+<span class="comment">// log_bot_1713281234567_gc42_p.martin.json</span>
 [
   {
     <span class="key">"role"</span>: <span class="string">"user"</span>,
