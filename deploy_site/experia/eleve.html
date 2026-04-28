@@ -1244,8 +1244,8 @@ function renderMotsMeles() {
   gc.innerHTML = mmState.grid.map((row, r) => row.map((char, c) => {
     const isFound = mmState.foundCells.includes(`${r}-${c}`);
     const isStart = mmState.startCell && mmState.startCell.r === r && mmState.startCell.c === c;
-    const bgClass = isFound ? 'bg-emerald-100 border-emerald-400 text-emerald-700' : 
-                    isStart ? 'bg-rose-200 border-rose-400 text-rose-700' : 
+    const bgClass = isStart  ? 'bg-rose-200 border-rose-400 text-rose-700' :
+                    isFound  ? 'bg-emerald-100 border-emerald-400 text-emerald-700' :
                     'bg-white border-slate-100 text-slate-700 hover:border-rose-300 hover:bg-rose-50';
     return `<div id="mm-${r}-${c}" onclick="mmCellClick(${r},${c})" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center font-black rounded-lg cursor-pointer transition-colors shadow-sm border-2 ${bgClass}">
       ${char}
@@ -1254,8 +1254,6 @@ function renderMotsMeles() {
 }
 
 function mmCellClick(r, c) {
-  if (mmState.foundCells.includes(`${r}-${c}`)) return;
-
   if (!mmState.startCell) {
     mmState.startCell = {r, c};
     renderMotsMeles();
