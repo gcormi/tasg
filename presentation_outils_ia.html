@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experia & Mentoria — Outils IA pour la classe</title>
+<style>
+  :root {
+    --indigo: #4f46e5;
+    --indigo-light: #ede9fe;
+    --violet: #7c3aed;
+    --emerald: #059669;
+    --slate: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--slate); line-height: 1.6; }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  /* En-tête */
+  .header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #2563eb 100%);
+    color: #fff; border-radius: 1.25rem; padding: 2.5rem 2rem 2rem;
+    margin-bottom: 2rem;
+  }
+  .header-top { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .header-icon {
+    width: 3rem; height: 3rem; background: rgba(255,255,255,.2);
+    border-radius: .75rem; display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+  .header h1 { font-size: 1.6rem; font-weight: 900; }
+  .header .sub { font-size: .95rem; opacity: .85; margin-bottom: 1.25rem; }
+  .badges { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .badge {
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 2rem; padding: .25rem .8rem; font-size: .75rem; font-weight: 600;
+  }
+
+  /* Contexte */
+  .context {
+    background: #fff; border: 1px solid var(--border); border-radius: 1rem;
+    padding: 1.25rem 1.5rem; margin-bottom: 2rem;
+  }
+  .context p { color: var(--muted); font-size: .9rem; }
+  .context strong { color: var(--slate); }
+
+  /* Grille outils */
+  .tools { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  @media (max-width: 640px) { .tools { grid-template-columns: 1fr; } }
+
+  .tool {
+    background: #fff; border: 2px solid var(--border); border-radius: 1rem;
+    padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+  }
+  .tool-header { display: flex; align-items: center; gap: .75rem; }
+  .tool-icon {
+    width: 2.5rem; height: 2.5rem; border-radius: .6rem;
+    display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;
+  }
+  .tool-icon.experia { background: #ede9fe; }
+  .tool-icon.mentoria { background: #ecfdf5; }
+  .tool h2 { font-size: 1.1rem; font-weight: 800; }
+  .tool .tagline { font-size: .8rem; color: var(--muted); }
+  .tool p { font-size: .85rem; color: var(--muted); }
+  .tool p strong { color: var(--slate); }
+
+  ul.features { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+  ul.features li { font-size: .85rem; color: var(--muted); display: flex; align-items: flex-start; gap: .5rem; }
+  ul.features li::before { content: '✓'; color: var(--emerald); font-weight: 800; flex-shrink: 0; margin-top: .05rem; }
+
+  .tool-retour {
+    background: var(--bg); border-radius: .6rem; padding: .75rem 1rem;
+    font-size: .8rem; color: var(--muted); border-left: 3px solid var(--indigo);
+  }
+  .tool-retour strong { color: var(--slate); display: block; margin-bottom: .2rem; font-size: .8rem; }
+
+  /* Points forts communs */
+  .commun {
+    background: #fff; border: 1px solid var(--border); border-radius: 1rem;
+    padding: 1.5rem; margin-bottom: 2rem;
+  }
+  .commun h3 { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; }
+  .commun-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .75rem; }
+  .commun-item { display: flex; gap: .6rem; align-items: flex-start; }
+  .commun-item .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .1rem; }
+  .commun-item p { font-size: .82rem; color: var(--muted); }
+  .commun-item strong { color: var(--slate); display: block; font-size: .85rem; }
+
+  /* Contact */
+  .contact {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #86efac; border-radius: 1rem; padding: 1.25rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .contact p { font-size: .875rem; color: #15803d; }
+  .contact strong { color: #166534; }
+  .contact .email { font-size: .85rem; color: var(--indigo); font-weight: 600; }
+
+  @media print {
+    body { background: #fff; }
+    .page { padding: 1rem; }
+    .tool { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- En-tête -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-icon">🧪</div>
+      <div>
+        <h1>Experia &amp; Mentoria</h1>
+        <div class="sub">Deux outils IA pour la classe, développés et testés au collège</div>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge">🇫🇷 Albert API — IA souveraine</span>
+      <span class="badge">🔒 Conforme RGPD</span>
+      <span class="badge">🏫 Forge des Communs Numériques</span>
+      <span class="badge">☁️ Nuage Éducation</span>
+      <span class="badge">✅ Testés en classe</span>
+    </div>
+  </div>
+
+  <!-- Contexte -->
+  <div class="context">
+    <p>Ces deux outils ont été développés dans une démarche de <strong>prototypage rapide par un enseignant-référent</strong>, sans équipe technique dédiée. Ils reposent exclusivement sur des <strong>infrastructures souveraines de l'Éducation Nationale</strong> (Albert, Nuage, Forge) et ont été testés avec de vraies classes. L'objectif : explorer ce qui est immédiatement faisable en classe avec l'IA, avant toute démarche institutionnelle.</p>
+  </div>
+
+  <!-- Grille outils -->
+  <div class="tools">
+
+    <!-- EXPERIA -->
+    <div class="tool">
+      <div class="tool-header">
+        <div class="tool-icon experia">⚡</div>
+        <div>
+          <h2>Experia</h2>
+          <div class="tagline">Évaluation enrichie par l'IA</div>
+        </div>
+      </div>
+      <p>Le professeur crée une session d'activités (QCM, paires, mots mêlés, questions ouvertes…). <strong>Albert génère les questions</strong> à partir d'une leçon ou d'un thème. Les élèves y répondent via un simple lien — sans compte, sans installation.</p>
+      <ul class="features">
+        <li>Génération automatique d'activités par l'IA</li>
+        <li>Correction et feedback immédiat pour l'élève</li>
+        <li>Suivi en temps réel par le professeur</li>
+        <li>Élève peut "terminer" une activité pour la verrouiller</li>
+        <li>Le prof peut réactiver une activité par élève</li>
+        <li>Correction générale téléchargeable (Word)</li>
+        <li>Réutilisation d'une session pour plusieurs classes</li>
+      </ul>
+      <div class="tool-retour">
+        <strong>Retour terrain</strong>
+        Premier test avec une classe entière effectué. Retours élèves positifs sur le feedback immédiat. Ajustements réalisés en direct (QCM, paires, mots mêlés) suite aux retours de séance.
+      </div>
+    </div>
+
+    <!-- MENTORIA -->
+    <div class="tool">
+      <div class="tool-header">
+        <div class="tool-icon mentoria">🧭</div>
+        <div>
+          <h2>Mentoria</h2>
+          <div class="tagline">Bot pédagogique personnalisable</div>
+        </div>
+      </div>
+      <p>Le professeur configure un <strong>assistant IA thématique</strong> avec une personnalité, un rôle et un contexte pédagogique. Les élèves dialoguent avec le bot via un lien de classe. Le professeur suit les échanges en temps réel.</p>
+      <ul class="features">
+        <li>Création de bots sans aucune compétence technique</li>
+        <li>Personnalité, rôle et limites définis par le prof</li>
+        <li>Lien de classe unique, sans compte élève</li>
+        <li>Suivi des conversations en temps réel</li>
+        <li>Possibilité de bannir un élève par carte</li>
+        <li>Données stockées sur Nuage (WebDAV Éducation)</li>
+        <li>Rafraîchissement automatique toutes les 5 min</li>
+      </ul>
+      <div class="tool-retour">
+        <strong>Retour terrain</strong>
+        Testé en accompagnement de séquence. Le bot peut jouer un rôle (personnage historique, expert scientifique…) et guider les élèves sans donner directement les réponses.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Points communs -->
+  <div class="commun">
+    <h3>Points forts communs aux deux outils</h3>
+    <div class="commun-grid">
+      <div class="commun-item">
+        <div class="icon">🇫🇷</div>
+        <div>
+          <strong>IA souveraine</strong>
+          <p>Albert API (Étalab / État français) — aucune donnée hors UE</p>
+        </div>
+      </div>
+      <div class="commun-item">
+        <div class="icon">🔒</div>
+        <div>
+          <strong>Conforme RGPD</strong>
+          <p>Élèves anonymes (pseudonyme), aucun compte, données effaçables à tout moment</p>
+        </div>
+      </div>
+      <div class="commun-item">
+        <div class="icon">🏫</div>
+        <div>
+          <strong>Infra EN uniquement</strong>
+          <p>Forge des Communs Numériques + Nuage apps.education.fr</p>
+        </div>
+      </div>
+      <div class="commun-item">
+        <div class="icon">📱</div>
+        <div>
+          <strong>Zéro installation</strong>
+          <p>Navigateur seul — fonctionne sur tablette, téléphone, ordinateur du labo</p>
+        </div>
+      </div>
+      <div class="commun-item">
+        <div class="icon">🏗️</div>
+        <div>
+          <strong>Open source</strong>
+          <p>Code disponible sur la Forge, réutilisable et adaptable par d'autres équipes</p>
+        </div>
+      </div>
+      <div class="commun-item">
+        <div class="icon">⚡</div>
+        <div>
+          <strong>Déployable rapidement</strong>
+          <p>Un prof peut être opérationnel en moins d'une heure, sans DSI</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="contact">
+    <div>
+      <p><strong>Gilles Cormi</strong> — Enseignant-référent numérique</p>
+      <p style="font-size:.8rem;margin-top:.2rem;color:#166534;">Disponible pour une démonstration en classe ou une présentation aux équipes</p>
+    </div>
+    <div class="email">gilles.cormi@gmail.com</div>
+  </div>
+
+</div>
+</body>
+</html>
