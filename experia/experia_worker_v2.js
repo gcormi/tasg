@@ -34,6 +34,8 @@ export default {
     if (action === 'writePresence')      return handleWritePresence(body, env);
     if (action === 'readPresences')      return handleReadPresences(body, env);
     if (action === 'albert')             return handleAlbert(body, env);
+    if (action === 'getCompletions')     return handleGetCompletions(body, env);
+    if (action === 'setCompletion')      return handleSetCompletion(body, env);
 
     // ── Inscription prof ──────────────────────────────────────────────────────
     if (action === 'register') return handleRegister(body, env);
@@ -49,10 +51,11 @@ export default {
     if (action === 'deleteSession') return handleDeleteSession(body, env);
     if (action === 'readResults')   return handleReadResults(body, env);
     if (action === 'listModels')    return handleListModels(body, env);
-    if (action === 'listNotes')     return handleListNotes(body, env);
-    if (action === 'readNote')      return handleReadNote(body, env);
-    if (action === 'writeNote')     return handleWriteNote(body, env);
-    if (action === 'deleteNote')    return handleDeleteNote(body, env);
+    if (action === 'listNotes')        return handleListNotes(body, env);
+    if (action === 'readNote')         return handleReadNote(body, env);
+    if (action === 'writeNote')        return handleWriteNote(body, env);
+    if (action === 'deleteNote')       return handleDeleteNote(body, env);
+    if (action === 'resetCompletion')  return handleResetCompletion(body, env);
 
     return json({ success: false, error: 'Action inconnue : ' + action }, 400);
   }
@@ -356,6 +359,39 @@ async function handleDeleteNote(body, env) {
   const listKey = 'notelist:' + safeProfId;
   let list = await env.EXPERIA_KV.get(listKey, 'json') || [];
   await env.EXPERIA_KV.put(listKey, JSON.stringify(list.filter(id => id !== noteId)));
+  return json({ success: true });
+}
+
+// ── Completions activités ─────────────────────────────────────────────────────
+
+async function handleGetCompletions(body, env) {
+  const { sessionId, studentId } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+  const data = await env.EXPERIA_KV.get('completion:' + sessionId + ':' + safeId(studentId), 'json') || {};
+  return json({ success: true, completions: data });
+}
+
+async function handleSetCompletion(body, env) {
+  const { sessionId, studentId, activityId, score, max } = body;
+  if (!sessionId || !studentId || !activityId) return json({ success: false, error: 'paramètres requis' });
+  const key = 'completion:' + sessionId + ':' + safeId(studentId);
+  const data = await env.EXPERIA_KV.get(key, 'json') || {};
+  data[activityId] = { done: true, score: score || 0, max: max || 0, doneAt: Date.now() };
+  await env.EXPERIA_KV.put(key, JSON.stringify(data));
+  return json({ success: true });
+}
+
+async function handleResetCompletion(body, env) {
+  const { sessionId, studentId, activityId } = body;
+  if (!sessionId || !studentId) return json({ success: false, error: 'sessionId et studentId requis' });
+  const key = 'completion:' + sessionId + ':' + safeId(studentId);
+  const data = await env.EXPERIA_KV.get(key, 'json') || {};
+  if (activityId) {
+    delete data[activityId];
+  } else {
+    Object.keys(data).forEach(k => delete data[k]);
+  }
+  await env.EXPERIA_KV.put(key, JSON.stringify(data));
   return json({ success: true });
 }
 

@@ -382,6 +382,44 @@
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
+<!-- BOUTON FLOTTANT TERMINER -->
+<div id="btn-terminate-container" class="hidden fixed bottom-6 right-6 z-50">
+  <button onclick="terminateActivity()" class="bg-slate-800 text-white font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 text-sm hover:bg-slate-900 transition-all border border-slate-700">
+    <i data-lucide="flag" class="w-4 h-4"></i> Terminer l'activité
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN : ACTIVITÉ TERMINÉE (lecture seule)   -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-completed" class="screen">
+  <div class="max-w-xl mx-auto w-full px-6 py-8 fade-up">
+    <div class="flex items-center gap-3 mb-6">
+      <button onclick="backToDashboard()" class="p-2 hover:bg-white rounded-xl transition-colors text-slate-500">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Activité terminée</p>
+        <h3 id="completed-title" class="font-black text-slate-800"></h3>
+      </div>
+    </div>
+    <div class="bg-white rounded-3xl p-8 shadow-sm border border-emerald-100 text-center">
+      <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="check-circle" class="w-8 h-8 text-emerald-500"></i>
+      </div>
+      <p class="text-sm font-bold text-slate-500 mb-1">Ton score</p>
+      <div id="completed-score" class="text-5xl font-black text-emerald-600 mb-2"></div>
+      <p id="completed-date" class="text-xs text-slate-400 font-medium mb-6"></p>
+      <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 font-medium">
+        Tu ne peux plus recommencer cette activité.<br>Demande à ton professeur si tu as besoin de la rouvrir.
+      </p>
+      <button onclick="backToDashboard()" class="mt-6 bg-slate-700 text-white font-black px-8 py-3 rounded-2xl hover:bg-slate-800 transition-all">
+        Retour aux activités
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ÉCRAN JEU : COMPLÉTER LA PHRASE             -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-completer" class="screen">
@@ -626,7 +664,7 @@
 // ─── ÉTAT GLOBAL ──────────────────────────────────────────────────────────────
 const E = {
   config: null, session: null, studentId: '',
-  scores: {},
+  scores: {}, completions: {},
   gameIdx: 0, gameData: [], gameScore: 0,
   currentActivity: null
 };
@@ -654,9 +692,11 @@ const COLORS = {
 };
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
+const GAME_SCREENS = ['qcm','paires','motsmeles','motscroises','rapidite','completer','intrus','questions_ia'];
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('btn-terminate-container').classList.toggle('hidden', !GAME_SCREENS.includes(id));
 }
 
 // ─── STORAGE / ALBERT ─────────────────────────────────────────────────────────
@@ -759,6 +799,12 @@ async function doConnect() {
       }
     } catch(e) { E._resuming = false; }
 
+    // Charger les activités terminées depuis KV
+    try {
+      const compRes = await storage({ action: 'getCompletions', sessionId: session.id, studentId });
+      E.completions = compRes?.completions || {};
+    } catch(e) { E.completions = {}; }
+
     setupDashboard();
     showScreen('dashboard');
   } catch(e) {
@@ -790,30 +836,33 @@ function setupDashboard() {
   const available = ACTIVITIES.filter(a => E.session.questions?.[a.id]?.length > 0);
   const grid = document.getElementById('activities-grid');
   grid.innerHTML = available.map(a => {
+    const comp = E.completions[a.id];
     const sc = E.scores[a.id];
-    const done = !!sc;
-    const pct = done ? Math.round((sc.score / sc.max) * 100) : 0;
-    const retryable = E.session.retryable;
-    const disabled = done && !retryable;
-    return `<div onclick="${disabled ? '' : `startActivity('${a.id}')`}"
-      class="bg-white rounded-2xl p-4 shadow-sm border ${done ? 'border-emerald-200' : 'border-slate-100 hover:border-indigo-200 hover:shadow-md cursor-pointer'} transition-all flex items-center gap-4 ${disabled ? 'opacity-60' : ''}">
+    const locked = !!comp?.done;
+    const scored = !locked && !!sc;
+    const pct = locked
+      ? (comp.max > 0 ? Math.round((comp.score / comp.max) * 100) : 0)
+      : (scored ? Math.round((sc.score / sc.max) * 100) : 0);
+    const shown = locked || scored;
+    return `<div onclick="startActivity('${a.id}')"
+      class="bg-white rounded-2xl p-4 shadow-sm border ${locked ? 'border-emerald-300 opacity-70' : 'border-slate-100 hover:border-indigo-200 hover:shadow-md cursor-pointer'} transition-all flex items-center gap-4">
       <div class="w-12 h-12 ${COLORS[a.color].bg} rounded-2xl flex items-center justify-center flex-none">
-        <i data-lucide="${a.icon}" class="w-6 h-6 ${COLORS[a.color].text}"></i>
+        <i data-lucide="${locked ? 'check-circle' : a.icon}" class="w-6 h-6 ${locked ? 'text-emerald-500' : COLORS[a.color].text}"></i>
       </div>
       <div class="flex-1 min-w-0">
         <h3 class="font-black text-slate-800">${a.label}</h3>
-        <p class="text-xs text-slate-400 font-medium">${E.session.questions[a.id].length} questions</p>
+        <p class="text-xs text-slate-400 font-medium">${locked ? 'Activité terminée — cliquer pour voir le résultat' : `${E.session.questions[a.id].length} questions`}</p>
       </div>
       <div class="flex-none text-right">
-        ${done
-          ? `<div class="font-black text-emerald-600 text-xl">${pct}%</div><p class="text-xs text-emerald-500 font-bold">terminé</p>`
+        ${shown
+          ? `<div class="font-black text-emerald-600 text-xl">${pct}%</div><p class="text-xs text-emerald-500 font-bold">${locked ? '✓ terminé' : 'en cours'}</p>`
           : `<div class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-slate-400"></i></div>`
         }
       </div>
     </div>`;
   }).join('');
 
-  const done = Object.keys(E.scores).length;
+  const done = available.filter(a => E.completions[a.id]?.done || E.scores[a.id]).length;
   const total = available.length;
   document.getElementById('dash-progress-bar').style.width = `${total ? (done/total)*100 : 0}%`;
   document.getElementById('dash-progress-text').textContent = `${done}/${total}`;
@@ -829,8 +878,30 @@ function setupDashboard() {
 
 function backToDashboard() { setupDashboard(); showScreen('dashboard'); }
 
+async function terminateActivity() {
+  if (!confirm('Terminer cette activité ?\n\nTu pourras voir ton score mais tu ne pourras plus recommencer.\nSi tu veux y accéder à nouveau, demande à ton professeur.')) return;
+  const id = E.currentActivity;
+  const sc = E.scores[id];
+  const score = sc ? sc.score : 0;
+  const max = sc ? sc.max : (E.session.scoring?.[id] || E.gameData.length || 1);
+  E.completions[id] = { done: true, score, max, doneAt: Date.now() };
+  storage({ action: 'setCompletion', sessionId: E.session.id, studentId: E.studentId, activityId: id, score, max }).catch(() => {});
+  backToDashboard();
+}
+
 // ─── DÉMARRER UNE ACTIVITÉ ────────────────────────────────────────────────────
+function showCompletedActivity(id) {
+  const a = ACTIVITIES.find(x => x.id === id);
+  const c = E.completions[id];
+  document.getElementById('completed-title').textContent = a?.label || id;
+  const pct = c.max > 0 ? Math.round((c.score / c.max) * 100) : 0;
+  document.getElementById('completed-score').textContent = pct + '%';
+  document.getElementById('completed-date').textContent = 'Terminé le ' + new Date(c.doneAt).toLocaleDateString('fr-FR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+  showScreen('completed');
+}
+
 function startActivity(id) {
+  if (E.completions[id]?.done) { showCompletedActivity(id); return; }
   E.currentActivity = id;
   E.gameIdx = 0;
   E.gameScore = 0;
