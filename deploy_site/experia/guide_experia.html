@@ -200,7 +200,7 @@
 
   <div class="nav-section">Notice Technique</div>
   <a href="#deploiement" onclick="setActive(this)">Déploiement Cloudflare</a>
-  <a href="#firebase" onclick="setActive(this)">Déploiement Firebase</a>
+  <a href="#forge" onclick="setActive(this)">Déploiement Forge</a>
   <a href="#secrets" onclick="setActive(this)">Secrets & Variables</a>
   <a href="#donnees" onclick="setActive(this)">Structure des données</a>
   <a href="#maintenance" onclick="setActive(this)">Maintenance</a>
@@ -550,6 +550,17 @@
     <div class="alert alert-info">
       <strong>Ordre des réponses QCM mélangé :</strong> pour les activités de type QCM, les choix de réponses sont mélangés de façon aléatoire à chaque ouverture. Deux élèves côte à côte voient les mêmes options dans un ordre différent — pas de copie possible.
     </div>
+
+    <div class="alert alert-info">
+      <strong>QCM en deux temps :</strong> l'élève sélectionne d'abord une réponse (elle s'affiche en bleu) et peut en changer librement. Ce n'est qu'en cliquant sur <strong>"Valider ma réponse"</strong> que la réponse est définitivement soumise. Plus de soumission accidentelle.
+    </div>
+
+    <h3>Terminer une activité</h3>
+    <p>Un bouton <strong>"Terminer l'activité"</strong> (drapeau, coin bas-droit) est disponible pendant toute activité. En cliquant dessus, l'élève <strong>verrouille définitivement l'activité</strong> : son score est enregistré et il ne peut plus y accéder. L'activité apparaît alors avec une coche verte dans le tableau de bord élève.</p>
+
+    <div class="alert alert-warning">
+      <strong>Attention :</strong> un élève peut terminer une activité à tout moment, même sans avoir répondu à tout. Encouragez-les à finir avant de cliquer. Si un élève a terminé par erreur, le professeur peut <strong>réactiver l'activité</strong> depuis la fiche résultat de l'élève.
+    </div>
   </section>
 
   <section id="resultats">
@@ -582,15 +593,22 @@
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
-          <h4>Ajoutez une note manuelle (optionnel)</h4>
-          <p>Sur la fiche d'un élève, vous pouvez ajouter votre propre note /20 et un commentaire, en complément de la correction IA.</p>
+          <h4>Ajoutez une appréciation (optionnel)</h4>
+          <p>Sur la fiche d'un élève, rédigez votre appréciation dans l'éditeur de texte enrichi : gras, italique, souligné, listes à puces. Ajoutez aussi votre note /20 si vous le souhaitez.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-body">
-          <h4>Téléchargez la correction (optionnel)</h4>
-          <p>Utilisez le bouton "Télécharger la correction" pour exporter un récapitulatif au format HTML.</p>
+          <h4>Réactivez une activité terminée (si nécessaire)</h4>
+          <p>Sur la fiche d'un élève, les activités qu'il a "terminées" affichent un badge <strong style="color:#16a34a">✓ terminé</strong> et un bouton <strong>"Réactiver"</strong>. Cliquez "Réactiver" pour déverrouiller l'activité — l'élève peut y retourner.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>Téléchargez la correction générale (optionnel)</h4>
+          <p>Utilisez le bouton "Télécharger la correction" pour exporter un récapitulatif de toutes les réponses correctes au format <strong>Word (.doc)</strong> — avec titres, couleurs et mise en forme conservés.</p>
         </div>
       </div>
     </div>
@@ -600,7 +618,7 @@
     </div>
 
     <div class="alert alert-success">
-      <strong>Présence vs résultats :</strong> un élève "connecté" (section du haut) est en train de travailler. Un élève "résultat" (section du bas) a terminé et soumis au moins une activité. Un élève peut passer de connecté à résultat en cours de session.
+      <strong>Présence vs résultats :</strong> un élève "connecté" (section du haut) est en train de travailler. Un élève "résultat" (section du bas) a soumis au moins une activité. Les activités qu'il a "terminées" (verrouillées) apparaissent avec une coche verte sur sa fiche.
     </div>
   </section>
 
@@ -738,14 +756,14 @@
     <p>Cliquez "Deploy" après chaque ajout.</p>
   </section>
 
-  <!-- ── DÉPLOIEMENT FIREBASE ── -->
-  <section id="firebase">
+  <!-- ── DÉPLOIEMENT FORGE ── -->
+  <section id="forge">
     <div class="section-label">Notice Technique</div>
-    <h2>Déploiement des pages Firebase</h2>
-    <p>Les pages <code>prof.html</code> et <code>eleve.html</code> sont hébergées sur <strong>Firebase Hosting</strong> (projet <code>portail-postits</code>). Elles sont indépendantes du Worker Cloudflare. Tout changement dans ces fichiers nécessite deux étapes : copier vers le dossier de déploiement, puis lancer Firebase.</p>
+    <h2>Déploiement des pages (Forge des Communs Numériques)</h2>
+    <p>Les pages <code>prof.html</code>, <code>eleve.html</code> et le guide sont hébergées sur la <strong>Forge des Communs Numériques</strong> (forge.aeif.fr). Le déploiement est <strong>entièrement automatique</strong> : dès qu'une modification est poussée sur la branche principale, la Forge publie le site en quelques secondes.</p>
 
-    <div class="alert alert-warning">
-      <strong>Important :</strong> modifier un fichier dans <code>experia/</code> ne suffit pas — il faut aussi copier dans <code>deploy_site/experia/</code> et relancer <code>firebase deploy</code>. Sinon le site en ligne reste sur l'ancienne version.
+    <div class="alert alert-success">
+      <strong>Déploiement simplifié :</strong> pas de commande à taper, pas de copie de fichier. Modifiez dans <code>experia/</code>, faites un commit + push depuis GitHub Desktop → le site est à jour automatiquement.
     </div>
 
     <h3>Flux de déploiement</h3>
@@ -754,50 +772,27 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <h4>Modifier le fichier dans <code>experia/</code></h4>
-          <p>Toutes les modifications se font dans le dossier de travail : <code>experia/prof.html</code>, <code>experia/eleve.html</code>, ou <code>experia/experia_worker_v2.js</code>.</p>
+          <p>Toutes les modifications se font dans le dossier de travail : <code>experia/prof.html</code>, <code>experia/eleve.html</code>, <code>experia/guide_experia.html</code>.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h4>Copier vers <code>deploy_site/experia/</code></h4>
-          <p>Dans le terminal (depuis le dossier <code>frojet/</code>) :</p>
+          <h4>Commit + Push depuis GitHub Desktop</h4>
+          <p>Dans GitHub Desktop : saisissez un message de commit (ex : "mise à jour guide"), cliquez "Commit to main", puis "Push origin". C'est tout.</p>
         </div>
       </div>
-    </div>
-
-    <div class="code-block">
-<span class="comment"># Copier prof.html</span>
-cp experia/prof.html deploy_site/experia/prof.html
-
-<span class="comment"># Copier eleve.html</span>
-cp experia/eleve.html deploy_site/experia/eleve.html
-
-<span class="comment"># Copier le guide</span>
-cp experia/guide_experia.html deploy_site/experia/guide_experia.html
-    </div>
-
-    <div class="steps">
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <h4>Déployer sur Firebase</h4>
-          <p>Depuis le dossier <code>frojet/</code> (pas <code>experia/</code>) :</p>
+          <h4>La Forge déploie automatiquement</h4>
+          <p>Le pipeline GitLab CI (<code>.gitlab-ci.yml</code>) publie le site sur la Forge Pages. Le déploiement prend environ 1 à 2 minutes.</p>
         </div>
       </div>
     </div>
 
-    <div class="code-block">
-<span class="comment"># Depuis C:\Users\gille\Documents\Downloads\Dossier-projet\frojet</span>
-firebase deploy
-    </div>
-
-    <div class="alert alert-success">
-      <strong>Résultat :</strong> Firebase publie les fichiers sur <code>portail-postits.web.app</code>. Le déploiement prend environ 30 secondes.
-    </div>
-
     <h3>Mettre à jour le Worker Cloudflare</h3>
-    <p>Le Worker est indépendant de Firebase. Pour le mettre à jour :</p>
+    <p>Le Worker Cloudflare est <strong>indépendant</strong> de la Forge — il doit être mis à jour manuellement :</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
@@ -813,9 +808,9 @@ firebase deploy
         <tr><th>Composant</th><th>Emplacement source</th><th>Déploiement</th></tr>
       </thead>
       <tbody>
-        <tr><td><code>prof.html</code></td><td><code>experia/prof.html</code></td><td>Copie → <code>deploy_site/</code> → <code>firebase deploy</code></td></tr>
-        <tr><td><code>eleve.html</code></td><td><code>experia/eleve.html</code></td><td>Copie → <code>deploy_site/</code> → <code>firebase deploy</code></td></tr>
-        <tr><td><code>experia_worker_v2.js</code></td><td><code>experia/experia_worker_v2.js</code></td><td>Coller dans l'éditeur Cloudflare → Deploy</td></tr>
+        <tr><td><code>prof.html</code></td><td><code>experia/prof.html</code></td><td>Commit + Push → Forge CI automatique</td></tr>
+        <tr><td><code>eleve.html</code></td><td><code>experia/eleve.html</code></td><td>Commit + Push → Forge CI automatique</td></tr>
+        <tr><td><code>experia_worker_v2.js</code></td><td><code>experia/experia_worker_v2.js</code></td><td>Coller dans l'éditeur Cloudflare → Deploy (manuel)</td></tr>
       </tbody>
     </table>
   </section>
@@ -905,6 +900,11 @@ firebase deploy
           <td>Liste des IDs élèves connectés à la session</td>
           <td>Action <code>writePresence</code></td>
         </tr>
+        <tr>
+          <td><code>completion:{sessionId}:{studentId}</code></td>
+          <td>Activités terminées (verrouillées) par un élève, avec score et date</td>
+          <td>Action <code>setCompletion</code></td>
+        </tr>
       </tbody>
     </table>
 
@@ -928,6 +928,9 @@ firebase deploy
         <tr><td><code>readPresences</code></td><td>profId + profSecret</td><td>Lire la liste des élèves connectés à une session</td></tr>
         <tr><td><code>albert</code></td><td>Aucune</td><td>Appel IA via clé partagée ou clé prof</td></tr>
         <tr><td><code>listModels</code></td><td>profId + profSecret</td><td>Lister les modèles Albert disponibles</td></tr>
+        <tr><td><code>getCompletions</code></td><td>Aucune</td><td>Lire les activités terminées d'un élève</td></tr>
+        <tr><td><code>setCompletion</code></td><td>Aucune</td><td>Verrouiller une activité (élève "termine")</td></tr>
+        <tr><td><code>resetCompletion</code></td><td>profId + profSecret</td><td>Réactiver une activité verrouillée (prof)</td></tr>
       </tbody>
     </table>
   </section>
