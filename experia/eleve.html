@@ -1086,7 +1086,7 @@ function checkPair() {
   const termEl = document.getElementById(`term-${selectedTerm.idx}`);
   const defEl  = document.getElementById(`def-${selectedDef.idx}`);
 
-  const correct = termData.term === defData.term; // même paire si term identique dans les deux listes
+  const correct = termData === defData; // même objet = même paire (évite les faux positifs sur termes identiques)
 
   if (correct) {
     termEl.classList.remove('selected'); termEl.classList.add('matched');
