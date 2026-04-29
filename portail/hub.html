@@ -2,7 +2,7 @@
 <html lang="fr" class="scroll-smooth">
 <head>
     <script>
-        if (localStorage.getItem('portal_unlocked') !== 'true') {
+        if (localStorage.getItem('portal_unlocked') !== 'true' && sessionStorage.getItem('portal_invitation_unlocked') !== 'true') {
             window.location.href = 'index.html';
         }
     </script>

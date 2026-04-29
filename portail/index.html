@@ -1811,14 +1811,11 @@
     <script>
         // Check unlock status immediately to prevent flash
         (function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isGuest = urlParams.has('invit') || sessionStorage.getItem('portal_invitation_unlocked') === 'true';
+            const isGuest = sessionStorage.getItem('portal_invitation_unlocked') === 'true';
             const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || !window.location.hostname);
             const unlocked = localStorage.getItem('portal_unlocked') === 'true' || isLocal || isGuest;
             if (unlocked) {
                 document.documentElement.classList.add('portal-unlocked');
-                if (isGuest) sessionStorage.setItem('portal_invitation_unlocked', 'true');
-                else localStorage.setItem('portal_unlocked', 'true');
             }
         })();
     </script>
@@ -1830,40 +1827,139 @@
     <div id="lock-screen" aria-modal="true" role="dialog">
         <div class="lock-card">
             <div class="lock-icon">
-                <i class="fas fa-lock"></i>
+                <i class="fas fa-graduation-cap"></i>
             </div>
-            <h1 class="lock-title">Accès Protégé</h1>
-            <p class="lock-subtitle">Veuillez entrer le mot de passe pour accéder au Portail de l'Ingénierie Pédagogique.</p>
-            
+            <h1 class="lock-title">Portail Pédagogique</h1>
+            <p class="lock-subtitle">Connectez-vous ou entrez votre code d'accès.</p>
+
+            <!-- Admin : connexion Google -->
+            <button id="google-login-btn" onclick="window.loginPortal()"
+                    style="width:100%;padding:13px 20px;border-radius:16px;background:white;border:1.5px solid #e2e8f0;font-weight:700;color:#1e293b;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;transition:all 0.2s;font-size:0.9rem;">
+                <i class="fab fa-google" style="color:#4285F4;font-size:1rem;"></i>
+                Connexion Admin (Google)
+            </button>
+
+            <!-- Séparateur -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+                <span style="font-size:0.65rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">ou code invité</span>
+                <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+            </div>
+
+            <!-- Invité : saisie du code -->
             <form id="lock-form" onsubmit="return false;">
                 <div class="lock-input-group">
-                    <input type="password" id="portal-password-input" placeholder="••••••••" autocomplete="current-password" required>
+                    <input type="text" id="portal-password-input" placeholder="Entrez votre code d'accès"
+                           autocomplete="off" style="text-transform:uppercase;letter-spacing:0.15em;" required>
                 </div>
                 <button type="submit" id="unlock-button" class="lock-btn">
-                    Accéder au portail
-                    <i class="fas fa-chevron-right"></i>
+                    Accéder <i class="fas fa-chevron-right"></i>
                 </button>
             </form>
-            
-            <p id="lock-error" class="text-xs text-rose-500 font-bold mt-4 opacity-0 transition-opacity">Mot de passe incorrect. Réessayez.</p>
+
+            <p id="lock-error" class="text-xs font-bold mt-4 opacity-0 transition-opacity" style="color:#ef4444;min-height:1.2rem;"></p>
+            <p id="lock-loading" style="font-size:0.75rem;color:#6366f1;font-weight:700;opacity:0;transition:opacity 0.3s;margin-top:4px;">Vérification en cours...</p>
         </div>
     </div>
 
     <script>
-        // Logic for unlocking the portal
-        const VALID_PASSWORD = "Brigitte*1963";
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            // Enregistrement Service Worker
+        // --- AUTHENTIFICATION DU PORTAIL ---
+        // Initialisation Firebase (portail-postits) si pas encore fait
+        (function() {
+            const cfg = {
+                apiKey: "AIzaSyBGxXTvy8thfYJZTP-QbWrV-2euTmj4NPY",
+                authDomain: "portail-postits.firebaseapp.com",
+                projectId: "portail-postits",
+                storageBucket: "portail-postits.firebasestorage.app",
+                messagingSenderId: "494625342197",
+                appId: "1:494625342197:web:d20c7d9e4a82e74f3e3f72"
+            };
+            if (!firebase.apps.length) firebase.initializeApp(cfg);
+        })();
+
+        const _lockDb = firebase.firestore();
+        const _lockInvitations = _lockDb.collection('invitations');
+
+        // Connexion Google (admin)
+        window.loginPortal = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const loading = document.getElementById('lock-loading');
+            const errEl = document.getElementById('lock-error');
+            loading.style.opacity = '1';
+            errEl.style.opacity = '0';
+            firebase.auth().signInWithPopup(provider)
+                .then(() => {
+                    localStorage.setItem('portal_unlocked', 'true');
+                    document.documentElement.classList.add('portal-unlocked');
+                    document.getElementById('lock-screen').classList.add('hidden');
+                    document.body.style.overflow = '';
+                })
+                .catch(err => {
+                    loading.style.opacity = '0';
+                    if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+                        firebase.auth().signInWithRedirect(provider);
+                    } else {
+                        errEl.textContent = 'Erreur Google : ' + err.message;
+                        errEl.style.opacity = '1';
+                    }
+                });
+        };
+
+        // Détecter une session Google déjà active
+        firebase.auth().onAuthStateChanged(user => {
+            if (user && !user.isAnonymous) {
+                localStorage.setItem('portal_unlocked', 'true');
+                document.documentElement.classList.add('portal-unlocked');
+                const ls = document.getElementById('lock-screen');
+                if (ls) { ls.classList.add('hidden'); document.body.style.overflow = ''; }
+            }
+        });
+
+        // Validation d'un code invité (saisie manuelle ou lien ?invit=)
+        async function unlockWithCode(token) {
+            const errEl = document.getElementById('lock-error');
+            const loading = document.getElementById('lock-loading');
             const lockScreen = document.getElementById('lock-screen');
-            const passwordInput = document.getElementById('portal-password-input');
+            loading.textContent = 'Vérification...';
+            loading.style.opacity = '1';
+            errEl.style.opacity = '0';
+            try {
+                const snap = await _lockInvitations.where('token', '==', token).get();
+                if (snap.empty) {
+                    loading.style.opacity = '0';
+                    errEl.textContent = 'Code invalide. Vérifiez et réessayez.';
+                    errEl.style.opacity = '1';
+                    return;
+                }
+                const data = snap.docs[0].data();
+                if (data.expiresAt.toDate() < new Date()) {
+                    loading.style.opacity = '0';
+                    errEl.textContent = 'Ce code a expiré. Demandez un nouveau code.';
+                    errEl.style.opacity = '1';
+                    return;
+                }
+                // Code valide
+                sessionStorage.setItem('portal_invitation_unlocked', 'true');
+                sessionStorage.setItem('guest_token', token);
+                document.documentElement.classList.add('portal-unlocked');
+                firebase.auth().signInAnonymously().catch(() => {});
+                if (lockScreen) { lockScreen.classList.add('hidden'); document.body.style.overflow = ''; }
+                if (window.location.search) window.history.replaceState({}, '', window.location.pathname);
+            } catch(e) {
+                loading.style.opacity = '0';
+                errEl.textContent = 'Erreur réseau. Vérifiez votre connexion.';
+                errEl.style.opacity = '1';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const lockScreen = document.getElementById('lock-screen');
+            const codeInput = document.getElementById('portal-password-input');
             const lockForm = document.getElementById('lock-form');
-            const lockError = document.getElementById('lock-error');
 
-            // If already unlocked via localStorage or local dev, hide lock screen immediately
+            // Déverrouiller si déjà authentifié
             const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:' || !location.hostname);
-            const isGuest = new URLSearchParams(window.location.search).has('invit') || sessionStorage.getItem('portal_invitation_unlocked') === 'true';
-
+            const isGuest = sessionStorage.getItem('portal_invitation_unlocked') === 'true';
             if (localStorage.getItem('portal_unlocked') === 'true' || isLocal || isGuest) {
                 lockScreen.classList.add('hidden');
                 document.body.style.overflow = '';
@@ -1871,50 +1967,28 @@
                 document.body.style.overflow = 'hidden';
             }
 
-            function handleUnlock() {
-                const entered = passwordInput.value;
-                if (entered === VALID_PASSWORD) {
-                    localStorage.setItem('portal_unlocked', 'true');
-                    lockScreen.classList.add('hidden');
-                    document.body.style.overflow = '';
-                    
-                    // Small toast success
-                    if (typeof showToast === 'function') {
-                        showToast('Bonjour Brigitte ! Portail déverrouillé.', 'success');
-                    }
-                } else {
-                    // Password failed
-                    const card = document.querySelector('.lock-card');
-                    card.classList.add('shake');
-                    lockError.classList.remove('opacity-0');
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                    
-                    setTimeout(() => {
-                        card.classList.remove('shake');
-                    }, 500);
-                }
-            }
+            // Lien partagé avec token dans l'URL
+            const urlToken = new URLSearchParams(window.location.search).get('invit');
+            if (urlToken) unlockWithCode(urlToken);
 
-            lockForm.addEventListener('submit', (e) => {
+            // Soumission du formulaire code invité
+            lockForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                handleUnlock();
+                const code = codeInput.value.trim().toUpperCase();
+                if (code) await unlockWithCode(code);
             });
 
-            // Focus on input automatically
-            if (!lockScreen.classList.contains('hidden')) {
-                passwordInput.focus();
-            }
+            if (!lockScreen.classList.contains('hidden')) codeInput?.focus();
 
-            // Logout/Lock Logic
-            const logoutBtns = [document.getElementById('logout-portal-btn')];
-            logoutBtns.forEach(btn => {
-                btn?.addEventListener('click', () => {
-                    if (confirm('Voulez-vous verrouiller l\'accès au portail ?')) {
-                        localStorage.removeItem('portal_unlocked');
-                        location.reload();
-                    }
-                });
+            // Déconnexion
+            document.getElementById('logout-portal-btn')?.addEventListener('click', () => {
+                if (confirm('Verrouiller le portail ?')) {
+                    localStorage.removeItem('portal_unlocked');
+                    sessionStorage.removeItem('portal_invitation_unlocked');
+                    sessionStorage.removeItem('guest_token');
+                    firebase.auth().signOut();
+                    location.reload();
+                }
             });
         });
     </script>
@@ -3855,39 +3929,7 @@
             await invitationsRef.doc(id).delete();
         }
 
-        // --- VERIFICATION INVITATION ENTREE ---
-        async function checkIncomingInvitation() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('invit');
-
-            if (token) {
-                // On enregistre le token pour qu'il suive l'utilisateur s'il navigue
-                sessionStorage.setItem('guest_token', token);
-                
-                const snap = await invitationsRef.where('token', '==', token).get();
-                if (snap.empty) {
-                    alert("Ce code d'accès est invalide.");
-                    window.location.href = window.location.pathname; // Retire le param
-                    return;
-                }
-
-                const data = snap.docs[0].data();
-                if (data.expiresAt.toDate() < new Date()) {
-                    alert("Ce code d'accès a expiré.");
-                    window.location.href = window.location.pathname;
-                    return;
-                }
-
-                // Tout est ok -> on s'assure d'être en mode ANONYME si on n'est pas loggué Google
-                firebase.auth().onAuthStateChanged(user => {
-                    if (!user) {
-                        firebase.auth().signInAnonymously();
-                    }
-                });
-            }
-        }
-        
-        checkIncomingInvitation();
+        // La vérification des tokens invité est gérée par unlockWithCode() dans le script du lock screen
 
         // ========================================================================
         // GESTION DU GUIDE INTELLIGENT (EVOLUTIF)
