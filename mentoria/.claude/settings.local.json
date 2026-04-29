@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:albert.api.etalab.gouv.fr)"
-    ]
-  }
-}
