@@ -588,7 +588,14 @@
             if (user) {
                 startApp(user);
             } else {
-                // Si on a un jeton dans l'URL mais pas encore en session, on le récupère
+                // Restaurer le guest_token depuis localStorage si ouvert dans un nouvel onglet
+                if (!sessionStorage.getItem('guest_token')) {
+                    try {
+                        const ga = JSON.parse(localStorage.getItem('portal_guest_auth') || 'null');
+                        if (ga && ga.token && new Date(ga.expiresAt) > new Date()) sessionStorage.setItem('guest_token', ga.token);
+                    } catch(e) {}
+                }
+
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('invit')) {
                     sessionStorage.setItem('guest_token', urlParams.get('invit'));

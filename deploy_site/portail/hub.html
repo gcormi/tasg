@@ -2,9 +2,17 @@
 <html lang="fr" class="scroll-smooth">
 <head>
     <script>
-        if (localStorage.getItem('portal_unlocked') !== 'true') {
+        (function() {
+            if (localStorage.getItem('portal_unlocked') === 'true') return;
+            try {
+                const ga = JSON.parse(localStorage.getItem('portal_guest_auth') || 'null');
+                if (ga && ga.token && new Date(ga.expiresAt) > new Date()) {
+                    if (!sessionStorage.getItem('guest_token')) sessionStorage.setItem('guest_token', ga.token);
+                    return;
+                }
+            } catch(e) {}
             window.location.href = 'index.html';
-        }
+        })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
