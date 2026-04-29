@@ -209,7 +209,7 @@
               <tr><td class="p-2 font-medium">Mission rapidité</td><td class="p-2 text-center text-slate-500">8</td><td class="p-2 text-center text-slate-500">8</td></tr>
               <tr><td class="p-2 font-medium">Compléter la phrase</td><td class="p-2 text-center text-slate-500">5</td><td class="p-2 text-center text-slate-500">5</td></tr>
               <tr><td class="p-2 font-medium">Détection d'intrus</td><td class="p-2 text-center text-slate-500">5</td><td class="p-2 text-center text-slate-500">5</td></tr>
-              <tr><td class="p-2 font-medium">Questions ouvertes IA</td><td class="p-2 text-center text-slate-500">3</td><td class="p-2 text-center text-slate-500">20</td></tr>
+              <tr><td class="p-2 font-medium">Questions ouvertes IA</td><td class="p-2 text-center text-slate-500">3</td><td class="p-2 text-center text-slate-500">5</td></tr>
             </tbody>
           </table>
         </div>
@@ -228,6 +228,16 @@
       <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-800 font-medium flex items-start gap-2">
         <i data-lucide="clock" class="w-4 h-4 mt-0.5 flex-none"></i>
         <span>La génération prend <strong>30 à 90 secondes</strong> selon le nombre d'activités et la taille du corpus. Une barre de progression indique l'avancement activité par activité.</span>
+      </div>
+
+      <div class="bg-white rounded-xl border-2 border-indigo-200 p-5 shadow-sm">
+        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="clipboard-check" class="w-4 h-4 text-indigo-500"></i> Valider les questions avant publication</h4>
+        <p class="text-sm text-slate-600 font-medium mb-3">Après la génération, un <strong>écran de validation</strong> s'affiche avant que les élèves puissent accéder à la session. Sur cet écran vous pouvez :</p>
+        <ul class="space-y-1.5 text-sm text-slate-600 font-medium mb-3">
+          <li class="flex items-start gap-2"><i data-lucide="trash-2" class="w-4 h-4 text-red-400 mt-0.5 flex-none"></i><span><strong>Supprimer des questions</strong> — survolez une question, l'icône corbeille apparaît. Cliquez pour la retirer définitivement. Si toutes les questions d'une activité sont supprimées, l'activité disparaît.</span></li>
+          <li class="flex items-start gap-2"><i data-lucide="award" class="w-4 h-4 text-indigo-400 mt-0.5 flex-none"></i><span><strong>Ajuster le barème</strong> — chaque activité affiche un champ pts modifiable. Changez la valeur selon vos besoins (ex : QCM sur 5 pts au lieu de 10).</span></li>
+        </ul>
+        <p class="text-sm text-slate-600 font-medium">Cliquez <strong>"Publier la session"</strong> pour rendre la session accessible aux élèves. La session n'est enregistrée qu'à ce moment-là.</p>
       </div>
     </div>
   </section>
@@ -255,11 +265,20 @@
       <strong>Côté élève :</strong> l'élève saisit son <strong>identifiant ENT</strong> et le code de session. Il peut reprendre là où il s'était arrêté s'il n'a pas eu le temps de tout terminer — ses scores partiels sont sauvegardés automatiquement après chaque activité.
     </div>
     
-    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mt-4 text-sm text-indigo-800 font-medium flex items-start gap-2 shadow-sm">
-      <i data-lucide="download" class="w-5 h-5 mt-0.5 flex-none"></i>
-      <div>
-        <strong class="text-slate-800">Télécharger la correction</strong>
-        <p class="text-xs text-slate-600 mt-0.5">Sur cet écran de partage, vous avez accès à un bouton "Télécharger la correction". Il vous permet d'enregistrer instantanément un document HTML (imprimable en PDF) contenant toutes les réponses et grilles de votre session pour la préparation de votre cours !</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-800 font-medium flex items-start gap-2 shadow-sm">
+        <i data-lucide="download" class="w-5 h-5 mt-0.5 flex-none"></i>
+        <div>
+          <strong class="text-slate-800">Télécharger la correction</strong>
+          <p class="text-xs text-slate-600 mt-0.5">Document Word (.doc) contenant toutes les réponses correctes, explications et grilles. À utiliser comme corrigé de référence ou pour préparer votre cours.</p>
+        </div>
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 font-medium flex items-start gap-2 shadow-sm">
+        <i data-lucide="printer" class="w-5 h-5 mt-0.5 flex-none text-slate-500"></i>
+        <div>
+          <strong class="text-slate-800">Évaluation papier</strong>
+          <p class="text-xs text-slate-600 mt-0.5">Génère un document Word (.doc) à imprimer et distribuer aux élèves pour une évaluation sur feuille. Questions sans les réponses, avec espaces pour écrire. Le professeur corrige manuellement. Note : mots mêlés et mots croisés ne sont pas exportables (grille numérique uniquement).</p>
+        </div>
       </div>
     </div>
   </section>
@@ -506,7 +525,7 @@
   </section>
 
   <div class="border-t border-slate-100 pt-6 text-center text-sm text-slate-400 font-medium">
-    Experia — Forge des Communs Numériques Éducatifs · v1.1 — Mise à jour avril 2026
+    Experia — Forge des Communs Numériques Éducatifs · v1.2 — Mise à jour avril 2026
   </div>
 
 </div>
