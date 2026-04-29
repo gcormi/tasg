@@ -927,6 +927,8 @@
 
         document.getElementById('btn-add-source').addEventListener('click', async () => {
             const urlInput = document.getElementById('new-url');
+            const btnEl = document.getElementById('btn-add-source');
+            const btnText = document.getElementById('btn-text');
             const folderId = document.getElementById('folder-select').value;
             let url = urlInput.value.trim();
             if (!url) return;
@@ -938,29 +940,29 @@
                 return;
             }
 
+            // Retour visuel immédiat
+            btnEl.disabled = true;
+            btnText.textContent = 'Analyse en cours...';
+
             try {
-                showToast("Vérification du site...");
                 const domain = new URL(url).hostname.replace('www.', '');
-                
+
                 // Détection intelligente du flux RSS
                 let rssUrlDetected = null;
                 const possiblePaths = [url, url + '/feed', url + '/rss', url + '/index.xml', url + '/feed/'];
-                
+
                 for(let path of possiblePaths) {
                     try {
                         const check = await fetchRSS({ url: path });
-                        if (check.hasFeed) {
-                            rssUrlDetected = path;
-                            break;
-                        }
+                        if (check.hasFeed) { rssUrlDetected = path; break; }
                     } catch(e) {}
                 }
 
                 const newSource = {
-                    name: domain, 
-                    url, 
-                    rss_url: rssUrlDetected, 
-                    folderId: folderId === 'none' ? null : folderId, 
+                    name: domain,
+                    url,
+                    rss_url: rssUrlDetected,
+                    folderId: folderId === 'none' ? null : folderId,
                     addedAt: new Date().toISOString()
                 };
 
@@ -972,11 +974,14 @@
                     localStorage.setItem('local_sources', JSON.stringify(sources));
                     fetchAllFeeds();
                 }
-                
+
                 urlInput.value = "";
-                showToast(rssUrlDetected ? "Site ajouté avec flux RSS !" : "Site ajouté aux favoris.");
+                showToast(rssUrlDetected ? "✅ Site ajouté avec flux RSS !" : "✅ Site ajouté aux favoris.");
             } catch(e) {
-                showToast("URL invalide.", true);
+                showToast("❌ URL invalide.", true);
+            } finally {
+                btnEl.disabled = false;
+                btnText.textContent = 'Ajouter';
             }
         });
 
