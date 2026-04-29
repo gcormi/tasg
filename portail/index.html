@@ -1811,12 +1811,15 @@
     <script>
         // Check unlock status immediately to prevent flash
         (function() {
-            const isGuest = sessionStorage.getItem('portal_invitation_unlocked') === 'true';
             const isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || !window.location.hostname);
-            const unlocked = localStorage.getItem('portal_unlocked') === 'true' || isLocal || isGuest;
-            if (unlocked) {
-                document.documentElement.classList.add('portal-unlocked');
+            let unlocked = localStorage.getItem('portal_unlocked') === 'true' || isLocal;
+            if (!unlocked) {
+                try {
+                    const ga = JSON.parse(localStorage.getItem('portal_guest_auth') || 'null');
+                    unlocked = ga && ga.token && new Date(ga.expiresAt) > new Date();
+                } catch(e) {}
             }
+            if (unlocked) document.documentElement.classList.add('portal-unlocked');
         })();
     </script>
 </head>
@@ -1938,9 +1941,13 @@
                     errEl.style.opacity = '1';
                     return;
                 }
-                // Code valide
-                sessionStorage.setItem('portal_invitation_unlocked', 'true');
-                sessionStorage.setItem('guest_token', token);
+                // Code valide — stockage persistant avec expiry
+                localStorage.setItem('portal_guest_auth', JSON.stringify({
+                    token: token,
+                    expiresAt: data.expiresAt.toDate().toISOString(),
+                    name: data.name || 'Invité'
+                }));
+                sessionStorage.setItem('guest_token', token); // Firebase anonymous auth dans l'onglet courant
                 document.documentElement.classList.add('portal-unlocked');
                 firebase.auth().signInAnonymously().catch(() => {});
                 if (lockScreen) { lockScreen.classList.add('hidden'); document.body.style.overflow = ''; }
@@ -1959,7 +1966,12 @@
 
             // Déverrouiller si déjà authentifié
             const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:' || !location.hostname);
-            const isGuest = sessionStorage.getItem('portal_invitation_unlocked') === 'true';
+            let isGuest = false;
+            try {
+                const ga = JSON.parse(localStorage.getItem('portal_guest_auth') || 'null');
+                isGuest = ga && ga.token && new Date(ga.expiresAt) > new Date();
+                if (isGuest && !sessionStorage.getItem('guest_token')) sessionStorage.setItem('guest_token', ga.token);
+            } catch(e) {}
             if (localStorage.getItem('portal_unlocked') === 'true' || isLocal || isGuest) {
                 lockScreen.classList.add('hidden');
                 document.body.style.overflow = '';
@@ -1984,7 +1996,7 @@
             document.getElementById('logout-portal-btn')?.addEventListener('click', () => {
                 if (confirm('Verrouiller le portail ?')) {
                     localStorage.removeItem('portal_unlocked');
-                    sessionStorage.removeItem('portal_invitation_unlocked');
+                    localStorage.removeItem('portal_guest_auth');
                     sessionStorage.removeItem('guest_token');
                     firebase.auth().signOut();
                     location.reload();
