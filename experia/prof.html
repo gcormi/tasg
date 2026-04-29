@@ -14,7 +14,7 @@
     .screen.active { display: block; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
     .fade-up { animation: fadeUp 0.35s ease forwards; }
-    .activity-row { transition: all 0.2s; }
+    .activity-card { transition: all 0.2s; }
     .progress-bar { transition: width 0.5s ease; }
     input, textarea, select { font-family: 'Outfit', sans-serif; }
     
@@ -429,6 +429,30 @@
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
+<!-- ÉCRAN 4.5 : VALIDATION DES QUESTIONS       -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-validation" class="screen">
+  <div class="max-w-2xl mx-auto px-6 py-10">
+    <div class="flex items-center gap-3 mb-2 fade-up">
+      <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+        <i data-lucide="clipboard-check" class="w-5 h-5 text-indigo-600"></i>
+      </div>
+      <div class="flex-1">
+        <h2 class="text-xl font-black text-slate-900">Vérifier les activités</h2>
+        <p class="text-sm text-slate-400 font-medium">Supprimez les questions indésirables. Ajustez le barème si besoin, puis publiez.</p>
+      </div>
+    </div>
+    <div id="validation-activities" class="space-y-4 mb-6 mt-6">
+      <!-- injecté par JS -->
+    </div>
+    <button id="val-publish-btn" onclick="publishSession()"
+      class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
+      <i data-lucide="rocket" class="w-5 h-5"></i> Publier la session
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
 <!-- ÉCRAN 5 : DÉTAIL SESSION                   -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-session" class="screen">
@@ -650,7 +674,7 @@ const ACTIVITIES = [
   { id: 'rapidite',     label: 'Mission rapidité',         icon: 'zap',             color: 'orange', default: 8,  defaultPts: 8  },
   { id: 'completer',    label: 'Compléter la phrase',     icon: 'pen-line',        color: 'green',  default: 5,  defaultPts: 5  },
   { id: 'intrus',       label: 'Détection d\'intrus',     icon: 'search-x',        color: 'amber',  default: 5,  defaultPts: 5  },
-  { id: 'questions_ia', label: 'Questions ouvertes IA',   icon: 'message-square',  color: 'indigo', default: 3,  defaultPts: 20 }
+  { id: 'questions_ia', label: 'Questions ouvertes IA',   icon: 'message-square',  color: 'indigo', default: 3,  defaultPts: 5  }
 ];
 
 const COLOR_MAP = {
@@ -930,25 +954,37 @@ function copyQuickLink() {
 // ─── INIT ACTIVITÉS CONFIG ────────────────────────────────────────────────────
 function initActivitiesConfig() {
   const container = document.getElementById('activities-config');
+  container.className = 'grid grid-cols-2 gap-2';
   container.innerHTML = ACTIVITIES.map(a => `
-    <div class="activity-row flex items-center gap-3 py-2 border-b border-slate-50 last:border-0" id="row-${a.id}">
-      <input type="checkbox" id="chk-${a.id}" checked onchange="toggleActivity('${a.id}')"
-        class="w-4 h-4 accent-indigo-600 cursor-pointer flex-none">
-      <div class="w-8 h-8 rounded-lg flex items-center justify-center ${COLOR_MAP[a.color]}">
-        <i data-lucide="${a.icon}" class="w-4 h-4"></i>
+    <div class="activity-card cursor-pointer rounded-xl border-2 border-indigo-300 bg-indigo-50 p-3 flex flex-col gap-2 select-none"
+         id="row-${a.id}" onclick="toggleViaCard('${a.id}')">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center ${COLOR_MAP[a.color]} flex-none">
+          <i data-lucide="${a.icon}" class="w-3.5 h-3.5"></i>
+        </div>
+        <span class="flex-1 font-bold text-slate-700 text-xs leading-tight">${a.label}</span>
+        <div id="checkmark-${a.id}" class="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center flex-none">
+          <i data-lucide="check" class="w-3 h-3 text-white"></i>
+        </div>
+        <input type="checkbox" id="chk-${a.id}" checked class="hidden">
       </div>
-      <span class="flex-1 font-bold text-slate-700 text-sm">${a.label}</span>
-      <div class="flex items-center gap-1.5" id="cfg-${a.id}">
-        <label class="text-xs text-slate-400 font-medium">Q.</label>
+      <div class="flex items-center gap-1.5" id="cfg-${a.id}" onclick="event.stopPropagation()">
+        <span class="text-xs text-slate-400 font-medium">Q.</span>
         <input type="number" id="act-${a.id}" value="${a.default}" min="2" max="20"
-          class="w-14 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
-        <label class="text-xs text-slate-400 font-medium">/ pts</label>
+          class="w-12 bg-white border border-slate-200 rounded-lg px-1 py-1 outline-none text-center font-bold text-xs focus:border-indigo-400">
+        <span class="text-xs text-slate-400 font-medium">pts</span>
         <input type="number" id="pts-${a.id}" value="${a.defaultPts}" min="1" max="100"
-          class="w-14 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-lg px-2 py-1.5 outline-none text-center font-bold text-sm">
+          class="w-12 bg-white border border-slate-200 rounded-lg px-1 py-1 outline-none text-center font-bold text-xs focus:border-indigo-400">
       </div>
     </div>
   `).join('');
   lucide.createIcons();
+}
+
+function toggleViaCard(id) {
+  const chk = document.getElementById('chk-' + id);
+  chk.checked = !chk.checked;
+  toggleActivity(id);
 }
 
 // ─── TOGGLE ACTIVITÉ ─────────────────────────────────────────────────────────
@@ -956,8 +992,19 @@ function toggleActivity(id) {
   const checked = document.getElementById('chk-' + id).checked;
   const row = document.getElementById('row-' + id);
   const cfg = document.getElementById('cfg-' + id);
-  row.style.opacity = checked ? '' : '0.35';
-  cfg.querySelectorAll('input').forEach(inp => inp.disabled = !checked);
+  const checkmark = document.getElementById('checkmark-' + id);
+  if (checked) {
+    row.classList.remove('opacity-40', 'border-slate-200', 'bg-white');
+    row.classList.add('border-indigo-300', 'bg-indigo-50');
+    checkmark.classList.remove('bg-slate-300');
+    checkmark.classList.add('bg-indigo-500');
+  } else {
+    row.classList.remove('border-indigo-300', 'bg-indigo-50');
+    row.classList.add('opacity-40', 'border-slate-200', 'bg-white');
+    checkmark.classList.remove('bg-indigo-500');
+    checkmark.classList.add('bg-slate-300');
+  }
+  cfg.querySelectorAll('input[type="number"]').forEach(inp => inp.disabled = !checked);
 }
 
 // ─── CHARGEMENT SESSIONS ──────────────────────────────────────────────────────
@@ -1404,20 +1451,129 @@ async function startGeneration() {
     return;
   }
 
-  // Construire et sauvegarder la session
+  // Proposer la validation avant publication
+  showValidation(questions, config, scoring, { title, code: customCode, corpus, retryable, showCorrection, theme, model, level });
+}
+
+// ─── VALIDATION DES QUESTIONS ────────────────────────────────────────────────
+let pendingQuestions = {};
+let pendingParams = {};
+
+function showValidation(questions, config, scoring, params) {
+  pendingQuestions = JSON.parse(JSON.stringify(questions));
+  pendingParams = { ...params, config, scoring };
+  renderValidationScreen();
+  showScreen('validation');
+}
+
+function renderValidationScreen() {
+  const container = document.getElementById('validation-activities');
+  const activityOrder = ACTIVITIES.filter(a => pendingQuestions[a.id] && pendingQuestions[a.id].length > 0);
+  container.innerHTML = activityOrder.map(a => {
+    const qs = pendingQuestions[a.id];
+    const pts = pendingParams.scoring[a.id] || 0;
+    return `
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden" id="val-block-${a.id}">
+      <div class="flex items-center gap-3 p-4 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center ${COLOR_MAP[a.color]} flex-none">
+          <i data-lucide="${a.icon}" class="w-4 h-4"></i>
+        </div>
+        <span class="flex-1 font-black text-slate-800 text-sm">${a.label}</span>
+        <span id="val-count-${a.id}" class="text-xs font-bold text-slate-400">${qs.length} question${qs.length > 1 ? 's' : ''}</span>
+        <div class="flex items-center gap-1 ml-3">
+          <span class="text-xs text-slate-400">/</span>
+          <input type="number" id="val-pts-${a.id}" value="${pts}" min="0" max="100"
+            class="w-14 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none text-center font-bold text-sm focus:border-indigo-400">
+          <span class="text-xs text-slate-400">pts</span>
+        </div>
+      </div>
+      <div class="p-3 space-y-1" id="val-list-${a.id}">
+        ${qs.map((q, i) => renderValQuestion(a.id, q, i)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function renderValQuestion(actId, q, i) {
+  const text = getQuestionPreview(actId, q);
+  return `
+    <div class="flex items-start gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 group" id="val-q-${actId}-${i}">
+      <span class="text-xs font-bold text-slate-300 w-5 flex-none mt-0.5">${i + 1}</span>
+      <span class="flex-1 text-sm text-slate-600 leading-snug">${text}</span>
+      <button onclick="deleteValQuestion('${actId}', ${i})"
+        class="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-400 flex-none">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>`;
+}
+
+function getQuestionPreview(actId, q) {
+  switch (actId) {
+    case 'qcm':
+    case 'rapidite':    return q.q || '';
+    case 'paires':      return `<strong>${q.term}</strong> — ${q.def}`;
+    case 'motsmeles':   return q.word || '';
+    case 'motscroises': return `<strong>${q.word}</strong> — ${q.def}`;
+    case 'completer':   return q.phrase || '';
+    case 'intrus':      return (q.statements || []).join(' · ');
+    case 'questions_ia':return q.q || '';
+    default:            return JSON.stringify(q);
+  }
+}
+
+function deleteValQuestion(actId, idx) {
+  pendingQuestions[actId].splice(idx, 1);
+  if (pendingQuestions[actId].length === 0) {
+    delete pendingQuestions[actId];
+    document.getElementById(`val-block-${actId}`)?.remove();
+  } else {
+    const listEl = document.getElementById(`val-list-${actId}`);
+    listEl.innerHTML = pendingQuestions[actId].map((q, i) => renderValQuestion(actId, q, i)).join('');
+    const count = pendingQuestions[actId].length;
+    document.getElementById(`val-count-${actId}`).textContent = `${count} question${count > 1 ? 's' : ''}`;
+    lucide.createIcons();
+  }
+}
+
+async function publishSession() {
+  if (Object.keys(pendingQuestions).length === 0) {
+    alert('Il n\'y a plus aucune question à publier.');
+    return;
+  }
+  const scoring = {};
+  Object.keys(pendingQuestions).forEach(actId => {
+    const inp = document.getElementById(`val-pts-${actId}`);
+    scoring[actId] = inp ? parseInt(inp.value) || 0 : 0;
+  });
+
+  const btn = document.getElementById('val-publish-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Sauvegarde...';
+  lucide.createIcons();
+
   const sessionId = 'session_' + Date.now();
-  const code = customCode;
   const session = {
-    id: sessionId, code, title, corpus, createdAt: new Date().toISOString(),
-    config, scoring, retryable, showCorrection, theme, questions, model
+    id: sessionId,
+    code: pendingParams.code,
+    title: pendingParams.title,
+    corpus: pendingParams.corpus,
+    createdAt: new Date().toISOString(),
+    config: pendingParams.config,
+    scoring,
+    retryable: pendingParams.retryable,
+    showCorrection: pendingParams.showCorrection,
+    theme: pendingParams.theme,
+    questions: pendingQuestions,
+    model: pendingParams.model
   };
 
-  document.getElementById('gen-subtitle').textContent = 'Sauvegarde en cours...';
   const saveRes = await storage({ action: 'writeSession', session });
   if (!saveRes.success) {
-    showScreen('create');
-    document.getElementById('create-error').textContent = 'Erreur sauvegarde : ' + (saveRes.error || 'Vérifiez votre connexion au Worker.');
-    document.getElementById('create-error').classList.remove('hidden');
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="rocket" class="w-5 h-5"></i> Publier la session';
+    lucide.createIcons();
+    alert('Erreur sauvegarde : ' + (saveRes.error || 'Vérifiez votre connexion au Worker.'));
     return;
   }
   if (saveRes.sessionId) session.id = saveRes.sessionId;
@@ -1425,11 +1581,10 @@ async function startGeneration() {
   state.currentSession = session;
   state.sessions.unshift(session);
 
-  // Afficher la session créée
-  document.getElementById('sess-title').textContent = title;
+  document.getElementById('sess-title').textContent = session.title;
   document.getElementById('sess-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('sess-code').textContent = code;
-  const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId, model}))))}`;
+  document.getElementById('sess-code').textContent = session.code;
+  const link = `${location.origin}${location.pathname.replace("prof.html","eleve.html")}#config=${btoa(unescape(encodeURIComponent(JSON.stringify({workerUrl: state.proxyUrl, sessionId: session.id, model: session.model}))))}`;
   document.getElementById('sess-link').value = link;
   document.getElementById('results-list').innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-100"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p class="font-medium text-sm">En attente des premiers élèves...</p></div>`;
   renderBareme(session);

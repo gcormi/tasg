@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide d'accès aux outils — Experia &amp; Mentoria</title>
+<style>
+@page { size: A4 portrait; margin: 18mm 16mm; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 10pt;
+  color: #1e293b;
+  background: #fff;
+  line-height: 1.6;
+  max-width: 178mm;
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+.header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+.header h1 { font-size: 1.25rem; font-weight: 900; margin-bottom: 4px; }
+.header .sub { font-size: 0.82rem; opacity: 0.85; }
+.for-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.for-tag {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.intro {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #4f46e5;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.intro strong { color: #1e293b; }
+
+/* TABLEAU RÉCAPITULATIF */
+.recap {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.recap-title {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.77rem; }
+th {
+  background: #f1f5f9;
+  text-align: left;
+  padding: 5px 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+td { padding: 5px 8px; border-top: 1px solid #f1f5f9; vertical-align: top; }
+tr:hover td { background: #fafafa; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 3px; }
+.dot-exp { background: #4f46e5; }
+.dot-men { background: #059669; }
+.dot-both { background: #0891b2; }
+
+/* FICHES OUTILS */
+.tool-card {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 13px 15px;
+  margin-bottom: 12px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.tool-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.tool-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.tool-header-text h2 { font-size: 0.95rem; font-weight: 900; }
+.tool-header-text .tool-url { font-size: 0.72rem; color: #4f46e5; font-weight: 600; }
+.used-by { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+.badge-exp { background: #ede9fe; color: #4338ca; border-radius: 20px; padding: 1px 7px; font-size: 0.65rem; font-weight: 800; }
+.badge-men { background: #dcfce7; color: #15803d; border-radius: 20px; padding: 1px 7px; font-size: 0.65rem; font-weight: 800; }
+
+.tool-body { font-size: 0.78rem; color: #475569; line-height: 1.6; }
+.tool-body strong { color: #1e293b; }
+
+.steps { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.step {
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.step-num {
+  background: #1e293b; color: #fff;
+  border-radius: 50%;
+  width: 17px; height: 17px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; font-weight: 900; flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 0.77rem; color: #475569; }
+.step-text strong { color: #1e293b; }
+
+.note {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.73rem;
+  color: #92400e;
+  margin-top: 8px;
+}
+.note strong { color: #78350f; }
+
+.why-box {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 0.75rem;
+  color: #0c4a6e;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.why-box strong { color: #0369a1; display: block; margin-bottom: 2px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media screen { body { background: #f8fafc; padding: 20px; } }
+@media print { body { background: #fff; padding: 0; max-width: 100%; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🛠️ Guide d'accès aux outils — Prérequis techniques</h1>
+  <div class="sub">Ce qu'il faut obtenir pour déployer Experia et/ou Mentoria depuis zéro</div>
+  <div class="for-tags">
+    <span class="for-tag">⚡ Experia</span>
+    <span class="for-tag">🧭 Mentoria</span>
+    <span class="for-tag">Enseignants & équipes techniques</span>
+    <span class="for-tag">Académie de Corse — 2025-2026</span>
+  </div>
+</div>
+
+<div class="intro">
+  Les deux outils reposent sur des services numériques de l'Éducation Nationale ou conformes RGPD. <strong>Aucun service commercial non encadré n'est utilisé.</strong> Ce guide explique comment obtenir l'accès à chacun d'eux. Certains accès nécessitent un compte académique (<code>@ac-corse.fr</code> ou équivalent) ; d'autres font l'objet d'une demande spécifique.
+</div>
+
+<!-- RÉCAP -->
+<div class="recap">
+  <div class="recap-title">Vue d'ensemble — quel outil pour quel projet</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Rôle</th>
+        <th>Utilisé par</th>
+        <th>Accès</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Forge des Communs</strong></td>
+        <td>Hébergement des interfaces (GitLab Pages)</td>
+        <td><span class="dot dot-both"></span>Les deux</td>
+        <td>Compte académique</td>
+      </tr>
+      <tr>
+        <td><strong>Albert API</strong></td>
+        <td>IA souveraine — génération et correction</td>
+        <td><span class="dot dot-both"></span>Les deux</td>
+        <td>Demande de clé API</td>
+      </tr>
+      <tr>
+        <td><strong>Nuage national</strong></td>
+        <td>Stockage des données (WebDAV)</td>
+        <td><span class="dot dot-men"></span>Mentoria</td>
+        <td>Compte académique</td>
+      </tr>
+      <tr>
+        <td><strong>n8n incubateur</strong></td>
+        <td>Orchestration des flux IA</td>
+        <td><span class="dot dot-men"></span>Mentoria</td>
+        <td>Demande projet incubateur</td>
+      </tr>
+      <tr>
+        <td><strong>Cloudflare Workers</strong></td>
+        <td>Proxy IA + stockage sessions</td>
+        <td><span class="dot dot-exp"></span>Experia</td>
+        <td>Compte gratuit (email)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FORGE -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon" style="background:#f1f5f9;">🏫</div>
+    <div class="tool-header-text">
+      <h2>Forge des Communs Numériques</h2>
+      <div class="tool-url">forge.aeif.fr</div>
+      <div class="used-by">
+        <span class="badge-exp">⚡ Experia</span>
+        <span class="badge-men">🧭 Mentoria</span>
+      </div>
+    </div>
+  </div>
+  <div class="tool-body">
+    Instance GitLab de l'Éducation Nationale. Les fichiers HTML des interfaces (prof, élève, suivi) sont versionnés ici et déployés automatiquement en <strong>GitLab Pages</strong> via un fichier <code>.gitlab-ci.yml</code>. Chaque push sur la branche principale met à jour le site en ligne.
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Aller sur <strong>forge.aeif.fr</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Se connecter avec son <strong>compte académique</strong> (via SSO académique)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Créer un nouveau projet ou dupliquer (fork) le projet source</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Activer <strong>GitLab Pages</strong> dans les paramètres du projet → l'URL publique est générée automatiquement</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ALBERT -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon" style="background:#fef9c3;">🤖</div>
+    <div class="tool-header-text">
+      <h2>Albert API — IA souveraine</h2>
+      <div class="tool-url">albert.api.etalab.gouv.fr</div>
+      <div class="used-by">
+        <span class="badge-exp">⚡ Experia</span>
+        <span class="badge-men">🧭 Mentoria</span>
+      </div>
+    </div>
+  </div>
+  <div class="tool-body">
+    IA générative développée par <strong>Étalab / DINUM</strong>, hébergée sur des serveurs de l'État français. C'est le cœur des deux outils : génération d'activités pour Experia, réponses du bot pour Mentoria. Conforme RGPD par construction — les données ne quittent pas le territoire français.
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Aller sur <strong>albert.api.etalab.gouv.fr</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Créer un compte (email académique recommandé) ou se connecter via FranceConnect</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Dans le tableau de bord, générer une <strong>clé API</strong> (token Bearer)</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Noter le modèle disponible (ex. <code>AgentPublic/llama3-instruct-8b</code>) et l'URL de base de l'API</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Insérer la clé dans la configuration du Worker (Experia) ou du workflow n8n (Mentoria)</div></div>
+    </div>
+    <div class="note"><strong>⚠️ Quota :</strong> L'accès Albert API est soumis à quota. Pour un usage classe, le free tier est généralement suffisant. Des accès renforcés peuvent être demandés via la DINUM pour des projets institutionnels.</div>
+  </div>
+</div>
+
+<!-- NUAGE -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon" style="background:#f0fdfa;">☁️</div>
+    <div class="tool-header-text">
+      <h2>Nuage national</h2>
+      <div class="tool-url">nuage.apps.education.fr</div>
+      <div class="used-by">
+        <span class="badge-men">🧭 Mentoria uniquement</span>
+      </div>
+    </div>
+  </div>
+  <div class="tool-body">
+    Instance Nextcloud hébergée par l'Éducation Nationale. Mentoria l'utilise comme <strong>base de stockage</strong> via le protocole WebDAV : configurations des bots, conversations élèves, logs. Toutes les données restent sur les serveurs de l'EN.
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Aller sur <strong>nuage.apps.education.fr</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Se connecter avec son <strong>compte académique</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Créer un dossier dédié à Mentoria dans le Nuage</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-num">4</div><div class="step-text">Générer un <strong>mot de passe d'application</strong> (Paramètres → Sécurité → Mots de passe d'application) pour l'accès WebDAV depuis n8n</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Renseigner l'URL WebDAV et le mot de passe dans le workflow n8n</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- N8N -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon" style="background:#e0f2fe;">⚙️</div>
+    <div class="tool-header-text">
+      <h2>n8n — Orchestrateur de flux</h2>
+      <div class="tool-url">n8n.incubateur.education.gouv.fr</div>
+      <div class="used-by">
+        <span class="badge-men">🧭 Mentoria uniquement</span>
+      </div>
+    </div>
+  </div>
+  <div class="tool-body">
+    Instance n8n hébergée par l'incubateur de l'Éducation Nationale. N8n est un outil d'<strong>automatisation de flux</strong> (type Zapier, open source) qui relie les différents services entre eux : il reçoit les messages des élèves, interroge Albert API, sauvegarde les conversations sur le Nuage et renvoie les réponses.
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Contacter l'équipe de l'incubateur via <strong>incubateur.education.gouv.fr</strong> pour demander un accès</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Présenter le projet pédagogique (l'accès est réservé aux projets EN, pas à usage privé)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Une fois l'accès accordé, importer le fichier <strong>workflow JSON</strong> fourni dans le dépôt</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Configurer les credentials (Albert API key, Nuage WebDAV) dans n8n</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Activer le workflow et noter l'URL du webhook généré</div></div>
+    </div>
+    <div class="note"><strong>⚠️ Usage éthique :</strong> Le n8n de l'incubateur est une ressource publique mutualisée, réservée aux projets pédagogiques de l'EN. Il ne doit pas être utilisé pour des activités privées ou commerciales.</div>
+  </div>
+</div>
+
+<!-- CLOUDFLARE -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon" style="background:#fff7ed;">🔶</div>
+    <div class="tool-header-text">
+      <h2>Cloudflare Workers + KV</h2>
+      <div class="tool-url">dash.cloudflare.com</div>
+      <div class="used-by">
+        <span class="badge-exp">⚡ Experia uniquement</span>
+      </div>
+    </div>
+  </div>
+  <div class="tool-body">
+    Cloudflare Workers est un service de <strong>calcul en périphérie</strong> (edge computing) qui permet d'exécuter du code côté serveur sans gérer d'infrastructure. KV (Key-Value) est sa base de données associée. Dans Experia, il joue deux rôles : <strong>proxy sécurisé</strong> vers Albert API (pour éviter d'exposer la clé API dans le navigateur) et <strong>stockage des sessions</strong> (activités générées, réponses élèves, résultats).
+
+    <div class="why-box">
+      <strong>🤔 Pourquoi Cloudflare et pas un service EN ?</strong>
+      Experia a d'abord utilisé Firebase (Google), mais Firebase est <strong>bloqué dans de nombreux établissements scolaires</strong>. Cloudflare Workers, lui, passe partout. Par ailleurs, les services souverains de l'EN (Nuage, n8n) n'offrent pas nativement de proxy d'API ni de stockage clé-valeur temps réel adapté. Cloudflare a été retenu car il dispose d'un <strong>accord DPA RGPD</strong>, les données peuvent être localisées en Europe, et son free tier (100 000 requêtes/jour) est largement suffisant pour un usage classe.
+    </div>
+
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Créer un compte gratuit sur <strong>cloudflare.com</strong> (email suffisant, pas de carte bancaire pour le free tier)</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Dans le tableau de bord → <strong>Workers & Pages</strong> → créer un nouveau Worker</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Coller le code du fichier <code>experia_worker_v2.js</code> fourni dans le dépôt</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Créer un namespace <strong>KV</strong> (Workers → KV) et le lier au Worker</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Définir les variables d'environnement : <code>ALBERT_API_KEY</code>, <code>MASTER_SECRET</code></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text">Déployer → noter l'URL du Worker (ex. <code>experia-proxy.votrecompte.workers.dev</code>)</div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-text">Renseigner cette URL dans <code>prof.html</code> et <code>eleve.html</code> (variable <code>WORKER_URL</code>)</div></div>
+    </div>
+    <div class="note"><strong>RGPD :</strong> Cloudflare est une entreprise américaine mais dispose d'un accord de traitement des données (DPA) conforme au RGPD. Les Workers peuvent être configurés pour traiter les données en Europe uniquement. Aucune donnée personnelle identifiable n'est stockée — les élèves utilisent des pseudonymes libres.</div>
+  </div>
+</div>
+
+<div class="footer">Guide prérequis — Experia &amp; Mentoria — Académie de Corse — 2025-2026 · Code source : forge.aeif.fr</div>
+
+</body>
+</html>

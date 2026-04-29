@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche Mentoria — Flux d'information</title>
+<style>
+@page { size: A4 portrait; margin: 18mm 16mm; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 10pt;
+  color: #1e293b;
+  background: #fff;
+  line-height: 1.5;
+  max-width: 178mm;
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #059669 0%, #0891b2 60%, #0e7490 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.icon { font-size: 2rem; line-height: 1; padding-top: 2px; }
+.header h1 { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em; }
+.header .sub { font-size: 0.82rem; opacity: 0.88; margin-top: 3px; }
+.badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.badge {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.32);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+/* SECTIONS */
+.section {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 13px 15px;
+  margin-bottom: 12px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.section-title {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #059669;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #dcfce7;
+}
+
+/* FLUX */
+.phases { display: flex; flex-direction: column; gap: 0; }
+.phase { padding: 8px 0; }
+.phase + .phase { border-top: 1px dashed #e2e8f0; }
+.phase-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 7px;
+}
+.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+.flow + .flow { margin-left: 18px; }
+
+.node {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.node.prof   { background: #ede9fe; color: #4338ca; }
+.node.eleve  { background: #dcfce7; color: #15803d; }
+.node.n8n    { background: #e0f2fe; color: #0369a1; }
+.node.ia     { background: #fef9c3; color: #92400e; }
+.node.nuage  { background: #f0fdfa; color: #0f766e; }
+.node.forge  { background: #f1f5f9; color: #475569; }
+
+.arr { color: #94a3b8; font-weight: 700; font-size: 0.9rem; }
+.desc { font-size: 0.76rem; color: #475569; }
+.desc strong { color: #1e293b; }
+
+/* INFRA */
+.infra-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.infra-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+.infra-role {
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #059669;
+  margin-bottom: 2px;
+}
+.infra-name { font-size: 0.8rem; font-weight: 800; color: #1e293b; margin-bottom: 3px; }
+.infra-desc { font-size: 0.7rem; color: #64748b; line-height: 1.45; }
+
+/* COMPARAISON */
+.compar {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.compar-item {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+.compar-tool { font-size: 0.8rem; font-weight: 800; color: #1e293b; margin-bottom: 3px; }
+.compar-desc { font-size: 0.72rem; color: #64748b; line-height: 1.45; }
+.compar-item.highlight {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.compar-item.highlight .compar-tool { color: #15803d; }
+
+/* RGPD */
+.rgpd-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.rgpd-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media screen {
+  body { background: #f8fafc; padding: 20px; }
+}
+@media print {
+  body { background: #fff; padding: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="icon">🧭</div>
+  <div>
+    <h1>Mentoria</h1>
+    <div class="sub">Plateforme de bots pédagogiques personnalisables — fiche de fonctionnement</div>
+    <div class="badges">
+      <span class="badge">🇫🇷 Albert API — IA souveraine</span>
+      <span class="badge">☁️ Nuage national (apps.education.fr)</span>
+      <span class="badge">🔧 n8n incubateur.education.gouv.fr</span>
+      <span class="badge">🏫 Forge des Communs Numériques</span>
+    </div>
+  </div>
+</div>
+
+<!-- FLUX -->
+<div class="section">
+  <div class="section-title">Circuit des données — qui fait quoi, où va l'information</div>
+  <div class="phases">
+
+    <div class="phase">
+      <div class="phase-title">① Création du bot — côté professeur</div>
+      <div class="flow">
+        <span class="node prof">👨‍🏫 Professeur</span>
+        <span class="arr">→</span>
+        <span class="desc">remplit un formulaire guidé : <strong>rôle du bot, personnalité, limites, contexte pédagogique</strong></span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node nuage">☁️ Nuage national</span>
+        <span class="arr">←</span>
+        <span class="desc">la configuration du bot est <strong>stockée sur le Nuage de l'Éducation Nationale</strong> (WebDAV)</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node forge">🏫 Forge (interface)</span>
+        <span class="arr">→</span>
+        <span class="desc">un <strong>lien de classe unique</strong> est généré — le professeur le partage avec ses élèves</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-title">② Dialogue élève avec le bot — en classe ou à distance</div>
+      <div class="flow">
+        <span class="node eleve">🎓 Élève</span>
+        <span class="arr">→</span>
+        <span class="desc">ouvre le lien dans son navigateur — <strong>sans compte, sans installation</strong>, pseudonyme libre</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="desc">saisit un message dans le chat → envoyé à l'orchestrateur</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node n8n">⚙️ n8n (incubateur EN)</span>
+        <span class="arr">→</span>
+        <span class="desc">récupère la config du bot sur le Nuage + transmet le contexte à Albert</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node ia">🤖 Albert API (Étalab)</span>
+        <span class="arr">→</span>
+        <span class="desc"><strong>génère la réponse du bot</strong> en respectant son rôle et ses limites pédagogiques</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node n8n">⚙️ n8n</span>
+        <span class="arr">→</span>
+        <span class="node nuage">☁️ Nuage national</span>
+        <span class="arr">→</span>
+        <span class="desc">la <strong>conversation est sauvegardée</strong> sur le Nuage EN</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node eleve">🎓 Élève</span>
+        <span class="arr">←</span>
+        <span class="desc">reçoit la réponse du bot dans son navigateur</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-title">③ Suivi en temps réel — côté professeur</div>
+      <div class="flow">
+        <span class="node nuage">☁️ Nuage national</span>
+        <span class="arr">→</span>
+        <span class="node forge">🏫 Interface suivi</span>
+        <span class="arr">→</span>
+        <span class="node prof">👨‍🏫 Professeur</span>
+        <span class="arr">←</span>
+        <span class="desc">voit <strong>toutes les conversations en direct</strong>, peut intervenir ou exclure un élève</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INFRA -->
+<div class="section">
+  <div class="section-title">Infrastructures mobilisées — 100 % souveraines ou conformes RGPD</div>
+  <div class="infra-grid">
+    <div class="infra-item">
+      <div class="infra-role">IA — réponses du bot</div>
+      <div class="infra-name">Albert API</div>
+      <div class="infra-desc">IA souveraine (Étalab / DINUM). Serveurs de l'État français.</div>
+    </div>
+    <div class="infra-item">
+      <div class="infra-role">Stockage des données</div>
+      <div class="infra-name">Nuage national</div>
+      <div class="infra-desc">apps.education.fr — conversations et configs stockées sur le Nuage de l'EN.</div>
+    </div>
+    <div class="infra-item">
+      <div class="infra-role">Orchestration des flux</div>
+      <div class="infra-name">n8n incubateur</div>
+      <div class="infra-desc">n8n.incubateur.education.gouv.fr — automatisation hébergée par l'EN.</div>
+    </div>
+    <div class="infra-item">
+      <div class="infra-role">Interface & déploiement</div>
+      <div class="infra-name">Forge des Communs</div>
+      <div class="infra-desc">forge.aeif.fr — GitLab EN. Code open source, déploiement automatique.</div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARAISON -->
+<div class="section">
+  <div class="section-title">Positionnement — entre deux outils existants</div>
+  <div class="compar">
+    <div class="compar-item">
+      <div class="compar-tool">ChatMD</div>
+      <div class="compar-desc">Bot configurable via fichier Markdown. Très simple mais peu souple, pas de suivi en temps réel.</div>
+    </div>
+    <div class="compar-item highlight">
+      <div class="compar-tool">✦ Mentoria</div>
+      <div class="compar-desc">Entre les deux : formulaire guidé, suivi prof en direct, infrastructure 100 % EN, modération possible.</div>
+    </div>
+    <div class="compar-item">
+      <div class="compar-tool">Mizou</div>
+      <div class="compar-desc">Outil généraliste puissant, mais hébergé hors EN, moins ancré dans les usages pédagogiques français.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RGPD -->
+<div class="section">
+  <div class="section-title">Garanties RGPD</div>
+  <div class="rgpd-list">
+    <span class="rgpd-tag">✓ Pseudonyme libre pour les élèves</span>
+    <span class="rgpd-tag">✓ Aucun compte élève requis</span>
+    <span class="rgpd-tag">✓ Conversations stockées sur Nuage national</span>
+    <span class="rgpd-tag">✓ Effacement immédiat possible par le prof</span>
+    <span class="rgpd-tag">✓ IA hébergée sur serveurs de l'État</span>
+    <span class="rgpd-tag">✓ Orchestration via infra Éducation Nationale</span>
+  </div>
+</div>
+
+<div class="footer">Mentoria — Prototype pédagogique — Académie de Corse — 2025-2026 · Code source : forge.aeif.fr</div>
+
+</body>
+</html>

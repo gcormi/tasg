@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche Experia — Flux d'information</title>
+<style>
+@page { size: A4 portrait; margin: 18mm 16mm; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 10pt;
+  color: #1e293b;
+  background: #fff;
+  line-height: 1.5;
+  max-width: 178mm;
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #2563eb 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.icon { font-size: 2rem; line-height: 1; padding-top: 2px; }
+.header h1 { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em; }
+.header .sub { font-size: 0.82rem; opacity: 0.88; margin-top: 3px; }
+.badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.badge {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.32);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+/* SECTIONS */
+.section {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 13px 15px;
+  margin-bottom: 12px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.section-title {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #4f46e5;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #ede9fe;
+}
+
+/* FLUX */
+.phases { display: flex; flex-direction: column; gap: 0; }
+.phase { padding: 8px 0; }
+.phase + .phase { border-top: 1px dashed #e2e8f0; }
+.phase-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 7px;
+}
+.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+.flow + .flow { margin-left: 18px; }
+
+.node {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.node.prof   { background: #ede9fe; color: #4338ca; }
+.node.eleve  { background: #dcfce7; color: #15803d; }
+.node.sys    { background: #e0f2fe; color: #0369a1; }
+.node.ia     { background: #fef9c3; color: #92400e; }
+.node.store  { background: #f1f5f9; color: #475569; }
+
+.arr { color: #94a3b8; font-weight: 700; font-size: 0.9rem; }
+.desc { font-size: 0.76rem; color: #475569; }
+.desc strong { color: #1e293b; }
+
+/* INFRA */
+.infra-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.infra-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+.infra-role {
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #4f46e5;
+  margin-bottom: 2px;
+}
+.infra-name { font-size: 0.8rem; font-weight: 800; color: #1e293b; margin-bottom: 3px; }
+.infra-desc { font-size: 0.7rem; color: #64748b; line-height: 1.45; }
+
+/* RGPD */
+.rgpd-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.rgpd-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+/* FOOTER */
+.footer {
+  text-align: right;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media screen {
+  body { background: #f8fafc; padding: 20px; }
+  body > * { background: #fff; }
+}
+@media print {
+  body { background: #fff; padding: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="icon">⚡</div>
+  <div>
+    <h1>Experia</h1>
+    <div class="sub">Outil d'évaluation formative enrichi par l'IA — fiche de fonctionnement</div>
+    <div class="badges">
+      <span class="badge">🇫🇷 Albert API — IA souveraine</span>
+      <span class="badge">☁️ Cloudflare Workers (Europe, RGPD)</span>
+      <span class="badge">🏫 Forge des Communs Numériques</span>
+      <span class="badge">📱 Zéro installation élève</span>
+    </div>
+  </div>
+</div>
+
+<!-- FLUX -->
+<div class="section">
+  <div class="section-title">Circuit des données — qui fait quoi, où va l'information</div>
+  <div class="phases">
+
+    <div class="phase">
+      <div class="phase-title">① Création de la séance — côté professeur</div>
+      <div class="flow">
+        <span class="node prof">👨‍🏫 Professeur</span>
+        <span class="arr">→</span>
+        <span class="desc">saisit un thème, un niveau ou colle une leçon dans l'interface Experia</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node sys">⚙️ Worker Cloudflare</span>
+        <span class="arr">→</span>
+        <span class="node ia">🤖 Albert API (Étalab)</span>
+        <span class="arr">→</span>
+        <span class="desc"><strong>génère les activités</strong> : QCM, mots croisés, phrases à trous, mots mêlés…</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node store">💾 Cloudflare KV</span>
+        <span class="arr">→</span>
+        <span class="desc">la session est <strong>stockée</strong> + un <strong>lien unique</strong> est généré pour les élèves</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-title">② Activité élève — en classe ou à distance</div>
+      <div class="flow">
+        <span class="node eleve">🎓 Élève</span>
+        <span class="arr">→</span>
+        <span class="desc">ouvre le lien dans son navigateur (tablette, téléphone, PC) — <strong>sans compte, sans installation</strong></span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="desc">choisit un pseudonyme libre → accède aux activités → répond</span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node sys">⚙️ Worker Cloudflare</span>
+        <span class="arr">→</span>
+        <span class="node ia">🤖 Albert API</span>
+        <span class="arr">→</span>
+        <span class="desc">corrige la réponse et <strong>génère un feedback personnalisé</strong></span>
+      </div>
+      <div class="flow">
+        <span class="arr">↓</span>
+        <span class="node eleve">🎓 Élève</span>
+        <span class="arr">←</span>
+        <span class="desc">reçoit le feedback <strong>immédiatement</strong> dans son navigateur — résultats enregistrés dans KV</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-title">③ Suivi en temps réel — côté professeur</div>
+      <div class="flow">
+        <span class="node store">💾 Cloudflare KV</span>
+        <span class="arr">→</span>
+        <span class="node sys">⚙️ Worker</span>
+        <span class="arr">→</span>
+        <span class="node prof">👨‍🏫 Professeur</span>
+        <span class="arr">←</span>
+        <span class="desc">voit les résultats <strong>en direct</strong>, peut réactiver une activité, télécharger la correction (.doc)</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INFRA -->
+<div class="section">
+  <div class="section-title">Infrastructures mobilisées</div>
+  <div class="infra-grid">
+    <div class="infra-item">
+      <div class="infra-role">IA — génération & correction</div>
+      <div class="infra-name">Albert API</div>
+      <div class="infra-desc">IA souveraine française (Étalab / DINUM). Les échanges restent sur les serveurs de l'État français.</div>
+    </div>
+    <div class="infra-item">
+      <div class="infra-role">Proxy & stockage des sessions</div>
+      <div class="infra-name">Cloudflare Workers + KV</div>
+      <div class="infra-desc">Accord DPA RGPD en place. Données localisables en Europe. Effacement possible à tout moment.</div>
+    </div>
+    <div class="infra-item">
+      <div class="infra-role">Hébergement de l'interface</div>
+      <div class="infra-name">Forge des Communs</div>
+      <div class="infra-desc">forge.aeif.fr — GitLab de l'Éducation Nationale. Déploiement automatique, code open source.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RGPD -->
+<div class="section">
+  <div class="section-title">Garanties RGPD</div>
+  <div class="rgpd-list">
+    <span class="rgpd-tag">✓ Pseudonyme libre pour les élèves</span>
+    <span class="rgpd-tag">✓ Aucun compte élève requis</span>
+    <span class="rgpd-tag">✓ Aucune donnée personnelle collectée</span>
+    <span class="rgpd-tag">✓ Sessions effaçables par le professeur</span>
+    <span class="rgpd-tag">✓ IA hébergée sur serveurs de l'État</span>
+    <span class="rgpd-tag">✓ Aucun service commercial non encadré</span>
+  </div>
+</div>
+
+<div class="footer">Experia — Prototype pédagogique — Académie de Corse — 2025-2026 · Code source : forge.aeif.fr</div>
+
+</body>
+</html>
