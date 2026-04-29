@@ -94,7 +94,7 @@
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
-          <div><p class="font-semibold text-slate-700">Création de session</p><p class="text-slate-400">Titre, saisie corpus texte libre, upload fichier TXT/PDF, configuration du nombre de questions par activité, choix modèle Albert</p></div>
+          <div><p class="font-semibold text-slate-700">Création de session</p><p class="text-slate-400">Titre, saisie corpus texte libre, upload fichier TXT/PDF, configuration du nombre de questions par activité, choix modèle Albert. Compatible avec la transcription d'une vidéo YouTube (copier-coller depuis YouTube → Afficher la transcription).</p></div>
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
@@ -110,7 +110,19 @@
         </div>
         <div class="item">
           <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
-          <div><p class="font-semibold text-slate-700">Tableau de résultats (Live)</p><p class="text-slate-400">Lecture de tous les <code>result_*.json</code>, **Auto-polling (30s)**, indicateur de rendu définitif (submitted), affichage des points réels sur barème</p></div>
+          <div><p class="font-semibold text-slate-700">Tableau de résultats (Live)</p><p class="text-slate-400">Lecture de tous les <code>result_*.json</code>, auto-polling (30 s), indicateur de rendu définitif (submitted), affichage des points réels sur barème.</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Sélection des activités par cartes</p><p class="text-slate-400">Interface redessinée en grille 2 colonnes — chaque carte est entièrement cliquable pour activer/désactiver l'activité. Le champ nombre de questions reste éditable sans déclencher le toggle.</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Écran de validation avant publication</p><p class="text-slate-400">Après génération, le prof visualise toutes les questions, peut en supprimer individuellement, ajuster le barème par activité, puis publier le lien élève en connaissance de cause.</p></div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-done"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+          <div><p class="font-semibold text-slate-700">Export évaluation papier (Word)</p><p class="text-slate-400">Bouton "Évaluation papier" dans l'écran de session — génère un document Word (.doc) avec les questions formatées et un tableau de correction prêt à imprimer.</p></div>
         </div>
       </div>
 
@@ -216,15 +228,22 @@
         <div class="item">
           <div class="item-icon icon-todo"><i data-lucide="circle" class="w-3.5 h-3.5 text-slate-400"></i></div>
           <div>
-            <p class="font-semibold text-slate-700">Export CSV des résultats</p>
-            <p class="text-slate-400">Bouton "Exporter" dans le tableau résultats → téléchargement d'un fichier CSV avec nom élève, scores par activité, total, date. Utile pour import dans un carnet de notes.</p>
+            <p class="font-semibold text-slate-700">Export résultats de classe <span class="pill-todo ml-2">Priorité haute</span></p>
+            <p class="text-slate-400">Vue synthétique de la classe téléchargeable (CSV ou Word) : nom élève, scores par activité, total, date de rendu, participation. Utile pour la trace pédagogique et l'import dans un carnet de notes.</p>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon icon-todo"><i data-lucide="circle" class="w-3.5 h-3.5 text-slate-400"></i></div>
+          <div>
+            <p class="font-semibold text-slate-700">Banque de sessions <span class="pill-todo ml-2">Priorité haute</span></p>
+            <p class="text-slate-400">Sauvegarder une configuration (corpus + activités sélectionnées + barème) pour la réutiliser ou la partager avec un collègue. Évite de repartir de zéro pour une session similaire ou pour une autre classe.</p>
           </div>
         </div>
         <div class="item">
           <div class="item-icon icon-todo"><i data-lucide="circle" class="w-3.5 h-3.5 text-slate-400"></i></div>
           <div>
             <p class="font-semibold text-slate-700">QR code du lien élève</p>
-            <p class="text-slate-400">Générer un QR code directement dans l'interface prof pour partager le lien par projection vidéoprojecteur. Librairie légère type <code>qrcode.js</code>.</p>
+            <p class="text-slate-400">Générer un QR code directement dans l'interface prof — à projeter au tableau ou à scanner depuis un smartphone. Permet aux élèves de rejoindre la session depuis leur téléphone (QCM, appariement, texte à trous). Un avertissement s'affiche si la session contient des mots mêlés ou mots croisés, peu adaptés au petit écran.</p>
           </div>
         </div>
         <div class="item">
@@ -246,13 +265,6 @@
           <div>
             <p class="font-semibold text-slate-700">Suppression de session</p>
             <p class="text-slate-400">Bouton "Supprimer" dans le tableau de bord prof → supprime le fichier session + tous les fichiers résultats associés sur le Nuage.</p>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-icon icon-todo"><i data-lucide="circle" class="w-3.5 h-3.5 text-slate-400"></i></div>
-          <div>
-            <p class="font-semibold text-slate-700">Prévisualisation de la session avant partage</p>
-            <p class="text-slate-400">Permettre au prof de voir les questions générées avant d'envoyer le lien aux élèves, avec possibilité de régénérer une activité si le résultat est insatisfaisant.</p>
           </div>
         </div>
         <div class="item">
@@ -336,20 +348,20 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
         <div class="bg-white/10 rounded-2xl p-4 text-center">
-          <p class="text-4xl font-black text-white">95%</p>
-          <p class="text-indigo-200 text-sm font-medium mt-1">des fonctionnalités v1.0 codées</p>
+          <p class="text-4xl font-black text-white">v1.1</p>
+          <p class="text-indigo-200 text-sm font-medium mt-1">en production — usage classe possible</p>
         </div>
         <div class="bg-white/10 rounded-2xl p-4 text-center">
           <p class="text-4xl font-black text-white">8/8</p>
           <p class="text-indigo-200 text-sm font-medium mt-1">activités élève implémentées</p>
         </div>
         <div class="bg-white/10 rounded-2xl p-4 text-center">
-          <p class="text-4xl font-black text-white">0</p>
-          <p class="text-indigo-200 text-sm font-medium mt-1">bloqueur restant</p>
+          <p class="text-4xl font-black text-white">2</p>
+          <p class="text-indigo-200 text-sm font-medium mt-1">priorités hautes à venir (export + banque)</p>
         </div>
       </div>
 
-      <p class="text-indigo-100 text-sm mt-5">L'application est mature et prête pour un usage en classe. Les 8 activités sont fonctionnelles, le système de rendu et de reprise est robuste, et le tableau de bord professeur permet un suivi en temps réel grâce à l'auto-polling. La v1.1 marque le passage au statut de production.</p>
+      <p class="text-indigo-100 text-sm mt-5">L'application est stable et utilisable en classe. Les 8 activités sont fonctionnelles, le prof peut valider les questions avant publication, exporter une évaluation papier, et suivre les résultats en temps réel. Les prochaines priorités sont l'export de résultats de classe et la banque de sessions réutilisables.</p>
     </div>
 
   </div>
