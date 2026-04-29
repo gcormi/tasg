@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <script>
+        // Accès admin uniquement — ni invités ni accès direct
+        if (localStorage.getItem('portal_unlocked') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bloc-note | Portail Éducatif</title>
@@ -458,6 +464,7 @@ let isLoading = false;
 let saveTimer = null;
 let profId = null;
 let profSecret = null;
+let _hasUnsaved = false; // true dès qu'une frappe est en attente de sauvegarde
 
 // ── Sync status ───────────────────────────────────────────────────────────────
 function setSyncStatus(status, label) {
@@ -647,6 +654,7 @@ function renderEditor() {
 
     quill.on('text-change', () => {
         if (isLoading) return;
+        _hasUnsaved = true;
         setSyncStatus('saving', 'Sauvegarde...');
         clearTimeout(saveTimer);
         saveTimer = setTimeout(() => saveCurrentNote(), 1200);
@@ -666,6 +674,7 @@ async function saveCurrentNote() {
     note.content = content;
     try {
         await workerCall({ action: 'writeNote', note: { ...note, content } });
+        _hasUnsaved = false;
         setSyncStatus('saved', 'Synchronisé');
     } catch(e) {
         setSyncStatus('error', 'Erreur sauvegarde');
@@ -819,6 +828,7 @@ async function handlePaste(e) {
                 quill.insertEmbed(range.index, 'image', dataUrl);
                 quill.setSelection(range.index + 1);
                 showPasteToast('✅ Image insérée !');
+                _hasUnsaved = true;
                 clearTimeout(saveTimer);
                 saveTimer = setTimeout(() => saveCurrentNote(), 800);
             } catch(err) {
@@ -871,6 +881,21 @@ document.getElementById('login-secret').addEventListener('keydown', e => {
 });
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeRenameModal(); closeColorModal(); }
+});
+
+// ── Protection fermeture accidentelle ─────────────────────────────────────────
+window.addEventListener('beforeunload', function(e) {
+    // Avertir si connecté ET sauvegarde en attente ou en cours
+    if (!profId) return;
+    if (_hasUnsaved || saveTimer !== null) {
+        e.preventDefault();
+        e.returnValue = 'Votre bloc-note contient des modifications non encore sauvegardées. Voulez-vous vraiment quitter ?';
+        return e.returnValue;
+    }
+    // Même sans modification en cours : demander confirmation car carnet sensible
+    e.preventDefault();
+    e.returnValue = 'Voulez-vous vraiment quitter votre bloc-note ?';
+    return e.returnValue;
 });
 
 // ── Auto-login depuis localStorage ────────────────────────────────────────────
