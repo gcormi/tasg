@@ -1710,9 +1710,14 @@
     async function loadSuiviConversation(sid) {
         const convEl = document.getElementById('suivi-conversation');
         const header = document.getElementById('suivi-conv-header');
-        document.getElementById('suivi-eval-panel').classList.add('hidden');
-        header.classList.remove('hidden');
-        document.getElementById('suivi-conv-name').textContent = sid;
+        const evalPanel = document.getElementById('suivi-eval-panel');
+        if (evalPanel) evalPanel.classList.add('hidden');
+        if (header) {
+            header.classList.remove('hidden');
+            header.style.display = 'flex';
+        }
+        const nameEl = document.getElementById('suivi-conv-name');
+        if (nameEl) nameEl.textContent = sid;
         if (window.lucide) lucide.createIcons();
         convEl.innerHTML = '<p class="text-xs text-gray-400 text-center">Chargement…</p>';
         const data = await callNuageSuivi('get_student_log', { studentId: sid });
