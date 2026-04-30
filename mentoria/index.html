@@ -1662,7 +1662,7 @@
             const lastTs = new Date(s.lastActivity || 0).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
             const firstTs = s.firstActivity ? new Date(s.firstActivity).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : lastTs;
             const count = s.messageCount || s.msgCount || 0;
-            const preview = s.lastMessage ? s.lastMessage.slice(0, 60) + (s.lastMessage.length > 60 ? '…' : '') : '';
+            const preview = s.lastMessage ? s.lastMessage.replace(/\*\*/g,'').replace(/\*/g,'').slice(0, 60) + (s.lastMessage.length > 60 ? '…' : '') : '';
             const isSelected = sid === suiviSelectedStudent;
             const roleIcon = s.lastRole === 'assistant' ? '🤖' : '🧑';
             return `<div onclick="selectSuiviStudent('${sid}')" class="px-4 py-3 cursor-pointer hover:bg-indigo-50 transition-colors border-b border-gray-50 ${isSelected ? 'bg-indigo-50 border-l-2 border-indigo-500' : 'border-l-2 border-transparent'}">
