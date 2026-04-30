@@ -1568,6 +1568,8 @@
         // Mémoriser le groupe dans localStorage pour le suivi
         const groupsKey = 'mentoria_groups_' + currentBotId;
         const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
+        const existingIdx = groups.findIndex(g => g.classKey === classKey);
+        if (existingIdx >= 0) groups.splice(existingIdx, 1);
         groups.unshift({ classKey, date: new Date().toLocaleDateString('fr-FR'), link });
         if (groups.length > 20) groups.pop();
         localStorage.setItem(groupsKey, JSON.stringify(groups));
