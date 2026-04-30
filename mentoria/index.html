@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentoria — Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1343,9 +1345,11 @@
                     const bot = await readBotFile(filename);
                     if (bot && bot.id) {
                         library[bot.id] = bot;
-                        // Restaurer les groupes publiés dans localStorage (multi-poste)
+                        // Restaurer les groupes publiés dans localStorage (multi-poste, dédoublonnés)
                         if (bot.publishedGroups?.length) {
-                            localStorage.setItem('mentoria_groups_' + bot.id, JSON.stringify(bot.publishedGroups));
+                            const seen = new Set();
+                            const deduped = bot.publishedGroups.filter(g => seen.has(g.classKey) ? false : seen.add(g.classKey));
+                            localStorage.setItem('mentoria_groups_' + bot.id, JSON.stringify(deduped));
                         }
                     } else missing++;
                 } catch { missing++; }
@@ -1567,11 +1571,8 @@
         const link = base + 'compagnion.html#config=' + encoded;
         // Mémoriser le groupe dans localStorage pour le suivi
         const groupsKey = 'mentoria_groups_' + currentBotId;
-        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]');
-        const existingIdx = groups.findIndex(g => g.classKey === classKey);
-        if (existingIdx >= 0) groups.splice(existingIdx, 1);
+        const groups = JSON.parse(localStorage.getItem(groupsKey) || '[]').filter(g => g.classKey !== classKey);
         groups.unshift({ classKey, date: new Date().toLocaleDateString('fr-FR'), link });
-        if (groups.length > 20) groups.pop();
         localStorage.setItem(groupsKey, JSON.stringify(groups));
         // Persister les groupes dans le fichier bot sur Nuage (multi-poste)
         if (storageMode && library[currentBotId]) {
