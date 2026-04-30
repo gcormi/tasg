@@ -1341,8 +1341,13 @@
             for (const filename of files) {
                 try {
                     const bot = await readBotFile(filename);
-                    if (bot && bot.id) library[bot.id] = bot;
-                    else missing++;
+                    if (bot && bot.id) {
+                        library[bot.id] = bot;
+                        // Restaurer les groupes publiés dans localStorage (multi-poste)
+                        if (bot.publishedGroups?.length) {
+                            localStorage.setItem('mentoria_groups_' + bot.id, JSON.stringify(bot.publishedGroups));
+                        }
+                    } else missing++;
                 } catch { missing++; }
             }
             if (missing > 0) showToast('⚠️ Fichiers introuvables', `${missing} bot(s) référencé(s) dans le manifest mais absent(s) du Nuage — ignoré(s).`);
@@ -1566,6 +1571,12 @@
         groups.unshift({ classKey, date: new Date().toLocaleDateString('fr-FR'), link });
         if (groups.length > 20) groups.pop();
         localStorage.setItem(groupsKey, JSON.stringify(groups));
+        // Persister les groupes dans le fichier bot sur Nuage (multi-poste)
+        if (storageMode && library[currentBotId]) {
+            library[currentBotId].publishedGroups = groups;
+            const allFilenames = Object.keys(library).map(id => id + '.json');
+            writeBotFile(currentBotId + '.json', library[currentBotId], allFilenames).catch(() => {});
+        }
         document.getElementById('share-link').value = link;
         document.getElementById('share-link-section').classList.remove('hidden');
         // Jauge de poids du lien
