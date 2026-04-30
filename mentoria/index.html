@@ -1071,7 +1071,7 @@
      MODAL SUIVI DE CLASSE
 ══════════════════════════════════════ -->
 <div id="suivi-modal" class="hidden fixed inset-0 z-[120]" style="background:rgba(15,23,42,0.5)">
-    <div id="suivi-window" class="bg-white rounded-xl shadow-2xl border border-gray-100 absolute" style="display:flex;flex-direction:column;width:680px;height:80vh;min-width:400px;min-height:300px;resize:both;overflow:auto;top:50%;left:50%;transform:translate(-50%,-50%)">
+    <div id="suivi-window" class="bg-white rounded-xl shadow-2xl border border-gray-100 absolute" style="display:flex;flex-direction:column;width:820px;height:80vh;min-width:500px;min-height:300px;resize:both;overflow:auto;top:50%;left:50%;transform:translate(-50%,-50%)">
         <div class="h-1 flex-none rounded-tl-xl rounded-tr-xl" style="background:linear-gradient(90deg,#6366f1,var(--teal))"></div>
         <div id="suivi-drag-handle" class="flex justify-between items-center p-5 border-b border-gray-100 flex-none cursor-move select-none">
             <div>
@@ -1079,7 +1079,7 @@
                     <i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Suivi de classe
                     <span id="suivi-bot-name" class="text-gray-400 font-normal"></span>
                 </h3>
-                <p class="text-xs text-gray-400 mt-0.5">Conversations des élèves — actualisation toutes les 30 s</p>
+                <p class="text-xs text-gray-400 mt-0.5">Conversations des élèves — actualisation toutes les 5 min</p>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="refreshSuivi()" title="Actualiser" class="text-gray-400 hover:text-indigo-500 transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
@@ -1094,16 +1094,39 @@
                 <i data-lucide="link" class="w-3 h-3 inline-block mr-1"></i>Copier lien
             </button>
         </div>
-        <!-- LISTE ÉLÈVES -->
-        <div id="suivi-student-list" class="flex-none border-b border-gray-100 overflow-y-auto" style="max-height:200px">
-            <div class="p-4 text-xs text-gray-400 text-center">Chargement…</div>
-        </div>
-        <!-- CONVERSATION SÉLECTIONNÉE -->
-        <div id="suivi-conversation" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
-            <p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>
+        <!-- CORPS PRINCIPAL GAUCHE/DROITE -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- LISTE ÉLÈVES (gauche) -->
+            <div id="suivi-student-list" class="flex-none border-r border-gray-100 overflow-y-auto bg-white" style="width:230px">
+                <div class="p-4 text-xs text-gray-400 text-center">Chargement…</div>
+            </div>
+            <!-- COLONNE DROITE -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <!-- En-tête conversation avec bouton Évaluer -->
+                <div id="suivi-conv-header" class="hidden flex-none px-4 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-800" id="suivi-conv-name">—</span>
+                    <button onclick="evaluateSuiviConversation()" class="text-xs px-2.5 py-1 rounded-lg border border-indigo-200 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center gap-1">
+                        <i data-lucide="bar-chart-2" class="w-3 h-3"></i> Évaluer
+                    </button>
+                </div>
+                <!-- Conversation messages -->
+                <div id="suivi-conversation" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
+                    <p class="text-xs text-gray-400 text-center mt-8">Cliquez sur un élève pour voir sa conversation.</p>
+                </div>
+                <!-- Panneau d'évaluation Albert -->
+                <div id="suivi-eval-panel" class="hidden flex-none border-t-2 border-indigo-100 bg-white overflow-y-auto" style="max-height:260px">
+                    <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100 sticky top-0 bg-white z-10">
+                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-3 h-3"></i> Évaluation Albert — indicative
+                        </span>
+                        <button onclick="document.getElementById('suivi-eval-panel').classList.add('hidden')" class="text-gray-300 hover:text-gray-500 text-lg leading-none">&times;</button>
+                    </div>
+                    <div id="suivi-eval-content" class="p-4"></div>
+                </div>
+            </div>
         </div>
         <!-- FOOTER -->
-        <div class="p-4 border-t border-gray-100 flex items-center justify-between flex-none">
+        <div class="p-3 border-t border-gray-100 flex items-center justify-between flex-none">
             <button onclick="deleteAllLogs()" class="btn btn-ghost text-xs text-red-400 hover:text-red-600">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Supprimer tous les logs
             </button>
@@ -1609,7 +1632,7 @@
         suiviSelectedStudent = null;
         await refreshSuivi();
         clearInterval(window._suiviInterval);
-        window._suiviInterval = setInterval(refreshSuivi, 30000);
+        window._suiviInterval = setInterval(refreshSuivi, 300000);
     };
 
     window.refreshSuivi = async () => {
@@ -1673,6 +1696,11 @@
 
     async function loadSuiviConversation(sid) {
         const convEl = document.getElementById('suivi-conversation');
+        const header = document.getElementById('suivi-conv-header');
+        document.getElementById('suivi-eval-panel').classList.add('hidden');
+        header.classList.remove('hidden');
+        document.getElementById('suivi-conv-name').textContent = sid;
+        if (window.lucide) lucide.createIcons();
         convEl.innerHTML = '<p class="text-xs text-gray-400 text-center">Chargement…</p>';
         const data = await callNuageSuivi('get_student_log', { studentId: sid });
         const log = data?.log || [];
@@ -1683,12 +1711,17 @@
         convEl.innerHTML = log.map(entry => {
             const isUser = entry.role === 'user';
             const ts = new Date(entry.ts).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            const text = entry.text
+                .replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]))
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
             return `<div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
                 <div class="max-w-[80%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${isUser ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-700'}">
                     <div class="flex items-center gap-2 mb-1 ${isUser ? 'justify-end' : ''}">
                         <span class="text-[9px] opacity-60">${isUser ? sid : 'Bot'} · ${ts}</span>
                     </div>
-                    ${entry.text.replace(/[&<>'\"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t])).replace(/\n/g, '<br>')}
+                    ${text}
                 </div>
             </div>`;
         }).join('');
@@ -1702,6 +1735,52 @@
         suiviSelectedStudent = null;
         document.getElementById('suivi-conversation').innerHTML = '<p class="text-xs text-gray-400 text-center mt-8">Élève expulsé.</p>';
         await refreshSuivi();
+    };
+
+    window.evaluateSuiviConversation = async () => {
+        if (!suiviSelectedStudent || !currentBotId) return;
+        const bot = library[currentBotId];
+        if (!bot?.apiKey) { showToast('⚠️ Config manquante', 'Clé API absente dans la config du bot.'); return; }
+        const data = await callNuageSuivi('get_student_log', { studentId: suiviSelectedStudent });
+        const log = data?.log || [];
+        if (log.filter(e => e.role === 'user').length < 2) { showToast('⚠️ Trop court', 'Conversation trop courte (min. 2 messages élève).'); return; }
+        const panel = document.getElementById('suivi-eval-panel');
+        panel.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+        document.getElementById('suivi-eval-content').innerHTML = `
+            <div class="flex items-center gap-2 text-gray-400 text-xs py-4">
+                <div class="w-3.5 h-3.5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin flex-none"></div>
+                Albert analyse la conversation de ${suiviSelectedStudent}…
+            </div>`;
+        const convText = log.map(e => `[${e.role === 'user' ? suiviSelectedStudent : 'Bot'}] ${e.text}`).join('\n');
+        const apiUrl = bot.proxyUrl || 'https://albert.api.gouv.fr/v1/chat/completions';
+        const prompt = `Tu es un évaluateur pédagogique. Analyse cette conversation entre un élève et un assistant pédagogique IA, et évalue l'élève sur 5 critères (chacun sur 2 points, total sur 10).\n\nCritères :\n1. Effort de rédaction et orthographe (/2)\n2. Pertinence des questions posées (/2)\n3. Quantité d'interactions (/2)\n4. Relances et réponses aux défis du bot (/2)\n5. Progression dans la conversation (/2)\n\nNotes possibles : 0, 0.5, 1, 1.5 ou 2.\n\nRéponds UNIQUEMENT en JSON valide sans markdown :\n{"criteres":[{"nom":"Effort de rédaction et orthographe","note":0,"commentaire":""},{"nom":"Pertinence des questions posées","note":0,"commentaire":""},{"nom":"Quantité d'interactions","note":0,"commentaire":""},{"nom":"Relances et réponses aux défis du bot","note":0,"commentaire":""},{"nom":"Progression dans la conversation","note":0,"commentaire":""}],"total":0,"appreciation":""}\n\nConversation :\n${convText}`;
+        try {
+            const res = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${bot.apiKey}` },
+                body: JSON.stringify({ model: bot.model || 'openweight-medium', messages: [{ role: 'system', content: 'Tu es un évaluateur pédagogique expert. Réponds UNIQUEMENT en JSON valide, sans balises markdown.' }, { role: 'user', content: prompt }], max_tokens: 900, temperature: 0.2 })
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            const raw = (json.choices?.[0]?.message?.content || '').replace(/```json/gi,'').replace(/```/g,'').trim();
+            const match = raw.match(/\{[\s\S]*\}/);
+            if (!match) throw new Error('Réponse non JSON');
+            const ev = JSON.parse(match[0]);
+            const total = ev.total ?? ev.criteres.reduce((s,c) => s + (c.note||0), 0);
+            document.getElementById('suivi-eval-content').innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-gray-600">${suiviSelectedStudent}</span>
+                    <span class="text-2xl font-black text-indigo-600">${total}<span class="text-sm font-bold text-gray-400"> / 10</span></span>
+                </div>
+                <div class="space-y-2 mb-3">
+                    ${ev.criteres.map(c => `<div class="bg-slate-50 rounded-lg px-3 py-2"><div class="flex justify-between items-center mb-0.5"><span class="text-[11px] font-bold text-gray-700">${c.nom}</span><span class="text-[11px] font-black ${c.note >= 1.5 ? 'text-emerald-600' : c.note >= 1 ? 'text-amber-500' : 'text-red-400'}">${c.note}/2</span></div><p class="text-[10px] text-gray-400 leading-snug">${c.commentaire}</p></div>`).join('')}
+                </div>
+                ${ev.appreciation ? `<div class="bg-indigo-50 rounded-lg px-3 py-2 text-[10px] text-indigo-700 italic mb-2">${ev.appreciation}</div>` : ''}
+                <p class="text-[9px] text-gray-300">Évaluation automatique indicative — la note finale reste à la discrétion du professeur.</p>`;
+        } catch(e) {
+            document.getElementById('suivi-eval-content').innerHTML = `<p class="text-xs text-red-500 py-2">Erreur : ${e.message}</p>`;
+        }
     };
 
     window.deleteAllLogs = async () => {
